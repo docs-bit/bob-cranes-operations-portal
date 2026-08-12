@@ -21,3 +21,10 @@
 ## Attendance persistence fix
 - [x] Persist the selected attendance date in Home state so it survives navigation within the dashboard session.
 - [x] Save a new checkpoint after the date-persistence fix.
+
+## Department Excel upload center
+- [x] Add a dedicated Data Upload Center entry to the dashboard navigation.
+- [x] Add one Excel upload card for each operating department with accepted .xlsx/.xls file types.
+- [x] Show upload status, file name, size, row count, last updated time, replace, and remove controls.
+- [x] Add a department-wide upload summary and responsive layout.
+- [x] Validate upload behavior, tests, and build; save a new checkpoint after final verification.

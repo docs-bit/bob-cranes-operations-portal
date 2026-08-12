@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { canDispatch as canDispatchByRule, departmentCompletion, documentCompletion, revisionReversionStage, revertBooking, transitionBooking, type DocumentItem } from "@shared/bookingRules";
 import { ATTENDANCE_STATUSES, attendanceCompletion, dateKey, defaultAttendanceRecord, formatAttendanceDate, historicalAttendanceRecord, shiftDate, summarizeAttendance, updateAttendance, type AttendanceRecord, type AttendanceStatus } from "@shared/attendanceRules";
+import DataUploadCenter, { type UploadMap } from "@/components/DataUploadCenter";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -47,7 +48,7 @@ type Stage =
   | "Reviewed"
   | "Dispatched";
 
-type View = "overview" | "bookings" | "wizard" | "docs" | "crew" | "gear" | "attendance" | "detail" | "department";
+type View = "overview" | "bookings" | "wizard" | "docs" | "crew" | "gear" | "attendance" | "uploads" | "detail" | "department";
 
 type Booking = {
   id: string;
@@ -168,6 +169,7 @@ function Shell({ children, view, setView, onClient, onDepartment, departmentLabe
     { id: "crew", label: "Crew Assignment", icon: <Users /> },
     { id: "gear", label: "Lifting Gears", icon: <Wrench /> },
     { id: "attendance", label: "Attendance", icon: <CalendarDays /> },
+    { id: "uploads", label: "Excel Data Uploads", icon: <FolderOpen /> },
   ];
   const departmentItems = ["Sales & Client Relations", "Documentation & Permits", "Lifting Gears / Engineering", "Maintenance", "Crew / Workmen Assignment", "HSE / Safety", "Accounts", "HR", "Transportation", "Administrator / Super Admin"];
   return <div className="app-shell">
@@ -177,7 +179,7 @@ function Shell({ children, view, setView, onClient, onDepartment, departmentLabe
       <div className="sidebar-footer"><div className="user-mini"><div className="avatar">NS</div><div className="user-copy"><div className="user-name">Nishanth Shetty</div><div className="user-role">Documentation Supervisor</div></div><ChevronDown size={14} color="#777" /></div></div>
     </aside>
     <main className="main-shell">
-      <header className="topbar"><div className="breadcrumb">BOB Cranes / <strong>{view === "overview" ? "Operations Cockpit" : view === "wizard" ? "New Booking" : view === "detail" ? "Booking Dossier" : view === "department" ? departmentLabel : view[0].toUpperCase() + view.slice(1)}</strong></div><div className="topbar-actions"><div className="search-pill"><Search size={14} /> Search dossiers <span style={{ marginLeft: "auto", color: "#555" }}>⌘ K</span></div><button className="icon-button" onClick={() => setNotifications((value) => !value)}><Bell size={16} />{notifications && <div style={{ position: "absolute", top: 54, right: 30, width: 300, background: "#191919", border: "1px solid #383838", borderRadius: 10, padding: 12, textAlign: "left", boxShadow: "0 20px 60px rgba(0,0,0,.45)" }}><div className="panel-title" style={{ marginBottom: 10 }}>Notifications <span className="status-badge red" style={{ float: "right" }}>6 new</span></div><div className="notification-stack"><div className="notification"><div className="title">Ready for dispatch</div><div className="body">BOB Booking-31390 is ready for Sales review.</div></div><div className="notification"><div className="title">Training flag raised</div><div className="body">Vijayakumar · renewal due in 16 days.</div></div></div></div>}</button><button className="icon-button"><MoreHorizontal size={17} /></button></div></header>
+      <header className="topbar"><div className="breadcrumb">BOB Cranes / <strong>{view === "overview" ? "Operations Cockpit" : view === "wizard" ? "New Booking" : view === "detail" ? "Booking Dossier" : view === "department" ? departmentLabel : view === "uploads" ? "Excel Data Uploads" : view[0].toUpperCase() + view.slice(1)}</strong></div><div className="topbar-actions"><div className="search-pill"><Search size={14} /> Search dossiers <span style={{ marginLeft: "auto", color: "#555" }}>⌘ K</span></div><button className="icon-button" onClick={() => setNotifications((value) => !value)}><Bell size={16} />{notifications && <div style={{ position: "absolute", top: 54, right: 30, width: 300, background: "#191919", border: "1px solid #383838", borderRadius: 10, padding: 12, textAlign: "left", boxShadow: "0 20px 60px rgba(0,0,0,.45)" }}><div className="panel-title" style={{ marginBottom: 10 }}>Notifications <span className="status-badge red" style={{ float: "right" }}>6 new</span></div><div className="notification-stack"><div className="notification"><div className="title">Ready for dispatch</div><div className="body">BOB Booking-31390 is ready for Sales review.</div></div><div className="notification"><div className="title">Training flag raised</div><div className="body">Vijayakumar · renewal due in 16 days.</div></div></div></div>}</button><button className="icon-button"><MoreHorizontal size={17} /></button></div></header>
       {children}
     </main>
   </div>;
@@ -326,11 +328,12 @@ function DepartmentView({ department, bookings, setDetail }: { department: strin
 
 export default function Home() {
   const [location, setLocation] = useLocation();
-  const [view, setView] = useState<View>("overview");
+  const [view, setView] = useState<View>(() => location === "/uploads" ? "uploads" : location === "/attendance" ? "attendance" : "overview");
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [uploadDocuments, setUploadDocuments] = useState<DocumentItem[]>(initialUploadDocuments);
   const [attendanceRecords, setAttendanceRecords] = useState<Record<string, AttendanceRecord>>({});
   const [selectedAttendanceDate, setSelectedAttendanceDate] = useState(() => dateKey(new Date()));
+  const [uploadRecords, setUploadRecords] = useState<UploadMap>({});
   const [activeBooking, setActiveBooking] = useState<Booking | null>(null);
   const [activeDepartment, setActiveDepartment] = useState<string | null>(null);
   const updateBooking = (nextBooking: Booking) => { setBookings((current) => current.map((item) => item.id === nextBooking.id ? nextBooking : item)); setActiveBooking(nextBooking); };
@@ -349,6 +352,7 @@ export default function Home() {
     {view === "crew" && <CrewView />}
     {view === "gear" && <GearView />}
     {view === "attendance" && <AttendanceView records={attendanceRecords} setRecords={setAttendanceRecords} selectedDate={selectedAttendanceDate} setSelectedDate={setSelectedAttendanceDate} />}
+    {view === "uploads" && <DataUploadCenter uploads={uploadRecords} setUploads={setUploadRecords} />}
     {view === "department" && activeDepartment && <DepartmentView department={activeDepartment} bookings={bookings} setDetail={openDetail} />}
     {view === "detail" && activeBooking && <BookingDetail booking={activeBooking} documents={uploadDocuments} onUpdate={updateBooking} onBack={() => { setActiveBooking(null); setView("overview"); }} />}
     <div style={{ color: "#555", fontSize: 10, textAlign: "right", padding: "10px 0 0" }}>System status: operational · {groupedCount} dossiers in view · v3.0</div>

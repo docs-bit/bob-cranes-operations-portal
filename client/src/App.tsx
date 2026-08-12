@@ -9,7 +9,9 @@ import Home from "./pages/Home";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path={"/"} component={Home} />
+      <Route path={"/uploads"} component={Home} />
+      <Route path={"/attendance"} component={Home} />
       <Route path="/client/:token" component={Home} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
