@@ -28,3 +28,10 @@
 - [x] Show upload status, file name, size, row count, last updated time, replace, and remove controls.
 - [x] Add a department-wide upload summary and responsive layout.
 - [x] Validate upload behavior, tests, and build; save a new checkpoint after final verification.
+
+## Data import mapping and department exports
+- [x] Add a visual source-column to required-system-field mapping step after workbook selection.
+- [x] Validate required mappings and confirm the import only when the mapping is complete.
+- [x] Add a downloadable Excel export action for every department dataset.
+- [x] Validate desktop/mobile interactions, tests, production build, import confirmation, and downloaded department export.
+- [ ] Save the verified data import-export checkpoint.
