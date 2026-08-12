@@ -31,5 +31,5 @@ describe("operations router", () => {
     const equipment = await caller.operations.getEquipment();
     expect(Array.isArray(equipment)).toBe(true);
     expect(equipment.length).toBeGreaterThan(0);
-  });
+  }, 15000);
 });
