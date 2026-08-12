@@ -76,4 +76,4 @@
 
 ## Final checkpoint hardening
 - [x] Add unit coverage for incomplete documents becoming 100% complete before All Docs Submitted.
-- [ ] Save the validated upload-state and dispatch-gate checkpoint.
+- [x] Save the validated upload-state and dispatch-gate checkpoint.
