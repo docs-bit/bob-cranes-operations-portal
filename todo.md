@@ -41,4 +41,4 @@
 - [x] Reuse compatible saved mappings automatically for future department uploads.
 - [x] Preserve the mapping review and block confirmation when source headers are missing or changed.
 - [x] Add tests and verify the UI flow; save the mapping-preferences checkpoint.
-- [ ] Save the verified mapping-preferences checkpoint.
+- [x] Save the verified mapping-preferences checkpoint.
