@@ -7,6 +7,22 @@ export type ImportField = {
 
 export type ColumnMapping = Record<string, string>;
 export type SpreadsheetRow = Record<string, unknown>;
+export type MappingPreference = {
+  departmentId: string;
+  mapping: ColumnMapping;
+  headerSignature: string;
+  savedAt: string;
+};
+
+export type MappingPreferenceMap = Record<string, MappingPreference>;
+
+export type PreferenceApplication = {
+  mapping: ColumnMapping;
+  matchedCount: number;
+  savedCount: number;
+  changedHeaders: string[];
+  fullyCompatible: boolean;
+};
 
 const field = (id: string, label: string, required: boolean, aliases: string[] = []): ImportField => ({ id, label, required, aliases });
 
@@ -101,6 +117,56 @@ export function autoMapColumns(fields: ImportField[], headers: string[]): Column
   });
 
   return mapped;
+}
+
+export function headerSignature(headers: string[]) {
+  return headers.map(normaliseHeader).filter(Boolean).sort().join("|");
+}
+
+export function createMappingPreference(departmentId: string, mapping: ColumnMapping, headers: string[]): MappingPreference {
+  return {
+    departmentId,
+    mapping,
+    headerSignature: headerSignature(headers),
+    savedAt: new Date().toISOString(),
+  };
+}
+
+export function applyMappingPreference(fields: ImportField[], headers: string[], preference?: MappingPreference): PreferenceApplication {
+  const automaticMapping = autoMapColumns(fields, headers);
+  if (!preference) {
+    return { mapping: automaticMapping, matchedCount: 0, savedCount: 0, changedHeaders: [], fullyCompatible: false };
+  }
+
+  const validFieldIds = new Set(fields.map((field) => field.id));
+  const preferredEntries = Object.entries(preference.mapping).filter(([fieldId]) => validFieldIds.has(fieldId));
+  const savedCount = preferredEntries.length;
+  const preferredMapping: ColumnMapping = {};
+  const usedHeaders = new Set<string>();
+  const changedHeaders: string[] = [];
+
+  preferredEntries.forEach(([fieldId, savedHeader]) => {
+    const matchedHeader = headers.find((header) => normaliseHeader(header) === normaliseHeader(savedHeader) && !usedHeaders.has(header));
+    if (matchedHeader) {
+      preferredMapping[fieldId] = matchedHeader;
+      usedHeaders.add(matchedHeader);
+    } else {
+      changedHeaders.push(savedHeader);
+    }
+  });
+
+  const mapping: ColumnMapping = { ...preferredMapping };
+  const consumedHeaders = new Set(Object.values(preferredMapping));
+  fields.forEach((field) => {
+    const fallbackHeader = automaticMapping[field.id];
+    if (!mapping[field.id] && fallbackHeader && !consumedHeaders.has(fallbackHeader)) {
+      mapping[field.id] = fallbackHeader;
+      consumedHeaders.add(fallbackHeader);
+    }
+  });
+
+  const fullyCompatible = savedCount > 0 && changedHeaders.length === 0 && missingRequiredFields(fields, mapping).length === 0;
+  return { mapping, matchedCount: Object.keys(preferredMapping).length, savedCount, changedHeaders, fullyCompatible };
 }
 
 export function missingRequiredFields(fields: ImportField[], mappings: ColumnMapping) {

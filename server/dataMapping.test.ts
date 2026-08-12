@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { autoMapColumns, mapSpreadsheetRows, missingRequiredFields, type ImportField } from "../shared/dataMapping";
+import { applyMappingPreference, autoMapColumns, createMappingPreference, mapSpreadsheetRows, missingRequiredFields, type ImportField } from "../shared/dataMapping";
 
 const fields: ImportField[] = [
   { id: "clientName", label: "Client Name", required: true, aliases: ["client"] },
@@ -25,5 +25,25 @@ describe("department data mapping", () => {
       { "Client Name": "Gulf Contracting", "LPO Reference": "LPO-14" },
     ]);
   });
-});
 
+  it("reuses a compatible saved mapping even when the header case changes", () => {
+    const preference = createMappingPreference("sales", { clientName: "Client", lpoReference: "LPO", email: "Email" }, ["Client", "LPO", "Email"]);
+
+    expect(applyMappingPreference(fields, ["CLIENT", "LPO", "Email"], preference)).toMatchObject({
+      mapping: { clientName: "CLIENT", lpoReference: "LPO", email: "Email" },
+      matchedCount: 3,
+      savedCount: 3,
+      changedHeaders: [],
+      fullyCompatible: true,
+    });
+  });
+
+  it("flags missing saved headers and keeps the required-field guard active", () => {
+    const preference = createMappingPreference("sales", { clientName: "Client", lpoReference: "LPO" }, ["Client", "LPO"]);
+    const application = applyMappingPreference(fields, ["Client", "Reference Number"], preference);
+
+    expect(application.changedHeaders).toEqual(["LPO"]);
+    expect(application.fullyCompatible).toBe(false);
+    expect(missingRequiredFields(fields, application.mapping).map((field) => field.id)).toEqual(["lpoReference"]);
+  });
+});

@@ -35,3 +35,10 @@
 - [x] Add a downloadable Excel export action for every department dataset.
 - [x] Validate desktop/mobile interactions, tests, production build, import confirmation, and downloaded department export.
 - [x] Save the verified data import-export checkpoint.
+
+## Saved column-mapping preferences
+- [x] Save approved source-column mappings by department and source-header signature.
+- [x] Reuse compatible saved mappings automatically for future department uploads.
+- [x] Preserve the mapping review and block confirmation when source headers are missing or changed.
+- [x] Add tests and verify the UI flow; save the mapping-preferences checkpoint.
+- [ ] Save the verified mapping-preferences checkpoint.
