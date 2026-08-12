@@ -62,3 +62,18 @@
 - [x] Redesign the booking progress visualization as a clear stage timeline and completion graph.
 - [x] Validate responsive rendering and preserve all existing booking, review, compliance, and client portal interactions after post-redesign QA.
 - [x] Save and deliver the updated checkpoint.
+
+## Document upload simulation QA
+- [x] Add client portal upload simulation state for outstanding requirements across departments.
+- [x] Recompute dossier and client progress from uploaded document state.
+- [x] Verify All Docs Submitted, Reviewed, and Dispatch package gating after the final upload.
+- [x] Re-run tests and save a checkpoint if the portal behavior changes.
+
+## Upload-state consistency fixes
+- [x] Bind internal dossier completion rows to the same mutable uploaded-document state used by the client portal.
+- [x] Keep Dispatch package disabled at All Docs Submitted and unlock it only after Reviewed.
+- [x] Add unit coverage for post-upload stage progression and dispatch blocking before review approval.
+
+## Final checkpoint hardening
+- [x] Add unit coverage for incomplete documents becoming 100% complete before All Docs Submitted.
+- [ ] Save the validated upload-state and dispatch-gate checkpoint.

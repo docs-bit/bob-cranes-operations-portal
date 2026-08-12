@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BOOKING_STAGES, canAdvanceStage, canDispatch, isGearSelectionBlocked, transitionBooking } from "../shared/bookingRules";
+import { BOOKING_STAGES, canAdvanceStage, canDispatch, documentCompletion, isGearSelectionBlocked, transitionBooking } from "../shared/bookingRules";
 
 describe("BOB Cranes booking rules", () => {
   it("keeps the lifecycle in the exact eight-stage order", () => {
@@ -36,5 +36,22 @@ describe("BOB Cranes booking rules", () => {
     expect(canDispatch("Reviewed", false, false)).toBe(false);
     expect(canDispatch("Reviewed", true, true)).toBe(false);
     expect(canDispatch("Reviewed", true, false)).toBe(true);
+  });
+
+  it("requires an explicit All Docs Submitted to Reviewed handoff before dispatch", () => {
+    expect(transitionBooking("All Docs Submitted", "Reviewed", "Salesperson").stage).toBe("Reviewed");
+    expect(canDispatch("All Docs Submitted", true, false)).toBe(false);
+    expect(canDispatch("Reviewed", true, false)).toBe(true);
+  });
+
+  it("reaches All Docs Submitted only after the uploaded document set is complete", () => {
+    const documents = [
+      { id: "doc-1", departmentCode: "DOC" as const, name: "Method statement", state: "Uploaded" as const, required: true },
+      { id: "doc-2", departmentCode: "HSE" as const, name: "Lift plan", state: "Required" as const, required: true },
+    ];
+    expect(documentCompletion(documents)).toBe(50);
+    const uploaded = documents.map((document) => ({ ...document, state: "Uploaded" as const }));
+    expect(documentCompletion(uploaded)).toBe(100);
+    expect(transitionBooking("Docs In Progress", "All Docs Submitted", "Documentation").stage).toBe("All Docs Submitted");
   });
 });
