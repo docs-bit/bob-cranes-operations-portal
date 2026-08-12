@@ -9,7 +9,7 @@
 - [x] Replace the current stage graph presentation with a minimalist department-completion card inspired by the supplied reference.
 - [x] Preserve computed department completion, dossier context, and status colors.
 - [x] Validate the redesign at mobile and desktop widths without changing workflow behavior.
-- [ ] Save and deliver the updated UI checkpoint.
+- [x] Save and deliver the updated UI checkpoint.
 
 ## Attendance workspace
 - [x] Add dashboard attendance section with employee roster and daily status marking.
@@ -20,4 +20,4 @@
 
 ## Attendance persistence fix
 - [x] Persist the selected attendance date in Home state so it survives navigation within the dashboard session.
-- [ ] Save a new checkpoint after the date-persistence fix.
+- [x] Save a new checkpoint after the date-persistence fix.
