@@ -1,0 +1,44 @@
+{
+  "sourceStatus": {
+    "dailyOperations": "parsed",
+    "vehicleList": "parsed via operations workbook equipment rows because the vehicle register uses merged presentation headers",
+    "attendance": "parsed"
+  },
+  "bookings": [
+    { "clientName": "NPCC-NMDC Energy", "equipmentName": "Trailer 1", "site": "Musaffah", "salesperson": "Manoj", "sourceRow": 2 },
+    { "clientName": "Laing O'Rourke Middle East", "equipmentName": "100T Mobile Crane", "site": "Ajman", "salesperson": "Sarath", "sourceRow": 3 },
+    { "clientName": "Al Nasr Contracting", "equipmentName": "50T Mobile Crane", "site": "Dubai Hills C-149", "salesperson": "Sarath", "sourceRow": 4 },
+    { "clientName": "Al Wathba Cement Industries", "equipmentName": "Manlift", "site": "Musaffah, Abu Dhabi", "salesperson": "Mohammed", "sourceRow": 5 },
+    { "clientName": "Halliburton", "equipmentName": "Lifting Accessories", "site": "Liwa", "salesperson": "Gopan", "sourceRow": 6 },
+    { "clientName": "Mak Force Electro Mechanical LLC", "equipmentName": "B-217 · 350T Mobile Crane · LTM · 95095", "site": "Garhoud", "salesperson": "Sarath", "sourceRow": 12 },
+    { "clientName": "Laing O'Rourke Middle East Holdings Ltd", "equipmentName": "B-218 · 100T Lattice Crane · 71597", "site": "Ajman", "salesperson": "Sarath", "sourceRow": 13 },
+    { "clientName": "Hansa Energy", "equipmentName": "B-220 · 50T Mobile Crane · SANY · 69009", "site": "Dubai Maktoum Airport", "salesperson": "Sarath", "sourceRow": 14 },
+    { "clientName": "Al Hamad Industrial Company LLC", "equipmentName": "B-221 · 500T Mobile Crane · LTM · 63309", "site": "Business Bay", "salesperson": "Nishanth", "sourceRow": 15 },
+    { "clientName": "Cool Mechs Technical Service", "equipmentName": "B-222 · 130T Mobile Crane · LTM · 88999", "site": "Dubai Internet City", "salesperson": "Arun", "sourceRow": 16 }
+  ],
+  "equipment": [
+    { "assetCode": "B-205", "name": "50T Mobile Crane · DEMAG", "registration": "60312", "type": "Mobile Crane" },
+    { "assetCode": "B-210", "name": "35T Mobile Crane · PPM", "registration": "98274", "type": "Mobile Crane" },
+    { "assetCode": "B-213", "name": "250T Mobile Crane · LTM", "registration": "92080", "type": "Mobile Crane" },
+    { "assetCode": "B-217", "name": "350T Mobile Crane · LTM", "registration": "95095", "type": "Mobile Crane" },
+    { "assetCode": "B-218", "name": "100T Lattice Crane", "registration": "71597", "type": "Lattice Crane" },
+    { "assetCode": "B-220", "name": "50T Mobile Crane · SANY", "registration": "69009", "type": "Mobile Crane" },
+    { "assetCode": "B-221", "name": "500T Mobile Crane · LTM", "registration": "63309", "type": "Mobile Crane" },
+    { "assetCode": "B-222", "name": "130T Mobile Crane · LTM", "registration": "88999", "type": "Mobile Crane" },
+    { "assetCode": "B-224", "name": "75T Mobile Crane · SANY", "registration": "65577", "type": "Mobile Crane" }
+  ],
+  "crew": [
+    { "name": "Vineeth Vijayan", "designation": "Crane Operator", "availability": "Present" },
+    { "name": "Anoop Panikashery", "designation": "Crane Operator", "availability": "Assigned" },
+    { "name": "Vijayakumar", "designation": "Rigger", "availability": "Present" },
+    { "name": "Amal Krishnan", "designation": "Rigger", "availability": "Present" },
+    { "name": "ABDUL JALEEL", "designation": "Rigger", "availability": "Present" },
+    { "name": "ABI RENJU KUMAR", "designation": "Crane Operator Assistant", "availability": "Present" },
+    { "name": "ABHILASH UNNI", "designation": "Rigger", "availability": "Present" },
+    { "name": "ABHIRAM SUNEEF", "designation": "Rigger", "availability": "Present" },
+    { "name": "ABHISHEK KRISHNA", "designation": "Crane Operator Assistant", "availability": "Present" },
+    { "name": "ADERSH SREEKUMAR NAIR", "designation": "Rigger", "availability": "On Leave" },
+    { "name": "AMAL APPUKUTTAN", "designation": "Rigger", "availability": "Present" },
+    { "name": "AMARNADH BAIJU", "designation": "Rigger", "availability": "Off-Site" }
+  ]
+}
