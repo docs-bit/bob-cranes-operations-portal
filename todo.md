@@ -34,4 +34,4 @@
 - [x] Validate required mappings and confirm the import only when the mapping is complete.
 - [x] Add a downloadable Excel export action for every department dataset.
 - [x] Validate desktop/mobile interactions, tests, production build, import confirmation, and downloaded department export.
-- [ ] Save the verified data import-export checkpoint.
+- [x] Save the verified data import-export checkpoint.
