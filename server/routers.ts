@@ -298,6 +298,28 @@ export const appRouter = router({
         return await db.updateBookingAssignment(input.id, input);
       }),
 
+    getCrewAllocations: protectedProcedure.query(async () => {
+      await db.seedInitialDataIfNeeded();
+      return await db.listBookingCrewAllocations();
+    }),
+
+    saveCrewAllocations: protectedProcedure
+      .input(z.object({ crewId: z.string(), crewName: z.string().min(1), bookingIds: z.array(z.string()).max(20) }))
+      .mutation(async ({ ctx, input }) => {
+        requireDepartmentAccess(ctx.user, "crew");
+        const crewList = await db.getAllCrew();
+        if (!crewList.some((member) => member.id === input.crewId && member.name === input.crewName)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "That employee is not in the persisted crew roster." });
+        }
+        for (const bookingId of input.bookingIds) {
+          if (!(await db.getBookingById(bookingId))) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: `Booking ${bookingId} is not available for persisted allocation.` });
+          }
+        }
+        const allocations = await db.replaceCrewBookingAllocations({ ...input, assignedBy: ctx.user.id });
+        return { allocations };
+      }),
+
     getEquipment: protectedProcedure.query(async () => {
       await db.seedInitialDataIfNeeded();
       return await db.getAllEquipment();

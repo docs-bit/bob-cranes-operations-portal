@@ -50,6 +50,13 @@
       "when": 1786609104124,
       "tag": "0006_powerful_black_panther",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1786616876937,
+      "tag": "0007_strange_rhodey",
+      "breakpoints": true
     }
   ]
 }

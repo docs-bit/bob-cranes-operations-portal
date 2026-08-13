@@ -46,6 +46,15 @@ export const bookings = mysqlTable("bookings", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const bookingCrewAllocations = mysqlTable("booking_crew_allocations", {
+  id: int("id").autoincrement().primaryKey(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  crewId: varchar("crewId", { length: 64 }).notNull(),
+  crewName: varchar("crewName", { length: 255 }).notNull(),
+  assignedBy: int("assignedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const equipment = mysqlTable("equipment", {
   id: varchar("id", { length: 64 }).primaryKey(),
   assetCode: varchar("assetCode", { length: 64 }).notNull().unique(),
@@ -127,6 +136,7 @@ export const auditLogs = mysqlTable("audit_logs", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Booking = typeof bookings.$inferSelect;
+export type BookingCrewAllocation = typeof bookingCrewAllocations.$inferSelect;
 export type InsertBooking = typeof bookings.$inferInsert;
 export type EquipmentItem = typeof equipment.$inferSelect;
 export type CrewMemberItem = typeof crew.$inferSelect;

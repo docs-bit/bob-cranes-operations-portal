@@ -2,7 +2,7 @@ import { and, desc, eq, isNotNull, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { nanoid } from "nanoid";
 import { 
-  InsertUser, users, userActivityLogs, bookings, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
+  InsertUser, users, userActivityLogs, bookings, bookingCrewAllocations, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -237,6 +237,27 @@ export async function updateBookingAssignment(id: string, updates: { craneId?: s
   return await getBookingById(id);
 }
 
+export async function listBookingCrewAllocations() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(bookingCrewAllocations).orderBy(desc(bookingCrewAllocations.createdAt));
+}
+
+export async function replaceCrewBookingAllocations(input: { bookingIds: string[]; crewId: string; crewName: string; assignedBy?: number | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(bookingCrewAllocations).where(eq(bookingCrewAllocations.crewId, input.crewId));
+  if (input.bookingIds.length > 0) {
+    await db.insert(bookingCrewAllocations).values(input.bookingIds.map((bookingId) => ({
+      bookingId,
+      crewId: input.crewId,
+      crewName: input.crewName,
+      assignedBy: input.assignedBy ?? null,
+    })));
+  }
+  return await listBookingCrewAllocations();
+}
+
 export async function getAllEquipment() {
   const db = await getDb();
   if (!db) return [];
@@ -454,5 +475,15 @@ export async function seedInitialDataIfNeeded() {
         await db.insert(documents).values(d).onDuplicateKeyUpdate({ set: d });
       }
     }
+  }
+
+  const allocationList = await db.select().from(bookingCrewAllocations).limit(1);
+  if (allocationList.length === 0) {
+    await db.insert(bookingCrewAllocations).values([
+      { bookingId: "BOB-59116", crewId: "cr-1", crewName: "Vineeth Vijayan", assignedBy: null },
+      { bookingId: "BOB-59116", crewId: "cr-2", crewName: "Anoop Panikashery", assignedBy: null },
+      { bookingId: "BOB-59116", crewId: "cr-3", crewName: "Vijayakumar", assignedBy: null },
+      { bookingId: "BOB-59116", crewId: "cr-4", crewName: "Amal Krishnan", assignedBy: null },
+    ]);
   }
 }

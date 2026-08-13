@@ -108,3 +108,16 @@
 ## Final repair release gaps
 - [x] Re-verify the repaired progress UI and key interactive controls at a true mobile viewport after the latest fixes, and record the result.
 - [x] Save a new checkpoint after the progress/button repair changes and deliver that updated checkpoint to the user.
+
+## Attendance, multi-booking assignment, and onshore/offshore training register
+- [x] Profile the supplied ONSHORE&OFFSHORE.xlsx workbook and extract certificate/training records.
+- [x] Build a database-backed or structured training register reflecting the Excel dataset.
+- [x] Add employee attendance marking with daily records and history navigation.
+- [x] Implement multi-booking employee assignment with overlap / conflict detection and clear warnings.
+- [x] Add unit tests, type checks, responsive visual QA, and save checkpoint.
+
+## Attendance and allocation release hardening
+- [x] Persist multi-booking employee allocations through the backend using real crew and booking records, with overlap warnings derived from persisted data.
+- [ ] Run mobile visual QA for Attendance, Crew multi-booking, and Training Register screens and record the results.
+- [ ] Save a new checkpoint covering the attendance, allocation, and workbook-backed training release.
+- [x] Add direct deep links for the Training Register and Crew allocation workspace so preview capture and browser refreshes do not fall through to 404.

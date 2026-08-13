@@ -81,6 +81,24 @@ describe("operations router", () => {
     vi.restoreAllMocks();
   });
 
+  it("persists a crew employee across multiple real bookings", async () => {
+    const getCrew = vi.spyOn(db, "getAllCrew").mockResolvedValue([{ id: "cr-1", name: "Vineeth Vijayan" }] as any);
+    const getBooking = vi.spyOn(db, "getBookingById").mockResolvedValue({ id: "BOB-59116" } as any);
+    const replaceAllocations = vi.spyOn(db, "replaceCrewBookingAllocations").mockResolvedValue([{ bookingId: "BOB-59116", crewId: "cr-1", crewName: "Vineeth Vijayan" }] as any);
+    const caller = appRouter.createCaller({ ...createTestContext(), user: { ...createTestContext().user, departmentCode: "crew" } } as any);
+    const result = await caller.operations.saveCrewAllocations({ crewId: "cr-1", crewName: "Vineeth Vijayan", bookingIds: ["BOB-59116"] });
+    expect(result.allocations[0]?.crewId).toBe("cr-1");
+    expect(getCrew).toHaveBeenCalled();
+    expect(getBooking).toHaveBeenCalledWith("BOB-59116");
+    expect(replaceAllocations).toHaveBeenCalledWith(expect.objectContaining({ crewId: "cr-1", bookingIds: ["BOB-59116"] }));
+    vi.restoreAllMocks();
+  });
+
+  it("rejects persisted crew allocation writes from another department", async () => {
+    const caller = appRouter.createCaller(createSalesContext());
+    await expect(caller.operations.saveCrewAllocations({ crewId: "cr-1", crewName: "Vineeth Vijayan", bookingIds: ["BOB-59116"] })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
   it("fetches bookings and equipment successfully", async () => {
     const ctx = createTestContext();
     const caller = appRouter.createCaller(ctx);
