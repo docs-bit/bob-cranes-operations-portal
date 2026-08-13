@@ -431,6 +431,19 @@ export const appRouter = router({
         if (ctx.user.role !== "admin") requireDepartmentAccess(ctx.user, input.departmentCode as DepartmentCode);
         return await db.addNotification(input);
       }),
+
+    clearNotifications: protectedProcedure
+      .input(z.object({ departmentCode: z.string().optional() }).optional())
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin" && input?.departmentCode && input.departmentCode !== ctx.user.departmentCode) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Your department account cannot clear these notifications." });
+        }
+        await db.markAllNotificationsRead({
+          departmentCode: ctx.user.role === "admin" ? input?.departmentCode : ctx.user.departmentCode ?? undefined,
+          userId: ctx.user.id,
+        });
+        return { success: true };
+      }),
   }),
 });
 

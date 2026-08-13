@@ -118,6 +118,6 @@
 
 ## Attendance and allocation release hardening
 - [x] Persist multi-booking employee allocations through the backend using real crew and booking records, with overlap warnings derived from persisted data.
-- [ ] Run mobile visual QA for Attendance, Crew multi-booking, and Training Register screens and record the results.
-- [ ] Save a new checkpoint covering the attendance, allocation, and workbook-backed training release.
+- [x] Run mobile visual QA for Attendance, Crew multi-booking, and Training Register screens and record the results.
+- [x] Save a new checkpoint covering the attendance, allocation, and workbook-backed training release.
 - [x] Add direct deep links for the Training Register and Crew allocation workspace so preview capture and browser refreshes do not fall through to 404.

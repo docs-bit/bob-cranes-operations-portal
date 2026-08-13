@@ -99,6 +99,15 @@ describe("operations router", () => {
     await expect(caller.operations.saveCrewAllocations({ crewId: "cr-1", crewName: "Vineeth Vijayan", bookingIds: ["BOB-59116"] })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 
+  it("marks all notifications read when clearNotifications is invoked", async () => {
+    const markRead = vi.spyOn(db, "markAllNotificationsRead").mockResolvedValue(undefined);
+    const caller = appRouter.createCaller({ ...createTestContext(), user: { ...createTestContext().user, departmentCode: "hse" } } as any);
+    const result = await caller.operations.clearNotifications({ departmentCode: "hse" });
+    expect(result.success).toBe(true);
+    expect(markRead).toHaveBeenCalled();
+    vi.restoreAllMocks();
+  });
+
   it("fetches bookings and equipment successfully", async () => {
     const ctx = createTestContext();
     const caller = appRouter.createCaller(ctx);

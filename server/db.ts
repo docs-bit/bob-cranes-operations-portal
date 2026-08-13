@@ -336,6 +336,28 @@ export async function addNotification(data: { id: string; userId?: number | null
   return data;
 }
 
+export async function markAllNotificationsRead(filters?: { departmentCode?: string; userId?: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { departmentCode, userId } = filters ?? {};
+  if (userId !== undefined && departmentCode) {
+    await db.update(notifications).set({ read: 1 }).where(or(
+      eq(notifications.userId, userId),
+      and(isNull(notifications.userId), eq(notifications.departmentCode, departmentCode)),
+    ));
+    return;
+  }
+  if (userId !== undefined) {
+    await db.update(notifications).set({ read: 1 }).where(eq(notifications.userId, userId));
+    return;
+  }
+  if (departmentCode) {
+    await db.update(notifications).set({ read: 1 }).where(eq(notifications.departmentCode, departmentCode));
+    return;
+  }
+  await db.update(notifications).set({ read: 1 });
+}
+
 export async function seedInitialDataIfNeeded() {
   const db = await getDb();
   if (!db) return;
