@@ -129,3 +129,7 @@
 - [x] Add a 'Clear All' or 'Mark as Read' control inside the notification dropdown.
 - [x] Make employees in the expiring certificates widget clickable to view their full profile and training details.
 - [x] Add an option to export the visual crew assignment calendar to PDF or Excel.
+- [x] Fix duplicate React keys in training and calendar views (`EMP ID-B-368 & 300 TON`).
+- [x] Implement hover tooltips on the visual crew assignment calendar to show quick details about assigned tasks and crew members.
+- [x] Create a monthly summary report feature for attendance showing total days worked and absences for each employee.
+- [x] Add a search bar and department filter to the attendance roster to easily find specific employees.

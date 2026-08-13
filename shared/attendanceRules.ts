@@ -55,4 +55,50 @@ export function historicalAttendanceRecord(record: AttendanceRecord): Attendance
   };
 }
 
+export function computeMonthlyAttendanceSummary(
+  roster: Array<{ name: string; department?: string; role: string }>,
+  records: Record<string, AttendanceRecord>,
+  days: string[]
+) {
+  return roster.map((employee) => {
+    let daysWorked = 0;
+    let daysOnLeave = 0;
+    let daysOffSite = 0;
+    let daysAssigned = 0;
+    let unrecorded = 0;
+
+    for (const day of days) {
+      const record = records[day];
+      const status = record?.[employee.name];
+      if (!status) {
+        unrecorded++;
+      } else if (status === "Present") {
+        daysWorked++;
+      } else if (status === "On Leave") {
+        daysOnLeave++;
+      } else if (status === "Off-Site") {
+        daysOffSite++;
+      } else if (status === "Assigned") {
+        daysAssigned++;
+      }
+    }
+
+    const recordedDays = days.length - unrecorded;
+    const absences = Math.max(0, recordedDays - (daysWorked + daysOnLeave + daysOffSite + daysAssigned));
+
+    return {
+      name: employee.name,
+      department: employee.department ?? "August Roster",
+      role: employee.role,
+      daysWorked,
+      daysOnLeave,
+      daysOffSite,
+      daysAssigned,
+      absences,
+      unrecorded,
+      totalRecorded: days.length,
+    };
+  });
+}
+
 export type AttendanceSummary = ReturnType<typeof summarizeAttendance>;
