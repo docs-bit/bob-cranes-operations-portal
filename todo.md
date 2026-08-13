@@ -135,3 +135,7 @@
 - [x] Add a search bar and department filter to the attendance roster to easily find specific employees.
 - [x] Eliminate duplicate key warnings for roster entries like GURPREET SINGH by using index-inclusive stable keys.
 - [x] Eliminate duplicate key warnings for roster entries like GURPREET SINGH by using index-inclusive stable keys.
+- [x] Restyle all progress graphs and dashboard surfaces into a light, clinical analytics system inspired by the reference references (airy cards, pale mint/green progress bars, clean KPI modules, and bar-chart progress indicators).
+- [ ] Audit and convert all remaining legacy progress visuals, including ReferenceUploadProgress, upload-center progress, booking-card meters, and department/client progress rails, to the new light analytics system.
+- [ ] Run authenticated desktop and mobile browser QA on the dashboard and key department/client views and record consistent rendering evidence.
+- [ ] Diagnose and repair the black-screen rendering regression, ensure zero runtime errors in console/server logs, and verify the UI.
