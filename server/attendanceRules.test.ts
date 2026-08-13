@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { attendanceCompletion, formatAttendanceDate, shiftDate, summarizeAttendance, updateAttendance } from "../shared/attendanceRules";
+import { attendanceCompletion, attendanceRosterKey, formatAttendanceDate, shiftDate, summarizeAttendance, updateAttendance } from "../shared/attendanceRules";
 
 describe("attendance rules", () => {
   it("summarizes daily employee statuses", () => {
@@ -17,5 +17,12 @@ describe("attendance rules", () => {
     expect(shiftDate("2026-08-12", -1)).toBe("2026-08-11");
     expect(shiftDate("2026-08-12", 1)).toBe("2026-08-13");
     expect(formatAttendanceDate("2026-08-12")).toContain("12 Aug 2026");
+  });
+
+  it("creates unique roster keys for duplicate source names", () => {
+    const first = attendanceRosterKey({ name: "GURPREET SINGH", department: "WORKSHOP AUG 2026" }, 12);
+    const second = attendanceRosterKey({ name: "GURPREET SINGH", department: "WORKSHOP AUG 2026" }, 13);
+    expect(first).not.toBe(second);
+    expect(first).toBe("WORKSHOP AUG 2026-GURPREET SINGH-12");
   });
 });

@@ -133,3 +133,5 @@
 - [x] Implement hover tooltips on the visual crew assignment calendar to show quick details about assigned tasks and crew members.
 - [x] Create a monthly summary report feature for attendance showing total days worked and absences for each employee.
 - [x] Add a search bar and department filter to the attendance roster to easily find specific employees.
+- [x] Eliminate duplicate key warnings for roster entries like GURPREET SINGH by using index-inclusive stable keys.
+- [x] Eliminate duplicate key warnings for roster entries like GURPREET SINGH by using index-inclusive stable keys.

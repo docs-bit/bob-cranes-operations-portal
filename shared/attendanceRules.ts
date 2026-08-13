@@ -41,6 +41,10 @@ export function formatAttendanceDate(date: string) {
   }).format(new Date(`${date}T12:00:00`));
 }
 
+export function attendanceRosterKey(employee: { name: string; department?: string }, index: number) {
+  return `${employee.department ?? "August Roster"}-${employee.name}-${index}`;
+}
+
 export function defaultAttendanceRecord(roster: Array<{ name: string; availability: string }>): AttendanceRecord {
   return Object.fromEntries(
     roster.map((employee) => [employee.name, ATTENDANCE_STATUSES.includes(employee.availability as AttendanceStatus) ? employee.availability : "Present"]),
