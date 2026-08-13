@@ -24,6 +24,10 @@ export default function Login() {
 
   const setupMode = setupStatus.data?.needsAdminSetup === true;
   const pending = login.isPending || bootstrapAdmin.isPending;
+  const readableError = (caught: unknown) => {
+    const message = caught instanceof Error ? caught.message : "We could not complete that sign-in request.";
+    return /invalid email|invalid password|unauthorized/i.test(message) ? "The email or password is incorrect. Check your credentials or contact your administrator." : message;
+  };
 
   useEffect(() => {
     if (user) setLocation("/");
@@ -50,12 +54,12 @@ export default function Login() {
       await utils.auth.me.invalidate();
       setLocation("/");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "We could not complete that sign-in request.");
+      setError(readableError(caught));
     }
   };
 
   if (loading || setupStatus.isLoading) {
-    return <div className="auth-loading">Loading secure workspace…</div>;
+    return <div className="auth-loading"><div className="auth-loading-card"><span className="auth-spinner" aria-hidden="true" /><strong>Loading secure workspace…</strong><span>Checking your department access.</span></div></div>;
   }
 
   return (
@@ -82,8 +86,9 @@ export default function Login() {
             {setupMode && <label><span>Administrator name</span><input value={form.name} onChange={(event) => update("name", event.target.value)} autoComplete="name" placeholder="e.g. Nishanth Shetty" required /></label>}
             <label><span>Work email</span><input type="email" value={form.email} onChange={(event) => update("email", event.target.value)} autoComplete="email" placeholder="name@bobcranes.com" required /></label>
             <label><span>Password</span><input type="password" value={form.password} onChange={(event) => update("password", event.target.value)} autoComplete={setupMode ? "new-password" : "current-password"} placeholder={setupMode ? "At least 10 characters" : "Enter your password"} minLength={setupMode ? 10 : undefined} required /></label>
-            {error && <div className="auth-error" role="alert">{error}</div>}
-            <button className="auth-submit" type="submit" disabled={pending}>{pending ? "Please wait…" : setupMode ? "Create administrator account" : "Sign in"}</button>
+            {error && <div className="auth-error" role="alert"><ShieldCheck size={15} /> <span>{error}</span></div>}
+            {pending && <div className="auth-pending-note" role="status"><span className="button-spinner" aria-hidden="true" /> Securely verifying your account…</div>}
+            <button className="auth-submit" type="submit" disabled={pending}><span className={pending ? "button-spinner" : ""} aria-hidden="true" />{pending ? "Please wait…" : setupMode ? "Create administrator account" : "Sign in"}</button>
           </form>
           <div className="auth-note"><ShieldCheck size={14} />Your administrator controls new accounts and department access.</div>
         </div>

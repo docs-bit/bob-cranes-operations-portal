@@ -120,6 +120,26 @@ export async function updateUserLastSignedIn(id: number) {
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, id));
 }
 
+export async function updateLocalUser(id: number, input: { name: string; email: string; departmentCode: string; passwordHash?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for account update.");
+  await db.update(users).set({
+    name: input.name,
+    email: input.email,
+    localEmail: input.email,
+    departmentCode: input.departmentCode,
+    ...(input.passwordHash ? { passwordHash: input.passwordHash } : {}),
+  }).where(eq(users.id, id));
+  return await getUserById(id);
+}
+
+export async function setLocalUserActive(id: number, isActive: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for account status update.");
+  await db.update(users).set({ isActive }).where(eq(users.id, id));
+  return await getUserById(id);
+}
+
 // ---- Bookings & Operations Queries ----
 
 export async function getAllBookings() {

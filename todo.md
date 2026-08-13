@@ -51,7 +51,15 @@
 - [x] Restyle the portal with a LinkedIn-inspired blue, white, and neutral visual system.
 - [x] Ensure every sidebar navigation item has an understandable, accessible icon.
 - [x] Add unit coverage and validate admin, department-user, sign-out, desktop, and mobile flows.
-- [ ] Save the verified authentication and theme checkpoint.
+- [x] Save the verified authentication and theme checkpoint.
 - [x] Restrict non-admin sidebar and workspace navigation to department-permitted sections, not only the Departments list.
 - [x] Add view guards and tests proving department users cannot open unauthorized workspace or administration sections.
 - [x] Re-verify the HSE account with the narrowed navigation and save the final checkpoint.
+
+## User management, profile customization, and login feedback
+- [x] Add admin user-management dashboard for viewing, editing, and deactivating department users.
+- [x] Enhance the profile section with department details, role badge, and customizable avatar options next to sign-out.
+- [x] Add login loading animations and clear error messaging for incorrect credentials.
+- [x] Validate updated user management, profile customization, and login feedback with unit tests and browser tests.
+- [ ] Save and deliver the final user-management checkpoint.
+- [x] Remove deprecated `expires` options from local/OAuth sign-out cookie clearing and rerun final checks.

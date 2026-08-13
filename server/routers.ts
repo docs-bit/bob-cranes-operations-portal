@@ -81,10 +81,42 @@ export const appRouter = router({
       });
       return toSessionUser(user);
     }),
+    updateUser: adminProcedure.input(z.object({
+      id: z.number().int().positive(),
+      name: z.string().trim().min(2).max(120),
+      email: z.string().trim().email().max(320),
+      departmentCode: z.string().refine(isDepartmentCode, "Choose a valid department."),
+      password: z.string().min(10).max(160).optional().or(z.literal("")),
+    })).mutation(async ({ ctx, input }) => {
+      if (input.id === ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "You cannot edit your own administrator account here." });
+      const existing = await db.getUserById(input.id);
+      if (!existing?.localEmail) throw new TRPCError({ code: "NOT_FOUND", message: "That local account could not be found." });
+      if (existing.role === "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Administrator accounts cannot be edited from this workspace." });
+      const email = normalizeEmail(input.email);
+      const emailOwner = await db.getUserByLocalEmail(email);
+      if (emailOwner && emailOwner.id !== input.id) throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email address." });
+      const user = await db.updateLocalUser(input.id, {
+        name: input.name,
+        email,
+        departmentCode: input.departmentCode,
+        ...(input.password ? { passwordHash: await hashPassword(input.password) } : {}),
+      });
+      if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "The account could not be updated." });
+      return toSessionUser(user);
+    }),
+    setUserActive: adminProcedure.input(z.object({ id: z.number().int().positive(), isActive: z.boolean() })).mutation(async ({ ctx, input }) => {
+      if (input.id === ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "You cannot deactivate your own administrator account." });
+      const existing = await db.getUserById(input.id);
+      if (!existing?.localEmail) throw new TRPCError({ code: "NOT_FOUND", message: "That local account could not be found." });
+      if (existing.role === "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Administrator accounts cannot be deactivated from this workspace." });
+      const user = await db.setLocalUserActive(input.id, input.isActive ? 1 : 0);
+      if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "The account status could not be updated." });
+      return toSessionUser(user);
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, expires: new Date(0) });
-      ctx.res.clearCookie(LOCAL_AUTH_COOKIE_NAME, { ...cookieOptions, expires: new Date(0) });
+      ctx.res.clearCookie(COOKIE_NAME, cookieOptions);
+      ctx.res.clearCookie(LOCAL_AUTH_COOKIE_NAME, cookieOptions);
       return { success: true } as const;
     }),
   }),

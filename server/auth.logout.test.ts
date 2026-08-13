@@ -50,13 +50,9 @@ describe("auth.logout", () => {
 
     expect(result).toEqual({ success: true });
     expect(clearedCookies.map((call) => call.name)).toEqual([COOKIE_NAME, LOCAL_AUTH_COOKIE_NAME]);
-    expect(clearedCookies[0]?.options).toMatchObject({
-      expires: expect.any(Date),
-      secure: true,
-      sameSite: "none",
-      httpOnly: true,
-      path: "/",
-    });
-    expect(clearedCookies[1]?.options).toMatchObject({ expires: expect.any(Date), secure: true, httpOnly: true });
+    expect(clearedCookies[0]?.options).toMatchObject({ secure: true, sameSite: "none", httpOnly: true, path: "/" });
+    expect(clearedCookies[0]?.options).not.toHaveProperty("expires");
+    expect(clearedCookies[1]?.options).toMatchObject({ secure: true, httpOnly: true });
+    expect(clearedCookies[1]?.options).not.toHaveProperty("expires");
   });
 });
