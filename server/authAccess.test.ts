@@ -83,7 +83,7 @@ describe("account registration access", () => {
 
   it("prevents an administrator from editing or deactivating their own account", async () => {
     const caller = appRouter.createCaller(adminContext());
-    await expect(caller.auth.updateUser({ id: 60001, name: "Admin", email: "admin@bobcranes.com", departmentCode: "administrator", password: "" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(caller.auth.updateUser({ id: 60001, name: "Admin", email: "admin@bobcranes.com", departmentCode: "administrator", role: "admin", password: "" })).rejects.toMatchObject({ code: "FORBIDDEN" });
     await expect(caller.auth.setUserActive({ id: 60001, isActive: false })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 });

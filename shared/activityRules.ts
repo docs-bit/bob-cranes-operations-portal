@@ -12,10 +12,10 @@ export const signInActivity = (userId: number): UserActivityEntry => ({
   detail: "Signed in to the department workspace.",
 });
 
-export const profileUpdateActivity = (userId: number, actorLabel: string): UserActivityEntry => ({
+export const profileUpdateActivity = (userId: number, actorLabel: string, roleLabel?: string, departmentLabel?: string): UserActivityEntry => ({
   userId,
   action: "profile_update",
-  detail: `Profile updated by ${actorLabel}.`,
+  detail: `Profile updated by ${actorLabel}${roleLabel ? ` · role set to ${roleLabel}` : ""}${departmentLabel ? ` · department set to ${departmentLabel}` : ""}.`,
 });
 
 export const accountStatusActivity = (userId: number, isActive: boolean, actorLabel: string): UserActivityEntry => ({

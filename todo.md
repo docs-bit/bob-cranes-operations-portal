@@ -69,6 +69,14 @@
 - [x] Implement account activity logging for sign-ins and profile updates with an admin activity viewer.
 - [x] Tighten role-based sidebar and direct-view visibility so department users see only relevant tools.
 - [x] Validate new modal safety, activity logs, and role permissions with unit tests and browser tests.
-- [ ] Save and deliver the final admin safety and activity-log checkpoint.
+- [x] Save and deliver the final admin safety and activity-log checkpoint.
 - [x] Add unit assertions for activity event creation during sign-in, profile update, and status changes.
 - [x] Add focused unit-level assertions for deactivation confirmation safety and rerun the full validation suite.
+- [x] Deliver the final admin safety and activity-log checkpoint attachment to the user.
+
+## Search, CSV export, and header notifications
+- [x] Add department filter dropdown and enhanced search inputs to the user-management dashboard.
+- [x] Implement CSV export for the administrator activity log with audit headers.
+- [x] Create an in-app header notification dropdown for profile updates and role changes.
+- [x] Validate new search, export, and notification features with unit tests and browser checks.
+- [x] Save and deliver the final search and notification checkpoint.

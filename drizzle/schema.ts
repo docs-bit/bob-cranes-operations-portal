@@ -101,6 +101,7 @@ export const chatMessages = mysqlTable("chat_messages", {
 
 export const notifications = mysqlTable("notifications", {
   id: varchar("id", { length: 64 }).primaryKey(),
+  userId: int("userId"),
   departmentCode: varchar("departmentCode", { length: 16 }).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   body: text("body").notNull(),

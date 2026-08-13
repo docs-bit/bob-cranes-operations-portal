@@ -1,6 +1,7 @@
 import { LOCAL_AUTH_COOKIE_NAME, COOKIE_NAME } from "@shared/const";
-import { canAccessDepartment, isDepartmentCode, type DepartmentCode } from "@shared/departmentAccess";
+import { canAccessDepartment, DEPARTMENTS, isDepartmentCode, type DepartmentCode } from "@shared/departmentAccess";
 import { accountStatusActivity, profileUpdateActivity, signInActivity } from "@shared/activityRules";
+import { accountUpdateNotification } from "@shared/accountNotifications";
 import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -89,23 +90,34 @@ export const appRouter = router({
       name: z.string().trim().min(2).max(120),
       email: z.string().trim().email().max(320),
       departmentCode: z.string().refine(isDepartmentCode, "Choose a valid department."),
+      role: z.enum(["user", "admin"]),
       password: z.string().min(10).max(160).optional().or(z.literal("")),
     })).mutation(async ({ ctx, input }) => {
       if (input.id === ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "You cannot edit your own administrator account here." });
       const existing = await db.getUserById(input.id);
       if (!existing?.localEmail) throw new TRPCError({ code: "NOT_FOUND", message: "That local account could not be found." });
-      if (existing.role === "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Administrator accounts cannot be edited from this workspace." });
       const email = normalizeEmail(input.email);
       const emailOwner = await db.getUserByLocalEmail(email);
       if (emailOwner && emailOwner.id !== input.id) throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email address." });
       const user = await db.updateLocalUser(input.id, {
         name: input.name,
         email,
-        departmentCode: input.departmentCode,
+        departmentCode: input.role === "admin" ? "administrator" : input.departmentCode,
+        role: input.role,
         ...(input.password ? { passwordHash: await hashPassword(input.password) } : {}),
       });
       if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "The account could not be updated." });
-      await db.addUserActivity(profileUpdateActivity(input.id, ctx.user.name ?? ctx.user.email ?? "an administrator"));
+      const actorLabel = ctx.user.name ?? ctx.user.email ?? "an administrator";
+      const roleLabel = input.role === "admin" ? "Administrator" : "Department user";
+      const departmentLabel = input.role === "admin" ? "Administrator" : DEPARTMENTS.find((department) => department.code === input.departmentCode)?.label ?? input.departmentCode;
+      await db.addUserActivity(profileUpdateActivity(input.id, actorLabel, roleLabel, departmentLabel));
+      const accountNotification = accountUpdateNotification(roleLabel, departmentLabel);
+      await db.addNotification({
+        id: `account-update-${user.id}-${Date.now()}`,
+        userId: user.id,
+        departmentCode: user.departmentCode ?? input.departmentCode,
+        ...accountNotification,
+      });
       return toSessionUser(user);
     }),
     setUserActive: adminProcedure.input(z.object({ id: z.number().int().positive(), isActive: z.boolean() })).mutation(async ({ ctx, input }) => {
@@ -281,7 +293,10 @@ export const appRouter = router({
         if (ctx.user.role !== "admin" && input?.departmentCode && input.departmentCode !== ctx.user.departmentCode) {
           throw new TRPCError({ code: "FORBIDDEN", message: "Your department account cannot access these notifications." });
         }
-        return await db.getNotifications(ctx.user.role === "admin" ? input?.departmentCode : ctx.user.departmentCode ?? undefined);
+        return await db.getNotifications({
+          departmentCode: ctx.user.role === "admin" ? input?.departmentCode : ctx.user.departmentCode ?? undefined,
+          userId: ctx.user.id,
+        });
       }),
 
     addNotification: protectedProcedure

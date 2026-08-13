@@ -1,4 +1,4 @@
-import { desc, eq, isNotNull } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { nanoid } from "nanoid";
 import { 
@@ -120,7 +120,7 @@ export async function updateUserLastSignedIn(id: number) {
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, id));
 }
 
-export async function updateLocalUser(id: number, input: { name: string; email: string; departmentCode: string; passwordHash?: string }) {
+export async function updateLocalUser(id: number, input: { name: string; email: string; departmentCode: string; role: "admin" | "user"; passwordHash?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable for account update.");
   await db.update(users).set({
@@ -128,6 +128,7 @@ export async function updateLocalUser(id: number, input: { name: string; email: 
     email: input.email,
     localEmail: input.email,
     departmentCode: input.departmentCode,
+    role: input.role,
     ...(input.passwordHash ? { passwordHash: input.passwordHash } : {}),
   }).where(eq(users.id, id));
   return await getUserById(id);
@@ -283,16 +284,26 @@ export async function addChatMessage(data: { id: string; bookingId: string; team
   return data;
 }
 
-export async function getNotifications(departmentCode?: string) {
+export async function getNotifications(filters?: { departmentCode?: string; userId?: number }) {
   const db = await getDb();
   if (!db) return [];
+  const { departmentCode, userId } = filters ?? {};
+  if (userId !== undefined && departmentCode) {
+    return await db.select().from(notifications).where(or(
+      eq(notifications.userId, userId),
+      and(isNull(notifications.userId), eq(notifications.departmentCode, departmentCode)),
+    )).orderBy(desc(notifications.createdAt));
+  }
+  if (userId !== undefined) {
+    return await db.select().from(notifications).where(eq(notifications.userId, userId)).orderBy(desc(notifications.createdAt));
+  }
   if (departmentCode) {
     return await db.select().from(notifications).where(eq(notifications.departmentCode, departmentCode)).orderBy(desc(notifications.createdAt));
   }
   return await db.select().from(notifications).orderBy(desc(notifications.createdAt));
 }
 
-export async function addNotification(data: { id: string; departmentCode: string; title: string; body: string }) {
+export async function addNotification(data: { id: string; userId?: number | null; departmentCode: string; title: string; body: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.insert(notifications).values(data);

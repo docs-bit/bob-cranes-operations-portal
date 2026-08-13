@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { canAccessDepartment, canAccessWorkspaceView, departmentsForUser } from "../shared/departmentAccess";
 import { hashPassword, normalizeEmail, verifyPassword } from "./localAuth";
 import { accountStatusActivity, profileUpdateActivity, signInActivity } from "../shared/activityRules";
+import { accountUpdateNotification } from "../shared/accountNotifications";
 import { canManageAccount, nextAccountActiveState, requiresDeactivationConfirmation } from "../shared/accountManagementRules";
 
 describe("local password security", () => {
@@ -32,6 +33,11 @@ describe("account activity and deactivation safety", () => {
   it("constructs stable activity entries for sign-in, profile update, and status changes", () => {
     expect(signInActivity(44)).toEqual({ userId: 44, action: "sign_in", detail: "Signed in to the department workspace." });
     expect(profileUpdateActivity(44, "Administrator")).toEqual({ userId: 44, action: "profile_update", detail: "Profile updated by Administrator." });
+    expect(profileUpdateActivity(44, "Administrator", "Administrator", "Administrator").detail).toContain("role set to Administrator");
+    expect(accountUpdateNotification("Department user", "HSE / Safety")).toEqual({
+      title: "Your profile or role was updated",
+      body: "An administrator updated your profile. Your access is now Department user in HSE / Safety. Sign in to review the latest details.",
+    });
     expect(accountStatusActivity(44, false, "Administrator")).toEqual({ userId: 44, action: "account_deactivated", detail: "Account deactivated by Administrator." });
     expect(accountStatusActivity(44, true, "Administrator")).toEqual({ userId: 44, action: "account_activated", detail: "Account activated by Administrator." });
   });
