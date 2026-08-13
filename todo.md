@@ -61,5 +61,14 @@
 - [x] Enhance the profile section with department details, role badge, and customizable avatar options next to sign-out.
 - [x] Add login loading animations and clear error messaging for incorrect credentials.
 - [x] Validate updated user management, profile customization, and login feedback with unit tests and browser tests.
-- [ ] Save and deliver the final user-management checkpoint.
+- [x] Save and deliver the final user-management checkpoint.
 - [x] Remove deprecated `expires` options from local/OAuth sign-out cookie clearing and rerun final checks.
+
+## Admin safety, activity log, and role-based sidebar visibility
+- [x] Add deactivation confirmation modal and success toast notification.
+- [x] Implement account activity logging for sign-ins and profile updates with an admin activity viewer.
+- [x] Tighten role-based sidebar and direct-view visibility so department users see only relevant tools.
+- [x] Validate new modal safety, activity logs, and role permissions with unit tests and browser tests.
+- [ ] Save and deliver the final admin safety and activity-log checkpoint.
+- [x] Add unit assertions for activity event creation during sign-in, profile update, and status changes.
+- [x] Add focused unit-level assertions for deactivation confirmation safety and rerun the full validation suite.

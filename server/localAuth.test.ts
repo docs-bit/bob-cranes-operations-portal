@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { canAccessDepartment, canAccessWorkspaceView, departmentsForUser } from "../shared/departmentAccess";
 import { hashPassword, normalizeEmail, verifyPassword } from "./localAuth";
+import { accountStatusActivity, profileUpdateActivity, signInActivity } from "../shared/activityRules";
+import { canManageAccount, nextAccountActiveState, requiresDeactivationConfirmation } from "../shared/accountManagementRules";
 
 describe("local password security", () => {
   it("normalizes email addresses and verifies only the correct password", async () => {
@@ -23,5 +25,28 @@ describe("department access rules", () => {
     expect(canAccessWorkspaceView({ role: "user", departmentCode: "hse" }, "bookings")).toBe(false);
     expect(canAccessWorkspaceView({ role: "user", departmentCode: "hse" }, "users")).toBe(false);
     expect(canAccessWorkspaceView({ role: "admin", departmentCode: "administrator" }, "users")).toBe(true);
+  });
+});
+
+describe("account activity and deactivation safety", () => {
+  it("constructs stable activity entries for sign-in, profile update, and status changes", () => {
+    expect(signInActivity(44)).toEqual({ userId: 44, action: "sign_in", detail: "Signed in to the department workspace." });
+    expect(profileUpdateActivity(44, "Administrator")).toEqual({ userId: 44, action: "profile_update", detail: "Profile updated by Administrator." });
+    expect(accountStatusActivity(44, false, "Administrator")).toEqual({ userId: 44, action: "account_deactivated", detail: "Account deactivated by Administrator." });
+    expect(accountStatusActivity(44, true, "Administrator")).toEqual({ userId: 44, action: "account_activated", detail: "Account activated by Administrator." });
+  });
+
+  it("requires explicit confirmation only for active department accounts", () => {
+    const activeDepartmentUser = { id: 44, role: "user" as const, isActive: 1 };
+    const inactiveDepartmentUser = { id: 44, role: "user" as const, isActive: 0 };
+    const administrator = { id: 60001, role: "admin" as const, isActive: 1 };
+
+    expect(canManageAccount(activeDepartmentUser, 60001)).toBe(true);
+    expect(requiresDeactivationConfirmation(activeDepartmentUser, 60001)).toBe(true);
+    expect(nextAccountActiveState(activeDepartmentUser, 60001)).toBe(false);
+    expect(requiresDeactivationConfirmation(inactiveDepartmentUser, 60001)).toBe(false);
+    expect(nextAccountActiveState(inactiveDepartmentUser, 60001)).toBe(true);
+    expect(canManageAccount(administrator, 60001)).toBe(false);
+    expect(nextAccountActiveState(administrator, 60001)).toBeNull();
   });
 });

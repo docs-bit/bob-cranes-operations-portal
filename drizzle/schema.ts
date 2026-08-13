@@ -16,6 +16,14 @@ export const users = mysqlTable("users", {
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
+export const userActivityLogs = mysqlTable("user_activity_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  action: varchar("action", { length: 64 }).notNull(),
+  detail: text("detail").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const bookings = mysqlTable("bookings", {
   id: varchar("id", { length: 64 }).primaryKey(),
   clientName: varchar("clientName", { length: 255 }).notNull(),

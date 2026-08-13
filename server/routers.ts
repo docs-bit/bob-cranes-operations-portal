@@ -1,5 +1,6 @@
 import { LOCAL_AUTH_COOKIE_NAME, COOKIE_NAME } from "@shared/const";
 import { canAccessDepartment, isDepartmentCode, type DepartmentCode } from "@shared/departmentAccess";
+import { accountStatusActivity, profileUpdateActivity, signInActivity } from "@shared/activityRules";
 import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -62,10 +63,12 @@ export const appRouter = router({
           throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
         }
         await db.updateUserLastSignedIn(user.id);
+        await db.addUserActivity(signInActivity(user.id));
         writeLocalSession(ctx, await createLocalSession(user));
         return toSessionUser({ ...user, lastSignedIn: new Date() });
       }),
     listUsers: adminProcedure.query(async () => (await db.listLocalUsers()).map(toSessionUser)),
+    listActivity: adminProcedure.query(async () => await db.listRecentUserActivity()),
     registerUser: adminProcedure.input(accountInput).mutation(async ({ input }) => {
       const email = normalizeEmail(input.email);
       if (await db.getUserByLocalEmail(email)) {
@@ -102,6 +105,7 @@ export const appRouter = router({
         ...(input.password ? { passwordHash: await hashPassword(input.password) } : {}),
       });
       if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "The account could not be updated." });
+      await db.addUserActivity(profileUpdateActivity(input.id, ctx.user.name ?? ctx.user.email ?? "an administrator"));
       return toSessionUser(user);
     }),
     setUserActive: adminProcedure.input(z.object({ id: z.number().int().positive(), isActive: z.boolean() })).mutation(async ({ ctx, input }) => {
@@ -111,6 +115,7 @@ export const appRouter = router({
       if (existing.role === "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Administrator accounts cannot be deactivated from this workspace." });
       const user = await db.setLocalUserActive(input.id, input.isActive ? 1 : 0);
       if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "The account status could not be updated." });
+      await db.addUserActivity(accountStatusActivity(input.id, input.isActive, ctx.user.name ?? ctx.user.email ?? "an administrator"));
       return toSessionUser(user);
     }),
     logout: publicProcedure.mutation(({ ctx }) => {

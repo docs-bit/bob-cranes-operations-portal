@@ -413,3 +413,27 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 @keyframes auth-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .auth-spinner, .button-spinner { animation: none; } }
 @media (max-width: 760px) { .account-toolbar { align-items: stretch; flex-direction: column; } .account-filter { width: 100%; } .account-edit-form { grid-template-columns: 1fr; } .account-edit-actions { grid-column: auto; justify-content: stretch; } .account-edit-actions button { flex: 1; } }
+
+/* Admin activity feed and safe deactivation modal */
+.user-activity-panel { margin-bottom: 16px; }
+.user-activity-panel .panel-title { display: flex; align-items: center; gap: 7px; }
+.activity-list { display: grid; gap: 0; }
+.activity-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: start; gap: 10px; padding: 11px 0; border-bottom: 1px solid #e7e6e3; }
+.activity-row:last-child { border-bottom: 0; }
+.activity-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #e8f3ff; color: #0a66c2; }
+.activity-copy { min-width: 0; }
+.activity-copy > div { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.activity-copy strong { color: #191919; font-size: 12px; }
+.activity-copy p { margin: 4px 0 0; color: #777; font-size: 11px; }
+.activity-action { color: #0a66c2; font-size: 10px; font-weight: 700; }
+.activity-row time { color: #888; font-size: 10px; white-space: nowrap; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 22px; background: rgba(15, 23, 42, .36); backdrop-filter: blur(3px); }
+.confirmation-modal { width: min(100%, 430px); padding: 26px; border: 1px solid #dfdedb; border-radius: 14px; background: #fff; box-shadow: 0 22px 80px rgba(15, 23, 42, .22); }
+.confirmation-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: #a15c00; background: #fff4d6; margin-bottom: 15px; }
+.confirmation-modal h2 { margin: 0; color: #191919; font-size: 20px; letter-spacing: -.02em; }
+.confirmation-modal p { margin: 10px 0 22px; color: #666; font-size: 12px; line-height: 1.55; }
+.confirmation-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.danger-button { height: 38px; display: inline-flex; align-items: center; justify-content: center; padding: 0 15px; border: 0; border-radius: 999px; background: #b42318; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; }
+.danger-button:hover:not(:disabled) { background: #8f1818; }
+.danger-button:disabled { opacity: .65; cursor: wait; }
+@media (max-width: 760px) { .activity-row { grid-template-columns: 28px minmax(0, 1fr); } .activity-row time { grid-column: 2; } .confirmation-actions { flex-direction: column-reverse; } .confirmation-actions button { width: 100%; } }

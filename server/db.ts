@@ -2,7 +2,7 @@ import { desc, eq, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { nanoid } from "nanoid";
 import { 
-  InsertUser, users, bookings, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
+  InsertUser, users, userActivityLogs, bookings, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -138,6 +138,27 @@ export async function setLocalUserActive(id: number, isActive: number) {
   if (!db) throw new Error("Database unavailable for account status update.");
   await db.update(users).set({ isActive }).where(eq(users.id, id));
   return await getUserById(id);
+}
+
+export async function addUserActivity(input: { userId: number; action: string; detail: string }) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(userActivityLogs).values(input);
+}
+
+export async function listRecentUserActivity(limit = 40) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select({
+    id: userActivityLogs.id,
+    userId: userActivityLogs.userId,
+    userName: users.name,
+    userEmail: users.localEmail,
+    departmentCode: users.departmentCode,
+    action: userActivityLogs.action,
+    detail: userActivityLogs.detail,
+    createdAt: userActivityLogs.createdAt,
+  }).from(userActivityLogs).leftJoin(users, eq(userActivityLogs.userId, users.id)).orderBy(desc(userActivityLogs.createdAt)).limit(limit);
 }
 
 // ---- Bookings & Operations Queries ----
