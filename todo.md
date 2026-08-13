@@ -1,4 +1,4 @@
-# Project TODO - PRD v3.0 Alignment & Handoff
+# Project TODO - PRD v3.0 & Crane App Archive Alignment
 
 ## Phase 2 & 3: Verification & Validation
 - [x] Verify PRD v3.0 requirements against checkpoint bb8c0c51
