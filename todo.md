@@ -121,3 +121,11 @@
 - [x] Run mobile visual QA for Attendance, Crew multi-booking, and Training Register screens and record the results.
 - [x] Save a new checkpoint covering the attendance, allocation, and workbook-backed training release.
 - [x] Add direct deep links for the Training Register and Crew allocation workspace so preview capture and browser refreshes do not fall through to 404.
+- [x] Add a visual calendar view for crew assignments so I can easily see overlaps and schedules.
+- [x] Add filtering options to the notification dropdown so users can sort alerts by urgency or department.
+- [x] Create a dashboard widget that highlights employees with expiring training certificates based on the onboarded dataset.
+- [x] Add employees data from attached Excel sheet (from August 2026 only).
+- [x] Add all employees from OP AUG 2026, HELP AUG 2026, WORKSHOP AUG 2026, and OFFICE AUG 2026 tabs to the attendance roster.
+- [x] Add a 'Clear All' or 'Mark as Read' control inside the notification dropdown.
+- [x] Make employees in the expiring certificates widget clickable to view their full profile and training details.
+- [x] Add an option to export the visual crew assignment calendar to PDF or Excel.
