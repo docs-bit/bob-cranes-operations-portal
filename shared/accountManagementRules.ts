@@ -1,6 +1,6 @@
 export type ManagedAccount = {
   id: number;
-  role: "admin" | "user";
+  role: "admin" | "supervisor" | "user";
   isActive: number;
   name?: string | null;
   email?: string | null;

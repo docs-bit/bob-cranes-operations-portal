@@ -91,7 +91,8 @@ export async function createLocalUser(input: {
   email: string;
   passwordHash: string;
   departmentCode: string;
-  role: "admin" | "user";
+  role: "admin" | "supervisor" | "user";
+  supervisorId?: number | null;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable for account creation.");
@@ -103,6 +104,7 @@ export async function createLocalUser(input: {
     localEmail: input.email,
     passwordHash: input.passwordHash,
     departmentCode: input.departmentCode,
+    supervisorId: input.supervisorId ?? null,
     isActive: 1,
     loginMethod: "password",
     role: input.role,
@@ -120,7 +122,8 @@ export async function updateUserLastSignedIn(id: number) {
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, id));
 }
 
-export async function updateLocalUser(id: number, input: { name: string; email: string; departmentCode: string; role: "admin" | "user"; passwordHash?: string }) {
+export async function updateLocalUser(id: number, input: { name: string; email: string; departmentCode: string; role: "admin" | "supervisor" | "user";
+  supervisorId?: number | null; passwordHash?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable for account update.");
   await db.update(users).set({
@@ -128,6 +131,7 @@ export async function updateLocalUser(id: number, input: { name: string; email: 
     email: input.email,
     localEmail: input.email,
     departmentCode: input.departmentCode,
+    supervisorId: input.supervisorId ?? null,
     role: input.role,
     ...(input.passwordHash ? { passwordHash: input.passwordHash } : {}),
   }).where(eq(users.id, id));
@@ -147,10 +151,10 @@ export async function addUserActivity(input: { userId: number; action: string; d
   await db.insert(userActivityLogs).values(input);
 }
 
-export async function listRecentUserActivity(limit = 40) {
+export async function listRecentUserActivity(limit = 40, departmentCode?: string | null) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select({
+  const query = db.select({
     id: userActivityLogs.id,
     userId: userActivityLogs.userId,
     userName: users.name,
@@ -159,7 +163,8 @@ export async function listRecentUserActivity(limit = 40) {
     action: userActivityLogs.action,
     detail: userActivityLogs.detail,
     createdAt: userActivityLogs.createdAt,
-  }).from(userActivityLogs).leftJoin(users, eq(userActivityLogs.userId, users.id)).orderBy(desc(userActivityLogs.createdAt)).limit(limit);
+  }).from(userActivityLogs).leftJoin(users, eq(userActivityLogs.userId, users.id));
+  return await query.where(departmentCode ? eq(users.departmentCode, departmentCode) : undefined).orderBy(desc(userActivityLogs.createdAt)).limit(limit);
 }
 
 // ---- Bookings & Operations Queries ----

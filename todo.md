@@ -80,3 +80,31 @@
 - [x] Create an in-app header notification dropdown for profile updates and role changes.
 - [x] Validate new search, export, and notification features with unit tests and browser checks.
 - [x] Save and deliver the final search and notification checkpoint.
+
+## Universal back button, supervisor accounts, department dashboards, and reference progress UI
+- [x] Add universal back button/navigation across all departmental and administrative screens.
+- [x] Update user model and roles to support department supervisors (admin can assign supervisors; supervisors can register and manage users solely within their own department).
+- [x] Build individual dedicated dashboards for all operating departments linked to the flawless 8-stage booking workflow.
+- [x] Restyle progress bars and step indicators exactly matching the supplied dark/green reference visual style.
+- [x] Add unit tests and verify end-to-end authorization, supervisor management, and workflow integration.
+- [x] Save checkpoint and deliver the fully updated portal.
+
+## Follow-up gaps discovered during final validation
+- [x] Wire every department portal to a real lifecycle action or explicitly document why a department is read-only; persist transition notifications on handoff.
+- [x] Add tests and/or browser verification for the full supervisor workflow: admin creates supervisor, supervisor login, supervisor-only same-department user creation/edit/deactivation, cross-department denial.
+- [x] Add workflow integration coverage for department dashboard handoff actions and notification generation.
+- [x] Save and deliver a new checkpoint for the supervisor and department-portal release.
+
+## Final end-to-end supervisor release verification
+- [ ] Run a real browser flow in which an administrator creates or assigns a supervisor, the supervisor signs in, and the supervisor creates, edits, deactivates, and is denied access to another department’s user.
+- [ ] Save and deliver the final checkpoint after the supervisor and workflow fixes.
+
+## Progress UI and button interaction repair
+- [x] Reproduce and diagnose why the reference-style progress bar and related UI are not visibly changed in the rendered portal.
+- [x] Identify and fix shared button handlers, stale DOM targets, disabled states, and runtime errors affecting navigation and workflow controls.
+- [x] Re-verify progress visuals and interactive controls at desktop and mobile widths, then run unit tests, type check, and production build.
+- [x] Save and deliver the repaired portal checkpoint.
+
+## Final repair release gaps
+- [x] Re-verify the repaired progress UI and key interactive controls at a true mobile viewport after the latest fixes, and record the result.
+- [x] Save a new checkpoint after the progress/button repair changes and deliver that updated checkpoint to the user.

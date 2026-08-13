@@ -462,3 +462,95 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .notification-empty { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 110px; padding: 18px; color: #7a869a; font-size: 11px; text-align: center; }
 .notification-error { color: #b42318; }
 @media (max-width: 760px) { .activity-header-actions { align-items: flex-start; flex-direction: column; } .activity-header-actions .compact-button { width: 100%; } .notification-dropdown { right: -8px; } }
+
+/* Universal navigation and reference-style progress system */
+.topbar-leading { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.back-button { height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid #d2d2d7; border-radius: 999px; background: #fff; color: #424245; font-size: 11px; font-weight: 700; cursor: pointer; transition: .18s ease; }
+.back-button:hover:not(:disabled) { color: #004182; border-color: #70b5f9; background: #edf6ff; transform: translateX(-1px); }
+.back-button:disabled { opacity: .45; cursor: not-allowed; }
+.reference-progress-board { display: grid; gap: 16px; padding: 16px; border: 1px solid #e1e1e4; border-radius: 14px; background: linear-gradient(180deg, #fbfbfc, #f4f4f6); }
+.reference-progress-grid { display: grid; grid-template-columns: minmax(220px, .9fr) minmax(0, 1.45fr); gap: 18px; align-items: center; }
+.reference-progress-copy { min-width: 0; }
+.reference-progress-copy strong { display: block; color: #242426; font-size: 12px; font-weight: 760; }
+.reference-progress-copy span { display: block; color: #77777d; font-size: 10px; margin-top: 4px; }
+.reference-progress-segments { display: grid; grid-template-columns: repeat(7, minmax(16px, 1fr)); gap: 4px; }
+.reference-progress-segments span { height: 5px; border-radius: 3px; background: #dedee2; }
+.reference-progress-segments span.complete { background: #14a44d; }
+.reference-progress-segments span.partial { background: linear-gradient(90deg, #14a44d 50%, #dedee2 50%); }
+.reference-progress-segments.failed span:last-child { background: #d93535; }
+.reference-progress-segments.yellow span.complete { background: #d6db00; }
+.reference-progress-rail { display: grid; grid-template-columns: repeat(8, minmax(66px, 1fr)); gap: 0; align-items: start; overflow-x: auto; padding: 2px 0 7px; }
+.reference-step { position: relative; min-width: 66px; text-align: center; color: #77777d; font-size: 10px; }
+.reference-step:not(:last-child)::after { content: ""; position: absolute; top: 12px; left: 50%; right: -50%; height: 2px; background: #d9d9de; z-index: 0; }
+.reference-step.done:not(:last-child)::after { background: #14a44d; }
+.reference-step.yellow.done:not(:last-child)::after { background: #d6db00; }
+.reference-step-dot { position: relative; z-index: 1; width: 25px; height: 25px; margin: 0 auto 6px; display: grid; place-items: center; border: 1px solid #d1d1d6; border-radius: 50%; background: #fff; color: #77777d; font-size: 10px; font-weight: 760; }
+.reference-step.done .reference-step-dot { border-color: #14a44d; background: #14a44d; color: #fff; }
+.reference-step.current .reference-step-dot { box-shadow: 0 0 0 4px rgba(20,164,77,.14); }
+.reference-step.yellow.done .reference-step-dot { border-color: #d6db00; background: #d6db00; color: #232323; }
+.reference-step-label { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reference-progress-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-top: 4px; color: #77777d; font-size: 10px; }
+.reference-progress-footer strong { color: #242426; font-size: 12px; }
+@media (max-width: 800px) { .reference-progress-grid { grid-template-columns: 1fr; gap: 10px; } .topbar-leading { gap: 8px; } .back-button span { display: none; } }
+
+.reference-progress-list { display: grid; gap: 10px; padding-top: 4px; }
+.reference-progress-department { padding-top: 10px; border-top: 1px solid #e2e2e5; }
+.reference-progress-department .reference-progress-grid { grid-template-columns: minmax(170px, .7fr) minmax(0, 1.5fr); gap: 14px; }
+.reference-progress-department .reference-progress-copy strong { font-size: 11px; }
+@media (max-width: 620px) { .reference-progress-department .reference-progress-grid { grid-template-columns: 1fr; gap: 8px; } .reference-progress-footer { align-items: flex-start; flex-direction: column; } }
+
+.department-portal-banner { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 18px 20px; margin-bottom: 18px; border: 1px solid #cfe2f5; border-radius: 16px; background: linear-gradient(110deg, #eef6ff, #fff); }
+.department-portal-stage { display: flex; align-items: center; gap: 9px; padding: 12px 14px; border: 1px solid #cfe2f5; border-radius: 12px; background: #fff; color: #0a66c2; white-space: nowrap; }
+.department-portal-stage span { color: #6e6e73; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.department-portal-stage strong { font-size: 11px; color: #004182; }
+.department-queue-row { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e5e5e7; }
+.department-queue-row:last-child { border-bottom: 0; }
+.department-checklist { display: grid; gap: 12px; }
+.department-checklist-row { display: flex; align-items: flex-start; gap: 10px; }
+.department-checklist-row > span { width: 22px; height: 22px; display: grid; place-items: center; flex: none; border-radius: 50%; background: #e8f3ff; color: #0a66c2; font-size: 10px; font-weight: 800; }
+.department-checklist-row strong { display: block; color: #1d1d1f; font-size: 12px; }
+.department-checklist-row small { display: block; color: #6e6e73; font-size: 10px; margin-top: 3px; }
+@media (max-width: 760px) { .department-portal-banner { align-items: flex-start; flex-direction: column; } .department-portal-stage { width: 100%; justify-content: space-between; } .department-queue-row { align-items: stretch; flex-direction: column; gap: 4px; padding: 8px 0; } .department-queue-row .secondary-button { align-self: flex-start; } }
+
+.reference-progress-board { background: linear-gradient(145deg, #171b21, #222831); border-color: #303842; color: #f5f5f7; box-shadow: 0 14px 28px rgba(15,18,23,.14); }
+.reference-progress-board .panel-title, .reference-progress-board .reference-progress-copy strong, .reference-progress-board .reference-progress-footer strong { color: #f5f5f7; }
+.reference-progress-board .eyebrow { color: #52db7e; }
+.reference-progress-board .reference-progress-copy span, .reference-progress-board .reference-progress-footer, .reference-progress-board .compliance-sub { color: #a4abb4; }
+.reference-progress-board .reference-progress-segments span { background: #3a424d; }
+.reference-progress-board .reference-progress-segments span.complete { background: #19b957; }
+.reference-progress-board .reference-progress-segments span.partial { background: linear-gradient(90deg, #19b957 50%, #3a424d 50%); }
+.reference-progress-board .reference-progress-segments.failed span:last-child { background: #d94343; }
+.reference-progress-board .reference-progress-segments.yellow span.complete { background: #d8dd00; }
+.reference-progress-board .reference-step { color: #a4abb4; }
+.reference-progress-board .reference-step:not(:last-child)::after { background: #3a424d; }
+.reference-progress-board .reference-step.done:not(:last-child)::after { background: #19b957; }
+.reference-progress-board .reference-step-dot { background: #222831; border-color: #56606d; color: #a4abb4; }
+.reference-progress-board .reference-step.done .reference-step-dot { border-color: #19b957; background: #19b957; color: #fff; }
+.reference-progress-board .reference-step.current .reference-step-dot { box-shadow: 0 0 0 4px rgba(25,185,87,.2); }
+.reference-progress-board .reference-progress-department { border-color: #303842; }
+
+/* Interaction feedback for repaired controls */
+.active-control { background: #e8f3ff; border-color: #70b5f9; color: #004182; }
+.filter-chip:active, .primary-button:active, .secondary-button:active, .icon-button:active { transform: scale(.97); }
+.search-pill input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: #191919; font-size: 12px; }
+.search-pill input::placeholder { color: #6e6e73; }
+.booking-search { cursor: text; }
+@media (max-width: 620px) { .booking-search { width: 100% !important; } }
+
+.client-reference-progress { display: grid; gap: 14px; padding: 16px; border: 1px solid #303842; border-radius: 12px; background: linear-gradient(145deg, #171b21, #222831); color: #f5f5f7; }
+.client-reference-progress .reference-upload-progress { color: #f5f5f7; }
+.client-reference-progress .reference-upload-progress strong { color: #f5f5f7; }
+.client-reference-progress .reference-upload-progress span { color: #a4abb4; }
+.client-reference-progress .reference-progress-segments span { background: #3a424d; }
+.client-reference-progress .reference-progress-segments span.complete { background: #19b957; }
+.client-reference-progress .reference-progress-segments span.partial { background: linear-gradient(90deg, #19b957 50%, #3a424d 50%); }
+.client-reference-progress .reference-step { color: #a4abb4; }
+.client-reference-progress .reference-step:not(:last-child)::after { background: #3a424d; }
+.client-reference-progress .reference-step.done:not(:last-child)::after { background: #19b957; }
+.client-reference-progress .reference-step-dot { background: #222831; border-color: #56606d; color: #a4abb4; }
+.client-reference-progress .reference-step.done .reference-step-dot { border-color: #19b957; background: #19b957; color: #fff; }
+.client-reference-progress .reference-progress-footer { color: #a4abb4; }
+.client-reference-progress .reference-progress-footer strong { color: #f5f5f7; }
+@media (max-width: 620px) { .client-reference-progress { padding: 12px; } .client-reference-rail { grid-template-columns: repeat(8, minmax(72px, 1fr)); } }
+.client-reference-progress .reference-progress-copy strong { color: #f5f5f7; }
+.client-reference-progress .reference-progress-copy span { color: #a4abb4; }

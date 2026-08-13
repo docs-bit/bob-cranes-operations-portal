@@ -15,7 +15,7 @@ describe("BOB Cranes booking rules", () => {
     ]);
     expect(canAdvanceStage("Created by Salesperson", "Documentation Supervisor", "Documentation Supervisor")).toBe(true);
     expect(canAdvanceStage("Created by Salesperson", "Crew Assigned", "Crew Assignment")).toBe(false);
-    expect(canAdvanceStage("Reviewed", "Dispatched", "Documentation")).toBe(true);
+    expect(canAdvanceStage("Reviewed", "Dispatched", "Salesperson")).toBe(true);
   });
 
   it("returns notifications when a role-gated transition succeeds", () => {

@@ -21,10 +21,27 @@ export const DEPARTMENT_LABEL_TO_CODE = Object.fromEntries(
   DEPARTMENTS.map((department) => [department.label, department.code]),
 ) as Record<string, DepartmentCode>;
 
+export type PortalRole = "admin" | "supervisor" | "user";
 export type DepartmentAccessUser = {
-  role: "admin" | "user";
+  role: PortalRole;
   departmentCode?: string | null;
 };
+
+export function isAdmin(user: DepartmentAccessUser) {
+  return user.role === "admin";
+}
+
+export function isSupervisor(user: DepartmentAccessUser) {
+  return user.role === "supervisor";
+}
+
+export function canManageDepartmentUsers(user: DepartmentAccessUser, departmentCode?: string | null) {
+  return user.role === "admin" || (user.role === "supervisor" && Boolean(user.departmentCode) && user.departmentCode === departmentCode);
+}
+
+export function roleLabel(role: PortalRole) {
+  return role === "admin" ? "Administrator" : role === "supervisor" ? "Department supervisor" : "Department user";
+}
 
 export function isDepartmentCode(value: string): value is DepartmentCode {
   return value in DEPARTMENT_BY_CODE;
@@ -57,5 +74,5 @@ export function departmentsForUser(user: DepartmentAccessUser) {
 }
 
 export function canAccessWorkspaceView(user: DepartmentAccessUser, view: string) {
-  return user.role === "admin" || view === "overview" || view === "detail" || view === "department" || DEPARTMENT_WORKSPACE_VIEW[user.departmentCode as DepartmentCode] === view;
+  return user.role === "admin" || view === "overview" || view === "detail" || view === "department" || (view === "users" && user.role === "supervisor") || DEPARTMENT_WORKSPACE_VIEW[user.departmentCode as DepartmentCode] === view;
 }

@@ -46,7 +46,7 @@ export const STAGE_ROLES: Record<BookingStage, string> = {
   "Docs In Progress": "Department users",
   "All Docs Submitted": "Documentation",
   Reviewed: "Salesperson",
-  Dispatched: "Documentation",
+  Dispatched: "Salesperson",
 };
 
 export function canAdvanceStage(current: BookingStage, next: BookingStage, actorRole: string) {
