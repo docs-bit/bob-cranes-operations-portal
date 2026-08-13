@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
-import { COOKIE_NAME } from "../shared/const";
+import { COOKIE_NAME, LOCAL_AUTH_COOKIE_NAME } from "../shared/const";
 import type { TrpcContext } from "./_core/context";
 
 type CookieCall = {
@@ -42,21 +42,21 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
 }
 
 describe("auth.logout", () => {
-  it("clears the session cookie and reports success", async () => {
+  it("clears OAuth and local password session cookies and reports success", async () => {
     const { ctx, clearedCookies } = createAuthContext();
     const caller = appRouter.createCaller(ctx);
 
     const result = await caller.auth.logout();
 
     expect(result).toEqual({ success: true });
-    expect(clearedCookies).toHaveLength(1);
-    expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
+    expect(clearedCookies.map((call) => call.name)).toEqual([COOKIE_NAME, LOCAL_AUTH_COOKIE_NAME]);
     expect(clearedCookies[0]?.options).toMatchObject({
-      maxAge: -1,
+      expires: expect.any(Date),
       secure: true,
       sameSite: "none",
       httpOnly: true,
       path: "/",
     });
+    expect(clearedCookies[1]?.options).toMatchObject({ expires: expect.any(Date), secure: true, httpOnly: true });
   });
 });

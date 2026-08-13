@@ -1,5 +1,6 @@
-import { eq, desc } from "drizzle-orm";
+import { desc, eq, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import { nanoid } from "nanoid";
 import { 
   InsertUser, users, bookings, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
 } from "../drizzle/schema";
@@ -56,6 +57,67 @@ export async function getUserByOpenId(openId: string) {
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getUserByLocalEmail(localEmail: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.localEmail, localEmail)).limit(1);
+  return result[0];
+}
+
+export async function countLocalUsers() {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select().from(users).where(isNotNull(users.localEmail));
+  return result.length;
+}
+
+export async function listLocalUsers() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(users).where(isNotNull(users.localEmail)).orderBy(desc(users.createdAt));
+}
+
+export async function createLocalUser(input: {
+  name: string;
+  email: string;
+  passwordHash: string;
+  departmentCode: string;
+  role: "admin" | "user";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable for account creation.");
+
+  await db.insert(users).values({
+    openId: `local-${nanoid(32)}`,
+    name: input.name,
+    email: input.email,
+    localEmail: input.email,
+    passwordHash: input.passwordHash,
+    departmentCode: input.departmentCode,
+    isActive: 1,
+    loginMethod: "password",
+    role: input.role,
+    lastSignedIn: new Date(),
+  });
+
+  const user = await getUserByLocalEmail(input.email);
+  if (!user) throw new Error("Account was created but could not be retrieved.");
+  return user;
+}
+
+export async function updateUserLastSignedIn(id: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, id));
 }
 
 // ---- Bookings & Operations Queries ----

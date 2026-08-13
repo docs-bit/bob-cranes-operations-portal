@@ -1,8 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
 import { canDispatch as canDispatchByRule, departmentCompletion, documentCompletion, revisionReversionStage, revertBooking, transitionBooking, type DocumentItem } from "@shared/bookingRules";
 import { ATTENDANCE_STATUSES, attendanceCompletion, dateKey, defaultAttendanceRecord, formatAttendanceDate, historicalAttendanceRecord, shiftDate, summarizeAttendance, updateAttendance, type AttendanceRecord, type AttendanceStatus } from "@shared/attendanceRules";
+import { canAccessWorkspaceView, DEPARTMENTS, DEPARTMENT_LABEL_TO_CODE } from "@shared/departmentAccess";
 import DataUploadCenter, { type UploadMap } from "@/components/DataUploadCenter";
+import DepartmentUsersView from "@/components/DepartmentUsersView";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -21,8 +25,10 @@ import {
   FolderOpen,
   Gauge,
   HardHat,
+  Landmark,
   LayoutDashboard,
   Lock,
+  LogOut,
   Mail,
   MapPin,
   MessageCircle,
@@ -34,6 +40,7 @@ import {
   ShieldCheck,
   Truck,
   Users,
+  UserCog,
   Wrench,
   X,
 } from "lucide-react";
@@ -48,7 +55,7 @@ type Stage =
   | "Reviewed"
   | "Dispatched";
 
-type View = "overview" | "bookings" | "wizard" | "docs" | "crew" | "gear" | "attendance" | "uploads" | "detail" | "department";
+type View = "overview" | "bookings" | "wizard" | "docs" | "crew" | "gear" | "attendance" | "uploads" | "detail" | "department" | "users";
 
 type Booking = {
   id: string;
@@ -160,8 +167,9 @@ function MetricCard({ label, value, foot, icon, tone = "red" }: { label: string;
   return <div className="metric-card"><div className="metric-label">{label}</div><div className="metric-value">{value}</div><div className="metric-foot"><span className={tone === "green" ? "delta-up" : ""}>{icon}</span>{foot}</div></div>;
 }
 
-function Shell({ children, view, setView, onClient, onDepartment, departmentLabel }: { children: React.ReactNode; view: View; setView: (view: View) => void; onClient: () => void; onDepartment: (department: string) => void; departmentLabel: string | null }) {
+function Shell({ children, view, setView, onClient, onDepartment, departmentLabel, user, onSignOut }: { children: React.ReactNode; view: View; setView: (view: View) => void; onClient: () => void; onDepartment: (department: string) => void; departmentLabel: string | null; user: { name: string | null; email: string | null; role: "admin" | "user"; departmentCode: string | null }; onSignOut: () => Promise<void> }) {
   const [notifications, setNotifications] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const navItems: { id: View; label: string; icon: React.ReactNode }[] = [
     { id: "overview", label: "Operations Cockpit", icon: <LayoutDashboard /> },
     { id: "bookings", label: "Booking Dossiers", icon: <ClipboardCheck /> },
@@ -171,12 +179,27 @@ function Shell({ children, view, setView, onClient, onDepartment, departmentLabe
     { id: "attendance", label: "Attendance", icon: <CalendarDays /> },
     { id: "uploads", label: "Excel Data Uploads", icon: <FolderOpen /> },
   ];
-  const departmentItems = ["Sales & Client Relations", "Documentation & Permits", "Lifting Gears / Engineering", "Maintenance", "Crew / Workmen Assignment", "HSE / Safety", "Accounts", "HR", "Transportation", "Administrator / Super Admin"];
+  const visibleNavItems = navItems.filter((item) => canAccessWorkspaceView(user, item.id));
+  const departmentItems = [
+    { label: "Sales & Client Relations", code: "sales", icon: <ClipboardCheck /> },
+    { label: "Documentation & Permits", code: "documentation", icon: <FileText /> },
+    { label: "Lifting Gears / Engineering", code: "lifting-gears", icon: <Wrench /> },
+    { label: "Maintenance", code: "maintenance", icon: <Gauge /> },
+    { label: "Crew / Workmen Assignment", code: "crew", icon: <Users /> },
+    { label: "HSE / Safety", code: "hse", icon: <ShieldCheck /> },
+    { label: "Accounts", code: "accounts", icon: <Landmark /> },
+    { label: "HR", code: "hr", icon: <CalendarDays /> },
+    { label: "Transportation", code: "transportation", icon: <Truck /> },
+    { label: "Administrator / Super Admin", code: "administrator", icon: <Settings /> },
+  ] as const;
+  const permittedDepartments = user.role === "admin" ? departmentItems : departmentItems.filter((department) => department.code === user.departmentCode);
+  const userName = user.name?.trim() || "BOB Cranes user";
+  const userDepartment = user.role === "admin" ? "Administrator" : DEPARTMENTS.find((department) => department.code === user.departmentCode)?.label ?? "Department user";
   return <div className="app-shell">
     <aside className="sidebar">
       <div className="brand"><div className="brand-row"><div className="brand-mark">B</div><div className="brand-copy"><div className="brand-title">BOB CRANES</div><div className="brand-subtitle">Operations Control</div></div></div></div>
-      <nav className="nav"><div className="nav-section">Workspace</div>{navItems.map((item) => <button key={item.id} className={`nav-item ${view === item.id || (view === "detail" && item.id === "bookings") ? "active" : ""}`} onClick={() => setView(item.id)}>{item.icon}<span>{item.label}</span></button>)}<div className="nav-section" style={{ marginTop: 22 }}>Departments</div>{departmentItems.map((department) => <button className={`nav-item ${view === "department" && departmentLabel === department ? "active" : ""}`} key={department} onClick={() => onDepartment(department)}><ShieldCheck /><span>{department}</span></button>)}<div className="nav-section" style={{ marginTop: 22 }}>Administration</div><button className="nav-item" onClick={() => setView("overview")}><Gauge /><span>Fleet & Utilization</span></button><button className="nav-item" onClick={() => setView("overview")}><Settings /><span>System Settings</span></button><button className="nav-item" onClick={onClient}><MessageCircle /><span>Client Portal Preview</span></button></nav>
-      <div className="sidebar-footer"><div className="user-mini"><div className="avatar">NS</div><div className="user-copy"><div className="user-name">Nishanth Shetty</div><div className="user-role">Documentation Supervisor</div></div><ChevronDown size={14} color="#777" /></div></div>
+      <nav className="nav"><div className="nav-section">Workspace</div>{visibleNavItems.map((item) => <button key={item.id} className={`nav-item ${view === item.id || (view === "detail" && item.id === "bookings") ? "active" : ""}`} onClick={() => setView(item.id)}>{item.icon}<span>{item.label}</span></button>)}<div className="nav-section" style={{ marginTop: 22 }}>Departments</div>{permittedDepartments.map((department) => <button className={`nav-item ${view === "department" && departmentLabel === department.label ? "active" : ""}`} key={department.code} onClick={() => onDepartment(department.label)}>{department.icon}<span>{department.label}</span></button>)}<div className="nav-section" style={{ marginTop: 22 }}>Administration</div>{user.role === "admin" && <><button className="nav-item" onClick={() => setView("overview")}><Gauge /><span>Fleet & Utilization</span></button><button className="nav-item" onClick={() => setView("overview")}><Settings /><span>System Settings</span></button><button className={`nav-item ${view === "users" ? "active" : ""}`} onClick={() => setView("users")}><UserCog /><span>Department Users</span></button></>}{(user.role === "admin" || user.departmentCode === "sales") && <button className="nav-item" onClick={onClient}><MessageCircle /><span>Client Portal Preview</span></button>}</nav>
+      <div className="sidebar-footer"><div className="profile-menu-wrap"><button className="user-mini" onClick={() => setProfileOpen((open) => !open)} aria-expanded={profileOpen} aria-label="Open profile menu"><div className="avatar">{initials(userName)}</div><div className="user-copy"><div className="user-name">{userName}</div><div className="user-role">{userDepartment}</div></div><ChevronDown size={14} /></button>{profileOpen && <div className="profile-menu"><div className="profile-menu-heading"><strong>{userName}</strong><span>{user.email ?? "No email on record"}</span></div>{user.role === "admin" && <button onClick={() => { setProfileOpen(false); setView("users"); }}><UserCog size={15} />Manage department users</button>}<button className="profile-signout" onClick={onSignOut}><LogOut size={15} />Sign out</button></div>}</div></div>
     </aside>
     <main className="main-shell">
       <header className="topbar"><div className="breadcrumb">BOB Cranes / <strong>{view === "overview" ? "Operations Cockpit" : view === "wizard" ? "New Booking" : view === "detail" ? "Booking Dossier" : view === "department" ? departmentLabel : view === "uploads" ? "Excel Data Uploads" : view[0].toUpperCase() + view.slice(1)}</strong></div><div className="topbar-actions"><div className="search-pill"><Search size={14} /> Search dossiers <span style={{ marginLeft: "auto", color: "#555" }}>⌘ K</span></div><button className="icon-button" onClick={() => setNotifications((value) => !value)}><Bell size={16} />{notifications && <div style={{ position: "absolute", top: 54, right: 30, width: 300, background: "#191919", border: "1px solid #383838", borderRadius: 10, padding: 12, textAlign: "left", boxShadow: "0 20px 60px rgba(0,0,0,.45)" }}><div className="panel-title" style={{ marginBottom: 10 }}>Notifications <span className="status-badge red" style={{ float: "right" }}>6 new</span></div><div className="notification-stack"><div className="notification"><div className="title">Ready for dispatch</div><div className="body">BOB Booking-31390 is ready for Sales review.</div></div><div className="notification"><div className="title">Training flag raised</div><div className="body">Vijayakumar · renewal due in 16 days.</div></div></div></div>}</button><button className="icon-button"><MoreHorizontal size={17} /></button></div></header>
@@ -214,8 +237,10 @@ function AttendanceSummaryCard({ records, setRecords, setView }: { records: Reco
   return <div className="panel attendance-dashboard-card"><div className="panel-header"><div><div className="panel-title">Today’s attendance</div><div className="panel-meta">Daily employee status · {formatAttendanceDate(today)}</div></div><button className="secondary-button" onClick={() => setView("attendance")}><ClipboardCheck size={14} /> View attendance</button></div><div className="panel-body"><div className="attendance-mini-summary"><span><strong>{summary.Present}</strong> present</span><span><strong>{summary["On Leave"]}</strong> on leave</span><span><strong>{summary.Assigned + summary["Off-Site"]}</strong> away</span></div><div className="attendance-mini-list">{attendanceRoster.slice(0, 4).map((employee) => { const status = record[employee.name] ?? "Present"; return <div className="attendance-mini-row" key={employee.name}><div className="attendance-person"><div className="avatar">{employee.initials}</div><div><div className="compliance-name">{employee.name}</div><div className="compliance-sub">{employee.role}</div></div></div><select className="attendance-select compact" value={status} onChange={(event) => updateStatus(employee.name, event.target.value as AttendanceStatus)} aria-label={`Attendance for ${employee.name}`} >{ATTENDANCE_STATUSES.map((option) => <option value={option} key={option}>{option}</option>)}</select></div>; })}</div></div></div>;
 }
 
-function Overview({ bookings, documents, setView, setDetail, attendanceRecords, setAttendanceRecords }: { bookings: Booking[]; documents: DocumentItem[]; setView: (view: View) => void; setDetail: (booking: Booking) => void; attendanceRecords: Record<string, AttendanceRecord>; setAttendanceRecords: React.Dispatch<React.SetStateAction<Record<string, AttendanceRecord>>> }) {
-  return <div className="content"><PageHeading eyebrow="Operations control center" title="Good morning, Nishanth" copy="A live view of every crane booking, compliance blocker, and next action across BOB Cranes." action={<button className="primary-button" onClick={() => setView("wizard")}><Plus size={15} /> New booking</button>} /><div className="metric-grid"><MetricCard label="Active dossiers" value="24" foot="6 require action today" icon={<ArrowRight size={13} />} /><MetricCard label="Ready for dispatch" value="03" foot="Sales review queue" icon={<CheckCircle2 size={13} />} tone="green" /><MetricCard label="Crew availability" value="88%" foot="32 of 36 workmen" icon={<Users size={13} />} tone="green" /><MetricCard label="Compliance watch" value="06" foot="Certificates expiring ≤20 days" icon={<AlertTriangle size={13} />} /></div><Pipeline bookings={bookings} documents={documents} setDetail={setDetail} /><AttendanceSummaryCard records={attendanceRecords} setRecords={setAttendanceRecords} setView={setView} /><div className="dashboard-grid" style={{ marginTop: 16 }}><div className="panel"><div className="panel-header"><div><div className="panel-title">Department activity</div><div className="panel-meta">Pending actions by team</div></div><button className="secondary-button">View comms <ArrowRight size={13} /></button></div><div className="panel-body"><div className="compliance-list">{departments.map(([name, count, color]) => <div className="compliance-row" key={name}><div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 7, height: 7, borderRadius: "50%", background: color }} /><div><div className="compliance-name">{name}</div><div className="compliance-sub">{count} pending action{count > 1 ? "s" : ""}</div></div></div><div style={{ width: 120 }}><div className="progress-track"><div className="progress-fill" style={{ width: `${Math.min(96, count * 12 + 8)}%`, background: color }} /></div></div></div>)}</div></div></div><div className="panel"><div className="panel-header"><div><div className="panel-title">Live operations feed</div><div className="panel-meta">Updated just now</div></div><Bell size={15} color="#777" /></div><div className="panel-body"><div className="activity-item"><div className="activity-dot" /><div><div className="activity-text"><strong>All departments notified</strong> for BOB Booking-31511.</div><div className="activity-time">2 minutes ago · System broadcast</div></div></div><div className="activity-item"><div className="activity-dot" style={{ background: "#f2b94b" }} /><div><div className="activity-text"><strong>Vijayakumar</strong> flagged for certificate renewal.</div><div className="activity-time">18 minutes ago · HSE inbox</div></div></div><div className="activity-item"><div className="activity-dot" style={{ background: "#31b56b" }} /><div><div className="activity-text"><strong>Client uploaded LPO_Rev2.pdf</strong> to response portal.</div><div className="activity-time">32 minutes ago · Gulf Contracting LLC</div></div></div><div className="activity-item"><div className="activity-dot" style={{ background: "#4f9cf9" }} /><div><div className="activity-text"><strong>Google Drive folder synced</strong> for BOB Booking-31390.</div><div className="activity-time">1 hour ago · Drive archive</div></div></div></div></div></div></div>;
+function Overview({ bookings, documents, setView, setDetail, attendanceRecords, setAttendanceRecords, user }: { bookings: Booking[]; documents: DocumentItem[]; setView: (view: View) => void; setDetail: (booking: Booking) => void; attendanceRecords: Record<string, AttendanceRecord>; setAttendanceRecords: React.Dispatch<React.SetStateAction<Record<string, AttendanceRecord>>>; user: { role: "admin" | "user"; departmentCode: string | null } }) {
+  const canCreateBooking = user.role === "admin" || user.departmentCode === "sales";
+  const visibleDepartments = user.role === "admin" ? departments : departments.filter(([name]) => DEPARTMENT_LABEL_TO_CODE[name] === user.departmentCode);
+  return <div className="content"><PageHeading eyebrow="Operations control center" title="Good morning, Nishanth" copy={user.role === "admin" ? "A live view of every crane booking, compliance blocker, and next action across BOB Cranes." : "A focused view of the dossiers and compliance actions assigned to your department."} action={canCreateBooking ? <button className="primary-button" onClick={() => setView("wizard")}><Plus size={15} /> New booking</button> : <span className="status-badge blue">Department workspace</span>} /><div className="metric-grid"><MetricCard label="Active dossiers" value="24" foot="6 require action today" icon={<ArrowRight size={13} />} /><MetricCard label="Ready for dispatch" value="03" foot="Sales review queue" icon={<CheckCircle2 size={13} />} tone="green" /><MetricCard label="Crew availability" value="88%" foot="32 of 36 workmen" icon={<Users size={13} />} tone="green" /><MetricCard label="Compliance watch" value="06" foot="Certificates expiring ≤20 days" icon={<AlertTriangle size={13} />} /></div>{user.role === "admin" ? <Pipeline bookings={bookings} documents={documents} setDetail={setDetail} /> : <div className="panel department-scope-banner"><div className="panel-body"><div className="panel-title">{DEPARTMENTS.find((department) => department.code === user.departmentCode)?.label ?? "Department"} workspace</div><div className="panel-meta">This view is limited to your department. Use the dedicated workspace section in the sidebar to review and submit assigned work.</div></div></div>}{(user.role === "admin" || user.departmentCode === "hr") && <AttendanceSummaryCard records={attendanceRecords} setRecords={setAttendanceRecords} setView={setView} />}<div className="dashboard-grid" style={{ marginTop: 16 }}><div className="panel"><div className="panel-header"><div><div className="panel-title">Department activity</div><div className="panel-meta">Pending actions by team</div></div><button className="secondary-button">View comms <ArrowRight size={13} /></button></div><div className="panel-body"><div className="compliance-list">{visibleDepartments.map(([name, count, color]) => <div className="compliance-row" key={name}><div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 7, height: 7, borderRadius: "50%", background: color }} /><div><div className="compliance-name">{name}</div><div className="compliance-sub">{count} pending action{count > 1 ? "s" : ""}</div></div></div><div style={{ width: 120 }}><div className="progress-track"><div className="progress-fill" style={{ width: `${Math.min(96, count * 12 + 8)}%`, background: color }} /></div></div></div>)}</div></div></div><div className="panel"><div className="panel-header"><div><div className="panel-title">Live operations feed</div><div className="panel-meta">Updated just now</div></div><Bell size={15} color="#777" /></div><div className="panel-body"><div className="activity-item"><div className="activity-dot" /><div><div className="activity-text"><strong>All departments notified</strong> for BOB Booking-31511.</div><div className="activity-time">2 minutes ago · System broadcast</div></div></div><div className="activity-item"><div className="activity-dot" style={{ background: "#f2b94b" }} /><div><div className="activity-text"><strong>Vijayakumar</strong> flagged for certificate renewal.</div><div className="activity-time">18 minutes ago · HSE inbox</div></div></div><div className="activity-item"><div className="activity-dot" style={{ background: "#31b56b" }} /><div><div className="activity-text"><strong>Client uploaded LPO_Rev2.pdf</strong> to response portal.</div><div className="activity-time">32 minutes ago · Gulf Contracting LLC</div></div></div><div className="activity-item"><div className="activity-dot" style={{ background: "#4f9cf9" }} /><div><div className="activity-text"><strong>Google Drive folder synced</strong> for BOB Booking-31390.</div><div className="activity-time">1 hour ago · Drive archive</div></div></div></div></div></div></div>;
 }
 
 function BookingsView({ bookings, setView, setDetail }: { bookings: Booking[]; setView: (view: View) => void; setDetail: (booking: Booking) => void }) {
@@ -328,6 +353,7 @@ function DepartmentView({ department, bookings, setDetail }: { department: strin
 
 export default function Home() {
   const [location, setLocation] = useLocation();
+  const { user, logout } = useAuth();
   const [view, setView] = useState<View>(() => location === "/uploads" ? "uploads" : location === "/attendance" ? "attendance" : "overview");
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [uploadDocuments, setUploadDocuments] = useState<DocumentItem[]>(initialUploadDocuments);
@@ -343,16 +369,22 @@ export default function Home() {
   if (isClient && clientBooking) return <ClientPortal booking={clientBooking} documents={uploadDocuments} onUpdate={updateBooking} onUploadAll={() => setUploadDocuments((current) => current.map((doc) => doc.state === "Required" ? { ...doc, state: "Uploaded" } : doc))} onBackToInternal={() => setLocation("/")} />;
   const openDetail = (booking: Booking) => { setActiveBooking(booking); setView("detail"); };
   const createBooking = (booking: Booking) => { setBookings((current) => [booking, ...current]); setActiveBooking(booking); setView("detail"); };
-  const openDepartment = (department: string) => { setActiveDepartment(department); setActiveBooking(null); setView("department"); };
-  return <Shell view={view} setView={(nextView) => { setActiveBooking(null); setActiveDepartment(null); setView(nextView); }} onClient={() => setLocation("/client/portal-bob-31511")} onDepartment={openDepartment} departmentLabel={activeDepartment}>
-    {view === "overview" && <Overview bookings={bookings} documents={uploadDocuments} setView={setView} setDetail={openDetail} attendanceRecords={attendanceRecords} setAttendanceRecords={setAttendanceRecords} />}
-    {view === "bookings" && <BookingsView bookings={bookings} setView={setView} setDetail={openDetail} />}
-    {view === "wizard" && <Wizard onCreated={createBooking} onCancel={() => setView("overview")} />}
-    {view === "docs" && <DocsView bookings={bookings} setDetail={openDetail} />}
-    {view === "crew" && <CrewView />}
-    {view === "gear" && <GearView />}
-    {view === "attendance" && <AttendanceView records={attendanceRecords} setRecords={setAttendanceRecords} selectedDate={selectedAttendanceDate} setSelectedDate={setSelectedAttendanceDate} />}
-    {view === "uploads" && <DataUploadCenter uploads={uploadRecords} setUploads={setUploadRecords} />}
+  const openDepartment = (department: string) => { const departmentCode = DEPARTMENT_LABEL_TO_CODE[department]; if (!user || (user.role !== "admin" && user.departmentCode !== departmentCode)) return; setActiveDepartment(department); setActiveBooking(null); setView("department"); };
+  const signOut = async () => { await logout(); setLocation("/login"); };
+  const canView = (nextView: View) => canAccessWorkspaceView(user ?? { role: "user", departmentCode: null }, nextView);
+  useEffect(() => { if (user && !canView(view)) setView("overview"); }, [user, view]);
+  if (!user) return null;
+  const guardedSetView = (nextView: View) => { setActiveBooking(null); setActiveDepartment(null); setView(canView(nextView) ? nextView : "overview"); };
+  return <Shell view={view} setView={guardedSetView} onClient={() => setLocation("/client/portal-bob-31511")} onDepartment={openDepartment} departmentLabel={activeDepartment} user={user} onSignOut={signOut}>
+    {view === "overview" && <Overview bookings={bookings} documents={uploadDocuments} setView={guardedSetView} setDetail={openDetail} attendanceRecords={attendanceRecords} setAttendanceRecords={setAttendanceRecords} user={user} />}
+    {view === "bookings" && user.role === "admin" && <BookingsView bookings={bookings} setView={guardedSetView} setDetail={openDetail} />}
+    {view === "wizard" && (user.role === "admin" || user.departmentCode === "sales") && <Wizard onCreated={createBooking} onCancel={() => guardedSetView("overview")} />}
+    {view === "docs" && (user.role === "admin" || user.departmentCode === "documentation" || user.departmentCode === "hse") && <DocsView bookings={bookings} setDetail={openDetail} />}
+    {view === "crew" && (user.role === "admin" || user.departmentCode === "crew") && <CrewView />}
+    {view === "gear" && (user.role === "admin" || user.departmentCode === "lifting-gears") && <GearView />}
+    {view === "attendance" && (user.role === "admin" || user.departmentCode === "hr") && <AttendanceView records={attendanceRecords} setRecords={setAttendanceRecords} selectedDate={selectedAttendanceDate} setSelectedDate={setSelectedAttendanceDate} />}
+    {view === "uploads" && (user.role === "admin" || user.departmentCode === "accounts") && <DataUploadCenter uploads={uploadRecords} setUploads={setUploadRecords} />}
+    {view === "users" && user.role === "admin" && <DepartmentUsersView />}
     {view === "department" && activeDepartment && <DepartmentView department={activeDepartment} bookings={bookings} setDetail={openDetail} />}
     {view === "detail" && activeBooking && <BookingDetail booking={activeBooking} documents={uploadDocuments} onUpdate={updateBooking} onBack={() => { setActiveBooking(null); setView("overview"); }} />}
     <div style={{ color: "#555", fontSize: 10, textAlign: "right", padding: "10px 0 0" }}>System status: operational · {groupedCount} dossiers in view · v3.0</div>

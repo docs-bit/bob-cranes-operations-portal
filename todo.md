@@ -42,3 +42,16 @@
 - [x] Preserve the mapping review and block confirmation when source headers are missing or changed.
 - [x] Add tests and verify the UI flow; save the mapping-preferences checkpoint.
 - [x] Save the verified mapping-preferences checkpoint.
+
+## Department account access and LinkedIn-inspired UI
+- [x] Review the existing authentication, dashboard layout, and database schema for department-scoped email/password accounts.
+- [x] Add admin-only registration and department-role assignment for new users.
+- [x] Add email/password sign-in, session handling, and profile sign-out to return users to the login screen.
+- [x] Restrict department navigation and workspace access according to the assigned department role.
+- [x] Restyle the portal with a LinkedIn-inspired blue, white, and neutral visual system.
+- [x] Ensure every sidebar navigation item has an understandable, accessible icon.
+- [x] Add unit coverage and validate admin, department-user, sign-out, desktop, and mobile flows.
+- [ ] Save the verified authentication and theme checkpoint.
+- [x] Restrict non-admin sidebar and workspace navigation to department-permitted sections, not only the Departments list.
+- [x] Add view guards and tests proving department users cannot open unauthorized workspace or administration sections.
+- [x] Re-verify the HSE account with the narrowed navigation and save the final checkpoint.
