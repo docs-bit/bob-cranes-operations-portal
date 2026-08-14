@@ -165,4 +165,15 @@
 - [x] Bind attendance-backed Crew Assignment availability to real attendance-derived status data instead of defaulting imported employees to Present.
 - [x] Add a real UI/integration test proving the full attendance roster is surfaced and persisted allocations hydrate correctly in Crew Assignment.
 - [x] Revalidate the roster workspace and save a new post-integration checkpoint.
-- [ ] Save the verified post-integration Crew Assignment roster checkpoint.
+- [x] Save the verified post-integration Crew Assignment roster checkpoint.
+
+## White-screen regression repair
+- [x] Reproduce the current white-screen route and capture the client/server runtime failure.
+- [x] Repair the rendering failure without regressing the attendance-backed Crew Assignment workspace.
+- [x] Verify clean sign-in, client portal, and authenticated app-shell renders; run tests/build and save a checkpoint.
+
+## White-screen repair validation gaps
+- [x] Document fresh browser and server evidence that distinguishes the transient loading state from a runtime exception.
+- [x] Verify the signed-out sign-in route after the loading-state repair alongside authenticated and client views.
+- [ ] Capture a fresh isolated signed-out /login render and save the dedicated loading-state repair checkpoint.
+- [ ] Save a dedicated checkpoint for the verified white-screen/loading-state repair.

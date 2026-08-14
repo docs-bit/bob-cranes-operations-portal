@@ -3,14 +3,26 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/_core/hooks/useAuth";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
+import { useEffect, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 
 function ProtectedPortal() {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="auth-loading">Loading secure workspace…</div>;
+  const { user, loading, refresh } = useAuth();
+  const [isSlow, setIsSlow] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      setIsSlow(false);
+      return;
+    }
+    const timeout = window.setTimeout(() => setIsSlow(true), 3200);
+    return () => window.clearTimeout(timeout);
+  }, [loading]);
+
+  if (loading) return <div className="auth-loading" role="status" aria-live="polite"><div className="auth-loading-card"><div className="auth-brand-mark">B</div><span className="auth-spinner" aria-hidden="true" /><strong>Loading secure workspace</strong><span>Checking your BOB Cranes access and saved session.</span>{isSlow && <button className="secondary-button" onClick={() => void refresh()}>Retry secure connection</button>}</div></div>;
   return user ? <Home /> : <Login />;
 }
 
