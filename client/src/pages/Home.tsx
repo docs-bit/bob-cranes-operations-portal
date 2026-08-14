@@ -760,7 +760,13 @@ function Shell({
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-row">
-            <div className="brand-mark">B</div>
+            <div className="brand-mark brand-logo">
+              <img
+                className="brand-logo-image"
+                src="/manus-storage/bob-cranes-mark_c80bfee2.png"
+                alt="BOB Cranes"
+              />
+            </div>
             <div className="brand-copy">
               <div className="brand-title">BOB CRANES</div>
               <div className="brand-subtitle">Operations Control</div>
@@ -5234,7 +5240,13 @@ export function ClientPortal({
     <div className="client-shell">
       <header className="client-topbar">
         <div className="brand-row">
-          <div className="brand-mark">B</div>
+          <div className="brand-mark brand-logo">
+            <img
+              className="brand-logo-image"
+              src="/manus-storage/bob-cranes-mark_c80bfee2.png"
+              alt="BOB Cranes"
+            />
+          </div>
           <div>
             <div className="brand-title">BOB CRANES</div>
             <div className="brand-subtitle">Client response portal</div>

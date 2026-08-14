@@ -250,3 +250,8 @@
 
 ## Light theme foreground contrast
 - [x] Change primary and currently faint dossier text to black across the light portal theme while retaining a readable secondary hierarchy.
+
+## Supplied BOB Cranes logo
+- [x] Host the supplied BOB Cranes logo as a deployment-safe static asset and replace existing generated brand marks.
+- [x] Apply the supplied logo consistently in the portal navigation and sign-in experience with responsive sizing and accessible alternative text.
+- [x] Add focused coverage, validate browser rendering, and save the verified logo update checkpoint.
