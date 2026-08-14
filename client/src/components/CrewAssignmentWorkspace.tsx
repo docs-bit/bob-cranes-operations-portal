@@ -1,134 +1,84 @@
 import React, { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
-import { CalendarDays, Download, ExternalLink, MoreHorizontal, Plus, Save, Search, ShieldCheck } from "lucide-react";
+import { AlertTriangle, CalendarDays, CheckSquare, Download, ExternalLink, Plus, Save, Search, ShieldCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { CREW_ASSIGNMENT_ROSTER } from "@shared/crewAssignmentRoster";
-import { findEmployeeBookingConflicts, toggleEmployeeBookingAllocation, type EmployeeAllocation } from "@shared/bookingConflictRules";
+import { toggleEmployeeBookingAllocation, type EmployeeAllocation } from "@shared/bookingConflictRules";
 import { focusAssignmentBooking } from "@shared/assignmentRules";
 import { allocationAwareAvailability, summarizeAllocationTiming, type AllocationTiming } from "@shared/crewAssignmentAvailability";
+import { buildBulkConflictSummary } from "@shared/bulkCrewAssignmentRules";
 
 type Booking = { id: string; client: string; project?: string; mob: string; offHire: string };
 type Availability = "All" | "Present" | "On Leave" | "Assigned" | "Upcoming booking" | "Completed booking" | "Off-Site" | "Scheduled booking";
 type CrewSearchPreset = { id: string; name: string; query: string; department: string; availability: Availability; date: string };
 
 const PRESET_STORAGE_KEY = "bob-crew-assignment-search-presets-v1";
-const toPersistedBookingId = (bookingId: string): string | null => bookingId === "BOB Booking-31511" ? "BOB-59116" : bookingId === "BOB Booking-31421" ? "BOB-59117" : bookingId === "BOB Booking-31390" ? "BOB-59118" : null;
-const toUiBookingId = (bookingId: string): string => bookingId === "BOB-59116" ? "BOB Booking-31511" : bookingId === "BOB-59117" ? "BOB Booking-31421" : bookingId === "BOB-59118" ? "BOB Booking-31390" : bookingId;
+const toPersistedBookingId = (id: string): string | null => id === "BOB Booking-31511" ? "BOB-59116" : id === "BOB Booking-31421" ? "BOB-59117" : id === "BOB Booking-31390" ? "BOB-59118" : null;
+const toUiBookingId = (id: string) => id === "BOB-59116" ? "BOB Booking-31511" : id === "BOB-59117" ? "BOB Booking-31421" : id === "BOB-59118" ? "BOB Booking-31390" : id;
 const todayKey = () => new Date().toISOString().slice(0, 10);
+const allocationMatches = (crew: { id: string; name: string }, allocation: EmployeeAllocation) => allocation.crewId ? allocation.crewId === crew.id : allocation.employeeName === crew.name;
 
-function StatusBadge({ value }: { value: string }) {
-  const tone = value === "Present" || value === "Compliant" || value === "Active booking" ? "green" : value === "On Leave" || value === "Off-Site" || value === "Training required" ? "red" : value === "Assigned" || value === "Upcoming booking" ? "blue" : value === "Completed booking" ? "gray" : "gray";
+function Badge({ value }: { value: string }) {
+  const tone = value === "Present" || value === "Active booking" ? "green" : value === "Assigned" || value === "Upcoming booking" ? "blue" : value === "On Leave" || value === "Off-Site" || value === "Conflict" ? "red" : "gray";
   return <span className={`status-badge ${tone}`}>{value}</span>;
 }
 
-function allocationMatches(employee: { id: string; name: string }, allocation: EmployeeAllocation) {
-  return allocation.crewId ? allocation.crewId === employee.id : allocation.employeeName === employee.name;
-}
-
-function availabilityForDate(
-  attendanceAvailability: (typeof CREW_ASSIGNMENT_ROSTER)[number]["availability"],
-  bookingIds: string[],
-  bookings: Booking[],
-  availabilityDate: string
-) {
-  if (!bookingIds.length) return allocationAwareAvailability(attendanceAvailability, false);
-  const timing = summarizeAllocationTiming(bookingIds, bookings, new Date(`${availabilityDate}T12:00:00`));
-  if (timing === "Active booking") return "Assigned" as const;
-  return timing;
-}
-
-function timingForDate(bookingIds: string[], bookings: Booking[], availabilityDate: string): AllocationTiming {
-  return summarizeAllocationTiming(bookingIds, bookings, new Date(`${availabilityDate}T12:00:00`));
+function dateAvailability(crew: (typeof CREW_ASSIGNMENT_ROSTER)[number], ids: string[], bookings: Booking[], date: string) {
+  if (!ids.length) return allocationAwareAvailability(crew.availability, false);
+  const timing = summarizeAllocationTiming(ids, bookings, new Date(`${date}T12:00:00`));
+  return timing === "Active booking" ? "Assigned" : timing;
 }
 
 export function CrewView({ bookings, allocations, setAllocations, focusedBookingId, onAddWorkman, onAllocationSaved, onOpenDossier = () => undefined }: { bookings: Booking[]; allocations: EmployeeAllocation[]; setAllocations: React.Dispatch<React.SetStateAction<EmployeeAllocation[]>>; focusedBookingId?: string | null; onAddWorkman: () => void; onAllocationSaved: (details: { bookingId: string; employeeName: string; action: "saved" | "removed" }) => void; onOpenDossier?: (bookingId: string) => void }) {
-  const saveAllocationsMutation = trpc.operations.saveCrewAllocations.useMutation();
-  const focusedCrewId = allocations.find((allocation) => allocation.bookingId === focusedBookingId)?.crewId;
-  const [selectedCrewId, setSelectedCrewId] = useState(focusedCrewId ?? CREW_ASSIGNMENT_ROSTER[0]?.id ?? "");
-  const [availability, setAvailability] = useState<Availability>("All");
-  const [department, setDepartment] = useState("All");
+  const saveAllocation = trpc.operations.saveCrewAllocations.useMutation();
+  const focusedCrewId = allocations.find(allocation => allocation.bookingId === focusedBookingId)?.crewId;
   const [query, setQuery] = useState("");
+  const [department, setDepartment] = useState("All");
+  const [availability, setAvailability] = useState<Availability>("All");
   const [availabilityDate, setAvailabilityDate] = useState(todayKey);
+  const [selectedCrewId, setSelectedCrewId] = useState(focusedCrewId ?? CREW_ASSIGNMENT_ROSTER[0]?.id ?? "");
+  const [bulkIds, setBulkIds] = useState<string[]>([]);
   const [presetName, setPresetName] = useState("");
   const [savedPresets, setSavedPresets] = useState<CrewSearchPreset[]>([]);
-  const departments = useMemo(() => Array.from(new Set(CREW_ASSIGNMENT_ROSTER.map((employee) => employee.department))).sort(), []);
-  const selectedCrew = CREW_ASSIGNMENT_ROSTER.find((employee) => employee.id === selectedCrewId) ?? CREW_ASSIGNMENT_ROSTER[0];
-  const focusedBooking = bookings.find((booking) => booking.id === focusedBookingId) ?? null;
-  const visibleBookings = useMemo(() => focusAssignmentBooking(bookings, focusedBookingId), [bookings, focusedBookingId]);
-  const bookingIdsByEmployeeId = useMemo(() => new Map(CREW_ASSIGNMENT_ROSTER.map((employee) => [employee.id, allocations.filter((allocation) => allocationMatches(employee, allocation)).map((allocation) => allocation.bookingId)])), [allocations]);
-  const availabilityByEmployeeId = useMemo(() => new Map(CREW_ASSIGNMENT_ROSTER.map((employee) => {
-    const bookingIds = bookingIdsByEmployeeId.get(employee.id) ?? [];
-    return [employee.id, availabilityForDate(employee.availability, bookingIds, bookings, availabilityDate)];
-  })), [availabilityDate, bookingIdsByEmployeeId, bookings]);
+  const focusedBooking = bookings.find(booking => booking.id === focusedBookingId) ?? null;
+  const departments = useMemo(() => Array.from(new Set(CREW_ASSIGNMENT_ROSTER.map(crew => crew.department))).sort(), []);
+  const bookingIdsByCrew = useMemo(() => new Map(CREW_ASSIGNMENT_ROSTER.map(crew => [crew.id, allocations.filter(allocation => allocationMatches(crew, allocation)).map(allocation => allocation.bookingId)])), [allocations]);
+  const roster = useMemo(() => CREW_ASSIGNMENT_ROSTER.map(crew => {
+    const bookingIds = bookingIdsByCrew.get(crew.id) ?? [];
+    return { ...crew, bookingIds, availability: dateAvailability(crew, bookingIds, bookings, availabilityDate) };
+  }), [availabilityDate, bookingIdsByCrew, bookings]);
   const visibleCrew = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return CREW_ASSIGNMENT_ROSTER.filter((employee) => {
-      const resolvedAvailability = availabilityByEmployeeId.get(employee.id) ?? employee.availability;
-      const bookingIds = bookingIdsByEmployeeId.get(employee.id) ?? [];
-      const matchesAvailability = availability === "All" || resolvedAvailability === availability;
-      const matchesDepartment = department === "All" || employee.department === department;
-      const matchesQuery = !normalized || `${employee.name} ${employee.sourceId} ${employee.role} ${employee.department} ${bookingIds.join(" ")}`.toLowerCase().includes(normalized);
-      return matchesAvailability && matchesDepartment && matchesQuery;
-    }).map((employee) => ({ ...employee, availability: availabilityByEmployeeId.get(employee.id) ?? employee.availability }));
-  }, [availability, availabilityByEmployeeId, bookingIdsByEmployeeId, department, query]);
-  const employeeAllocations = allocations.filter((allocation) => selectedCrew ? allocationMatches(selectedCrew, allocation) : false);
+    const needle = query.trim().toLowerCase();
+    return roster.filter(crew => (availability === "All" || crew.availability === availability) && (department === "All" || crew.department === department) && (!needle || `${crew.name} ${crew.sourceId} ${crew.role} ${crew.department} ${crew.bookingIds.join(" ")}`.toLowerCase().includes(needle)));
+  }, [availability, department, query, roster]);
+  const selectedCrew = roster.find(crew => crew.id === selectedCrewId) ?? roster[0];
+  const selectedBulkCrew = roster.filter(crew => bulkIds.includes(crew.id));
+  const targetBooking = focusedBooking ?? focusAssignmentBooking(bookings, focusedBookingId)[0] ?? null;
+  const conflictSummary = useMemo(() => targetBooking ? buildBulkConflictSummary(selectedBulkCrew, targetBooking, bookings, allocations) : [], [allocations, bookings, selectedBulkCrew, targetBooking]);
+  const activeConflicts = conflictSummary.filter(item => item.conflicts.length);
 
-  useEffect(() => {
-    if (focusedCrewId && CREW_ASSIGNMENT_ROSTER.some((employee) => employee.id === focusedCrewId)) setSelectedCrewId(focusedCrewId);
-  }, [focusedCrewId]);
-  useEffect(() => {
+  useEffect(() => { if (focusedCrewId) setSelectedCrewId(focusedCrewId); }, [focusedCrewId]);
+  useEffect(() => { if (focusedBookingId) setBulkIds(allocations.filter(allocation => allocation.bookingId === focusedBookingId).map(allocation => allocation.crewId).filter((id): id is string => Boolean(id))); }, [allocations, focusedBookingId]);
+  useEffect(() => { try { const saved = localStorage.getItem(PRESET_STORAGE_KEY); if (saved) setSavedPresets(JSON.parse(saved)); } catch {} }, []);
+  const savePresets = (items: CrewSearchPreset[]) => { setSavedPresets(items); try { localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(items)); } catch {} };
+  const savePreset = () => { const name = presetName.trim(); if (!name) return toast.info("Name this search before saving it."); savePresets([{ id: `${Date.now()}`, name, query, department, availability, date: availabilityDate }, ...savedPresets.filter(item => item.name !== name)].slice(0, 8)); setPresetName(""); };
+  const toggleBulk = (id: string) => setBulkIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
+  const selectVisible = () => setBulkIds(visibleCrew.map(crew => crew.id));
+  const exportCalendar = () => { const rows = allocations.map(allocation => ({ Crew: allocation.employeeName, Booking: allocation.bookingId })); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Crew Schedule"); XLSX.writeFile(wb, "BOB-Cranes-Crew-Assignment-Calendar.xlsx"); };
+  const persistCrew = async (crew: typeof roster[number], bookingIds: string[]) => saveAllocation.mutateAsync({ crewId: crew.id, crewName: crew.name, bookingIds: bookingIds.map(toPersistedBookingId).filter((id): id is string => Boolean(id)) });
+  const mergeCrewResult = (crewId: string, result: { allocations: { crewName: string; crewId: string; bookingId: string }[] }) => setAllocations(current => [...current.filter(allocation => allocation.crewId !== crewId), ...result.allocations.map(allocation => ({ employeeName: allocation.crewName, crewId: allocation.crewId, bookingId: toUiBookingId(allocation.bookingId) }))]);
+  const toggleSingle = async (booking: Booking) => { if (!selectedCrew) return; const ids = selectedCrew.bookingIds; const next = ids.includes(booking.id) ? ids.filter(id => id !== booking.id) : [...ids, booking.id]; try { const result = await persistCrew(selectedCrew, next); mergeCrewResult(selectedCrew.id, result); onAllocationSaved({ bookingId: booking.id, employeeName: selectedCrew.name, action: ids.includes(booking.id) ? "removed" : "saved" }); } catch { toast.error("Allocation could not be saved."); } };
+  const bulkAssign = async () => {
+    if (!targetBooking || !selectedBulkCrew.length) return toast.info("Select one or more crew members first.");
+    if (!toPersistedBookingId(targetBooking.id)) return toast.info("This preview dossier cannot receive durable assignments.");
     try {
-      const saved = localStorage.getItem(PRESET_STORAGE_KEY);
-      if (saved) setSavedPresets(JSON.parse(saved));
-    } catch { setSavedPresets([]); }
-  }, []);
-  const persistPresets = (presets: CrewSearchPreset[]) => {
-    setSavedPresets(presets);
-    try { localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(presets)); } catch {}
-  };
-  const savePreset = () => {
-    const name = presetName.trim();
-    if (!name) { toast.info("Name this search before saving it."); return; }
-    const preset: CrewSearchPreset = { id: `${Date.now()}`, name, query, department, availability, date: availabilityDate };
-    persistPresets([preset, ...savedPresets.filter((item) => item.name.toLowerCase() !== name.toLowerCase())].slice(0, 8));
-    setPresetName("");
-    toast.success(`Saved “${name}” for Crew Assignment.`);
-  };
-  const applyPreset = (preset: CrewSearchPreset) => {
-    setQuery(preset.query); setDepartment(preset.department); setAvailability(preset.availability); setAvailabilityDate(preset.date);
-    toast.success(`Applied “${preset.name}”.`);
-  };
-  const exportCalendar = () => {
-    const rows = allocations.map((allocation) => {
-      const employee = CREW_ASSIGNMENT_ROSTER.find((candidate) => allocationMatches(candidate, allocation));
-      const booking = bookings.find((candidate) => candidate.id === allocation.bookingId);
-      return { Workman: allocation.employeeName, EmployeeID: employee?.sourceId ?? allocation.crewId ?? "", Designation: employee?.role ?? "Workman", Department: employee?.department ?? "", BookingID: allocation.bookingId, Client: booking?.client ?? "BOB Cranes Project", Mobilization: booking?.mob ?? "", OffHire: booking?.offHire ?? "", AvailabilityOnSelectedDate: employee ? availabilityByEmployeeId.get(employee.id) : "" };
-    });
-    const sheet = XLSX.utils.json_to_sheet(rows.length ? rows : [{ Workman: "No persisted allocation", EmployeeID: "", Designation: "", Department: "", BookingID: "", Client: "", Mobilization: "", OffHire: "", AvailabilityOnSelectedDate: "" }]);
-    const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, sheet, "Crew Schedule"); XLSX.writeFile(workbook, "BOB-Cranes-Crew-Assignment-Calendar.xlsx");
-    toast.success("Crew calendar exported.");
-  };
-  const toggleAllocation = async (booking: Booking) => {
-    if (!selectedCrew) return;
-    const persistedBookingId = toPersistedBookingId(booking.id);
-    if (!persistedBookingId) { toast.info("Preview dossier", { description: "This presentation-only dossier cannot receive a durable crew allocation." }); return; }
-    const conflicts = findEmployeeBookingConflicts(selectedCrew.name, booking.id, bookings, allocations, selectedCrew.id);
-    if (conflicts.length) toast.warning("Booking overlap detected", { description: `${selectedCrew.name} is already allocated to ${conflicts.map((item) => item.id).join(", ")}.` });
-    const wasAssigned = employeeAllocations.some((allocation) => allocation.bookingId === booking.id);
-    const nextAllocations = toggleEmployeeBookingAllocation(allocations, selectedCrew.name, booking.id, selectedCrew.id);
-    setAllocations(nextAllocations);
-    try {
-      const result = await saveAllocationsMutation.mutateAsync({ crewId: selectedCrew.id, crewName: selectedCrew.name, bookingIds: nextAllocations.filter((allocation) => allocationMatches(selectedCrew, allocation)).map((allocation) => toPersistedBookingId(allocation.bookingId)).filter((id): id is string => id !== null) });
-      setAllocations(result.allocations.map((allocation) => ({ employeeName: allocation.crewName, crewId: allocation.crewId, bookingId: toUiBookingId(allocation.bookingId) })));
-      const action = wasAssigned ? "removed" : "saved";
-      toast.success(action === "saved" ? "Crew member assigned" : "Crew member removed", { description: `${selectedCrew.name} ${action === "saved" ? "is assigned to" : "was removed from"} ${booking.id}.` });
-      onAllocationSaved({ bookingId: booking.id, employeeName: selectedCrew.name, action });
-    } catch (error) {
-      setAllocations(allocations);
-      toast.error("Allocation save blocked", { description: error instanceof Error ? error.message : "The saved crew schedule could not be updated." });
-    }
+      const results = await Promise.all(selectedBulkCrew.map(async crew => ({ crew, result: await persistCrew(crew, crew.bookingIds.includes(targetBooking.id) ? crew.bookingIds : [...crew.bookingIds, targetBooking.id]) })));
+      results.forEach(({ crew, result }) => mergeCrewResult(crew.id, result));
+      results.forEach(({ crew }) => onAllocationSaved({ bookingId: targetBooking.id, employeeName: crew.name, action: "saved" }));
+      toast.success(`${results.length} crew member${results.length === 1 ? "" : "s"} assigned to ${targetBooking.id}.`);
+    } catch { toast.error("Bulk assignment could not be saved. Existing assignments were left unchanged."); }
   };
 
-  return <div className="content"><div className="page-heading"><div><div className="eyebrow">Resource readiness</div><h1>{focusedBooking ? `Edit assignment · ${focusedBooking.id}` : "Crew assignment"}</h1><p>{focusedBooking ? "Select any available or already-assigned employee below, then assign or remove them from this booking." : `Search, review, and allocate all ${CREW_ASSIGNMENT_ROSTER.length} employees from the August attendance workbook.`}</p></div><div style={{ display: "flex", gap: 8 }}><button className="secondary-button" onClick={exportCalendar}><Download size={14} /> Export schedule (.xlsx)</button><button className="primary-button" onClick={onAddWorkman}><Plus size={15} /> Add workman</button></div></div>{focusedBooking && <div className="notification" style={{ marginBottom: 16 }}><div className="title">Edit assignment mode</div><div className="body">Available, assigned, upcoming, and completed crew are all selectable. Use the target booking card below to save the employee selection.</div></div>}<div className="panel"><div className="panel-header"><div className="filter-row">{(["All", "Present", "On Leave", "Assigned", "Upcoming booking", "Completed booking", "Off-Site"] as Availability[]).map((value) => <button key={value} className={`filter-chip ${availability === value ? "selected" : ""}`} onClick={() => setAvailability(value)} aria-pressed={availability === value}>{value}</button>)}</div><div className="panel-meta">{visibleCrew.length} of {CREW_ASSIGNMENT_ROSTER.length} employees · {allocations.length} saved allocations</div></div><div className="panel-body crew-search-controls"><label className="search-pill booking-search"><Search size={14} /><input aria-label="Search crew assignment roster" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, ID, role, booking, or department" /></label><select className="attendance-select compact" aria-label="Filter crew by attendance department" value={department} onChange={(event) => setDepartment(event.target.value)}><option value="All">All attendance departments</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select><label className="crew-date-filter"><CalendarDays size={14} /><span>Availability on</span><input type="date" value={availabilityDate} onChange={(event) => setAvailabilityDate(event.target.value)} aria-label="Filter crew availability by date" /></label></div><div className="panel-body saved-search-controls"><input className="form-input" value={presetName} onChange={(event) => setPresetName(event.target.value)} placeholder="Name this workspace search" aria-label="Saved search name" /><button className="secondary-button" onClick={savePreset}><Save size={14} /> Save search</button>{savedPresets.length > 0 && <div className="saved-search-preset-list">{savedPresets.map((preset) => <button className="filter-chip" key={preset.id} onClick={() => applyPreset(preset)} title={`Apply ${preset.name}`}>{preset.name}</button>)}</div>}</div><div className="table-wrap"><table className="data-table" data-testid="crew-roster-table"><thead><tr><th>Workman</th><th>Attendance ID</th><th>Designation</th><th>Department</th><th>Availability on {availabilityDate}</th><th>Certificate status</th><th>Booking allocation</th><th /></tr></thead><tbody>{visibleCrew.map((employee) => { const crewAllocations = allocations.filter((allocation) => allocationMatches(employee, allocation)); const bookingIds = crewAllocations.map((allocation) => allocation.bookingId); const timing = timingForDate(bookingIds, bookings, availabilityDate); const assignedToFocused = Boolean(focusedBookingId && bookingIds.includes(focusedBookingId)); return <tr key={employee.id} className={selectedCrew?.id === employee.id ? "selected-row" : ""} onClick={() => setSelectedCrewId(employee.id)}><td><div style={{ display: "flex", alignItems: "center", gap: 9 }}><div className="avatar">{employee.initials}</div><div><strong>{employee.name}</strong>{crewAllocations.length > 0 && <span className="allocation-count-badge">{crewAllocations.length} {crewAllocations.length === 1 ? "allocation" : "allocations"}</span>}{assignedToFocused && <span className="assignment-target-badge">Selected for this booking</span>}</div></div></td><td>{employee.sourceId}</td><td>{employee.role}</td><td>{employee.department}</td><td>{crewAllocations.length ? <div className="crew-allocation-status"><StatusBadge value={employee.availability} />{employee.availability === "Assigned" && <StatusBadge value={timing}/>}</div> : <StatusBadge value={employee.availability} />}</td><td><StatusBadge value={employee.cert} /></td><td className="muted">{bookingIds.length ? <div className="crew-booking-ids">{bookingIds.map((bookingId) => <button className="booking-id-chip" key={`${employee.id}-${bookingId}`} onClick={(event) => { event.stopPropagation(); onOpenDossier(bookingId); }} aria-label={`Open ${bookingId} dossier`}>{bookingId}<ExternalLink size={11}/></button>)}</div> : employee.flag ? "Training flag raised" : "Available for assignment"}</td><td><MoreHorizontal size={15} color="#777" /></td></tr>; })}</tbody></table>{visibleCrew.length === 0 && <div className="empty-state">No crew records on this page match the current search, date, or filters.</div>}</div></div><div className="assignment-layout"><div className="panel"><div className="panel-header"><div><div className="panel-title">Arrange {selectedCrew?.name ?? "employee"} on bookings</div><div className="panel-meta">Select a crew row, then assign or remove that employee. Existing assignments remain selectable during edit mode.</div></div><StatusBadge value={`${employeeAllocations.length} assigned`}/></div><div className="panel-body"><div className="booking-allocation-list">{visibleBookings.map((booking) => { const persisted = Boolean(toPersistedBookingId(booking.id)); const assigned = employeeAllocations.some((allocation) => allocation.bookingId === booking.id); const conflicts = assigned && selectedCrew ? findEmployeeBookingConflicts(selectedCrew.name, booking.id, bookings, allocations, selectedCrew.id) : []; const timing = timingForDate([booking.id], bookings, availabilityDate); return <div className={`booking-allocation-row ${assigned ? "selected" : ""}`} key={booking.id}><div><strong>{booking.id}</strong><span>{booking.client} · {booking.mob} → {booking.offHire}</span></div><div className="allocation-actions">{assigned && <StatusBadge value={timing}/>} {conflicts.length > 0 && <StatusBadge value="Date overlap" />}{!persisted && <StatusBadge value="Preview only" />}<button disabled={!persisted || saveAllocationsMutation.isPending} className={assigned ? "secondary-button" : "primary-button"} onClick={() => toggleAllocation(booking)}>{!persisted ? "Preview only" : assigned ? "Remove" : saveAllocationsMutation.isPending ? "Saving…" : "Assign"}</button></div></div>; })}</div></div></div><div className="panel"><div className="panel-header"><div><div className="panel-title">Availability logic</div><div className="panel-meta">Availability is calculated using the selected date and saved booking dates.</div></div><ShieldCheck size={15} color="#138a43" /></div><div className="panel-body"><div className="department-checklist"><div className="department-checklist-row"><span>1</span><div><strong>Active booking</strong><small>The selected date is within the booking mobilization and off-hire period.</small></div></div><div className="department-checklist-row"><span>2</span><div><strong>Upcoming booking</strong><small>The selected date precedes a saved booking allocation.</small></div></div><div className="department-checklist-row"><span>3</span><div><strong>Choose any employee in edit mode</strong><small>Available and already-assigned employees remain selectable; overlap warnings are retained.</small></div></div></div></div></div></div></div>;
+  return <div className="content"><div className="page-heading"><div><div className="eyebrow">Resource readiness</div><h1>{focusedBooking ? `Edit assignment · ${focusedBooking.id}` : "Crew assignment"}</h1><p>{focusedBooking ? "Select multiple available or assigned employees, review conflicts, then assign the group in one action." : "Search, review, and allocate the attendance-backed crew roster."}</p></div><div style={{ display: "flex", gap: 8 }}><button className="secondary-button" onClick={exportCalendar}><Download size={14}/> Export schedule</button><button className="primary-button" onClick={onAddWorkman}><Plus size={14}/> Add workman</button></div></div>{focusedBooking && <div className="notification"><div className="title">Bulk Edit Assignment</div><div className="body">Available and already-assigned crew remain selectable. Conflicts are shown before the bulk save.</div></div>}<div className="panel" style={{ marginTop: 16 }}><div className="panel-header"><div className="filter-row">{(["All", "Present", "On Leave", "Assigned", "Upcoming booking", "Completed booking", "Off-Site"] as Availability[]).map(value => <button key={value} className={`filter-chip ${availability === value ? "selected" : ""}`} onClick={() => setAvailability(value)}>{value}</button>)}</div><span className="panel-meta">{visibleCrew.length} matching crew</span></div><div className="panel-body crew-search-controls"><label className="search-pill booking-search"><Search size={14}/><input aria-label="Search crew assignment roster" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search name, ID, role, booking, or department"/></label><select className="attendance-select compact" value={department} onChange={event => setDepartment(event.target.value)} aria-label="Filter crew by department"><option value="All">All departments</option>{departments.map(item => <option key={item}>{item}</option>)}</select><label className="crew-date-filter"><CalendarDays size={14}/><span>Availability on</span><input type="date" value={availabilityDate} onChange={event => setAvailabilityDate(event.target.value)} aria-label="Filter crew availability by date"/></label></div><div className="panel-body saved-search-controls"><input className="form-input" value={presetName} onChange={event => setPresetName(event.target.value)} placeholder="Name this workspace search" aria-label="Saved search name"/><button className="secondary-button" onClick={savePreset}><Save size={14}/> Save search</button>{savedPresets.map(preset => <button className="filter-chip" key={preset.id} onClick={() => { setQuery(preset.query); setDepartment(preset.department); setAvailability(preset.availability); setAvailabilityDate(preset.date); }}>{preset.name}</button>)}</div><div className="table-wrap"><table className="data-table" data-testid="crew-roster-table"><thead><tr>{focusedBooking && <th><button className="table-select-all" onClick={selectVisible} aria-label="Select all filtered crew"><CheckSquare size={14}/></button></th>}<th>Workman</th><th>Attendance ID</th><th>Role</th><th>Department</th><th>Availability</th><th>Booking allocation</th></tr></thead><tbody>{visibleCrew.map(crew => { const timing = crew.bookingIds.length ? summarizeAllocationTiming(crew.bookingIds, bookings, new Date(`${availabilityDate}T12:00:00`)) : null; return <tr key={crew.id} className={selectedCrew?.id === crew.id ? "selected-row" : ""} onClick={() => setSelectedCrewId(crew.id)}>{focusedBooking && <td><input type="checkbox" checked={bulkIds.includes(crew.id)} onChange={() => toggleBulk(crew.id)} onClick={event => event.stopPropagation()} aria-label={`Select ${crew.name} for bulk assignment`}/></td>}<td><strong>{crew.name}</strong><span className="allocation-count-badge">{crew.bookingIds.length} allocation{crew.bookingIds.length === 1 ? "" : "s"}</span></td><td>{crew.sourceId}</td><td>{crew.role}</td><td>{crew.department}</td><td><Badge value={crew.availability}/>{timing && <Badge value={timing}/>}</td><td>{crew.bookingIds.length ? <div className="crew-booking-ids">{crew.bookingIds.map(id => <button className="booking-id-chip" key={id} onClick={event => { event.stopPropagation(); onOpenDossier(id); }} aria-label={`Open ${id} dossier`}>{id}<ExternalLink size={11}/></button>)}</div> : "Available"}</td></tr>; })}</tbody></table>{!visibleCrew.length && <div className="empty-state">No crew match this page search and date filter.</div>}</div></div>{focusedBooking && <div className="bulk-assignment-layout"><section className="panel"><div className="panel-header"><div><div className="panel-title"><Users size={15}/> Bulk assignment · {targetBooking?.id}</div><div className="panel-meta">{selectedBulkCrew.length} selected crew member{selectedBulkCrew.length === 1 ? "" : "s"}</div></div><button className="primary-button" disabled={!selectedBulkCrew.length || saveAllocation.isPending} onClick={bulkAssign}>{saveAllocation.isPending ? "Saving…" : `Assign ${selectedBulkCrew.length || "selected"} crew`}</button></div><div className="panel-body">{selectedBulkCrew.length ? <div className="bulk-selected-list">{selectedBulkCrew.map(crew => <span className="booking-id-chip" key={crew.id}>{crew.name} · {crew.role}</span>)}</div> : <div className="empty-state">Select employees from the roster above to prepare a bulk assignment.</div>}</div></section><section className="panel"><div className="panel-header"><div><div className="panel-title"><AlertTriangle size={15}/> Conflict timeline before save</div><div className="panel-meta">Target booking dates are compared with every selected crew member’s saved allocations.</div></div><Badge value={activeConflicts.length ? `${activeConflicts.length} conflicts` : "Clear"}/></div><div className="panel-body conflict-timeline">{selectedBulkCrew.length ? conflictSummary.map(item => <div className="conflict-timeline-row" key={item.crew.id}><strong>{item.crew.name}</strong><div className="conflict-track"><span className="conflict-target-segment">Target · {targetBooking?.mob} → {targetBooking?.offHire}</span>{item.conflicts.map(conflict => <span className="conflict-overlap-segment" key={conflict.id}>Conflict · {conflict.id}</span>)}</div><small>{item.conflicts.length ? `${item.conflicts.length} overlapping booking${item.conflicts.length === 1 ? "" : "s"}` : "No date overlap"}</small></div>) : <div className="empty-state">Select crew to see their booking conflict timeline before saving.</div>}</div></section></div>}<div className="panel" style={{ marginTop: 16 }}><div className="panel-header"><div className="panel-title">Individual assignment</div><div className="panel-meta">Use this control for the selected roster row.</div></div></div><div className="panel-body booking-allocation-list">{focusAssignmentBooking(bookings, focusedBookingId).map(booking => <div className="booking-allocation-row" key={booking.id}><div><strong>{booking.id}</strong><span>{booking.client} · {booking.mob} → {booking.offHire}</span></div><button className="secondary-button" onClick={() => toggleSingle(booking)}>{selectedCrew?.bookingIds.includes(booking.id) ? "Remove selected crew" : "Assign selected crew"}</button></div>)}</div></div>;
 }

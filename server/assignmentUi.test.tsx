@@ -59,10 +59,13 @@ describe("Assignment edit UI flow", () => {
     const user = userEvent.setup();
     render(<AssignmentHarness />);
 
-    const assign = await screen.findByRole("button", { name: "Assign" });
-    await user.click(assign);
+    const assign = (await screen.findAllByRole("button", { name: "Assign selected crew" })).find(
+      button => !button.hasAttribute("disabled")
+    );
+    expect(assign).toBeDefined();
+    await user.click(assign!);
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Remove selected crew" })).toBeInTheDocument());
     expect(saveCrewAllocations).toHaveBeenCalledWith({
       crewId: "cr-1",
       crewName: "Vineeth Vijayan",
@@ -70,8 +73,8 @@ describe("Assignment edit UI flow", () => {
     });
     expect(screen.getByTestId("assignment-feedback")).toHaveTextContent("Vineeth Vijayan|saved|BOB Booking-31511");
 
-    await user.click(screen.getByRole("button", { name: "Remove" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "Assign" })).toBeInTheDocument());
+    await user.click(screen.getByRole("button", { name: "Remove selected crew" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Assign selected crew" })).toBeInTheDocument());
     expect(saveCrewAllocations).toHaveBeenCalledTimes(2);
     expect(saveCrewAllocations).toHaveBeenLastCalledWith({
       crewId: "cr-1",
@@ -99,6 +102,6 @@ describe("Assignment edit UI flow", () => {
     expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent(attendanceEmployee.name);
     expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent("Assigned");
     expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent("Active booking");
-    expect(rosterQueries.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+    expect(rosterQueries.getByRole("button", { name: "Remove selected crew" })).toBeInTheDocument();
   });
 });

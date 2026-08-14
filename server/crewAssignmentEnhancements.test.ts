@@ -25,12 +25,12 @@ describe("Crew Assignment enhancements", () => {
     expect(workspace).toContain('aria-label="Filter crew availability by date"');
     expect(workspace).toContain('aria-label="Saved search name"');
     expect(workspace).toContain("localStorage.setItem(PRESET_STORAGE_KEY");
-    expect(workspace).toContain('aria-label={`Open ${bookingId} dossier`}');
-    expect(workspace).toContain("onOpenDossier(bookingId)");
+    expect(workspace).toContain('aria-label={`Open ${id} dossier`}');
+    expect(workspace).toContain("onOpenDossier(id)");
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {
-    expect(workspace).toContain("Available and already-assigned employees remain selectable");
+    expect(workspace).toContain("Select multiple available or assigned employees");
     expect(workspace).toContain('const [availability, setAvailability] = useState<Availability>("All")');
     expect(home).toContain("setFocusedAssignmentBookingId(activeBooking.id)");
     expect(home).toContain("onOpenDossier={(bookingId) => {");

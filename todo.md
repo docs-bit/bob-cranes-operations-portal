@@ -275,3 +275,9 @@
 - [x] Add saved local search presets for the Crew Assignment workspace.
 - [x] Make Edit Assignment support selecting available and already-assigned employees for the active booking.
 - [x] Add regression coverage, verify integrated behavior, and save the completed release checkpoint.
+
+## Bulk Crew Assignment and conflict timeline
+- [x] Enable selecting multiple crew members and assigning them to the focused booking in one saved action.
+- [x] Display a visual conflict timeline for selected crew before bulk assignment is saved.
+- [x] Extend and validate the portal-refinement-release skill with bulk assignment and conflict-timeline guidance.
+- [x] Add focused coverage, verify the integrated workflow, and save the completed release checkpoint.
