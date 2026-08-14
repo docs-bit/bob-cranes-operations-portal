@@ -230,3 +230,10 @@
 
 ## Dashboard greeting correction
 - [x] Replace Nishanth with Admin in the Operations Cockpit greeting and verify the authenticated view.
+
+## Industrial equipment portal theme
+- [x] Translate the supplied high-contrast industrial equipment reference into accessible portal color, type, surface, and motion tokens.
+- [x] Restyle shared authenticated navigation, dashboard modules, controls, tables, dialogs, and progress states without changing workflows.
+- [x] Restyle the sign-in and secure-loading surfaces to match the industrial visual system.
+- [x] Add targeted theme regression coverage and validate the restyle on authenticated desktop and mobile views.
+- [x] Save a verified checkpoint for the industrial theme release.
