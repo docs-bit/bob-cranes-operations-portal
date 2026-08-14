@@ -255,3 +255,6 @@
 - [x] Host the supplied BOB Cranes logo as a deployment-safe static asset and replace existing generated brand marks.
 - [x] Apply the supplied logo consistently in the portal navigation and sign-in experience with responsive sizing and accessible alternative text.
 - [x] Add focused coverage, validate browser rendering, and save the verified logo update checkpoint.
+
+## Header dossier search repair
+- [x] Reproduce and repair the Operations Cockpit header dossier search so matching bookings can be found and opened reliably.

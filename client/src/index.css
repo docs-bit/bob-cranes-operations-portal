@@ -1402,3 +1402,68 @@ body,
     border-radius: 10px;
   }
 }
+
+/* Functional header dossier search. */
+.topbar-actions { position: relative; }
+.header-dossier-search {
+  position: absolute;
+  z-index: 55;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(460px, calc(100vw - 28px));
+  overflow: hidden;
+  border: 1px solid #e6e9ed;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 22px 48px rgba(32, 39, 48, .16);
+}
+.header-dossier-search-input {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 11px 10px 14px;
+  border-bottom: 1px solid #edf0f3;
+  color: #111;
+}
+.header-dossier-search-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #000;
+  font: inherit;
+  font-size: 13px;
+}
+.header-dossier-search-input input::placeholder { color: #5d6672; }
+.header-dossier-search-input .icon-button { width: 30px; height: 30px; border-radius: 9px; }
+.header-dossier-search-summary {
+  padding: 10px 15px 7px;
+  color: #343434;
+  font-size: 11px;
+  font-weight: 750;
+}
+.header-dossier-search-results { padding: 0 8px 8px; }
+.header-dossier-search-result {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 9px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #000;
+  text-align: left;
+}
+.header-dossier-search-result:hover,
+.header-dossier-search-result:focus-visible { background: #fff4e8; }
+.header-dossier-search-result > span:first-child { display: grid; gap: 3px; min-width: 0; }
+.header-dossier-search-result strong { overflow: hidden; color: #000; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.header-dossier-search-result small { overflow: hidden; color: #343434; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.header-dossier-search-result .status-badge { flex: none; font-size: 9px; }
+.header-dossier-search-empty { padding: 18px 9px; color: #343434; font-size: 12px; text-align: center; }
+@media (max-width: 760px) {
+  .header-dossier-search { position: fixed; top: 76px; right: 14px; left: 14px; width: auto; }
+}

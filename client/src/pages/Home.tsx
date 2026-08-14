@@ -602,7 +602,7 @@ function MetricCard({
   );
 }
 
-function Shell({
+export function Shell({
   children,
   view,
   setView,
@@ -610,6 +610,8 @@ function Shell({
   onClient,
   onDepartment,
   departmentLabel,
+  bookings,
+  onOpenDossier,
   user,
   onSignOut,
 }: {
@@ -620,6 +622,8 @@ function Shell({
   onClient: () => void;
   onDepartment: (department: string) => void;
   departmentLabel: string | null;
+  bookings: Booking[];
+  onOpenDossier: (booking: Booking) => void;
   user: {
     id: number;
     name: string | null;
@@ -633,6 +637,44 @@ function Shell({
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [moreActionsOpen, setMoreActionsOpen] = useState(false);
+  const [dossierSearchOpen, setDossierSearchOpen] = useState(false);
+  const [dossierSearchQuery, setDossierSearchQuery] = useState("");
+  const dossierSearchResults = useMemo(() => {
+    const query = dossierSearchQuery.trim().toLowerCase();
+    if (!query) return bookings.slice(0, 6);
+    return bookings
+      .filter(booking =>
+        [
+          booking.id,
+          booking.client,
+          booking.project,
+          booking.crane,
+          booking.site,
+          booking.stage,
+        ].some(value => value.toLowerCase().includes(query))
+      )
+      .slice(0, 6);
+  }, [bookings, dossierSearchQuery]);
+  const openDossierSearch = () => {
+    setDossierSearchQuery("");
+    setDossierSearchOpen(true);
+  };
+  const chooseDossierSearchResult = (booking: Booking) => {
+    setDossierSearchOpen(false);
+    setDossierSearchQuery("");
+    onOpenDossier(booking);
+  };
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        openDossierSearch();
+      }
+      if (event.key === "Escape") setDossierSearchOpen(false);
+    };
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
   const notificationInput = useMemo(
     () =>
       user.role === "admin"
@@ -966,12 +1008,73 @@ function Shell({
             <button
               type="button"
               className="search-pill search-launcher"
-              onClick={() => setView("bookings")}
+              onClick={openDossierSearch}
               aria-label="Open booking dossier search"
+              aria-expanded={dossierSearchOpen}
             >
               <Search size={14} /> Search dossiers{" "}
               <span style={{ marginLeft: "auto", color: "#555" }}>⌘ K</span>
             </button>
+            {dossierSearchOpen && (
+              <div
+                className="header-dossier-search"
+                role="dialog"
+                aria-label="Search booking dossiers"
+              >
+                <div className="header-dossier-search-input">
+                  <Search size={15} aria-hidden="true" />
+                  <input
+                    autoFocus
+                    value={dossierSearchQuery}
+                    onChange={event => setDossierSearchQuery(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === "Enter" && dossierSearchResults[0]) {
+                        chooseDossierSearchResult(dossierSearchResults[0]);
+                      }
+                    }}
+                    placeholder="Search ID, client, project, crane, site, or stage"
+                    aria-label="Search booking dossiers"
+                  />
+                  <button
+                    type="button"
+                    className="icon-button"
+                    onClick={() => setDossierSearchOpen(false)}
+                    aria-label="Close booking dossier search"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+                <div className="header-dossier-search-summary">
+                  {dossierSearchQuery.trim()
+                    ? `${dossierSearchResults.length} matching dossier${dossierSearchResults.length === 1 ? "" : "s"}`
+                    : "Recent dossiers"}
+                </div>
+                <div className="header-dossier-search-results">
+                  {dossierSearchResults.length ? (
+                    dossierSearchResults.map(booking => (
+                      <button
+                        type="button"
+                        className="header-dossier-search-result"
+                        key={booking.id}
+                        onClick={() => chooseDossierSearchResult(booking)}
+                      >
+                        <span>
+                          <strong>{booking.id}</strong>
+                          <small>
+                            {booking.client} · {booking.project}
+                          </small>
+                        </span>
+                        <span className="status-badge gray">{booking.stage}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="header-dossier-search-empty">
+                      No booking dossiers match this search.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="notification-wrap">
               <button
                 className="icon-button notification-trigger"
@@ -7091,6 +7194,8 @@ export default function Home() {
       onClient={() => setLocation("/client/portal-bob-31511")}
       onDepartment={openDepartment}
       departmentLabel={activeDepartment}
+      bookings={bookings}
+      onOpenDossier={openDetail}
       user={user}
       onSignOut={signOut}
     >
