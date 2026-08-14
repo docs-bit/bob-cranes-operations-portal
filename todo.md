@@ -267,3 +267,11 @@
 - [x] Derive and display active versus upcoming booking assignment availability using booking mobilization and off-hire dates.
 - [x] Audit every portal search control and ensure it filters only the data rendered by its current page, with useful matching details.
 - [x] Add coverage, validate the integrated interactions, and save a verified checkpoint.
+
+## Reusable portal-refinement skill and crew enhancements
+- [x] Create and validate a reusable skill for safe, tested portal refinements using the workflow established in this project.
+- [x] Add a calendar-date selector that filters Crew Assignment availability by a selected date.
+- [x] Make Crew Assignment booking-ID chips open their corresponding booking dossier.
+- [x] Add saved local search presets for the Crew Assignment workspace.
+- [x] Make Edit Assignment support selecting available and already-assigned employees for the active booking.
+- [x] Add regression coverage, verify integrated behavior, and save the completed release checkpoint.

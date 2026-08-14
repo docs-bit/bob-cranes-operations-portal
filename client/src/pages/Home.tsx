@@ -7248,6 +7248,13 @@ export default function Home() {
             allocations={allocations}
             setAllocations={setAllocations}
             focusedBookingId={focusedAssignmentBookingId}
+            onOpenDossier={(bookingId) => {
+              const booking = bookings.find((candidate) => candidate.id === bookingId);
+              if (!booking) return;
+              setFocusedAssignmentBookingId(null);
+              setActiveBooking(booking);
+              setView("detail");
+            }}
             onAddWorkman={() => {
               if (canView("users")) {
                 setView("users");

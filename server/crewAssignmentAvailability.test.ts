@@ -44,7 +44,7 @@ describe("allocation-aware Crew Assignment availability", () => {
   it("renders allocation count, booking ID, and date-aware timing details in Crew Assignment", () => {
     expect(workspaceSource).toContain("allocation-count-badge");
     expect(workspaceSource).toContain("booking-id-chip");
-    expect(workspaceSource).toContain("summarizeAllocationTiming(bookingIds, bookings)");
+    expect(workspaceSource).toContain("timingForDate(bookingIds, bookings, availabilityDate)");
     expect(workspaceSource).toContain("Active booking");
     expect(workspaceSource).toContain("Upcoming booking");
   });

@@ -1491,3 +1491,13 @@ body,
   padding: 4px 6px;
   white-space: nowrap;
 }
+.crew-search-controls, .saved-search-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.crew-search-controls .booking-search { width: min(360px, 100%); }
+.crew-date-filter { display: inline-flex; align-items: center; gap: 6px; color: #242a33; font-size: 11px; font-weight: 750; }
+.crew-date-filter input { min-height: 34px; border: 1px solid #e0e5e9; border-radius: 9px; background: #fff; color: #000; padding: 0 8px; font: inherit; }
+.saved-search-controls .form-input { min-width: 200px; max-width: 260px; }
+.saved-search-preset-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.assignment-target-badge { display: block; width: fit-content; margin-top: 3px; color: #0e5f90; font-size: 10px; font-weight: 800; }
+.booking-id-chip { border: 0; cursor: pointer; gap: 4px; }
+.booking-id-chip:hover, .booking-id-chip:focus-visible { background: #ffe1c5; outline: 2px solid #f0a05a; outline-offset: 1px; }
+@media (max-width: 760px) { .crew-date-filter { width: 100%; } .saved-search-controls .form-input { width: 100%; max-width: none; } }
