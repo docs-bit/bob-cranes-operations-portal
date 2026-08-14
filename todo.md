@@ -240,3 +240,10 @@
 
 ## Operations Cockpit header refinement
 - [x] Remove the Back control from the Operations Cockpit overview header only while preserving it on all other views.
+
+## Light equipment-operations theme replacement
+- [x] Translate the supplied light equipment-dashboard reference into accessible color, typography, surface, and control tokens.
+- [x] Replace the current industrial dark command theme across navigation, dashboard modules, data workspaces, controls, and progress states.
+- [x] Restyle sign-in and loading surfaces to match the light equipment-operations system.
+- [x] Add focused regression coverage and validate authenticated desktop plus responsive mobile views.
+- [x] Save a verified checkpoint for the completed theme replacement.
