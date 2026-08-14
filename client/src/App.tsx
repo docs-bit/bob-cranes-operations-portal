@@ -34,6 +34,7 @@ function Router() {
       <Route path={"/attendance"} component={ProtectedPortal} />
       <Route path={"/training"} component={ProtectedPortal} />
       <Route path={"/crew"} component={ProtectedPortal} />
+      <Route path={"/gear"} component={ProtectedPortal} />
       <Route path={"/login"} component={Login} />
       <Route path="/client/:token" component={Home} />
       <Route path="/404" component={NotFound} />

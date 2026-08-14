@@ -175,5 +175,18 @@
 ## White-screen repair validation gaps
 - [x] Document fresh browser and server evidence that distinguishes the transient loading state from a runtime exception.
 - [x] Verify the signed-out sign-in route after the loading-state repair alongside authenticated and client views.
-- [ ] Capture a fresh isolated signed-out /login render and save the dedicated loading-state repair checkpoint.
-- [ ] Save a dedicated checkpoint for the verified white-screen/loading-state repair.
+- [x] Capture a fresh isolated signed-out /login render and save the dedicated loading-state repair checkpoint.
+- [x] Save a dedicated checkpoint for the verified white-screen/loading-state repair.
+- [x] Record fresh isolated signed-out /login render evidence and revalidate the loading-state repair checklist.
+
+## Lifting gear document and validity tracking
+- [x] Add document selection and upload handling to the new lifting-gear entry workflow.
+- [x] Capture each uploaded gear document’s validity end date and show its status in the inventory.
+- [x] Preserve hard-blocking of expired gear documents during booking selection and add automated validation coverage.
+- [x] Verify the new gear-document form flow, run tests/build, and save a checkpoint.
+- [x] Register and verify the authenticated `/gear` route so the lifting-gear document workflow is reachable by direct link.
+
+## Lifting gear document workflow follow-up gaps
+- [x] Wire newly added gear records into booking-wizard selection and block expired document records from selection there.
+- [x] Add UI/integration coverage proving an expired uploaded gear cannot be selected for a booking.
+- [ ] Complete final gear-document browser verification and save a post-release checkpoint.

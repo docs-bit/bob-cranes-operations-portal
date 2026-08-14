@@ -11,6 +11,7 @@ import { z } from "zod";
 import { isKnownCrewAssignmentMember } from "../shared/crewAssignmentRoster";
 import * as db from "./db";
 import { createLocalSession, hashPassword, normalizeEmail, toSessionUser, verifyPassword } from "./localAuth";
+import { storagePut } from "./storage";
 
 db.seedInitialDataIfNeeded().catch(console.error);
 
@@ -335,6 +336,31 @@ export const appRouter = router({
       await db.seedInitialDataIfNeeded();
       return await db.getAllLiftingGears();
     }),
+
+    uploadGearDocument: protectedProcedure
+      .input(z.object({
+        fileName: z.string().trim().min(1).max(180),
+        contentType: z.string().trim().max(120).default("application/octet-stream"),
+        base64: z.string().min(1).max(10_000_000),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        requireDepartmentAccess(ctx.user, "lifting-gears");
+        const allowedTypes = new Set([
+          "application/pdf",
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ]);
+        const contentType = allowedTypes.has(input.contentType) ? input.contentType : "application/octet-stream";
+        const bytes = Buffer.from(input.base64, "base64");
+        if (!bytes.length || bytes.length > 7_500_000) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Each lifting-gear document must be between 1 byte and 7.5 MB." });
+        }
+        const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "gear-document";
+        const { key, url } = await storagePut(`lifting-gears/${ctx.user.id}/${Date.now()}-${safeName}`, bytes, contentType);
+        return { key, url, name: input.fileName, contentType, size: bytes.length };
+      }),
 
     getTrailers: protectedProcedure.query(async () => {
       await db.seedInitialDataIfNeeded();
