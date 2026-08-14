@@ -8,6 +8,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import { isKnownCrewAssignmentMember } from "../shared/crewAssignmentRoster";
 import * as db from "./db";
 import { createLocalSession, hashPassword, normalizeEmail, toSessionUser, verifyPassword } from "./localAuth";
 
@@ -308,7 +309,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         requireDepartmentAccess(ctx.user, "crew");
         const crewList = await db.getAllCrew();
-        if (!crewList.some((member) => member.id === input.crewId && member.name === input.crewName)) {
+        if (!crewList.some((member) => member.id === input.crewId && member.name === input.crewName) && !isKnownCrewAssignmentMember(input.crewId, input.crewName)) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "That employee is not in the persisted crew roster." });
         }
         for (const bookingId of input.bookingIds) {

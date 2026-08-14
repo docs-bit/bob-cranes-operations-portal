@@ -29,11 +29,12 @@ export function findEmployeeBookingConflicts(
   targetBookingId: string,
   bookings: BookingWindow[],
   allocations: EmployeeAllocation[],
+  crewId?: string,
 ) {
   const target = bookings.find((booking) => booking.id === targetBookingId);
   if (!target) return [];
   const allocatedBookingIds = allocations
-    .filter((allocation) => allocation.employeeName === employeeName && allocation.bookingId !== targetBookingId)
+    .filter((allocation) => (crewId ? allocation.crewId === crewId : allocation.employeeName === employeeName) && allocation.bookingId !== targetBookingId)
     .map((allocation) => allocation.bookingId);
   return bookings.filter((booking) => allocatedBookingIds.includes(booking.id) && bookingWindowsOverlap(target, booking));
 }
@@ -44,8 +45,8 @@ export function toggleEmployeeBookingAllocation(
   bookingId: string,
   crewId?: string,
 ) {
-  const exists = allocations.some((allocation) => allocation.employeeName === employeeName && allocation.bookingId === bookingId);
+  const exists = allocations.some((allocation) => (crewId ? allocation.crewId === crewId : allocation.employeeName === employeeName) && allocation.bookingId === bookingId);
   return exists
-    ? allocations.filter((allocation) => !(allocation.employeeName === employeeName && allocation.bookingId === bookingId))
+    ? allocations.filter((allocation) => !((crewId ? allocation.crewId === crewId : allocation.employeeName === employeeName) && allocation.bookingId === bookingId))
     : [...allocations, { employeeName, bookingId, ...(crewId ? { crewId } : {}) }];
 }

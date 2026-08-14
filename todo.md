@@ -154,3 +154,15 @@
 - [x] Bind BookingDetail assigned-crew rendering to persisted allocations and show saved-assignment feedback when returning from CrewView.
 - [x] Replace or remove remaining misleading toast-only visible controls, including More actions, admin utility entries, and certificate viewing.
 - [x] Add UI/integration coverage for Edit assignment -> focused CrewView -> save allocation -> updated dossier crew state.
+
+## Full attendance roster in Crew Assignment
+- [x] Replace the demonstration crew list with all employees from the August attendance roster while retaining identity and allocation compatibility.
+- [x] Make employee search, department filters, availability, and allocation scheduling work across the full imported roster.
+- [x] Add coverage proving all attendance employees are available in Crew Assignment and existing persisted allocations still resolve correctly.
+- [x] Validate the roster-integrated assignment workspace, tests, build, and checkpoint the release.
+
+## Full roster follow-up validation gaps
+- [x] Bind attendance-backed Crew Assignment availability to real attendance-derived status data instead of defaulting imported employees to Present.
+- [x] Add a real UI/integration test proving the full attendance roster is surfaced and persisted allocations hydrate correctly in Crew Assignment.
+- [x] Revalidate the roster workspace and save a new post-integration checkpoint.
+- [ ] Save the verified post-integration Crew Assignment roster checkpoint.

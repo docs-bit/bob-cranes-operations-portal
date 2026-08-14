@@ -1,11 +1,12 @@
 /** @vitest-environment jsdom */
 import React, { useState } from "react";
 import "@testing-library/jest-dom/vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { CrewView } from "../client/src/pages/Home";
 import type { EmployeeAllocation } from "../shared/bookingConflictRules";
+import { ATTENDANCE_CREW_ROSTER } from "../shared/attendanceCrewRoster";
 
 const saveCrewAllocations = vi.hoisted(() => vi.fn(async ({ crewName, crewId, bookingIds }: { crewName: string; crewId: string; bookingIds: string[] }) => ({
   allocations: bookingIds.map((bookingId) => ({ crewName, crewId, bookingId })),
@@ -78,5 +79,25 @@ describe("Assignment edit UI flow", () => {
       bookingIds: [],
     });
     expect(screen.getByTestId("assignment-feedback")).toHaveTextContent("Vineeth Vijayan|removed|BOB Booking-31511");
+  });
+
+  it("surfaces the attendance-backed roster and hydrates a persisted attendance employee allocation", async () => {
+    const attendanceEmployee = ATTENDANCE_CREW_ROSTER.find((employee) => employee.availability === "On Leave") ?? ATTENDANCE_CREW_ROSTER[0];
+    const seededAllocation: EmployeeAllocation = { employeeName: attendanceEmployee.name, crewId: attendanceEmployee.id, bookingId: booking.id };
+    const rosterView = render(<CrewView
+      bookings={[booking]}
+      allocations={[seededAllocation]}
+      setAllocations={() => undefined}
+      focusedBookingId={booking.id}
+      onAddWorkman={() => undefined}
+      onAllocationSaved={() => undefined}
+    />);
+
+    const rosterQueries = within(rosterView.container);
+    const search = rosterQueries.getByRole("textbox", { name: "Search attendance employees" });
+    await userEvent.setup().type(search, attendanceEmployee.sourceId);
+    expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent(attendanceEmployee.name);
+    expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent(attendanceEmployee.availability);
+    expect(rosterQueries.getByRole("button", { name: "Remove" })).toBeInTheDocument();
   });
 });

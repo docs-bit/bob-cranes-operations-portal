@@ -7,7 +7,12 @@ import { canDispatch as canDispatchByRule, departmentCompletion, documentComplet
 import { ATTENDANCE_STATUSES, attendanceCompletion, attendanceRosterKey, computeMonthlyAttendanceSummary, dateKey, defaultAttendanceRecord, formatAttendanceDate, historicalAttendanceRecord, shiftDate, summarizeAttendance, updateAttendance, type AttendanceRecord, type AttendanceStatus } from "@shared/attendanceRules";
 import { canAccessWorkspaceView, DEPARTMENTS, DEPARTMENT_LABEL_TO_CODE, roleLabel } from "@shared/departmentAccess";
 import { findEmployeeBookingConflicts, toggleEmployeeBookingAllocation, type EmployeeAllocation } from "@shared/bookingConflictRules";
-import { assignedEmployeeForBooking, focusAssignmentBooking } from "@shared/assignmentRules";
+import { focusAssignmentBooking } from "@shared/assignmentRules";
+import { ATTENDANCE_CREW_ROSTER } from "@shared/attendanceCrewRoster";
+import { CREW_ASSIGNMENT_ROSTER } from "@shared/crewAssignmentRoster";
+import { CrewView as CrewAssignmentWorkspace } from "@/components/CrewAssignmentWorkspace";
+
+export const CrewView = CrewAssignmentWorkspace;
 import { TRAINING_EMPLOYEES, TRAINING_SOURCE_FILE, type TrainingEmployee, type TrainingStatus, type TrainingWorkstream } from "@shared/trainingData";
 import { AUGUST_ATTENDANCE_ROSTER } from "@shared/augustAttendanceData";
 import { filterNotifications, getExpiringTrainingEmployees } from "@shared/notificationAndExpiryRules";
@@ -141,7 +146,18 @@ const departments = [
   ["Administrator", 1, "#858585"],
 ] as const;
 
-const crews = [
+type CrewRecord = {
+  id: string;
+  name: string;
+  role: string;
+  availability: "Present" | "On Leave" | "Assigned" | "Off-Site";
+  cert: string;
+  initials: string;
+  flag: boolean;
+  department?: string;
+};
+
+const legacyCrews: CrewRecord[] = [
   { id: "cr-1", name: "Vineeth Vijayan", role: "Crane Operator", availability: "Present", cert: "Valid · 12 Mar 2027", initials: "VV", flag: false },
   { id: "cr-2", name: "Anoop Panikashery", role: "Crane Operator", availability: "Assigned", cert: "Valid · 09 Feb 2027", initials: "AP", flag: false },
   { id: "cr-3", name: "Vijayakumar", role: "Rigger", availability: "Present", cert: "Renewal due in 16 days", initials: "VK", flag: true },
@@ -149,6 +165,15 @@ const crews = [
   { id: "cr-5", name: "Ramesh Babu", role: "Banksman", availability: "On Leave", cert: "Valid · 10 Jan 2027", initials: "RB", flag: false },
   { id: "cr-6", name: "Shahid Khan", role: "Site Supervisor", availability: "Off-Site", cert: "Training required", initials: "SK", flag: true },
 ];
+
+const crews: CrewRecord[] = [
+  ...legacyCrews,
+  ...ATTENDANCE_CREW_ROSTER.filter((employee) => !legacyCrews.some((legacy) => legacy.name.toLowerCase() === employee.name.toLowerCase())),
+].sort((first, second) => first.name.localeCompare(second.name));
+
+function allocationMatchesCrew(allocation: EmployeeAllocation, crew: Pick<CrewRecord, "id" | "name">) {
+  return allocation.crewId ? allocation.crewId === crew.id : allocation.employeeName === crew.name;
+}
 
 const attendanceRoster = AUGUST_ATTENDANCE_ROSTER.map((employee, index) => ({ name: employee.name, role: employee.role, availability: employee.availability as AttendanceStatus, initials: employee.initials, department: employee.department, rosterKey: attendanceRosterKey(employee, index) }));
 
@@ -364,21 +389,25 @@ function DocsView({ bookings, setDetail }: { bookings: Booking[]; setDetail: (bo
   return <div className="content"><PageHeading eyebrow="Compliance control" title="Documents & compliance" copy="Parallel completion tracking across every department. A dossier cannot be dispatched while a required item is missing, expired, or flagged." action={<button className="secondary-button" onClick={() => bookings[0] ? setDetail(bookings[0]) : toast.info("No dossier available", { description: "Create or import a booking before attaching documents." })}><CloudUpload size={14} /> Upload document</button>} /><div className="metric-grid"><MetricCard label="Documents in flight" value="46" foot="Across 9 active dossiers" icon={<FileText size={13} />} /><MetricCard label="100% complete" value="03" foot="Ready for review" icon={<CheckCircle2 size={13} />} tone="green" /><MetricCard label="Revision flags" value="04" foot="Kick-backs this week" icon={<AlertTriangle size={13} />} /><MetricCard label="Expiring soon" value="06" foot="HSE notified automatically" icon={<Clock3 size={13} />} /></div><div className="dashboard-grid"><div className="panel"><div className="panel-header"><div><div className="panel-title">Department completion</div><div className="panel-meta">BOB Booking-31511 · Gulf Contracting LLC</div></div><StatusBadge value="Docs In Progress" /></div><div className="panel-body"><div className="compliance-list">{docRows.map((row) => <div key={row.department} className="compliance-row"><div style={{ minWidth: 160 }}><div className="compliance-name">{row.department}</div><div className="compliance-sub">{row.items} documents · {row.blocker}</div></div><div style={{ flex: 1 }}><div className="progress-track"><div className={`progress-fill ${row.complete === 100 ? "green" : row.complete < 70 ? "amber" : ""}`} style={{ width: `${row.complete}%` }} /></div></div><div style={{ width: 42, textAlign: "right", fontSize: 11, color: row.complete === 100 ? "#69d495" : "#ddd" }}>{row.complete}%</div></div>)}</div></div></div><div className="panel"><div className="panel-header"><div className="panel-title">Ready for review</div><FileCheck2 size={15} color="#69d495" /></div><div className="panel-body">{bookings.filter((booking) => booking.stage === "All Docs Submitted" || booking.stage === "Reviewed").map((booking) => <div className="activity-item" key={booking.id} onClick={() => setDetail(booking)} style={{ cursor: "pointer" }}><div className="activity-dot" style={{ background: "#31b56b" }} /><div><div className="activity-text"><strong>{booking.id}</strong><br />{booking.client}</div><div className="activity-time">{booking.progress}% complete · Open review <ArrowRight size={10} style={{ verticalAlign: "-1px" }} /></div></div></div>)}</div></div></div></div>;
 }
 
-export function CrewView({ bookings, allocations, setAllocations, focusedBookingId, onAddWorkman, onAllocationSaved }: { bookings: Booking[]; allocations: EmployeeAllocation[]; setAllocations: React.Dispatch<React.SetStateAction<EmployeeAllocation[]>>; focusedBookingId?: string | null; onAddWorkman: () => void; onAllocationSaved: (details: { bookingId: string; employeeName: string; action: "saved" | "removed" }) => void }) {
+function CrewViewLegacy({ bookings, allocations, setAllocations, focusedBookingId, onAddWorkman, onAllocationSaved }: { bookings: Booking[]; allocations: EmployeeAllocation[]; setAllocations: React.Dispatch<React.SetStateAction<EmployeeAllocation[]>>; focusedBookingId?: string | null; onAddWorkman: () => void; onAllocationSaved: (details: { bookingId: string; employeeName: string; action: "saved" | "removed" }) => void }) {
   const saveAllocationsMutation = trpc.operations.saveCrewAllocations.useMutation();
   const [filter, setFilter] = useState("All");
-  const focusedEmployee = assignedEmployeeForBooking(allocations, focusedBookingId);
-  const [selectedEmployee, setSelectedEmployee] = useState(focusedEmployee ?? crews[0]?.name ?? "");
+  const focusedCrewId = allocations.find((allocation) => allocation.bookingId === focusedBookingId)?.crewId;
+  const [selectedCrewId, setSelectedCrewId] = useState(focusedCrewId ?? crews[0]?.id ?? "");
   const visible = crews.filter((crew) => filter === "All" || crew.availability === filter);
-  const selectedCrew = crews.find((crew) => crew.name === selectedEmployee) ?? crews[0];
+  const selectedCrew = crews.find((crew) => crew.id === selectedCrewId) ?? crews[0];
+  const setSelectedEmployee = (employeeName: string) => {
+    const match = crews.find((crew) => crew.name === employeeName);
+    if (match) setSelectedCrewId(match.id);
+  };
   const visibleBookings = useMemo(() => focusAssignmentBooking(bookings, focusedBookingId), [bookings, focusedBookingId]);
   useEffect(() => {
-    if (focusedEmployee) setSelectedEmployee(focusedEmployee);
-  }, [focusedEmployee]);
-  const employeeAllocations = allocations.filter((allocation) => allocation.employeeName === selectedCrew?.name);
+    if (focusedCrewId) setSelectedCrewId(focusedCrewId);
+  }, [focusedCrewId]);
+  const employeeAllocations = allocations.filter((allocation) => selectedCrew ? allocationMatchesCrew(allocation, selectedCrew) : false);
   const exportCalendar = () => {
     const rows = allocations.map((item) => {
-      const crew = crews.find((c) => c.name === item.employeeName);
+      const crew = crews.find((candidate) => item.crewId ? candidate.id === item.crewId : candidate.name === item.employeeName);
       const booking = bookings.find((b) => b.id === item.bookingId);
       return {
         Workman: item.employeeName,
@@ -405,7 +434,7 @@ export function CrewView({ bookings, allocations, setAllocations, focusedBooking
       toast.info("Preview dossier", { description: "This presentation-only dossier is not yet persisted and cannot receive a durable crew allocation." });
       return;
     }
-    const conflicts = findEmployeeBookingConflicts(selectedCrew.name, booking.id, bookings, allocations);
+    const conflicts = findEmployeeBookingConflicts(selectedCrew.name, booking.id, bookings, allocations, selectedCrew.id);
     if (conflicts.length > 0) toast.warning("Booking overlap detected", { description: `${selectedCrew.name} is already allocated to ${conflicts.map((item) => item.id).join(", ")} during the same mobilization window.` });
     const wasAssigned = employeeAllocations.some((allocation) => allocation.bookingId === booking.id);
     const nextAllocations = toggleEmployeeBookingAllocation(allocations, selectedCrew.name, booking.id, selectedCrew.id);
@@ -414,7 +443,7 @@ export function CrewView({ bookings, allocations, setAllocations, focusedBooking
       const result = await saveAllocationsMutation.mutateAsync({
         crewId: selectedCrew.id,
         crewName: selectedCrew.name,
-        bookingIds: nextAllocations.filter((allocation) => allocation.employeeName === selectedCrew.name && allocation.crewId === selectedCrew.id).map((allocation) => persistedBookingIdForUi(allocation.bookingId)).filter((id): id is string => Boolean(id)),
+        bookingIds: nextAllocations.filter((allocation) => allocationMatchesCrew(allocation, selectedCrew)).map((allocation) => persistedBookingIdForUi(allocation.bookingId)).filter((id): id is string => Boolean(id)),
       });
       setAllocations(result.allocations.map((allocation) => ({ employeeName: allocation.crewName, crewId: allocation.crewId, bookingId: uiBookingIdForPersisted(allocation.bookingId) })));
       const action = wasAssigned ? "removed" : "saved";
@@ -498,8 +527,9 @@ function GearCreateDialog({ open, onClose, onSave }: GearCreateDialogProps) {
 
 function BookingDetail({ booking, documents, allocations, assignmentSavedMessage, onBack, onUpdate, onEditAssignment, onOpenClientPortal }: { booking: Booking; documents: DocumentItem[]; allocations: EmployeeAllocation[]; assignmentSavedMessage?: string | null; onBack: () => void; onUpdate: (booking: Booking) => void; onEditAssignment: () => void; onOpenClientPortal: () => void }) {
   const [toast, setToast] = useState("");
-  const assignedCrew = useMemo(() => crews.filter((crew) => allocations.some((allocation) => allocation.bookingId === booking.id && allocation.employeeName === crew.name)), [allocations, booking.id]);
-  const dossierCrew = assignedCrew.length ? assignedCrew : crews.slice(0, 4);
+  const assignedCrew = useMemo(() => CREW_ASSIGNMENT_ROSTER.filter((crew) => allocations.some((allocation) => allocation.bookingId === booking.id && (allocation.crewId ? allocation.crewId === crew.id : allocation.employeeName === crew.name))), [allocations, booking.id]);
+  const crews = legacyCrews;
+  const dossierCrew = assignedCrew.length ? assignedCrew : legacyCrews.slice(0, 4);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [dispatchPreview, setDispatchPreview] = useState(false);
   const [previewDocument, setPreviewDocument] = useState<string | null>(null);
@@ -530,6 +560,7 @@ type ClientPortalProps = {
 };
 
 function ClientPortal({ booking, documents, onUpdate, onUploadAll, onBackToInternal }: ClientPortalProps) {
+  const crews = legacyCrews;
   const [tab, setTab] = useState<"summary" | "documents" | "chat">("summary");
   const [message, setMessage] = useState("");
   const [uploadToast, setUploadToast] = useState("");
