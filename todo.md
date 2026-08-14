@@ -215,3 +215,9 @@
 ## Client response portal navigation repair
 - [x] Add a visible back control to return from the Client Response Portal to the Operations Cockpit.
 - [x] Verify the return path in the authenticated client portal, run focused regression validation, and save a checkpoint.
+
+## Deployment-ready release
+- [x] Audit deployment configuration, production dependencies, schema migration state, and protected runtime paths.
+- [x] Resolve any release-readiness gap and document deployment-specific configuration or operational requirements.
+- [x] Run final TypeScript, focused regression, production-build, and authenticated smoke validation.
+- [x] Save a deployment-ready checkpoint and provide the in-product publication handoff steps.
