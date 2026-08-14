@@ -143,3 +143,14 @@
 - [ ] Run authenticated desktop and mobile QA on the actual dashboard and key department/client views.
 - [ ] Reproduce the black-screen scenario on an authenticated route, identify the actual rendering cause, and verify fresh logs have no current runtime errors.
 - [ ] Perform authenticated browser verification after the black-screen fix.
+
+## Assignment edit and complete control responsiveness audit
+- [x] Repair the Assignment edit control so it opens the edit state, saves changes, and refreshes assigned crew data with visible feedback.
+- [x] Audit all visible portal controls for missing handlers, dead navigation, silent errors, incorrect disabled states, and missing loading/success/error feedback; repair each verified issue.
+- [x] Add automated coverage for the Assignment edit interaction and repaired control feedback paths.
+- [ ] Run authenticated Assignment and full-control browser QA, then save a checkpoint after tests and build pass.
+
+## Assignment repair follow-up gaps
+- [x] Bind BookingDetail assigned-crew rendering to persisted allocations and show saved-assignment feedback when returning from CrewView.
+- [x] Replace or remove remaining misleading toast-only visible controls, including More actions, admin utility entries, and certificate viewing.
+- [x] Add UI/integration coverage for Edit assignment -> focused CrewView -> save allocation -> updated dossier crew state.

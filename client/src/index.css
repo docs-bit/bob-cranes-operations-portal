@@ -489,6 +489,12 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .filter-chip:active, .primary-button:active, .secondary-button:active, .icon-button:active { transform: scale(.97); }
 .search-pill input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: #191919; font-size: 12px; }
 .search-pill input::placeholder { color: #6e6e73; }
+.search-launcher { border: 1px solid #d7e4df; cursor: pointer; text-align: left; }
+.search-launcher:hover, .search-launcher:focus-visible { background: #edf7f3; border-color: #9acfc1; color: #1d725f; outline: none; }
+.more-actions-wrap { position: relative; }
+.more-actions-menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 30; min-width: 210px; padding: 6px; border: 1px solid #d7e4df; border-radius: 12px; background: #fff; box-shadow: 0 16px 38px rgba(20,50,42,.14); }
+.more-actions-menu button { width: 100%; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 8px; padding: 9px 10px; background: transparent; color: var(--analytics-ink); font-size: 12px; text-align: left; cursor: pointer; }
+.more-actions-menu button:hover, .more-actions-menu button:focus-visible { background: #edf7f3; color: #1d725f; outline: none; }
 .booking-search { cursor: text; }
 @media (max-width: 620px) { .booking-search { width: 100% !important; } }
 
