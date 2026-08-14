@@ -211,3 +211,7 @@
 - [x] Add date-range filters to activity-log viewing and CSV export.
 - [x] Harden the activity date-range controls so incomplete or malformed typed date values do not issue a failed audit query.
 - [x] Add automated coverage, responsive browser verification, and a checkpoint for the governance and dispatch-bundle release.
+
+## Client response portal navigation repair
+- [x] Add a visible back control to return from the Client Response Portal to the Operations Cockpit.
+- [x] Verify the return path in the authenticated client portal, run focused regression validation, and save a checkpoint.
