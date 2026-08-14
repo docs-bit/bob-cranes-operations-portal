@@ -64,6 +64,13 @@
       "when": 1786701540320,
       "tag": "0008_windy_karma",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1786706328662,
+      "tag": "0009_sudden_shocker",
+      "breakpoints": true
     }
   ]
 }

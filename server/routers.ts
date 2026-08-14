@@ -1,16 +1,44 @@
 import { LOCAL_AUTH_COOKIE_NAME, COOKIE_NAME } from "@shared/const";
-import { canAccessDepartment, canManageDepartmentUsers, DEPARTMENTS, isDepartmentCode, roleLabel, type DepartmentCode, type PortalRole } from "@shared/departmentAccess";
-import { BOOKING_STAGES, STAGE_ROLES, transitionBooking, type BookingStage } from "@shared/bookingRules";
-import { accountStatusActivity, profileUpdateActivity, signInActivity } from "@shared/activityRules";
+import {
+  canAccessDepartment,
+  canManageDepartmentUsers,
+  DEPARTMENTS,
+  isDepartmentCode,
+  roleLabel,
+  type DepartmentCode,
+  type PortalRole,
+} from "@shared/departmentAccess";
+import {
+  BOOKING_STAGES,
+  STAGE_ROLES,
+  transitionBooking,
+  type BookingStage,
+} from "@shared/bookingRules";
+import {
+  accountStatusActivity,
+  profileUpdateActivity,
+  signInActivity,
+} from "@shared/activityRules";
 import { accountUpdateNotification } from "@shared/accountNotifications";
 import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { adminProcedure, publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import {
+  adminProcedure,
+  publicProcedure,
+  protectedProcedure,
+  router,
+} from "./_core/trpc";
 import { z } from "zod";
 import { isKnownCrewAssignmentMember } from "../shared/crewAssignmentRoster";
 import * as db from "./db";
-import { createLocalSession, hashPassword, normalizeEmail, toSessionUser, verifyPassword } from "./localAuth";
+import {
+  createLocalSession,
+  hashPassword,
+  normalizeEmail,
+  toSessionUser,
+  verifyPassword,
+} from "./localAuth";
 import { storagePut } from "./storage";
 
 db.seedInitialDataIfNeeded().catch(console.error);
@@ -19,21 +47,26 @@ const accountInput = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(320),
   password: z.string().min(10).max(160),
-  departmentCode: z.string().refine(isDepartmentCode, "Choose a valid department."),
+  departmentCode: z
+    .string()
+    .refine(isDepartmentCode, "Choose a valid department."),
 });
 
-const registrationInput = accountInput.extend({ role: z.enum(["user", "supervisor"]).default("user") });
+const registrationInput = accountInput.extend({
+  role: z.enum(["user", "supervisor"]).default("user"),
+});
 
 const localSessionMaxAge = 12 * 60 * 60 * 1000;
-const lifecycleStageDepartment: Partial<Record<BookingStage, DepartmentCode>> = {
-  "Documentation Supervisor": "sales",
-  "Crew Assigned": "documentation",
-  "Gear Confirmed": "crew",
-  "Docs In Progress": "lifting-gears",
-  "All Docs Submitted": "documentation",
-  Reviewed: "sales",
-  Dispatched: "sales",
-};
+const lifecycleStageDepartment: Partial<Record<BookingStage, DepartmentCode>> =
+  {
+    "Documentation Supervisor": "sales",
+    "Crew Assigned": "documentation",
+    "Gear Confirmed": "crew",
+    "Docs In Progress": "lifting-gears",
+    "All Docs Submitted": "documentation",
+    Reviewed: "sales",
+    Dispatched: "sales",
+  };
 const lifecycleNotificationDepartment: Record<string, DepartmentCode> = {
   SAL: "sales",
   DOC: "documentation",
@@ -54,46 +87,83 @@ function writeLocalSession(ctx: { req: any; res: any }, token: string) {
   });
 }
 
-function requireDepartmentAccess(user: { role: PortalRole; departmentCode?: string | null }, code: DepartmentCode) {
+function requireDepartmentAccess(
+  user: { role: PortalRole; departmentCode?: string | null },
+  code: DepartmentCode
+) {
   if (!canAccessDepartment(user, code)) {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Your department account cannot access this workspace." });
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Your department account cannot access this workspace.",
+    });
   }
 }
 
-function requireAccountManagementAccess(user: { role: PortalRole; departmentCode?: string | null }, targetDepartment?: string | null) {
+function requireAccountManagementAccess(
+  user: { role: PortalRole; departmentCode?: string | null },
+  targetDepartment?: string | null
+) {
   if (user.role === "admin") return;
-  if (user.role === "supervisor" && user.departmentCode && targetDepartment === user.departmentCode) return;
-  throw new TRPCError({ code: "FORBIDDEN", message: "Only an administrator or the department supervisor can manage this account." });
+  if (
+    user.role === "supervisor" &&
+    user.departmentCode &&
+    targetDepartment === user.departmentCode
+  )
+    return;
+  throw new TRPCError({
+    code: "FORBIDDEN",
+    message:
+      "Only an administrator or the department supervisor can manage this account.",
+  });
 }
 
 export const appRouter = router({
   system: systemRouter,
   auth: router({
-    setupStatus: publicProcedure.query(async () => ({ needsAdminSetup: (await db.countLocalUsers()) === 0 })),
-    me: publicProcedure.query(opts => (opts.ctx.user ? toSessionUser(opts.ctx.user) : null)),
-    bootstrapAdmin: publicProcedure.input(accountInput).mutation(async ({ ctx, input }) => {
-      if ((await db.countLocalUsers()) > 0) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "An administrator account is already configured." });
-      }
-      const email = normalizeEmail(input.email);
-      const passwordHash = await hashPassword(input.password);
-      const user = await db.createLocalUser({
-        name: input.name,
-        email,
-        passwordHash,
-        departmentCode: "administrator",
-        role: "admin",
-      });
-      writeLocalSession(ctx, await createLocalSession(user));
-      return toSessionUser(user);
-    }),
+    setupStatus: publicProcedure.query(async () => ({
+      needsAdminSetup: (await db.countLocalUsers()) === 0,
+    })),
+    me: publicProcedure.query(opts =>
+      opts.ctx.user ? toSessionUser(opts.ctx.user) : null
+    ),
+    bootstrapAdmin: publicProcedure
+      .input(accountInput)
+      .mutation(async ({ ctx, input }) => {
+        if ((await db.countLocalUsers()) > 0) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "An administrator account is already configured.",
+          });
+        }
+        const email = normalizeEmail(input.email);
+        const passwordHash = await hashPassword(input.password);
+        const user = await db.createLocalUser({
+          name: input.name,
+          email,
+          passwordHash,
+          departmentCode: "administrator",
+          role: "admin",
+        });
+        writeLocalSession(ctx, await createLocalSession(user));
+        return toSessionUser(user);
+      }),
     login: publicProcedure
-      .input(z.object({ email: z.string().trim().email().max(320), password: z.string().min(1).max(160) }))
+      .input(
+        z.object({
+          email: z.string().trim().email().max(320),
+          password: z.string().min(1).max(160),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const user = await db.getUserByLocalEmail(normalizeEmail(input.email));
-        const passwordMatches = user?.passwordHash ? await verifyPassword(input.password, user.passwordHash) : false;
+        const passwordMatches = user?.passwordHash
+          ? await verifyPassword(input.password, user.passwordHash)
+          : false;
         if (!user || user.isActive !== 1 || !passwordMatches) {
-          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid email or password.",
+          });
         }
         await db.updateUserLastSignedIn(user.id);
         await db.addUserActivity(signInActivity(user.id));
@@ -101,131 +171,381 @@ export const appRouter = router({
         return toSessionUser({ ...user, lastSignedIn: new Date() });
       }),
     listUsers: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role === "admin") return (await db.listLocalUsers()).map(toSessionUser);
-      if (ctx.user.role === "supervisor" && ctx.user.departmentCode) return (await db.listLocalUsers()).filter((account) => account.departmentCode === ctx.user.departmentCode).map(toSessionUser);
-      throw new TRPCError({ code: "FORBIDDEN", message: "Only department supervisors can view their department accounts." });
+      if (ctx.user.role === "admin")
+        return (await db.listLocalUsers()).map(toSessionUser);
+      if (ctx.user.role === "supervisor" && ctx.user.departmentCode)
+        return (await db.listLocalUsers())
+          .filter(account => account.departmentCode === ctx.user.departmentCode)
+          .map(toSessionUser);
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message:
+          "Only department supervisors can view their department accounts.",
+      });
     }),
-    listActivity: protectedProcedure.input(z.object({
-      from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-      to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-      limit: z.number().int().min(1).max(250).optional(),
-    }).optional()).query(async ({ ctx, input }) => {
-      const from = input?.from ? new Date(`${input.from}T00:00:00.000Z`) : undefined;
-      const to = input?.to ? new Date(`${input.to}T23:59:59.999Z`) : undefined;
-      if (from && to && from > to) throw new TRPCError({ code: "BAD_REQUEST", message: "The activity start date must be before the end date." });
-      if (ctx.user.role === "admin") return await db.listRecentUserActivity({ from, to, limit: input?.limit ?? 100 });
-      if (ctx.user.role === "supervisor" && ctx.user.departmentCode) return await db.listRecentUserActivity({ from, to, limit: input?.limit ?? 100, departmentCode: ctx.user.departmentCode });
-      throw new TRPCError({ code: "FORBIDDEN", message: "Only department supervisors can view their department activity." });
-    }),
+    listActivity: protectedProcedure
+      .input(
+        z
+          .object({
+            from: z
+              .string()
+              .regex(/^\d{4}-\d{2}-\d{2}$/)
+              .optional(),
+            to: z
+              .string()
+              .regex(/^\d{4}-\d{2}-\d{2}$/)
+              .optional(),
+            limit: z.number().int().min(1).max(250).optional(),
+          })
+          .optional()
+      )
+      .query(async ({ ctx, input }) => {
+        const from = input?.from
+          ? new Date(`${input.from}T00:00:00.000Z`)
+          : undefined;
+        const to = input?.to
+          ? new Date(`${input.to}T23:59:59.999Z`)
+          : undefined;
+        if (from && to && from > to)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "The activity start date must be before the end date.",
+          });
+        if (ctx.user.role === "admin")
+          return await db.listRecentUserActivity({
+            from,
+            to,
+            limit: input?.limit ?? 100,
+          });
+        if (ctx.user.role === "supervisor" && ctx.user.departmentCode)
+          return await db.listRecentUserActivity({
+            from,
+            to,
+            limit: input?.limit ?? 100,
+            departmentCode: ctx.user.departmentCode,
+          });
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "Only department supervisors can view their department activity.",
+        });
+      }),
     getSupervisorPermissionAudit: adminProcedure.query(async () => {
       const accounts = await db.listLocalUsers();
-      return accounts.filter((account) => account.role === "supervisor").map((supervisor) => ({
-        id: supervisor.id,
-        name: supervisor.name,
-        email: supervisor.localEmail ?? supervisor.email,
-        departmentCode: supervisor.departmentCode,
-        isActive: supervisor.isActive,
-        createdAt: supervisor.createdAt,
-        lastSignedIn: supervisor.lastSignedIn,
-        managedUserCount: accounts.filter((account) => account.role === "user" && account.departmentCode === supervisor.departmentCode && account.isActive === 1).length,
-      }));
+      return accounts
+        .filter(account => account.role === "supervisor")
+        .map(supervisor => ({
+          id: supervisor.id,
+          name: supervisor.name,
+          email: supervisor.localEmail ?? supervisor.email,
+          departmentCode: supervisor.departmentCode,
+          isActive: supervisor.isActive,
+          createdAt: supervisor.createdAt,
+          lastSignedIn: supervisor.lastSignedIn,
+          managedUserCount: accounts.filter(
+            account =>
+              account.role === "user" &&
+              account.departmentCode === supervisor.departmentCode &&
+              account.isActive === 1
+          ).length,
+        }));
     }),
-    getActivityRetention: adminProcedure.query(async () => ({ retentionDays: await db.getActivityRetentionDays() })),
-    updateActivityRetention: adminProcedure.input(z.object({ retentionDays: z.union([z.literal(30), z.literal(90), z.literal(180), z.literal(365), z.literal(730)]) })).mutation(async ({ ctx, input }) => {
-      const retentionDays = await db.setActivityRetentionDays(input.retentionDays, ctx.user.id);
-      await db.addUserActivity({ userId: ctx.user.id, action: "retention_setting_updated", detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} set activity-log retention to ${retentionDays} days.` });
-      return { retentionDays };
-    }),
-    purgeExpiredActivity: adminProcedure.input(z.object({ confirm: z.literal(true) })).mutation(async ({ ctx }) => {
-      const retentionDays = await db.getActivityRetentionDays();
-      const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-      const purgedCount = await db.purgeUserActivityBefore(cutoff);
-      await db.addUserActivity({ userId: ctx.user.id, action: "retention_purge", detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} purged ${purgedCount} activity event${purgedCount === 1 ? "" : "s"} older than ${retentionDays} days.` });
-      return { retentionDays, purgedCount, cutoff };
-    }),
-    registerUser: protectedProcedure.input(registrationInput).mutation(async ({ ctx, input }) => {
-      const targetRole = input.role;
-      if (targetRole === "supervisor" && ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Only an administrator can add a department supervisor." });
-      }
-      requireAccountManagementAccess(ctx.user, input.departmentCode);
-      if (input.departmentCode === "administrator") throw new TRPCError({ code: "BAD_REQUEST", message: "Use the administrator setup flow for the administrator department." });
-      const email = normalizeEmail(input.email);
-      if (await db.getUserByLocalEmail(email)) {
-        throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email address." });
-      }
-      const passwordHash = await hashPassword(input.password);
-      const user = await db.createLocalUser({
-        name: input.name,
-        email,
-        passwordHash,
-        departmentCode: input.departmentCode,
-        role: targetRole,
-        supervisorId: ctx.user.role === "supervisor" ? ctx.user.id : null,
-      });
-      return toSessionUser(user);
-    }),
-    updateUser: protectedProcedure.input(z.object({
-      id: z.number().int().positive(),
-      name: z.string().trim().min(2).max(120),
-      email: z.string().trim().email().max(320),
-      departmentCode: z.string().refine(isDepartmentCode, "Choose a valid department."),
-      role: z.enum(["user", "supervisor", "admin"]),
-      password: z.string().min(10).max(160).optional().or(z.literal("")),
-    })).mutation(async ({ ctx, input }) => {
-      if (input.id === ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "You cannot edit your own account here." });
-      if (input.role === "admin" && ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Only an administrator can assign administrator access." });
-      const existing = await db.getUserById(input.id);
-      if (!existing?.localEmail) throw new TRPCError({ code: "NOT_FOUND", message: "That local account could not be found." });
-      requireAccountManagementAccess(ctx.user, existing.departmentCode);
-      if (ctx.user.role === "supervisor" && (existing.departmentCode !== input.departmentCode || input.role !== "user")) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Supervisors can only edit users in their own department." });
-      }
-      if (existing.role === "admin" && ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Administrator accounts are managed by administrators only." });
-      const email = normalizeEmail(input.email);
-      const emailOwner = await db.getUserByLocalEmail(email);
-      if (emailOwner && emailOwner.id !== input.id) throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email address." });
-      const departmentCode = input.role === "admin" ? "administrator" : input.departmentCode;
-      const user = await db.updateLocalUser(input.id, {
-        name: input.name,
-        email,
-        departmentCode,
-        role: input.role,
-        supervisorId: input.role === "user" && ctx.user.role === "supervisor" ? ctx.user.id : input.role === "admin" || input.role === "supervisor" ? null : existing.supervisorId,
-        ...(input.password ? { passwordHash: await hashPassword(input.password) } : {}),
-      });
-      if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "The account could not be updated." });
-      const actorLabel = ctx.user.name ?? ctx.user.email ?? "an administrator";
-      const nextRoleLabel = roleLabel(input.role);
-      const departmentLabel = input.role === "admin" ? "Administrator" : DEPARTMENTS.find((department) => department.code === input.departmentCode)?.label ?? input.departmentCode;
-      await db.addUserActivity(profileUpdateActivity(input.id, actorLabel, nextRoleLabel, departmentLabel));
-      const accountNotification = accountUpdateNotification(nextRoleLabel, departmentLabel);
-      await db.addNotification({
-        id: `account-update-${user.id}-${Date.now()}`,
-        userId: user.id,
-        departmentCode: user.departmentCode ?? input.departmentCode,
-        ...accountNotification,
-      });
-      return toSessionUser(user);
-    }),
-    setUserActive: protectedProcedure.input(z.object({ id: z.number().int().positive(), isActive: z.boolean() })).mutation(async ({ ctx, input }) => {
-      if (input.id === ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "You cannot deactivate your own account." });
-      const existing = await db.getUserById(input.id);
-      if (!existing?.localEmail) throw new TRPCError({ code: "NOT_FOUND", message: "That local account could not be found." });
-      if (existing.role === "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Administrator accounts cannot be deactivated from this workspace." });
-      requireAccountManagementAccess(ctx.user, existing.departmentCode);
-      if (ctx.user.role === "supervisor" && existing.role !== "user") throw new TRPCError({ code: "FORBIDDEN", message: "Supervisors can only manage users in their own department." });
-      const user = await db.setLocalUserActive(input.id, input.isActive ? 1 : 0);
-      if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "The account status could not be updated." });
-      await db.addUserActivity(accountStatusActivity(input.id, input.isActive, ctx.user.name ?? ctx.user.email ?? "a department supervisor"));
-      return toSessionUser(user);
-    }),
+    getActivityRetention: adminProcedure.query(async () => ({
+      retentionDays: await db.getActivityRetentionDays(),
+    })),
+    updateActivityRetention: adminProcedure
+      .input(
+        z.object({
+          retentionDays: z.union([
+            z.literal(30),
+            z.literal(90),
+            z.literal(180),
+            z.literal(365),
+            z.literal(730),
+          ]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const retentionDays = await db.setActivityRetentionDays(
+          input.retentionDays,
+          ctx.user.id
+        );
+        await db.addUserActivity({
+          userId: ctx.user.id,
+          action: "retention_setting_updated",
+          detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} set activity-log retention to ${retentionDays} days.`,
+        });
+        return { retentionDays };
+      }),
+    purgeExpiredActivity: adminProcedure
+      .input(z.object({ confirm: z.literal(true) }))
+      .mutation(async ({ ctx }) => {
+        const retentionDays = await db.getActivityRetentionDays();
+        const cutoff = new Date(
+          Date.now() - retentionDays * 24 * 60 * 60 * 1000
+        );
+        const purgedCount = await db.purgeUserActivityBefore(cutoff);
+        await db.addUserActivity({
+          userId: ctx.user.id,
+          action: "retention_purge",
+          detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} purged ${purgedCount} activity event${purgedCount === 1 ? "" : "s"} older than ${retentionDays} days.`,
+        });
+        return { retentionDays, purgedCount, cutoff };
+      }),
+    registerUser: protectedProcedure
+      .input(registrationInput)
+      .mutation(async ({ ctx, input }) => {
+        const targetRole = input.role;
+        if (targetRole === "supervisor" && ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only an administrator can add a department supervisor.",
+          });
+        }
+        requireAccountManagementAccess(ctx.user, input.departmentCode);
+        if (input.departmentCode === "administrator")
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Use the administrator setup flow for the administrator department.",
+          });
+        const email = normalizeEmail(input.email);
+        if (await db.getUserByLocalEmail(email)) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "An account already exists for this email address.",
+          });
+        }
+        const passwordHash = await hashPassword(input.password);
+        const user = await db.createLocalUser({
+          name: input.name,
+          email,
+          passwordHash,
+          departmentCode: input.departmentCode,
+          role: targetRole,
+          supervisorId: ctx.user.role === "supervisor" ? ctx.user.id : null,
+        });
+        return toSessionUser(user);
+      }),
+    updateUser: protectedProcedure
+      .input(
+        z.object({
+          id: z.number().int().positive(),
+          name: z.string().trim().min(2).max(120),
+          email: z.string().trim().email().max(320),
+          departmentCode: z
+            .string()
+            .refine(isDepartmentCode, "Choose a valid department."),
+          role: z.enum(["user", "supervisor", "admin"]),
+          password: z.string().min(10).max(160).optional().or(z.literal("")),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (input.id === ctx.user.id)
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You cannot edit your own account here.",
+          });
+        if (input.role === "admin" && ctx.user.role !== "admin")
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only an administrator can assign administrator access.",
+          });
+        const existing = await db.getUserById(input.id);
+        if (!existing?.localEmail)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "That local account could not be found.",
+          });
+        requireAccountManagementAccess(ctx.user, existing.departmentCode);
+        if (
+          ctx.user.role === "supervisor" &&
+          (existing.departmentCode !== input.departmentCode ||
+            input.role !== "user")
+        ) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Supervisors can only edit users in their own department.",
+          });
+        }
+        if (existing.role === "admin" && ctx.user.role !== "admin")
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "Administrator accounts are managed by administrators only.",
+          });
+        const email = normalizeEmail(input.email);
+        const emailOwner = await db.getUserByLocalEmail(email);
+        if (emailOwner && emailOwner.id !== input.id)
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "An account already exists for this email address.",
+          });
+        const departmentCode =
+          input.role === "admin" ? "administrator" : input.departmentCode;
+        const user = await db.updateLocalUser(input.id, {
+          name: input.name,
+          email,
+          departmentCode,
+          role: input.role,
+          supervisorId:
+            input.role === "user" && ctx.user.role === "supervisor"
+              ? ctx.user.id
+              : input.role === "admin" || input.role === "supervisor"
+                ? null
+                : existing.supervisorId,
+          ...(input.password
+            ? { passwordHash: await hashPassword(input.password) }
+            : {}),
+        });
+        if (!user)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "The account could not be updated.",
+          });
+        const actorLabel =
+          ctx.user.name ?? ctx.user.email ?? "an administrator";
+        const nextRoleLabel = roleLabel(input.role);
+        const departmentLabel =
+          input.role === "admin"
+            ? "Administrator"
+            : (DEPARTMENTS.find(
+                department => department.code === input.departmentCode
+              )?.label ?? input.departmentCode);
+        await db.addUserActivity(
+          profileUpdateActivity(
+            input.id,
+            actorLabel,
+            nextRoleLabel,
+            departmentLabel
+          )
+        );
+        const accountNotification = accountUpdateNotification(
+          nextRoleLabel,
+          departmentLabel
+        );
+        await db.addNotification({
+          id: `account-update-${user.id}-${Date.now()}`,
+          userId: user.id,
+          departmentCode: user.departmentCode ?? input.departmentCode,
+          ...accountNotification,
+        });
+        return toSessionUser(user);
+      }),
+    setUserActive: protectedProcedure
+      .input(
+        z.object({ id: z.number().int().positive(), isActive: z.boolean() })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (input.id === ctx.user.id)
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You cannot deactivate your own account.",
+          });
+        const existing = await db.getUserById(input.id);
+        if (!existing?.localEmail)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "That local account could not be found.",
+          });
+        if (existing.role === "admin")
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "Administrator accounts cannot be deactivated from this workspace.",
+          });
+        requireAccountManagementAccess(ctx.user, existing.departmentCode);
+        if (ctx.user.role === "supervisor" && existing.role !== "user")
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "Supervisors can only manage users in their own department.",
+          });
+        const user = await db.setLocalUserActive(
+          input.id,
+          input.isActive ? 1 : 0
+        );
+        if (!user)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "The account status could not be updated.",
+          });
+        await db.addUserActivity(
+          accountStatusActivity(
+            input.id,
+            input.isActive,
+            ctx.user.name ?? ctx.user.email ?? "a department supervisor"
+          )
+        );
+        return toSessionUser(user);
+      }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, cookieOptions);
       ctx.res.clearCookie(LOCAL_AUTH_COOKIE_NAME, cookieOptions);
       return { success: true } as const;
     }),
+  }),
+
+  clientFeedback: router({
+    submit: publicProcedure
+      .input(
+        z.object({
+          bookingId: z.string().trim().min(1).max(64),
+          category: z.enum(["Bug report", "Improvement", "Other"]),
+          message: z.string().trim().min(10).max(2000),
+          contactEmail: z
+            .string()
+            .trim()
+            .email()
+            .max(320)
+            .optional()
+            .or(z.literal("")),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const booking = await db.getBookingById(input.bookingId);
+        if (!booking)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "The associated booking could not be found.",
+          });
+        const feedback = await db.createClientFeedback({
+          bookingId: input.bookingId,
+          category: input.category,
+          message: input.message,
+          contactEmail: input.contactEmail || null,
+        });
+        return { success: true, feedbackId: feedback.id };
+      }),
+    list: adminProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(250).optional() })
+          .optional()
+      )
+      .query(async ({ input }) => {
+        return await db.listClientFeedback(input?.limit ?? 100);
+      }),
+    updateStatus: adminProcedure
+      .input(
+        z.object({
+          id: z.string().min(1).max(64),
+          status: z.enum(["Open", "In review", "Resolved"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const feedback = await db.updateClientFeedbackStatus(
+          input.id,
+          input.status
+        );
+        if (!feedback)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Feedback report not found.",
+          });
+        return feedback;
+      }),
   }),
 
   operations: router({
@@ -246,24 +566,26 @@ export const appRouter = router({
       }),
 
     createBooking: protectedProcedure
-      .input(z.object({
-        id: z.string(),
-        clientName: z.string(),
-        projectName: z.string(),
-        projectManager: z.string(),
-        lpoReference: z.string(),
-        mobilizationDate: z.string(),
-        offHireDate: z.string(),
-        clientContactName: z.string(),
-        clientEmail: z.string(),
-        clientPhone: z.string(),
-        priority: z.string(),
-        stage: z.string(),
-        craneId: z.string().optional(),
-        crewIds: z.array(z.string()).optional(),
-        gearIds: z.array(z.string()).optional(),
-        trailerIds: z.array(z.string()).optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          clientName: z.string(),
+          projectName: z.string(),
+          projectManager: z.string(),
+          lpoReference: z.string(),
+          mobilizationDate: z.string(),
+          offHireDate: z.string(),
+          clientContactName: z.string(),
+          clientEmail: z.string(),
+          clientPhone: z.string(),
+          priority: z.string(),
+          stage: z.string(),
+          craneId: z.string().optional(),
+          crewIds: z.array(z.string()).optional(),
+          gearIds: z.array(z.string()).optional(),
+          trailerIds: z.array(z.string()).optional(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         requireDepartmentAccess(ctx.user, "sales");
         return await db.createBooking(input);
@@ -277,36 +599,80 @@ export const appRouter = router({
       }),
 
     advanceBookingStage: protectedProcedure
-      .input(z.object({ id: z.string(), currentStage: z.enum(BOOKING_STAGES), nextStage: z.enum(BOOKING_STAGES) }))
+      .input(
+        z.object({
+          id: z.string(),
+          currentStage: z.enum(BOOKING_STAGES),
+          nextStage: z.enum(BOOKING_STAGES),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const currentStage = input.currentStage as BookingStage;
         const nextStage = input.nextStage as BookingStage;
         const department = lifecycleStageDepartment[nextStage];
-        if (!department) throw new TRPCError({ code: "BAD_REQUEST", message: "That lifecycle stage has no owning department." });
+        if (!department)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "That lifecycle stage has no owning department.",
+          });
         requireDepartmentAccess(ctx.user, department);
         const booking = await db.getBookingById(input.id);
         let transition;
         try {
-          transition = transitionBooking(currentStage, nextStage, STAGE_ROLES[nextStage]);
+          transition = transitionBooking(
+            currentStage,
+            nextStage,
+            STAGE_ROLES[nextStage]
+          );
         } catch (error) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: error instanceof Error ? error.message : "The lifecycle transition is not valid." });
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              error instanceof Error
+                ? error.message
+                : "The lifecycle transition is not valid.",
+          });
         }
-        const updated = booking ? await db.updateBookingStage(input.id, transition.stage) : { id: input.id, stage: transition.stage };
+        const updated = booking
+          ? await db.updateBookingStage(input.id, transition.stage)
+          : { id: input.id, stage: transition.stage };
         const timestamp = Date.now();
-        await Promise.all(transition.notifications.map((notification, index) => db.addNotification({
-          id: `lifecycle-${input.id}-${timestamp}-${index}`,
-          userId: null,
-          departmentCode: lifecycleNotificationDepartment[notification.departmentCode] ?? department,
-          title: notification.title,
-          body: `${notification.body} · ${input.id}`,
-        })));
-        return { booking: updated, stage: transition.stage, notifications: transition.notifications };
+        await Promise.all(
+          transition.notifications.map((notification, index) =>
+            db.addNotification({
+              id: `lifecycle-${input.id}-${timestamp}-${index}`,
+              userId: null,
+              departmentCode:
+                lifecycleNotificationDepartment[notification.departmentCode] ??
+                department,
+              title: notification.title,
+              body: `${notification.body} · ${input.id}`,
+            })
+          )
+        );
+        return {
+          booking: updated,
+          stage: transition.stage,
+          notifications: transition.notifications,
+        };
       }),
 
     completeBookingWorkstream: protectedProcedure
-      .input(z.object({ id: z.string(), workstream: z.enum(["MNT", "HSE", "ACC", "HR", "TRN"]), stage: z.enum(BOOKING_STAGES) }))
+      .input(
+        z.object({
+          id: z.string(),
+          workstream: z.enum(["MNT", "HSE", "ACC", "HR", "TRN"]),
+          stage: z.enum(BOOKING_STAGES),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
-        const workstreamDepartment: Record<string, DepartmentCode> = { MNT: "maintenance", HSE: "hse", ACC: "accounts", HR: "hr", TRN: "transportation" };
+        const workstreamDepartment: Record<string, DepartmentCode> = {
+          MNT: "maintenance",
+          HSE: "hse",
+          ACC: "accounts",
+          HR: "hr",
+          TRN: "transportation",
+        };
         const department = workstreamDepartment[input.workstream];
         requireDepartmentAccess(ctx.user, department);
         await db.getBookingById(input.id);
@@ -317,17 +683,24 @@ export const appRouter = router({
           title: `${input.workstream} workstream complete`,
           body: `${department} confirmed its evidence for ${input.id}. Documentation can review the parallel readiness queue.`,
         });
-        return { id: input.id, workstream: input.workstream, stage: input.stage, departmentCode: department };
+        return {
+          id: input.id,
+          workstream: input.workstream,
+          stage: input.stage,
+          departmentCode: department,
+        };
       }),
 
     updateAssignment: protectedProcedure
-      .input(z.object({
-        id: z.string(),
-        craneId: z.string().optional(),
-        crewIds: z.array(z.string()).optional(),
-        gearIds: z.array(z.string()).optional(),
-        trailerIds: z.array(z.string()).optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          craneId: z.string().optional(),
+          crewIds: z.array(z.string()).optional(),
+          gearIds: z.array(z.string()).optional(),
+          trailerIds: z.array(z.string()).optional(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         requireDepartmentAccess(ctx.user, "documentation");
         return await db.updateBookingAssignment(input.id, input);
@@ -339,19 +712,40 @@ export const appRouter = router({
     }),
 
     saveCrewAllocations: protectedProcedure
-      .input(z.object({ crewId: z.string(), crewName: z.string().min(1), bookingIds: z.array(z.string()).max(20) }))
+      .input(
+        z.object({
+          crewId: z.string(),
+          crewName: z.string().min(1),
+          bookingIds: z.array(z.string()).max(20),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         requireDepartmentAccess(ctx.user, "crew");
         const crewList = await db.getAllCrew();
-        if (!crewList.some((member) => member.id === input.crewId && member.name === input.crewName) && !isKnownCrewAssignmentMember(input.crewId, input.crewName)) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "That employee is not in the persisted crew roster." });
+        if (
+          !crewList.some(
+            member =>
+              member.id === input.crewId && member.name === input.crewName
+          ) &&
+          !isKnownCrewAssignmentMember(input.crewId, input.crewName)
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "That employee is not in the persisted crew roster.",
+          });
         }
         for (const bookingId of input.bookingIds) {
           if (!(await db.getBookingById(bookingId))) {
-            throw new TRPCError({ code: "BAD_REQUEST", message: `Booking ${bookingId} is not available for persisted allocation.` });
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Booking ${bookingId} is not available for persisted allocation.`,
+            });
           }
         }
-        const allocations = await db.replaceCrewBookingAllocations({ ...input, assignedBy: ctx.user.id });
+        const allocations = await db.replaceCrewBookingAllocations({
+          ...input,
+          assignedBy: ctx.user.id,
+        });
         return { allocations };
       }),
 
@@ -371,11 +765,17 @@ export const appRouter = router({
     }),
 
     uploadGearDocument: protectedProcedure
-      .input(z.object({
-        fileName: z.string().trim().min(1).max(180),
-        contentType: z.string().trim().max(120).default("application/octet-stream"),
-        base64: z.string().min(1).max(10_000_000),
-      }))
+      .input(
+        z.object({
+          fileName: z.string().trim().min(1).max(180),
+          contentType: z
+            .string()
+            .trim()
+            .max(120)
+            .default("application/octet-stream"),
+          base64: z.string().min(1).max(10_000_000),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         requireDepartmentAccess(ctx.user, "lifting-gears");
         const allowedTypes = new Set([
@@ -385,14 +785,33 @@ export const appRouter = router({
           "image/webp",
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ]);
-        const contentType = allowedTypes.has(input.contentType) ? input.contentType : "application/octet-stream";
+        const contentType = allowedTypes.has(input.contentType)
+          ? input.contentType
+          : "application/octet-stream";
         const bytes = Buffer.from(input.base64, "base64");
         if (!bytes.length || bytes.length > 7_500_000) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "Each lifting-gear document must be between 1 byte and 7.5 MB." });
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Each lifting-gear document must be between 1 byte and 7.5 MB.",
+          });
         }
-        const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "gear-document";
-        const { key, url } = await storagePut(`lifting-gears/${ctx.user.id}/${Date.now()}-${safeName}`, bytes, contentType);
-        return { key, url, name: input.fileName, contentType, size: bytes.length };
+        const safeName =
+          input.fileName
+            .replace(/[^a-zA-Z0-9._-]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "gear-document";
+        const { key, url } = await storagePut(
+          `lifting-gears/${ctx.user.id}/${Date.now()}-${safeName}`,
+          bytes,
+          contentType
+        );
+        return {
+          key,
+          url,
+          name: input.fileName,
+          contentType,
+          size: bytes.length,
+        };
       }),
 
     getTrailers: protectedProcedure.query(async () => {
@@ -407,15 +826,17 @@ export const appRouter = router({
       }),
 
     upsertDocument: protectedProcedure
-      .input(z.object({
-        id: z.string(),
-        bookingId: z.string(),
-        departmentCode: z.string(),
-        name: z.string(),
-        state: z.string(),
-        expiryDate: z.string().optional(),
-        required: z.number(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          bookingId: z.string(),
+          departmentCode: z.string(),
+          name: z.string(),
+          state: z.string(),
+          expiryDate: z.string().optional(),
+          required: z.number(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const departmentByDocumentCode: Record<string, DepartmentCode> = {
           DOC: "documentation",
@@ -437,13 +858,15 @@ export const appRouter = router({
       }),
 
     addChat: protectedProcedure
-      .input(z.object({
-        id: z.string(),
-        bookingId: z.string(),
-        team: z.string(),
-        sender: z.string(),
-        body: z.string(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          bookingId: z.string(),
+          team: z.string(),
+          sender: z.string(),
+          body: z.string(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const teamByDepartment: Record<DepartmentCode, string> = {
           sales: "Sales",
@@ -457,68 +880,132 @@ export const appRouter = router({
           hr: "Operations Management",
           transportation: "Operations Management",
         };
-        const expectedTeam = ctx.user.role === "admin" ? input.team : teamByDepartment[ctx.user.departmentCode as DepartmentCode];
-        if (ctx.user.role !== "admin" && (!expectedTeam || input.team !== expectedTeam)) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Your department account cannot post as another team." });
+        const expectedTeam =
+          ctx.user.role === "admin"
+            ? input.team
+            : teamByDepartment[ctx.user.departmentCode as DepartmentCode];
+        if (
+          ctx.user.role !== "admin" &&
+          (!expectedTeam || input.team !== expectedTeam)
+        ) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Your department account cannot post as another team.",
+          });
         }
         return await db.addChatMessage({
           ...input,
           team: expectedTeam ?? input.team,
-          sender: ctx.user.role === "admin" ? input.sender : ctx.user.name ?? ctx.user.email ?? "Department user",
+          sender:
+            ctx.user.role === "admin"
+              ? input.sender
+              : (ctx.user.name ?? ctx.user.email ?? "Department user"),
         });
       }),
 
     getNotifications: protectedProcedure
       .input(z.object({ departmentCode: z.string().optional() }).optional())
       .query(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin" && input?.departmentCode && input.departmentCode !== ctx.user.departmentCode) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Your department account cannot access these notifications." });
+        if (
+          ctx.user.role !== "admin" &&
+          input?.departmentCode &&
+          input.departmentCode !== ctx.user.departmentCode
+        ) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "Your department account cannot access these notifications.",
+          });
         }
         return await db.getNotifications({
-          departmentCode: ctx.user.role === "admin" ? input?.departmentCode : ctx.user.departmentCode ?? undefined,
+          departmentCode:
+            ctx.user.role === "admin"
+              ? input?.departmentCode
+              : (ctx.user.departmentCode ?? undefined),
           userId: ctx.user.id,
         });
       }),
 
     addNotification: protectedProcedure
-      .input(z.object({
-        id: z.string(),
-        departmentCode: z.string().refine(isDepartmentCode, "Choose a valid department."),
-        title: z.string(),
-        body: z.string(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          departmentCode: z
+            .string()
+            .refine(isDepartmentCode, "Choose a valid department."),
+          title: z.string(),
+          body: z.string(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") requireDepartmentAccess(ctx.user, input.departmentCode as DepartmentCode);
+        if (ctx.user.role !== "admin")
+          requireDepartmentAccess(
+            ctx.user,
+            input.departmentCode as DepartmentCode
+          );
         return await db.addNotification(input);
       }),
 
     clearNotifications: protectedProcedure
       .input(z.object({ departmentCode: z.string().optional() }).optional())
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin" && input?.departmentCode && input.departmentCode !== ctx.user.departmentCode) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Your department account cannot clear these notifications." });
+        if (
+          ctx.user.role !== "admin" &&
+          input?.departmentCode &&
+          input.departmentCode !== ctx.user.departmentCode
+        ) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "Your department account cannot clear these notifications.",
+          });
         }
         await db.markAllNotificationsRead({
-          departmentCode: ctx.user.role === "admin" ? input?.departmentCode : ctx.user.departmentCode ?? undefined,
+          departmentCode:
+            ctx.user.role === "admin"
+              ? input?.departmentCode
+              : (ctx.user.departmentCode ?? undefined),
           userId: ctx.user.id,
         });
         return { success: true };
       }),
-    requestDispatchBundle: protectedProcedure.input(z.object({ bookingId: z.string().min(1) })).mutation(async ({ ctx, input }) => {
-      requireDepartmentAccess(ctx.user, "sales");
-      const booking = await db.getBookingById(input.bookingId);
-      if (!booking) throw new TRPCError({ code: "NOT_FOUND", message: "The booking dossier could not be found." });
-      if (booking.stage !== "Reviewed" && booking.stage !== "Dispatched") {
-        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "A dispatch bundle can be generated only after the dossier has been reviewed." });
-      }
-      const docs = await db.getDocumentsForBooking(input.bookingId);
-      const outstanding = docs.filter((document) => document.required === 1 && !["Uploaded", "Approved"].includes(document.state));
-      if (outstanding.length) {
-        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Required documents are still incomplete, so the dispatch bundle is locked." });
-      }
-      await db.addUserActivity({ userId: ctx.user.id, action: "dispatch_bundle_generated", detail: `${ctx.user.name ?? ctx.user.email ?? "Sales"} requested the dispatch PDF bundle for ${input.bookingId}.` });
-      return { booking, documents: docs };
-    }),
+    requestDispatchBundle: protectedProcedure
+      .input(z.object({ bookingId: z.string().min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        requireDepartmentAccess(ctx.user, "sales");
+        const booking = await db.getBookingById(input.bookingId);
+        if (!booking)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "The booking dossier could not be found.",
+          });
+        if (booking.stage !== "Reviewed" && booking.stage !== "Dispatched") {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message:
+              "A dispatch bundle can be generated only after the dossier has been reviewed.",
+          });
+        }
+        const docs = await db.getDocumentsForBooking(input.bookingId);
+        const outstanding = docs.filter(
+          document =>
+            document.required === 1 &&
+            !["Uploaded", "Approved"].includes(document.state)
+        );
+        if (outstanding.length) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message:
+              "Required documents are still incomplete, so the dispatch bundle is locked.",
+          });
+        }
+        await db.addUserActivity({
+          userId: ctx.user.id,
+          action: "dispatch_bundle_generated",
+          detail: `${ctx.user.name ?? ctx.user.email ?? "Sales"} requested the dispatch PDF bundle for ${input.bookingId}.`,
+        });
+        return { booking, documents: docs };
+      }),
   }),
 });
 

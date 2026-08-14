@@ -4,6 +4,17 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
+vi.mock("../client/src/lib/trpc", () => ({
+  trpc: {
+    clientFeedback: {
+      submit: {
+        useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
+      },
+    },
+  },
+}));
+
 import { ClientPortal } from "../client/src/pages/Home";
 
 describe("Client Response Portal navigation", () => {

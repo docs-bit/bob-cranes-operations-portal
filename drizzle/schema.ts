@@ -1,4 +1,12 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json } from "drizzle-orm/mysql-core";
+import {
+  int,
+  mysqlEnum,
+  mysqlTable,
+  text,
+  timestamp,
+  varchar,
+  json,
+} from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -11,7 +19,9 @@ export const users = mysqlTable("users", {
   supervisorId: int("supervisorId"),
   isActive: int("isActive").notNull().default(1),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "supervisor", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "supervisor", "admin"])
+    .default("user")
+    .notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -23,6 +33,17 @@ export const userActivityLogs = mysqlTable("user_activity_logs", {
   action: varchar("action", { length: 64 }).notNull(),
   detail: text("detail").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const clientFeedback = mysqlTable("client_feedback", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  category: varchar("category", { length: 32 }).notNull().default("Bug report"),
+  message: text("message").notNull(),
+  contactEmail: varchar("contactEmail", { length: 320 }),
+  status: varchar("status", { length: 32 }).notNull().default("Open"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export const systemSettings = mysqlTable("system_settings", {
@@ -44,7 +65,9 @@ export const bookings = mysqlTable("bookings", {
   clientEmail: varchar("clientEmail", { length: 320 }).notNull(),
   clientPhone: varchar("clientPhone", { length: 64 }).notNull(),
   priority: varchar("priority", { length: 32 }).notNull().default("Standard"),
-  stage: varchar("stage", { length: 128 }).notNull().default("Created by Salesperson"),
+  stage: varchar("stage", { length: 128 })
+    .notNull()
+    .default("Created by Salesperson"),
   craneId: varchar("craneId", { length: 64 }),
   crewIds: json("crewIds"),
   gearIds: json("gearIds"),
@@ -77,7 +100,9 @@ export const crew = mysqlTable("crew", {
   id: varchar("id", { length: 64 }).primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   designation: varchar("designation", { length: 128 }).notNull(),
-  availability: varchar("availability", { length: 64 }).notNull().default("Present"),
+  availability: varchar("availability", { length: 64 })
+    .notNull()
+    .default("Present"),
   certificateExpiry: varchar("certificateExpiry", { length: 64 }).notNull(),
   trainingRequired: int("trainingRequired").notNull().default(0),
 });
@@ -93,7 +118,9 @@ export const liftingGears = mysqlTable("lifting_gears", {
 export const trailers = mysqlTable("trailers", {
   id: varchar("id", { length: 64 }).primaryKey(),
   plateNumber: varchar("plateNumber", { length: 64 }).notNull(),
-  trailerType: varchar("trailerType", { length: 64 }).notNull().default("Flatbed"),
+  trailerType: varchar("trailerType", { length: 64 })
+    .notNull()
+    .default("Flatbed"),
   status: varchar("status", { length: 64 }).notNull().default("Available"),
 });
 
@@ -142,6 +169,7 @@ export const auditLogs = mysqlTable("audit_logs", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+export type ClientFeedbackRecord = typeof clientFeedback.$inferSelect;
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type BookingCrewAllocation = typeof bookingCrewAllocations.$inferSelect;

@@ -221,3 +221,9 @@
 - [x] Resolve any release-readiness gap and document deployment-specific configuration or operational requirements.
 - [x] Run final TypeScript, focused regression, production-build, and authenticated smoke validation.
 - [x] Save a deployment-ready checkpoint and provide the in-product publication handoff steps.
+
+## Dispatch progress and Client Portal feedback
+- [x] Add a visible loading spinner and staged progress indicator during on-demand PDF dispatch-bundle generation.
+- [x] Add document search and sorting controls to the Client Response Portal.
+- [x] Add a lightweight Client Portal feedback form for bug reports with secure persistence and administrator review support.
+- [x] Add automated coverage, authenticated browser verification, and a checkpoint for the client-experience release.

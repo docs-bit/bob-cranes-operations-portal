@@ -1,10 +1,34 @@
-import { and, desc, eq, gte, isNotNull, isNull, lt, lte, or, type SQL } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  gte,
+  isNotNull,
+  isNull,
+  lt,
+  lte,
+  or,
+  type SQL,
+} from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { nanoid } from "nanoid";
-import { 
-  InsertUser, users, userActivityLogs, systemSettings, bookings, bookingCrewAllocations, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
+import {
+  InsertUser,
+  users,
+  userActivityLogs,
+  clientFeedback,
+  systemSettings,
+  bookings,
+  bookingCrewAllocations,
+  equipment,
+  crew,
+  liftingGears,
+  trailers,
+  documents,
+  chatMessages,
+  notifications,
 } from "../drizzle/schema";
-import { ENV } from './_core/env';
+import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -34,18 +58,21 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       name: user.name ?? null,
       email: user.email ?? null,
       loginMethod: user.loginMethod ?? null,
-      role: user.role ?? (user.openId === ENV.ownerOpenId ? 'admin' : 'user'),
+      role: user.role ?? (user.openId === ENV.ownerOpenId ? "admin" : "user"),
       lastSignedIn: user.lastSignedIn ?? new Date(),
     };
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: {
-        name: values.name,
-        email: values.email,
-        loginMethod: values.loginMethod,
-        lastSignedIn: values.lastSignedIn,
-      },
-    });
+    await db
+      .insert(users)
+      .values(values)
+      .onDuplicateKeyUpdate({
+        set: {
+          name: values.name,
+          email: values.email,
+          loginMethod: values.loginMethod,
+          lastSignedIn: values.lastSignedIn,
+        },
+      });
   } catch (error) {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
@@ -55,7 +82,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.openId, openId))
+    .limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -69,21 +100,32 @@ export async function getUserById(id: number) {
 export async function getUserByLocalEmail(localEmail: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(users).where(eq(users.localEmail, localEmail)).limit(1);
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.localEmail, localEmail))
+    .limit(1);
   return result[0];
 }
 
 export async function countLocalUsers() {
   const db = await getDb();
   if (!db) return 0;
-  const result = await db.select().from(users).where(isNotNull(users.localEmail));
+  const result = await db
+    .select()
+    .from(users)
+    .where(isNotNull(users.localEmail));
   return result.length;
 }
 
 export async function listLocalUsers() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(users).where(isNotNull(users.localEmail)).orderBy(desc(users.createdAt));
+  return await db
+    .select()
+    .from(users)
+    .where(isNotNull(users.localEmail))
+    .orderBy(desc(users.createdAt));
 }
 
 export async function createLocalUser(input: {
@@ -119,22 +161,37 @@ export async function createLocalUser(input: {
 export async function updateUserLastSignedIn(id: number) {
   const db = await getDb();
   if (!db) return;
-  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, id));
+  await db
+    .update(users)
+    .set({ lastSignedIn: new Date() })
+    .where(eq(users.id, id));
 }
 
-export async function updateLocalUser(id: number, input: { name: string; email: string; departmentCode: string; role: "admin" | "supervisor" | "user";
-  supervisorId?: number | null; passwordHash?: string }) {
+export async function updateLocalUser(
+  id: number,
+  input: {
+    name: string;
+    email: string;
+    departmentCode: string;
+    role: "admin" | "supervisor" | "user";
+    supervisorId?: number | null;
+    passwordHash?: string;
+  }
+) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable for account update.");
-  await db.update(users).set({
-    name: input.name,
-    email: input.email,
-    localEmail: input.email,
-    departmentCode: input.departmentCode,
-    supervisorId: input.supervisorId ?? null,
-    role: input.role,
-    ...(input.passwordHash ? { passwordHash: input.passwordHash } : {}),
-  }).where(eq(users.id, id));
+  await db
+    .update(users)
+    .set({
+      name: input.name,
+      email: input.email,
+      localEmail: input.email,
+      departmentCode: input.departmentCode,
+      supervisorId: input.supervisorId ?? null,
+      role: input.role,
+      ...(input.passwordHash ? { passwordHash: input.passwordHash } : {}),
+    })
+    .where(eq(users.id, id));
   return await getUserById(id);
 }
 
@@ -145,7 +202,11 @@ export async function setLocalUserActive(id: number, isActive: number) {
   return await getUserById(id);
 }
 
-export async function addUserActivity(input: { userId: number; action: string; detail: string }) {
+export async function addUserActivity(input: {
+  userId: number;
+  action: string;
+  detail: string;
+}) {
   const db = await getDb();
   if (!db) return;
   await db.insert(userActivityLogs).values(input);
@@ -158,50 +219,130 @@ export type ActivityLogFilters = {
   to?: Date;
 };
 
-export async function listRecentUserActivity({ limit = 40, departmentCode, from, to }: ActivityLogFilters = {}) {
+export async function listRecentUserActivity({
+  limit = 40,
+  departmentCode,
+  from,
+  to,
+}: ActivityLogFilters = {}) {
   const db = await getDb();
   if (!db) return [];
-  const query = db.select({
-    id: userActivityLogs.id,
-    userId: userActivityLogs.userId,
-    userName: users.name,
-    userEmail: users.localEmail,
-    departmentCode: users.departmentCode,
-    action: userActivityLogs.action,
-    detail: userActivityLogs.detail,
-    createdAt: userActivityLogs.createdAt,
-  }).from(userActivityLogs).leftJoin(users, eq(userActivityLogs.userId, users.id));
+  const query = db
+    .select({
+      id: userActivityLogs.id,
+      userId: userActivityLogs.userId,
+      userName: users.name,
+      userEmail: users.localEmail,
+      departmentCode: users.departmentCode,
+      action: userActivityLogs.action,
+      detail: userActivityLogs.detail,
+      createdAt: userActivityLogs.createdAt,
+    })
+    .from(userActivityLogs)
+    .leftJoin(users, eq(userActivityLogs.userId, users.id));
   const filters = [
     departmentCode ? eq(users.departmentCode, departmentCode) : undefined,
     from ? gte(userActivityLogs.createdAt, from) : undefined,
     to ? lte(userActivityLogs.createdAt, to) : undefined,
   ].filter((filter): filter is SQL => Boolean(filter));
-  return await query.where(filters.length ? and(...filters) : undefined).orderBy(desc(userActivityLogs.createdAt)).limit(Math.min(Math.max(limit, 1), 250));
+  return await query
+    .where(filters.length ? and(...filters) : undefined)
+    .orderBy(desc(userActivityLogs.createdAt))
+    .limit(Math.min(Math.max(limit, 1), 250));
 }
 
 export async function getActivityRetentionDays() {
   const db = await getDb();
   if (!db) return 365;
-  const result = await db.select().from(systemSettings).where(eq(systemSettings.key, "activity_log_retention_days")).limit(1);
+  const result = await db
+    .select()
+    .from(systemSettings)
+    .where(eq(systemSettings.key, "activity_log_retention_days"))
+    .limit(1);
   const value = Number(result[0]?.value);
   return [30, 90, 180, 365, 730].includes(value) ? value : 365;
 }
 
-export async function setActivityRetentionDays(days: number, updatedBy: number) {
+export async function setActivityRetentionDays(
+  days: number,
+  updatedBy: number
+) {
   const db = await getDb();
-  if (!db) throw new Error("Database is unavailable for activity retention settings.");
-  await db.insert(systemSettings).values({ key: "activity_log_retention_days", value: String(days), updatedBy }).onDuplicateKeyUpdate({
-    set: { value: String(days), updatedBy },
-  });
+  if (!db)
+    throw new Error("Database is unavailable for activity retention settings.");
+  await db
+    .insert(systemSettings)
+    .values({
+      key: "activity_log_retention_days",
+      value: String(days),
+      updatedBy,
+    })
+    .onDuplicateKeyUpdate({
+      set: { value: String(days), updatedBy },
+    });
   return await getActivityRetentionDays();
 }
 
 export async function purgeUserActivityBefore(cutoff: Date) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable for activity retention.");
-  const expired = await db.select({ id: userActivityLogs.id }).from(userActivityLogs).where(lt(userActivityLogs.createdAt, cutoff));
-  if (expired.length) await db.delete(userActivityLogs).where(lt(userActivityLogs.createdAt, cutoff));
+  const expired = await db
+    .select({ id: userActivityLogs.id })
+    .from(userActivityLogs)
+    .where(lt(userActivityLogs.createdAt, cutoff));
+  if (expired.length)
+    await db
+      .delete(userActivityLogs)
+      .where(lt(userActivityLogs.createdAt, cutoff));
   return expired.length;
+}
+
+export async function createClientFeedback(input: {
+  bookingId: string;
+  category: string;
+  message: string;
+  contactEmail?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable for client feedback.");
+  const id = `feedback-${nanoid(16)}`;
+  await db.insert(clientFeedback).values({
+    id,
+    bookingId: input.bookingId,
+    category: input.category,
+    message: input.message,
+    contactEmail: input.contactEmail ?? null,
+    status: "Open",
+  });
+  return { id };
+}
+
+export async function listClientFeedback(limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(clientFeedback)
+    .orderBy(desc(clientFeedback.createdAt))
+    .limit(Math.min(Math.max(limit, 1), 250));
+}
+
+export async function updateClientFeedbackStatus(
+  id: string,
+  status: "Open" | "In review" | "Resolved"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable for client feedback.");
+  await db
+    .update(clientFeedback)
+    .set({ status })
+    .where(eq(clientFeedback.id, id));
+  const result = await db
+    .select()
+    .from(clientFeedback)
+    .where(eq(clientFeedback.id, id))
+    .limit(1);
+  return result[0];
 }
 
 // ---- Bookings & Operations Queries ----
@@ -215,7 +356,11 @@ export async function getAllBookings() {
 export async function getBookingById(id: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const res = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
+  const res = await db
+    .select()
+    .from(bookings)
+    .where(eq(bookings.id, id))
+    .limit(1);
   return res[0];
 }
 
@@ -267,7 +412,15 @@ export async function updateBookingStage(id: string, stage: string) {
   return await getBookingById(id);
 }
 
-export async function updateBookingAssignment(id: string, updates: { craneId?: string; crewIds?: string[]; gearIds?: string[]; trailerIds?: string[] }) {
+export async function updateBookingAssignment(
+  id: string,
+  updates: {
+    craneId?: string;
+    crewIds?: string[];
+    gearIds?: string[];
+    trailerIds?: string[];
+  }
+) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(bookings).set(updates).where(eq(bookings.id, id));
@@ -277,20 +430,32 @@ export async function updateBookingAssignment(id: string, updates: { craneId?: s
 export async function listBookingCrewAllocations() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(bookingCrewAllocations).orderBy(desc(bookingCrewAllocations.createdAt));
+  return await db
+    .select()
+    .from(bookingCrewAllocations)
+    .orderBy(desc(bookingCrewAllocations.createdAt));
 }
 
-export async function replaceCrewBookingAllocations(input: { bookingIds: string[]; crewId: string; crewName: string; assignedBy?: number | null }) {
+export async function replaceCrewBookingAllocations(input: {
+  bookingIds: string[];
+  crewId: string;
+  crewName: string;
+  assignedBy?: number | null;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.delete(bookingCrewAllocations).where(eq(bookingCrewAllocations.crewId, input.crewId));
+  await db
+    .delete(bookingCrewAllocations)
+    .where(eq(bookingCrewAllocations.crewId, input.crewId));
   if (input.bookingIds.length > 0) {
-    await db.insert(bookingCrewAllocations).values(input.bookingIds.map((bookingId) => ({
-      bookingId,
-      crewId: input.crewId,
-      crewName: input.crewName,
-      assignedBy: input.assignedBy ?? null,
-    })));
+    await db.insert(bookingCrewAllocations).values(
+      input.bookingIds.map(bookingId => ({
+        bookingId,
+        crewId: input.crewId,
+        crewName: input.crewName,
+        assignedBy: input.assignedBy ?? null,
+      }))
+    );
   }
   return await listBookingCrewAllocations();
 }
@@ -322,74 +487,144 @@ export async function getAllTrailers() {
 export async function getDocumentsForBooking(bookingId: string) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(documents).where(eq(documents.bookingId, bookingId));
+  return await db
+    .select()
+    .from(documents)
+    .where(eq(documents.bookingId, bookingId));
 }
 
-export async function upsertDocument(data: { id: string; bookingId: string; departmentCode: string; name: string; state: string; expiryDate?: string; required: number }) {
+export async function upsertDocument(data: {
+  id: string;
+  bookingId: string;
+  departmentCode: string;
+  name: string;
+  state: string;
+  expiryDate?: string;
+  required: number;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.insert(documents).values(data).onDuplicateKeyUpdate({
-    set: { state: data.state, expiryDate: data.expiryDate, name: data.name }
-  });
+  await db
+    .insert(documents)
+    .values(data)
+    .onDuplicateKeyUpdate({
+      set: { state: data.state, expiryDate: data.expiryDate, name: data.name },
+    });
   return data;
 }
 
 export async function getChatForBooking(bookingId: string) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(chatMessages).where(eq(chatMessages.bookingId, bookingId)).orderBy(chatMessages.createdAt);
+  return await db
+    .select()
+    .from(chatMessages)
+    .where(eq(chatMessages.bookingId, bookingId))
+    .orderBy(chatMessages.createdAt);
 }
 
-export async function addChatMessage(data: { id: string; bookingId: string; team: string; sender: string; body: string }) {
+export async function addChatMessage(data: {
+  id: string;
+  bookingId: string;
+  team: string;
+  sender: string;
+  body: string;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.insert(chatMessages).values(data);
   return data;
 }
 
-export async function getNotifications(filters?: { departmentCode?: string; userId?: number }) {
+export async function getNotifications(filters?: {
+  departmentCode?: string;
+  userId?: number;
+}) {
   const db = await getDb();
   if (!db) return [];
   const { departmentCode, userId } = filters ?? {};
   if (userId !== undefined && departmentCode) {
-    return await db.select().from(notifications).where(or(
-      eq(notifications.userId, userId),
-      and(isNull(notifications.userId), eq(notifications.departmentCode, departmentCode)),
-    )).orderBy(desc(notifications.createdAt));
+    return await db
+      .select()
+      .from(notifications)
+      .where(
+        or(
+          eq(notifications.userId, userId),
+          and(
+            isNull(notifications.userId),
+            eq(notifications.departmentCode, departmentCode)
+          )
+        )
+      )
+      .orderBy(desc(notifications.createdAt));
   }
   if (userId !== undefined) {
-    return await db.select().from(notifications).where(eq(notifications.userId, userId)).orderBy(desc(notifications.createdAt));
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
   }
   if (departmentCode) {
-    return await db.select().from(notifications).where(eq(notifications.departmentCode, departmentCode)).orderBy(desc(notifications.createdAt));
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.departmentCode, departmentCode))
+      .orderBy(desc(notifications.createdAt));
   }
-  return await db.select().from(notifications).orderBy(desc(notifications.createdAt));
+  return await db
+    .select()
+    .from(notifications)
+    .orderBy(desc(notifications.createdAt));
 }
 
-export async function addNotification(data: { id: string; userId?: number | null; departmentCode: string; title: string; body: string }) {
+export async function addNotification(data: {
+  id: string;
+  userId?: number | null;
+  departmentCode: string;
+  title: string;
+  body: string;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.insert(notifications).values(data);
   return data;
 }
 
-export async function markAllNotificationsRead(filters?: { departmentCode?: string; userId?: number }) {
+export async function markAllNotificationsRead(filters?: {
+  departmentCode?: string;
+  userId?: number;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const { departmentCode, userId } = filters ?? {};
   if (userId !== undefined && departmentCode) {
-    await db.update(notifications).set({ read: 1 }).where(or(
-      eq(notifications.userId, userId),
-      and(isNull(notifications.userId), eq(notifications.departmentCode, departmentCode)),
-    ));
+    await db
+      .update(notifications)
+      .set({ read: 1 })
+      .where(
+        or(
+          eq(notifications.userId, userId),
+          and(
+            isNull(notifications.userId),
+            eq(notifications.departmentCode, departmentCode)
+          )
+        )
+      );
     return;
   }
   if (userId !== undefined) {
-    await db.update(notifications).set({ read: 1 }).where(eq(notifications.userId, userId));
+    await db
+      .update(notifications)
+      .set({ read: 1 })
+      .where(eq(notifications.userId, userId));
     return;
   }
   if (departmentCode) {
-    await db.update(notifications).set({ read: 1 }).where(eq(notifications.departmentCode, departmentCode));
+    await db
+      .update(notifications)
+      .set({ read: 1 })
+      .where(eq(notifications.departmentCode, departmentCode));
     return;
   }
   await db.update(notifications).set({ read: 1 });
@@ -402,36 +637,204 @@ export async function seedInitialDataIfNeeded() {
   const eqList = await db.select().from(equipment).limit(1);
   if (eqList.length === 0) {
     const initialEquipment = [
-      { id: "eq-1", assetCode: "B-205", name: "50T Mobile Crane · DEMAG", capacityTons: 50, status: "Available", inspectionExpiry: "2027-03-15", type: "Mobile Crane", registration: "60312" },
-      { id: "eq-2", assetCode: "B-210", name: "35T Mobile Crane · PPM", capacityTons: 35, status: "Available", inspectionExpiry: "2027-06-20", type: "Mobile Crane", registration: "98274" },
-      { id: "eq-3", assetCode: "B-213", name: "250T Mobile Crane · LTM", capacityTons: 250, status: "Assigned", inspectionExpiry: "2027-01-10", type: "Mobile Crane", registration: "92080" },
-      { id: "eq-4", assetCode: "B-217", name: "350T Mobile Crane · LTM", capacityTons: 350, status: "Available", inspectionExpiry: "2027-09-01", type: "Mobile Crane", registration: "95095" },
-      { id: "eq-5", assetCode: "B-218", name: "100T Lattice Crane", capacityTons: 100, status: "Available", inspectionExpiry: "2026-12-05", type: "Lattice Crane", registration: "71597" },
-      { id: "eq-6", assetCode: "B-220", name: "50T Mobile Crane · SANY", capacityTons: 50, status: "Available", inspectionExpiry: "2027-04-12", type: "Mobile Crane", registration: "69009" },
-      { id: "eq-7", assetCode: "B-221", name: "500T Mobile Crane · LTM", capacityTons: 500, status: "Available", inspectionExpiry: "2027-08-30", type: "Mobile Crane", registration: "63309" },
-      { id: "eq-8", assetCode: "B-222", name: "130T Mobile Crane · LTM", capacityTons: 130, status: "Available", inspectionExpiry: "2027-05-18", type: "Mobile Crane", registration: "88999" },
-      { id: "eq-9", assetCode: "B-224", name: "75T Mobile Crane · SANY", capacityTons: 75, status: "Available", inspectionExpiry: "2027-02-28", type: "Mobile Crane", registration: "65577" },
+      {
+        id: "eq-1",
+        assetCode: "B-205",
+        name: "50T Mobile Crane · DEMAG",
+        capacityTons: 50,
+        status: "Available",
+        inspectionExpiry: "2027-03-15",
+        type: "Mobile Crane",
+        registration: "60312",
+      },
+      {
+        id: "eq-2",
+        assetCode: "B-210",
+        name: "35T Mobile Crane · PPM",
+        capacityTons: 35,
+        status: "Available",
+        inspectionExpiry: "2027-06-20",
+        type: "Mobile Crane",
+        registration: "98274",
+      },
+      {
+        id: "eq-3",
+        assetCode: "B-213",
+        name: "250T Mobile Crane · LTM",
+        capacityTons: 250,
+        status: "Assigned",
+        inspectionExpiry: "2027-01-10",
+        type: "Mobile Crane",
+        registration: "92080",
+      },
+      {
+        id: "eq-4",
+        assetCode: "B-217",
+        name: "350T Mobile Crane · LTM",
+        capacityTons: 350,
+        status: "Available",
+        inspectionExpiry: "2027-09-01",
+        type: "Mobile Crane",
+        registration: "95095",
+      },
+      {
+        id: "eq-5",
+        assetCode: "B-218",
+        name: "100T Lattice Crane",
+        capacityTons: 100,
+        status: "Available",
+        inspectionExpiry: "2026-12-05",
+        type: "Lattice Crane",
+        registration: "71597",
+      },
+      {
+        id: "eq-6",
+        assetCode: "B-220",
+        name: "50T Mobile Crane · SANY",
+        capacityTons: 50,
+        status: "Available",
+        inspectionExpiry: "2027-04-12",
+        type: "Mobile Crane",
+        registration: "69009",
+      },
+      {
+        id: "eq-7",
+        assetCode: "B-221",
+        name: "500T Mobile Crane · LTM",
+        capacityTons: 500,
+        status: "Available",
+        inspectionExpiry: "2027-08-30",
+        type: "Mobile Crane",
+        registration: "63309",
+      },
+      {
+        id: "eq-8",
+        assetCode: "B-222",
+        name: "130T Mobile Crane · LTM",
+        capacityTons: 130,
+        status: "Available",
+        inspectionExpiry: "2027-05-18",
+        type: "Mobile Crane",
+        registration: "88999",
+      },
+      {
+        id: "eq-9",
+        assetCode: "B-224",
+        name: "75T Mobile Crane · SANY",
+        capacityTons: 75,
+        status: "Available",
+        inspectionExpiry: "2027-02-28",
+        type: "Mobile Crane",
+        registration: "65577",
+      },
     ];
     for (const item of initialEquipment) {
-      await db.insert(equipment).values(item).onDuplicateKeyUpdate({ set: item });
+      await db
+        .insert(equipment)
+        .values(item)
+        .onDuplicateKeyUpdate({ set: item });
     }
   }
 
   const crewList = await db.select().from(crew).limit(1);
   if (crewList.length === 0) {
     const initialCrew = [
-      { id: "cr-1", name: "Vineeth Vijayan", designation: "Crane Operator", availability: "Present", certificateExpiry: "2027-05-10", trainingRequired: 0 },
-      { id: "cr-2", name: "Anoop Panikashery", designation: "Crane Operator", availability: "Assigned", certificateExpiry: "2026-11-15", trainingRequired: 0 },
-      { id: "cr-3", name: "Vijayakumar", designation: "Rigger", availability: "Present", certificateExpiry: "2027-08-20", trainingRequired: 0 },
-      { id: "cr-4", name: "Amal Krishnan", designation: "Rigger", availability: "Present", certificateExpiry: "2027-01-30", trainingRequired: 0 },
-      { id: "cr-5", name: "ABDUL JALEEL", designation: "Rigger", availability: "Present", certificateExpiry: "2027-04-11", trainingRequired: 0 },
-      { id: "cr-6", name: "ABI RENJU KUMAR", designation: "Crane Operator Assistant", availability: "Present", certificateExpiry: "2027-06-01", trainingRequired: 0 },
-      { id: "cr-7", name: "ABHILASH UNNI", designation: "Rigger", availability: "Present", certificateExpiry: "2027-07-15", trainingRequired: 0 },
-      { id: "cr-8", name: "ABHIRAM SUNEEF", designation: "Rigger", availability: "Present", certificateExpiry: "2027-03-22", trainingRequired: 0 },
-      { id: "cr-9", name: "ABHISHEK KRISHNA", designation: "Crane Operator Assistant", availability: "Present", certificateExpiry: "2027-09-09", trainingRequired: 0 },
-      { id: "cr-10", name: "ADERSH SREEKUMAR NAIR", designation: "Rigger", availability: "On Leave", certificateExpiry: "2027-02-14", trainingRequired: 1 },
-      { id: "cr-11", name: "AMAL APPUKUTTAN", designation: "Rigger", availability: "Present", certificateExpiry: "2027-10-05", trainingRequired: 0 },
-      { id: "cr-12", name: "AMARNADH BAIJU", designation: "Rigger", availability: "Off-Site", certificateExpiry: "2027-04-04", trainingRequired: 0 },
+      {
+        id: "cr-1",
+        name: "Vineeth Vijayan",
+        designation: "Crane Operator",
+        availability: "Present",
+        certificateExpiry: "2027-05-10",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-2",
+        name: "Anoop Panikashery",
+        designation: "Crane Operator",
+        availability: "Assigned",
+        certificateExpiry: "2026-11-15",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-3",
+        name: "Vijayakumar",
+        designation: "Rigger",
+        availability: "Present",
+        certificateExpiry: "2027-08-20",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-4",
+        name: "Amal Krishnan",
+        designation: "Rigger",
+        availability: "Present",
+        certificateExpiry: "2027-01-30",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-5",
+        name: "ABDUL JALEEL",
+        designation: "Rigger",
+        availability: "Present",
+        certificateExpiry: "2027-04-11",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-6",
+        name: "ABI RENJU KUMAR",
+        designation: "Crane Operator Assistant",
+        availability: "Present",
+        certificateExpiry: "2027-06-01",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-7",
+        name: "ABHILASH UNNI",
+        designation: "Rigger",
+        availability: "Present",
+        certificateExpiry: "2027-07-15",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-8",
+        name: "ABHIRAM SUNEEF",
+        designation: "Rigger",
+        availability: "Present",
+        certificateExpiry: "2027-03-22",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-9",
+        name: "ABHISHEK KRISHNA",
+        designation: "Crane Operator Assistant",
+        availability: "Present",
+        certificateExpiry: "2027-09-09",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-10",
+        name: "ADERSH SREEKUMAR NAIR",
+        designation: "Rigger",
+        availability: "On Leave",
+        certificateExpiry: "2027-02-14",
+        trainingRequired: 1,
+      },
+      {
+        id: "cr-11",
+        name: "AMAL APPUKUTTAN",
+        designation: "Rigger",
+        availability: "Present",
+        certificateExpiry: "2027-10-05",
+        trainingRequired: 0,
+      },
+      {
+        id: "cr-12",
+        name: "AMARNADH BAIJU",
+        designation: "Rigger",
+        availability: "Off-Site",
+        certificateExpiry: "2027-04-04",
+        trainingRequired: 0,
+      },
     ];
     for (const item of initialCrew) {
       await db.insert(crew).values(item).onDuplicateKeyUpdate({ set: item });
@@ -441,25 +844,70 @@ export async function seedInitialDataIfNeeded() {
   const gearList = await db.select().from(liftingGears).limit(1);
   if (gearList.length === 0) {
     const initialGears = [
-      { id: "g-1", name: "Heavy Shackle 50T Set", gearType: "Shackle", swlTons: 50, inspectionExpiry: "2027-06-01" },
-      { id: "g-2", name: "Wire Rope Sling 20m", gearType: "Sling", swlTons: 25, inspectionExpiry: "2026-10-15" },
-      { id: "g-3", name: "Spreader Beam 100T", gearType: "Spreader beam", swlTons: 100, inspectionExpiry: "2027-12-31" },
-      { id: "g-4", name: "Webbing Sling 10T", gearType: "Sling", swlTons: 10, inspectionExpiry: "2027-03-30" },
+      {
+        id: "g-1",
+        name: "Heavy Shackle 50T Set",
+        gearType: "Shackle",
+        swlTons: 50,
+        inspectionExpiry: "2027-06-01",
+      },
+      {
+        id: "g-2",
+        name: "Wire Rope Sling 20m",
+        gearType: "Sling",
+        swlTons: 25,
+        inspectionExpiry: "2026-10-15",
+      },
+      {
+        id: "g-3",
+        name: "Spreader Beam 100T",
+        gearType: "Spreader beam",
+        swlTons: 100,
+        inspectionExpiry: "2027-12-31",
+      },
+      {
+        id: "g-4",
+        name: "Webbing Sling 10T",
+        gearType: "Sling",
+        swlTons: 10,
+        inspectionExpiry: "2027-03-30",
+      },
     ];
     for (const item of initialGears) {
-      await db.insert(liftingGears).values(item).onDuplicateKeyUpdate({ set: item });
+      await db
+        .insert(liftingGears)
+        .values(item)
+        .onDuplicateKeyUpdate({ set: item });
     }
   }
 
   const trailerList = await db.select().from(trailers).limit(1);
   if (trailerList.length === 0) {
     const initialTrailers = [
-      { id: "tr-1", plateNumber: "AD-55102", trailerType: "Flatbed", status: "Available" },
-      { id: "tr-2", plateNumber: "DXB-8819", trailerType: "Lowboy", status: "Assigned" },
-      { id: "tr-3", plateNumber: "SHJ-3341", trailerType: "Extendable", status: "Available" },
+      {
+        id: "tr-1",
+        plateNumber: "AD-55102",
+        trailerType: "Flatbed",
+        status: "Available",
+      },
+      {
+        id: "tr-2",
+        plateNumber: "DXB-8819",
+        trailerType: "Lowboy",
+        status: "Assigned",
+      },
+      {
+        id: "tr-3",
+        plateNumber: "SHJ-3341",
+        trailerType: "Extendable",
+        status: "Available",
+      },
     ];
     for (const item of initialTrailers) {
-      await db.insert(trailers).values(item).onDuplicateKeyUpdate({ set: item });
+      await db
+        .insert(trailers)
+        .values(item)
+        .onDuplicateKeyUpdate({ set: item });
     }
   }
 
@@ -524,11 +972,46 @@ export async function seedInitialDataIfNeeded() {
     for (const b of initialBookings) {
       await db.insert(bookings).values(b).onDuplicateKeyUpdate({ set: b });
       const docs = [
-        { id: `${b.id}-d1`, bookingId: b.id, departmentCode: "DOC", name: "Client LPO & Contract", state: "Approved", required: 1 },
-        { id: `${b.id}-d2`, bookingId: b.id, departmentCode: "HSE", name: "Third Party Crane Inspection", state: "Uploaded", required: 1 },
-        { id: `${b.id}-d3`, bookingId: b.id, departmentCode: "LG", name: "Rigging Study & SWL Certification", state: "Required", required: 1 },
-        { id: `${b.id}-d4`, bookingId: b.id, departmentCode: "CRW", name: "Operator Medical & License Verification", state: "Approved", required: 1 },
-        { id: `${b.id}-d5`, bookingId: b.id, departmentCode: "ACC", name: "Advance Payment Receipt", state: "Uploaded", required: 1 },
+        {
+          id: `${b.id}-d1`,
+          bookingId: b.id,
+          departmentCode: "DOC",
+          name: "Client LPO & Contract",
+          state: "Approved",
+          required: 1,
+        },
+        {
+          id: `${b.id}-d2`,
+          bookingId: b.id,
+          departmentCode: "HSE",
+          name: "Third Party Crane Inspection",
+          state: "Uploaded",
+          required: 1,
+        },
+        {
+          id: `${b.id}-d3`,
+          bookingId: b.id,
+          departmentCode: "LG",
+          name: "Rigging Study & SWL Certification",
+          state: "Required",
+          required: 1,
+        },
+        {
+          id: `${b.id}-d4`,
+          bookingId: b.id,
+          departmentCode: "CRW",
+          name: "Operator Medical & License Verification",
+          state: "Approved",
+          required: 1,
+        },
+        {
+          id: `${b.id}-d5`,
+          bookingId: b.id,
+          departmentCode: "ACC",
+          name: "Advance Payment Receipt",
+          state: "Uploaded",
+          required: 1,
+        },
       ];
       for (const d of docs) {
         await db.insert(documents).values(d).onDuplicateKeyUpdate({ set: d });
@@ -536,13 +1019,36 @@ export async function seedInitialDataIfNeeded() {
     }
   }
 
-  const allocationList = await db.select().from(bookingCrewAllocations).limit(1);
+  const allocationList = await db
+    .select()
+    .from(bookingCrewAllocations)
+    .limit(1);
   if (allocationList.length === 0) {
     await db.insert(bookingCrewAllocations).values([
-      { bookingId: "BOB-59116", crewId: "cr-1", crewName: "Vineeth Vijayan", assignedBy: null },
-      { bookingId: "BOB-59116", crewId: "cr-2", crewName: "Anoop Panikashery", assignedBy: null },
-      { bookingId: "BOB-59116", crewId: "cr-3", crewName: "Vijayakumar", assignedBy: null },
-      { bookingId: "BOB-59116", crewId: "cr-4", crewName: "Amal Krishnan", assignedBy: null },
+      {
+        bookingId: "BOB-59116",
+        crewId: "cr-1",
+        crewName: "Vineeth Vijayan",
+        assignedBy: null,
+      },
+      {
+        bookingId: "BOB-59116",
+        crewId: "cr-2",
+        crewName: "Anoop Panikashery",
+        assignedBy: null,
+      },
+      {
+        bookingId: "BOB-59116",
+        crewId: "cr-3",
+        crewName: "Vijayakumar",
+        assignedBy: null,
+      },
+      {
+        bookingId: "BOB-59116",
+        crewId: "cr-4",
+        crewName: "Amal Krishnan",
+        assignedBy: null,
+      },
     ]);
   }
 }
