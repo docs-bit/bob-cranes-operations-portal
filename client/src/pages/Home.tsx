@@ -17,6 +17,8 @@ export const CrewView = CrewAssignmentWorkspace;
 import { TRAINING_EMPLOYEES, TRAINING_SOURCE_FILE, type TrainingEmployee, type TrainingStatus, type TrainingWorkstream } from "@shared/trainingData";
 import { AUGUST_ATTENDANCE_ROSTER } from "@shared/augustAttendanceData";
 import { filterNotifications, getExpiringTrainingEmployees } from "@shared/notificationAndExpiryRules";
+import { VEHICLE_FLEET } from "@shared/vehicleFleetData";
+import { filterVehicleFleet, vehicleRegistrationStatus, type VehicleRegistrationStatus } from "@shared/vehicleFleetRules";
 import DataUploadCenter, { type UploadMap } from "@/components/DataUploadCenter";
 import * as XLSX from "xlsx";
 import DepartmentUsersView from "@/components/DepartmentUsersView";
@@ -804,6 +806,29 @@ const departmentPortalConfigs: Record<string, DepartmentPortalConfig> = {
   administrator: { label: "Administrator / Super Admin", focus: "Cross-department oversight, account governance, audit evidence, and workflow control.", checklist: ["Review lifecycle health across all departments", "Assign supervisors and unique credentials", "Monitor audit log and access status"], entryStage: "Created by Salesperson", actionLabel: "Review control center", owner: "Administrator", readOnly: true },
 };
 
+function TransportationFleetPanel() {
+  const [search, setSearch] = useState("");
+  const [fleetType, setFleetType] = useState("All");
+  const [registrationFilter, setRegistrationFilter] = useState<VehicleRegistrationStatus | "All">("All");
+  const [page, setPage] = useState(1);
+  const pageSize = 40;
+  const vehicleTypes = useMemo(() => Array.from(new Set(VEHICLE_FLEET.map((vehicle) => vehicle.fleetName))).sort(), []);
+  const filteredVehicles = useMemo(() => filterVehicleFleet(VEHICLE_FLEET, search, fleetType, registrationFilter), [search, fleetType, registrationFilter]);
+  const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const visibleVehicles = filteredVehicles.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const resetPage = (update: () => void) => { update(); setPage(1); };
+  const exportFleet = () => {
+    const rows = filteredVehicles.map((vehicle) => ({ "Fleet code": vehicle.fleetCode, "Registration number": vehicle.registrationNumber, "Fleet name": vehicle.fleetName, "Vehicle model": vehicle.vehicleModel, "Chassis number": vehicle.chassisNumber, "Plate type": vehicle.plateType, Colour: vehicle.colour, "Year of manufacture": vehicle.yearOfManufacture, "Mulkiya expiry": vehicle.mulkiyaExpiry, "Registration status": vehicleRegistrationStatus(vehicle.mulkiyaExpiry) }));
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transportation Fleet");
+    XLSX.writeFile(workbook, "BOB-Transportation-Fleet.xlsx");
+    toast.success("Transportation fleet export prepared", { description: `${rows.length} vehicle records included.` });
+  };
+  return <div className="panel" data-testid="transportation-fleet"><div className="panel-header"><div><div className="panel-title">Vehicle fleet register</div><div className="panel-meta">{VEHICLE_FLEET.length} workbook records · Mulkiya validity is monitored for every listed vehicle.</div></div><button className="secondary-button" onClick={exportFleet}><Download size={14} /> Export fleet (.xlsx)</button></div><div className="panel-body"><div className="filter-row" style={{ marginBottom: 14 }}><input aria-label="Search transportation vehicles" className="form-input" style={{ minWidth: 230 }} placeholder="Search fleet code, plate, model, or chassis" value={search} onChange={(event) => resetPage(() => setSearch(event.target.value))} /><select aria-label="Filter fleet by vehicle type" className="form-select" value={fleetType} onChange={(event) => resetPage(() => setFleetType(event.target.value))}><option value="All">All vehicle types</option>{vehicleTypes.map((type) => <option value={type} key={type}>{type}</option>)}</select><select aria-label="Filter fleet by registration status" className="form-select" value={registrationFilter} onChange={(event) => resetPage(() => setRegistrationFilter(event.target.value as VehicleRegistrationStatus | "All"))}><option value="All">All registration states</option><option value="Valid">Valid</option><option value="Expiring soon">Expiring soon</option><option value="Expired">Expired</option><option value="Unknown">Unknown</option></select><span className="status-badge blue">{filteredVehicles.length} matching</span></div><div style={{ overflowX: "auto" }}><table className="data-table"><thead><tr><th>Fleet code</th><th>Registration</th><th>Vehicle</th><th>Model</th><th>Year</th><th>Mulkiya expiry</th><th>Status</th></tr></thead><tbody>{visibleVehicles.map((vehicle) => <tr key={vehicle.id}><td><strong>{vehicle.fleetCode}</strong></td><td>{vehicle.registrationNumber}</td><td>{vehicle.fleetName}</td><td title={vehicle.chassisNumber}>{vehicle.vehicleModel}</td><td>{vehicle.yearOfManufacture || "—"}</td><td>{vehicle.mulkiyaExpiry || "Not recorded"}</td><td><StatusBadge value={vehicleRegistrationStatus(vehicle.mulkiyaExpiry)} /></td></tr>)}</tbody></table></div><div className="table-pagination"><span>Showing {(currentPage - 1) * pageSize + (visibleVehicles.length ? 1 : 0)}–{(currentPage - 1) * pageSize + visibleVehicles.length} of {filteredVehicles.length} vehicles</span><div style={{ display: "flex", gap: 8 }}><button className="secondary-button compact-button" disabled={currentPage === 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</button><button className="secondary-button compact-button" disabled={currentPage === totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>Next</button></div></div></div></div>;
+}
+
 function DepartmentView({ department, bookings, setDetail, onAdvance, onCompleteWorkstream, completedWorkstreams }: { department: string; bookings: Booking[]; setDetail: (booking: Booking) => void; onAdvance: (booking: Booking, config: DepartmentPortalConfig) => void; onCompleteWorkstream: (booking: Booking, config: DepartmentPortalConfig) => void; completedWorkstreams: Record<string, string[]> }) {
   const departmentCode = DEPARTMENT_LABEL_TO_CODE[department] ?? "administrator";
   const config = departmentPortalConfigs[departmentCode] ?? departmentPortalConfigs.administrator;
@@ -870,7 +895,7 @@ export default function Home() {
     {view === "training" && <TrainingView selectedEmployeeId={selectedTrainingEmployeeId} />}
     {view === "uploads" && (user.role === "admin" || user.departmentCode === "accounts") && <DataUploadCenter uploads={uploadRecords} setUploads={setUploadRecords} />}
     {view === "users" && user.role !== "user" && <DepartmentUsersView actor={user} />}
-    {view === "department" && activeDepartment && <DepartmentView department={activeDepartment} bookings={bookings} setDetail={openDetail} onAdvance={advanceDepartmentBooking} onCompleteWorkstream={completeDepartmentWorkstream} completedWorkstreams={completedWorkstreams} />}
+    {view === "department" && activeDepartment && <>{activeDepartment === "Transportation" && <TransportationFleetPanel />}<DepartmentView department={activeDepartment} bookings={bookings} setDetail={openDetail} onAdvance={advanceDepartmentBooking} onCompleteWorkstream={completeDepartmentWorkstream} completedWorkstreams={completedWorkstreams} /></>}
     {view === "detail" && activeBooking && <BookingDetail booking={activeBooking} documents={uploadDocuments} allocations={allocations} assignmentSavedMessage={assignmentSavedMessage} onUpdate={updateBooking} onOpenClientPortal={() => setLocation("/client/portal-bob-31511")} onEditAssignment={() => { if (!canView("crew")) { toast.error("Crew assignment access required", { description: "Open this action from an administrator or Crew department account." }); return; } setAssignmentSavedMessage(null); setFocusedAssignmentBookingId(activeBooking.id); setActiveBooking(null); setActiveDepartment(null); setView("crew"); }} onBack={() => { setAssignmentSavedMessage(null); setFocusedAssignmentBookingId(null); setActiveBooking(null); setView("overview"); }} />}
     <div style={{ color: "#555", fontSize: 10, textAlign: "right", padding: "10px 0 0" }}>System status: operational · {groupedCount} dossiers in view · v3.0</div>
   </Shell>;

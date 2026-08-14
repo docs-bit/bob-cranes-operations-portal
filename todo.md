@@ -189,4 +189,10 @@
 ## Lifting gear document workflow follow-up gaps
 - [x] Wire newly added gear records into booking-wizard selection and block expired document records from selection there.
 - [x] Add UI/integration coverage proving an expired uploaded gear cannot be selected for a booking.
-- [ ] Complete final gear-document browser verification and save a post-release checkpoint.
+- [x] Complete final gear-document browser verification and save a post-release checkpoint.
+
+## Transportation fleet workbook integration
+- [x] Inspect and normalize all vehicle records from the supplied vehicle workbook.
+- [x] Replace the Transportation demonstration fleet list with the complete imported vehicle inventory and searchable operational fields.
+- [x] Add regression coverage for vehicle count, unique identity handling, filters, and Transportation workspace rendering.
+- [x] Verify the imported fleet in the Transportation UI, run tests/build, and save a checkpoint.
