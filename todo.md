@@ -227,3 +227,6 @@
 - [x] Add document search and sorting controls to the Client Response Portal.
 - [x] Add a lightweight Client Portal feedback form for bug reports with secure persistence and administrator review support.
 - [x] Add automated coverage, authenticated browser verification, and a checkpoint for the client-experience release.
+
+## Dashboard greeting correction
+- [x] Replace Nishanth with Admin in the Operations Cockpit greeting and verify the authenticated view.
