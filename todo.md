@@ -203,3 +203,11 @@
 - [x] Replace the Transportation demonstration fleet list with the complete imported vehicle inventory and searchable operational fields.
 - [x] Add regression coverage for vehicle count, unique identity handling, filters, and Transportation workspace rendering.
 - [x] Verify the imported fleet in the Transportation UI, run tests/build, and save a checkpoint.
+
+## Supervisor audit, dispatch bundles, and activity-log governance
+- [x] Add a dedicated supervisor-permissions audit screen to the Operations Cockpit with department scope, account status, permission summary, and audit evidence.
+- [x] Add on-demand PDF dispatch-bundle generation from eligible booking dossiers with role-safe access and a user download flow.
+- [x] Add configurable activity-log retention settings with safe purge controls and clear audit feedback.
+- [x] Add date-range filters to activity-log viewing and CSV export.
+- [x] Harden the activity date-range controls so incomplete or malformed typed date values do not issue a failed audit query.
+- [x] Add automated coverage, responsive browser verification, and a checkpoint for the governance and dispatch-bundle release.

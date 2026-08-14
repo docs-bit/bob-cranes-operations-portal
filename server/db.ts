@@ -1,8 +1,8 @@
-import { and, desc, eq, isNotNull, isNull, or } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, isNull, lt, lte, or, type SQL } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { nanoid } from "nanoid";
 import { 
-  InsertUser, users, userActivityLogs, bookings, bookingCrewAllocations, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
+  InsertUser, users, userActivityLogs, systemSettings, bookings, bookingCrewAllocations, equipment, crew, liftingGears, trailers, documents, chatMessages, notifications
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -151,7 +151,14 @@ export async function addUserActivity(input: { userId: number; action: string; d
   await db.insert(userActivityLogs).values(input);
 }
 
-export async function listRecentUserActivity(limit = 40, departmentCode?: string | null) {
+export type ActivityLogFilters = {
+  limit?: number;
+  departmentCode?: string | null;
+  from?: Date;
+  to?: Date;
+};
+
+export async function listRecentUserActivity({ limit = 40, departmentCode, from, to }: ActivityLogFilters = {}) {
   const db = await getDb();
   if (!db) return [];
   const query = db.select({
@@ -164,7 +171,37 @@ export async function listRecentUserActivity(limit = 40, departmentCode?: string
     detail: userActivityLogs.detail,
     createdAt: userActivityLogs.createdAt,
   }).from(userActivityLogs).leftJoin(users, eq(userActivityLogs.userId, users.id));
-  return await query.where(departmentCode ? eq(users.departmentCode, departmentCode) : undefined).orderBy(desc(userActivityLogs.createdAt)).limit(limit);
+  const filters = [
+    departmentCode ? eq(users.departmentCode, departmentCode) : undefined,
+    from ? gte(userActivityLogs.createdAt, from) : undefined,
+    to ? lte(userActivityLogs.createdAt, to) : undefined,
+  ].filter((filter): filter is SQL => Boolean(filter));
+  return await query.where(filters.length ? and(...filters) : undefined).orderBy(desc(userActivityLogs.createdAt)).limit(Math.min(Math.max(limit, 1), 250));
+}
+
+export async function getActivityRetentionDays() {
+  const db = await getDb();
+  if (!db) return 365;
+  const result = await db.select().from(systemSettings).where(eq(systemSettings.key, "activity_log_retention_days")).limit(1);
+  const value = Number(result[0]?.value);
+  return [30, 90, 180, 365, 730].includes(value) ? value : 365;
+}
+
+export async function setActivityRetentionDays(days: number, updatedBy: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable for activity retention settings.");
+  await db.insert(systemSettings).values({ key: "activity_log_retention_days", value: String(days), updatedBy }).onDuplicateKeyUpdate({
+    set: { value: String(days), updatedBy },
+  });
+  return await getActivityRetentionDays();
+}
+
+export async function purgeUserActivityBefore(cutoff: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable for activity retention.");
+  const expired = await db.select({ id: userActivityLogs.id }).from(userActivityLogs).where(lt(userActivityLogs.createdAt, cutoff));
+  if (expired.length) await db.delete(userActivityLogs).where(lt(userActivityLogs.createdAt, cutoff));
+  return expired.length;
 }
 
 // ---- Bookings & Operations Queries ----

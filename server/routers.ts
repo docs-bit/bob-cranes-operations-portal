@@ -105,10 +105,43 @@ export const appRouter = router({
       if (ctx.user.role === "supervisor" && ctx.user.departmentCode) return (await db.listLocalUsers()).filter((account) => account.departmentCode === ctx.user.departmentCode).map(toSessionUser);
       throw new TRPCError({ code: "FORBIDDEN", message: "Only department supervisors can view their department accounts." });
     }),
-    listActivity: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role === "admin") return await db.listRecentUserActivity();
-      if (ctx.user.role === "supervisor" && ctx.user.departmentCode) return await db.listRecentUserActivity(40, ctx.user.departmentCode);
+    listActivity: protectedProcedure.input(z.object({
+      from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      limit: z.number().int().min(1).max(250).optional(),
+    }).optional()).query(async ({ ctx, input }) => {
+      const from = input?.from ? new Date(`${input.from}T00:00:00.000Z`) : undefined;
+      const to = input?.to ? new Date(`${input.to}T23:59:59.999Z`) : undefined;
+      if (from && to && from > to) throw new TRPCError({ code: "BAD_REQUEST", message: "The activity start date must be before the end date." });
+      if (ctx.user.role === "admin") return await db.listRecentUserActivity({ from, to, limit: input?.limit ?? 100 });
+      if (ctx.user.role === "supervisor" && ctx.user.departmentCode) return await db.listRecentUserActivity({ from, to, limit: input?.limit ?? 100, departmentCode: ctx.user.departmentCode });
       throw new TRPCError({ code: "FORBIDDEN", message: "Only department supervisors can view their department activity." });
+    }),
+    getSupervisorPermissionAudit: adminProcedure.query(async () => {
+      const accounts = await db.listLocalUsers();
+      return accounts.filter((account) => account.role === "supervisor").map((supervisor) => ({
+        id: supervisor.id,
+        name: supervisor.name,
+        email: supervisor.localEmail ?? supervisor.email,
+        departmentCode: supervisor.departmentCode,
+        isActive: supervisor.isActive,
+        createdAt: supervisor.createdAt,
+        lastSignedIn: supervisor.lastSignedIn,
+        managedUserCount: accounts.filter((account) => account.role === "user" && account.departmentCode === supervisor.departmentCode && account.isActive === 1).length,
+      }));
+    }),
+    getActivityRetention: adminProcedure.query(async () => ({ retentionDays: await db.getActivityRetentionDays() })),
+    updateActivityRetention: adminProcedure.input(z.object({ retentionDays: z.union([z.literal(30), z.literal(90), z.literal(180), z.literal(365), z.literal(730)]) })).mutation(async ({ ctx, input }) => {
+      const retentionDays = await db.setActivityRetentionDays(input.retentionDays, ctx.user.id);
+      await db.addUserActivity({ userId: ctx.user.id, action: "retention_setting_updated", detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} set activity-log retention to ${retentionDays} days.` });
+      return { retentionDays };
+    }),
+    purgeExpiredActivity: adminProcedure.input(z.object({ confirm: z.literal(true) })).mutation(async ({ ctx }) => {
+      const retentionDays = await db.getActivityRetentionDays();
+      const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
+      const purgedCount = await db.purgeUserActivityBefore(cutoff);
+      await db.addUserActivity({ userId: ctx.user.id, action: "retention_purge", detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} purged ${purgedCount} activity event${purgedCount === 1 ? "" : "s"} older than ${retentionDays} days.` });
+      return { retentionDays, purgedCount, cutoff };
     }),
     registerUser: protectedProcedure.input(registrationInput).mutation(async ({ ctx, input }) => {
       const targetRole = input.role;
@@ -471,6 +504,21 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    requestDispatchBundle: protectedProcedure.input(z.object({ bookingId: z.string().min(1) })).mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "sales");
+      const booking = await db.getBookingById(input.bookingId);
+      if (!booking) throw new TRPCError({ code: "NOT_FOUND", message: "The booking dossier could not be found." });
+      if (booking.stage !== "Reviewed" && booking.stage !== "Dispatched") {
+        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "A dispatch bundle can be generated only after the dossier has been reviewed." });
+      }
+      const docs = await db.getDocumentsForBooking(input.bookingId);
+      const outstanding = docs.filter((document) => document.required === 1 && !["Uploaded", "Approved"].includes(document.state));
+      if (outstanding.length) {
+        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Required documents are still incomplete, so the dispatch bundle is locked." });
+      }
+      await db.addUserActivity({ userId: ctx.user.id, action: "dispatch_bundle_generated", detail: `${ctx.user.name ?? ctx.user.email ?? "Sales"} requested the dispatch PDF bundle for ${input.bookingId}.` });
+      return { booking, documents: docs };
+    }),
   }),
 });
 

@@ -25,6 +25,13 @@ export const userActivityLogs = mysqlTable("user_activity_logs", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const systemSettings = mysqlTable("system_settings", {
+  key: varchar("key", { length: 64 }).primaryKey(),
+  value: varchar("value", { length: 255 }).notNull(),
+  updatedBy: int("updatedBy"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export const bookings = mysqlTable("bookings", {
   id: varchar("id", { length: 64 }).primaryKey(),
   clientName: varchar("clientName", { length: 255 }).notNull(),
@@ -135,6 +142,7 @@ export const auditLogs = mysqlTable("audit_logs", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+export type SystemSetting = typeof systemSettings.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type BookingCrewAllocation = typeof bookingCrewAllocations.$inferSelect;
 export type InsertBooking = typeof bookings.$inferInsert;

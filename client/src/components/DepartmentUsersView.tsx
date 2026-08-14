@@ -2,8 +2,9 @@ import { trpc } from "@/lib/trpc";
 import { DEPARTMENTS, roleLabel, type PortalRole } from "@shared/departmentAccess";
 import { nextAccountActiveState, requiresDeactivationConfirmation } from "@shared/accountManagementRules";
 import { activityToCsv } from "@shared/activityExport";
+import { activityFilterInput, isValidActivityDate } from "@shared/activityFilterRules";
 import { filterAccounts } from "@shared/userManagementRules";
-import { CheckCircle2, Download, Edit3, KeyRound, Power, Search, ShieldCheck, UserPlus, UsersRound, X, Activity, AlertTriangle, Crown } from "lucide-react";
+import { CheckCircle2, Download, Edit3, KeyRound, Power, Search, ShieldCheck, UserPlus, UsersRound, X, Activity, AlertTriangle, CalendarRange, Crown, RotateCcw, Settings2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 
@@ -38,11 +39,18 @@ export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps)
   const isSupervisor = actor.role === "supervisor";
   const scopedDepartmentCode = isSupervisor ? actor.departmentCode ?? "sales" : "sales";
   const manageableDepartments = useMemo(() => DEPARTMENTS.filter((department) => department.code !== "administrator" && (!isSupervisor || department.code === actor.departmentCode)), [actor.departmentCode, isSupervisor]);
+  const [activityFrom, setActivityFrom] = useState("");
+  const [activityTo, setActivityTo] = useState("");
+  const hasInvalidActivityDate = Boolean((activityFrom && !isValidActivityDate(activityFrom)) || (activityTo && !isValidActivityDate(activityTo)));
+  const activityInput = useMemo(() => activityFilterInput(activityFrom, activityTo), [activityFrom, activityTo]);
   const usersQuery = trpc.auth.listUsers.useQuery();
   const registerUser = trpc.auth.registerUser.useMutation();
   const updateUser = trpc.auth.updateUser.useMutation();
   const setUserActive = trpc.auth.setUserActive.useMutation();
-  const activityQuery = trpc.auth.listActivity.useQuery();
+  const activityQuery = trpc.auth.listActivity.useQuery(activityInput);
+  const retentionQuery = trpc.auth.getActivityRetention.useQuery(undefined, { enabled: isAdmin });
+  const updateRetention = trpc.auth.updateActivityRetention.useMutation();
+  const purgeExpiredActivity = trpc.auth.purgeExpiredActivity.useMutation();
   const utils = trpc.useUtils();
   const [form, setForm] = useState<AccountForm>({ name: "", email: "", password: "", departmentCode: scopedDepartmentCode, role: "user" });
   const [editForm, setEditForm] = useState<AccountEditorForm>({ name: "", email: "", password: "", departmentCode: scopedDepartmentCode, role: "user" });
@@ -128,6 +136,27 @@ export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps)
     URL.revokeObjectURL(url);
     toast.success("Activity CSV downloaded", { description: `${activity.length} audit events exported.` });
   };
+  const resetActivityRange = () => { setActivityFrom(""); setActivityTo(""); };
+  const saveRetention = async (retentionDays: number) => {
+    try {
+      await updateRetention.mutateAsync({ retentionDays: retentionDays as 30 | 90 | 180 | 365 | 730 });
+      await Promise.all([utils.auth.getActivityRetention.invalidate(), utils.auth.listActivity.invalidate()]);
+      toast.success("Activity retention updated", { description: `Events will be retained for ${retentionDays} days before an administrator-led purge.` });
+    } catch (caught) {
+      toast.error("Retention update failed", { description: caught instanceof Error ? caught.message : "Please try again." });
+    }
+  };
+  const purgeExpired = async () => {
+    const retentionDays = retentionQuery.data?.retentionDays ?? 365;
+    if (!window.confirm(`Permanently purge activity events older than ${retentionDays} days? This cannot be undone.`)) return;
+    try {
+      const result = await purgeExpiredActivity.mutateAsync({ confirm: true });
+      await utils.auth.listActivity.invalidate();
+      toast.success("Expired activity purged", { description: `${result.purgedCount} event${result.purgedCount === 1 ? "" : "s"} older than ${result.retentionDays} days removed.` });
+    } catch (caught) {
+      toast.error("Activity purge failed", { description: caught instanceof Error ? caught.message : "Please try again." });
+    }
+  };
 
   const title = isAdmin ? "User & supervisor management" : `${departmentLabel(scopedDepartmentCode)} user management`;
   const copy = isAdmin ? "Assign one supervisor per department, create unique credentials, and control access without deleting account history." : "Create and manage unique login credentials for users in your department. Supervisors cannot access other departments.";
@@ -137,6 +166,10 @@ export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps)
     <div className="metric-grid account-metrics"><div className="metric-card"><div className="metric-label">Visible accounts</div><div className="metric-value">{accounts.length}</div><div className="metric-foot">{isAdmin ? "All local identities" : `${departmentLabel(scopedDepartmentCode)} identities`}</div></div><div className="metric-card"><div className="metric-label">Active</div><div className="metric-value">{activeCount}</div><div className="metric-foot">Can sign in now</div></div><div className="metric-card"><div className="metric-label">Deactivated</div><div className="metric-value">{inactiveCount}</div><div className="metric-foot">Access paused</div></div><div className="metric-card"><div className="metric-label">Supervisors</div><div className="metric-value">{accounts.filter((account) => account.role === "supervisor").length}</div><div className="metric-foot">Department leads</div></div></div>
     {message && <div className="account-success" role="status"><CheckCircle2 size={15} />{message}</div>}
     {error && <div className="account-error" role="alert">{error}</div>}
+    <div className="detail-grid" style={{ marginBottom: 16 }}>
+      <section className="panel"><div className="panel-header"><div><div className="panel-title"><CalendarRange size={16} /> Activity period</div><div className="panel-meta">Filter before reviewing or exporting account activity.</div></div><button className="secondary-button compact-button" type="button" onClick={resetActivityRange} disabled={!activityFrom && !activityTo}><RotateCcw size={13} /> Clear dates</button></div><div className="panel-body account-toolbar"><label className="form-field"><span>From date</span><input className="form-input" type="date" value={activityFrom} onChange={(event) => setActivityFrom(event.target.value)} aria-label="Activity start date" /></label><label className="form-field"><span>To date</span><input className="form-input" type="date" value={activityTo} onChange={(event) => setActivityTo(event.target.value)} aria-label="Activity end date" /></label><span className={`status-badge ${hasInvalidActivityDate ? "amber" : "blue"}`}>{hasInvalidActivityDate ? "Enter a valid date" : activityQuery.isFetching ? "Filtering…" : `${activity.length} matching events`}</span></div></section>
+      {isAdmin && <section className="panel"><div className="panel-header"><div><div className="panel-title"><Settings2 size={16} /> Activity retention</div><div className="panel-meta">Retention does not delete history automatically; a separate, confirmed purge is required.</div></div><span className="status-badge amber">Admin only</span></div><div className="panel-body account-toolbar"><label className="form-field"><span>Retain events</span><select className="form-select" value={retentionQuery.data?.retentionDays ?? 365} onChange={(event) => void saveRetention(Number(event.target.value))} disabled={retentionQuery.isLoading || updateRetention.isPending} aria-label="Activity log retention period">{[30, 90, 180, 365, 730].map((days) => <option value={days} key={days}>{days} days</option>)}</select></label><button className="danger-button" type="button" onClick={() => void purgeExpired()} disabled={purgeExpiredActivity.isPending || retentionQuery.isLoading}><Trash2 size={13} />{purgeExpiredActivity.isPending ? "Purging…" : "Purge expired events"}</button></div></section>}
+    </div>
     <section className="panel user-activity-panel"><div className="panel-header"><div><div className="panel-title"><Activity size={16} /> Recent account activity</div><div className="panel-meta">{isAdmin ? "All departments" : `${departmentLabel(scopedDepartmentCode)} only`} · sign-ins, profile changes, and access status changes.</div></div><div className="activity-header-actions"><span className="status-badge blue">{activity.length} events</span><button className="secondary-button compact-button" type="button" onClick={exportActivity} disabled={!activity.length}><Download size={13} /> Export CSV</button></div></div><div className="panel-body activity-list">{activityQuery.isLoading ? <div className="empty-state">Loading activity…</div> : activityQuery.error ? <div className="account-error">Unable to load account activity.</div> : activity.length ? activity.slice(0, 8).map((event) => <div className="activity-row" key={event.id}><div className="activity-icon"><Activity size={14} /></div><div className="activity-copy"><div><strong>{event.userName ?? event.userEmail ?? "Unknown user"}</strong><span className="activity-action">{activityLabel(event.action)}</span></div><p>{event.detail}</p></div><time>{displayDateTime(event.createdAt)}</time></div>) : <div className="empty-state">No account activity has been recorded yet.</div>}</div></section>
     <div className="department-user-layout">
       <section className="panel"><div className="panel-header"><div><div className="panel-title">{isAdmin ? "Add a supervisor or department user" : "Add a department user"}</div><div className="panel-meta">Each account receives a unique email/password login and access only to its department portal.</div></div>{isAdmin ? <Crown size={17} /> : <UserPlus size={17} />}</div><form className="panel-body account-form" onSubmit={submit}><label><span>Full name</span><input className="form-input" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="Team member name" required /></label><label><span>Work email</span><input className="form-input" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} placeholder="name@bobcranes.com" required /></label><label><span>Unique password</span><input className="form-input" type="password" minLength={10} value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} placeholder="At least 10 characters" required /></label><label><span>Department</span><select className="form-select" value={form.departmentCode} onChange={(event) => setForm((current) => ({ ...current, departmentCode: event.target.value }))} disabled={isSupervisor}>{manageableDepartments.map((department) => <option value={department.code} key={department.code}>{department.label}</option>)}</select></label>{isAdmin && <label><span>Account level</span><select className="form-select" value={form.role} onChange={(event) => setForm((current) => ({ ...current, role: event.target.value as AccountForm["role"] }))}><option value="user">Department user</option><option value="supervisor">Department supervisor</option></select></label>}<button className="primary-button" type="submit" disabled={registerUser.isPending}><UserPlus size={14} />{registerUser.isPending ? "Creating account…" : `Create ${form.role === "supervisor" ? "supervisor" : "department user"}`}</button></form></section>

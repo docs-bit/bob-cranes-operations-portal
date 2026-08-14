@@ -57,6 +57,13 @@
       "when": 1786616876937,
       "tag": "0007_strange_rhodey",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1786701540320,
+      "tag": "0008_windy_karma",
+      "breakpoints": true
     }
   ]
 }

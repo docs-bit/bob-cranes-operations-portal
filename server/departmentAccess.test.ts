@@ -18,6 +18,8 @@ describe("department supervisor access", () => {
     expect(canManageDepartmentUsers(admin, "sales")).toBe(true);
     expect(canAccessWorkspaceView(supervisor, "users")).toBe(true);
     expect(canAccessWorkspaceView(user, "users")).toBe(false);
+    expect(canAccessWorkspaceView(admin, "supervisor-audit")).toBe(true);
+    expect(canAccessWorkspaceView(supervisor, "supervisor-audit")).toBe(false);
     expect(roleLabel("supervisor")).toBe("Department supervisor");
   });
 });
