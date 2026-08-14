@@ -925,15 +925,16 @@ function Shell({
       <main className="main-shell">
         <header className="topbar">
           <div className="topbar-leading">
-            <button
-              className="back-button"
-              onClick={onBack}
-              disabled={view === "overview"}
-              aria-label="Go back"
-            >
-              <ArrowLeft size={15} />
-              <span>Back</span>
-            </button>
+            {view !== "overview" && (
+              <button
+                className="back-button"
+                onClick={onBack}
+                aria-label="Go back"
+              >
+                <ArrowLeft size={15} />
+                <span>Back</span>
+              </button>
+            )}
             <div className="breadcrumb">
               BOB Cranes /{" "}
               <strong>

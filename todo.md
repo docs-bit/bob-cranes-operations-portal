@@ -237,3 +237,6 @@
 - [x] Restyle the sign-in and secure-loading surfaces to match the industrial visual system.
 - [x] Add targeted theme regression coverage and validate the restyle on authenticated desktop and mobile views.
 - [x] Save a verified checkpoint for the industrial theme release.
+
+## Operations Cockpit header refinement
+- [x] Remove the Back control from the Operations Cockpit overview header only while preserving it on all other views.

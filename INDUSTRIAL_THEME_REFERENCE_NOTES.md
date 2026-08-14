@@ -36,3 +36,5 @@
 ## Implementation verification
 
 The authenticated Operations Cockpit was reviewed after the shared theme layer loaded. The live view shows a navy command bar and navigation shell, yellow selected-navigation and progress markers, orange primary action treatment, off-white work canvas, uppercase condensed headings, and a dark booking-progress module. Booking records, filters, lifecycle stages, and attendance controls remain visible and reachable in the restyled view.
+
+The authenticated Operations Cockpit header was subsequently verified without the Back control. The breadcrumb now begins directly with “BOB Cranes / Operations Cockpit,” while source-level coverage preserves the Back control for all non-overview views.
