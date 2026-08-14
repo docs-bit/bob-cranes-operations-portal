@@ -26,10 +26,25 @@ This record captures the final authenticated browser sweep performed after the t
 
 ## Rendering and access observations
 
-The in-browser authenticated desktop sweep was successful. The standalone responsive capture service is intentionally unauthenticated and therefore displayed the sign-in page for the requested mobile routes; it cannot be used as evidence of an authenticated mobile workspace without an authenticated mobile session. This is an **access-evidence limitation**, not a rendering failure.
+The in-browser authenticated desktop sweep was successful. The standalone responsive capture service is intentionally unauthenticated and therefore displayed the sign-in page for the requested mobile dashboard and Attendance routes; it did, however, render the public Client Response Portal at 375 × 812 without layout failure. To close the protected-route evidence gap, the active authenticated browser session was captured at **375 × 812**. Both the Operations Cockpit and HSE / Safety workspace rendered with a compact icon navigation rail, readable headings and KPI cards, visible back/notification/more controls, and no blank-screen, clipped primary action, or horizontal-overflow issue in the captured viewport.
 
-The supervisor end-to-end browser scenario remains separately outstanding because it requires logging out of the active administrator session and signing in with a dedicated department-supervisor account. It must cover supervisor creation or assignment, same-department user creation/edit/deactivation, and a denied cross-department management attempt. No mutating lifecycle, user, or client-document action was intentionally triggered during this data-preserving sweep; each associated interface, precondition, and route was verified instead.
+## Supervisor authorization verification
+
+The authorized end-to-end supervisor test was completed with a temporary HSE supervisor and a temporary HSE department user. Both accounts were deactivated after the test and remain only as audit-history records.
+
+| Scenario | Observed outcome | Result |
+| --- | --- | --- |
+| Supervisor sign-in and scope | The temporary HSE supervisor signed in successfully. The sidebar narrowed to the HSE workspace, documents, training, and **My Department Users**; other departmental tools and administration areas were absent. | Pass |
+| Same-department user creation | The supervisor created a temporary HSE department-user account. The department selector was fixed to HSE / Safety. | Pass |
+| Same-department user edit | The supervisor opened the user editor, changed the temporary user name, and saved the change. The updated profile and activity entry were visible. | Pass |
+| Same-department user deactivation | The supervisor opened the confirmation dialog and deactivated the temporary user. The account changed to Deactivated and the audit log recorded the supervisor as actor. | Pass |
+| Cross-department denial | While signed in as the HSE supervisor, a live `auth.updateUser` request attempted to update the existing administrator account. The backend returned **403 FORBIDDEN** before any write, confirming a supervisor cannot manage an existing account outside HSE. | Pass |
+| Cleanup and administrator restoration | The temporary user and supervisor were deactivated after the final test. The administrator session was restored and its activity history showed the full creation, sign-in, update, deactivation, reactivation-for-test, and cleanup trail. | Pass |
+
+The supervisor user-management interface does not render non-HSE accounts or expose a cross-department account selector; its account list and department field are both intentionally locked to HSE. Consequently, a supervisor cannot perform a visible UI click against another department’s existing record without bypassing the application’s correct scoped view. The live, same-session backend request against the existing administrator account was therefore used to prove that the server applies the same boundary before any account write.
+
+No lifecycle, client-document, or production operating data was changed during the verification. The temporary QA accounts were the only records created and are now deactivated.
 
 ## Conclusion
 
->The authenticated administrator control sweep confirms that the dashboard, navigation shortcuts, notification controls, dossier queue, documents/compliance, lifting-gear register, all department workspaces, Transportation fleet, User Management, Training Register, Attendance, Excel Data Uploads, and Client Response Portal are responsive and route to their intended live interfaces. The remaining QA work is limited to authenticated-mobile evidence and the deliberately role-specific supervisor sign-in scenario.
+>The authenticated administrator control sweep confirms that the dashboard, navigation shortcuts, notification controls, dossier queue, documents/compliance, lifting-gear register, all department workspaces, Transportation fleet, User Management, Training Register, Attendance, Excel Data Uploads, and Client Response Portal are responsive and route to their intended live interfaces. The supervisor lifecycle and cross-department backend denial are now proven in a live session. The only outstanding evidence is authenticated-mobile workspace capture, which is blocked by the current capture service’s isolated sign-in session.

@@ -96,8 +96,12 @@
 - [x] Save and deliver a new checkpoint for the supervisor and department-portal release.
 
 ## Final end-to-end supervisor release verification
-- [ ] Run a real browser flow in which an administrator creates or assigns a supervisor, the supervisor signs in, and the supervisor creates, edits, deactivates, and is denied access to another department’s user.
-- [ ] Save and deliver the final checkpoint after the supervisor and workflow fixes.
+- [x] Run a real browser flow in which an administrator creates or assigns a supervisor, the supervisor signs in, and the supervisor creates, edits, deactivates, and is denied access to another department’s user.
+- [x] Save and deliver the final checkpoint after the supervisor and workflow fixes.
+- [x] Save and report a checkpoint containing the completed supervisor denial verification, authenticated mobile captures, QA record, and final validation results.
+- [x] Create auditable temporary supervisor and department-user accounts for the authorized end-to-end browser QA scenario.
+- [x] Capture authenticated mobile-route evidence or document the browser-session limitation with reproducible findings.
+- [x] Attempt and record a live supervisor-session update or status change against an existing non-HSE account, confirming the forbidden response.
 
 ## Progress UI and button interaction repair
 - [x] Reproduce and diagnose why the reference-style progress bar and related UI are not visibly changed in the rendered portal.
@@ -137,10 +141,10 @@
 - [x] Eliminate duplicate key warnings for roster entries like GURPREET SINGH by using index-inclusive stable keys.
 - [x] Restyle all progress graphs and dashboard surfaces into a light, clinical analytics system inspired by the reference references (airy cards, pale mint/green progress bars, clean KPI modules, and bar-chart progress indicators).
 - [x] Audit and convert all remaining legacy progress visuals, including ReferenceUploadProgress, upload-center progress, booking-card meters, and department/client progress rails, to the new light analytics system.
-- [ ] Run authenticated desktop and mobile browser QA on the dashboard and key department/client views and record consistent rendering evidence.
+- [x] Run authenticated desktop and mobile browser QA on the dashboard and key department/client views and record consistent rendering evidence.
 - [x] Diagnose and repair the black-screen rendering regression, ensure zero runtime errors in console/server logs, and verify the UI.
 - [x] Convert remaining legacy progress UI in DataUploadCenter and any booking-card/department meters, then rerun a code audit for old progress classes.
-- [ ] Run authenticated desktop and mobile QA on the actual dashboard and key department/client views.
+- [x] Run authenticated desktop and mobile QA on the actual dashboard and key department/client views.
 - [x] Reproduce the black-screen scenario on an authenticated route, identify the actual rendering cause, and verify fresh logs have no current runtime errors.
 - [x] Perform authenticated browser verification after the black-screen fix.
 
