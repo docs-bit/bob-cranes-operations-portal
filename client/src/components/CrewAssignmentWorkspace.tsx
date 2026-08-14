@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { CREW_ASSIGNMENT_ROSTER } from "@shared/crewAssignmentRoster";
 import { findEmployeeBookingConflicts, toggleEmployeeBookingAllocation, type EmployeeAllocation } from "@shared/bookingConflictRules";
 import { focusAssignmentBooking } from "@shared/assignmentRules";
+import { allocationAwareAvailability } from "@shared/crewAssignmentAvailability";
 
 type Booking = { id: string; client: string; mob: string; offHire: string };
 type Availability = "All" | "Present" | "On Leave" | "Assigned" | "Off-Site";
@@ -31,15 +32,26 @@ export function CrewView({ bookings, allocations, setAllocations, focusedBooking
   const departments = useMemo(() => Array.from(new Set(CREW_ASSIGNMENT_ROSTER.map((employee) => employee.department))).sort(), []);
   const selectedCrew = CREW_ASSIGNMENT_ROSTER.find((employee) => employee.id === selectedCrewId) ?? CREW_ASSIGNMENT_ROSTER[0];
   const visibleBookings = useMemo(() => focusAssignmentBooking(bookings, focusedBookingId), [bookings, focusedBookingId]);
+  const availabilityByEmployeeId = useMemo(() => new Map(CREW_ASSIGNMENT_ROSTER.map((employee) => [
+    employee.id,
+    allocationAwareAvailability(
+      employee.availability,
+      allocations.some((allocation) => allocationMatches(employee, allocation))
+    ),
+  ])), [allocations]);
   const visibleCrew = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return CREW_ASSIGNMENT_ROSTER.filter((employee) => {
-      const matchesAvailability = availability === "All" || employee.availability === availability;
+      const resolvedAvailability = availabilityByEmployeeId.get(employee.id) ?? employee.availability;
+      const matchesAvailability = availability === "All" || resolvedAvailability === availability;
       const matchesDepartment = department === "All" || employee.department === department;
       const matchesQuery = !normalized || `${employee.name} ${employee.sourceId} ${employee.role}`.toLowerCase().includes(normalized);
       return matchesAvailability && matchesDepartment && matchesQuery;
-    });
-  }, [availability, department, query]);
+    }).map((employee) => ({
+      ...employee,
+      availability: availabilityByEmployeeId.get(employee.id) ?? employee.availability,
+    }));
+  }, [availability, availabilityByEmployeeId, department, query]);
   const employeeAllocations = allocations.filter((allocation) => selectedCrew ? allocationMatches(selectedCrew, allocation) : false);
 
   useEffect(() => {

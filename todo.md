@@ -258,3 +258,6 @@
 
 ## Header dossier search repair
 - [x] Reproduce and repair the Operations Cockpit header dossier search so matching bookings can be found and opened reliably.
+
+## Coordinated Crew Assignment availability
+- [x] Derive Crew Assignment availability and Assigned filtering from persisted booking allocations so only allocated employees show Assigned.
