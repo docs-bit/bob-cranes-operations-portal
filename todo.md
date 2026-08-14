@@ -141,14 +141,17 @@
 - [x] Diagnose and repair the black-screen rendering regression, ensure zero runtime errors in console/server logs, and verify the UI.
 - [x] Convert remaining legacy progress UI in DataUploadCenter and any booking-card/department meters, then rerun a code audit for old progress classes.
 - [ ] Run authenticated desktop and mobile QA on the actual dashboard and key department/client views.
-- [ ] Reproduce the black-screen scenario on an authenticated route, identify the actual rendering cause, and verify fresh logs have no current runtime errors.
-- [ ] Perform authenticated browser verification after the black-screen fix.
+- [x] Reproduce the black-screen scenario on an authenticated route, identify the actual rendering cause, and verify fresh logs have no current runtime errors.
+- [x] Perform authenticated browser verification after the black-screen fix.
 
 ## Assignment edit and complete control responsiveness audit
 - [x] Repair the Assignment edit control so it opens the edit state, saves changes, and refreshes assigned crew data with visible feedback.
 - [x] Audit all visible portal controls for missing handlers, dead navigation, silent errors, incorrect disabled states, and missing loading/success/error feedback; repair each verified issue.
 - [x] Add automated coverage for the Assignment edit interaction and repaired control feedback paths.
-- [ ] Run authenticated Assignment and full-control browser QA, then save a checkpoint after tests and build pass.
+- [x] Run authenticated Assignment and full-control browser QA, then save a checkpoint after tests and build pass.
+- [x] Run and document a comprehensive authenticated browser QA sweep of major controls and flows, then save a verified checkpoint.
+- [x] Verify and record authenticated behavior for Documents & Compliance, Lifting Gears, each remaining department portal, Department Users, and Client Portal Preview.
+- [x] Confirm the QA verification record is saved and save a verified checkpoint after the full control sweep.
 
 ## Assignment repair follow-up gaps
 - [x] Bind BookingDetail assigned-crew rendering to persisted allocations and show saved-assignment feedback when returning from CrewView.
