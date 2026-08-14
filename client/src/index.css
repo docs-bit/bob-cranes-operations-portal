@@ -1280,3 +1280,80 @@ textarea:focus-visible {
   .page-title, .client-title { font-size: 27px; }
   .metric-card, .panel, .analytics-progress-board { border-radius: 16px; }
 }
+
+/* High-contrast foreground pass for the light workspace. */
+:root {
+  --equipment-ink: #000000;
+  --equipment-muted: #2f3742;
+  --analytics-ink: #000000;
+  --analytics-muted: #2f3742;
+}
+
+body,
+.page-title,
+.client-title,
+.panel-title,
+.metric-value,
+.metric-label,
+.booking-client,
+.booking-detail,
+.resource-name,
+.compliance-name,
+.detail-cell,
+.detail-cell label,
+.detail-cell value,
+.data-table td,
+.data-table th,
+.data-table strong,
+.panel-meta,
+.page-copy,
+.metric-foot,
+.compliance-sub,
+.data-table .muted,
+.activity-text,
+.activity-time {
+  color: #000000;
+}
+
+.detail-cell label,
+.panel-meta,
+.page-copy,
+.metric-foot,
+.compliance-sub,
+.data-table .muted,
+.activity-time {
+  color: #343434;
+}
+
+.detail-cell > div,
+.detail-cell value,
+.analytics-progress-board .panel-title,
+.analytics-progress-board .analytics-kpi strong,
+.analytics-progress-board .analytics-section-heading strong,
+.analytics-progress-board .analytics-workstream-row strong,
+.analytics-progress-board .analytics-workstream-meter > strong,
+.analytics-progress-board .analytics-progress-footer strong,
+.reference-progress-board .panel-title,
+.reference-progress-board .reference-progress-copy strong,
+.reference-progress-board .reference-progress-footer strong,
+.client-reference-progress .reference-progress-copy strong,
+.client-reference-progress .reference-progress-footer strong {
+  color: #000000;
+}
+
+.analytics-progress-board .panel-meta,
+.analytics-progress-board .analytics-kpi span,
+.analytics-progress-board .analytics-kpi small,
+.analytics-progress-board .analytics-section-heading span,
+.analytics-progress-board .analytics-legend,
+.analytics-progress-board .analytics-chart-column > span,
+.analytics-progress-board .analytics-stage small,
+.analytics-progress-board .analytics-progress-footer,
+.analytics-progress-board .analytics-workstream-row small,
+.reference-progress-board .reference-progress-copy span,
+.reference-progress-board .reference-progress-footer,
+.reference-progress-board .compliance-sub,
+.client-reference-progress .reference-progress-copy span,
+.client-reference-progress .reference-progress-footer {
+  color: #343434;
+}

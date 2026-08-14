@@ -247,3 +247,6 @@
 - [x] Restyle sign-in and loading surfaces to match the light equipment-operations system.
 - [x] Add focused regression coverage and validate authenticated desktop plus responsive mobile views.
 - [x] Save a verified checkpoint for the completed theme replacement.
+
+## Light theme foreground contrast
+- [x] Change primary and currently faint dossier text to black across the light portal theme while retaining a readable secondary hierarchy.

@@ -4430,14 +4430,14 @@ function BookingDetail({
               return (
                 <div
                   key={stage}
-                  style={{ minWidth: 100, opacity: active ? 1 : 0.48 }}
+                  style={{ minWidth: 100, opacity: active ? 1 : 0.78 }}
                 >
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: 6,
-                      color: active ? "#f1f1f1" : "#777",
+                      color: active ? "#000000" : "#27313d",
                       fontSize: 10,
                       lineHeight: 1.3,
                     }}
@@ -4449,8 +4449,8 @@ function BookingDetail({
                         borderRadius: "50%",
                         display: "grid",
                         placeItems: "center",
-                        background: active ? "#e31e24" : "#292929",
-                        color: active ? "#fff" : "#777",
+                        background: active ? "var(--equipment-orange)" : "#edf0f4",
+                        color: active ? "#000000" : "#27313d",
                         flex: "none",
                       }}
                     >
@@ -4462,7 +4462,7 @@ function BookingDetail({
                     <div
                       style={{
                         height: 2,
-                        background: active ? "#8e272b" : "#2b2b2b",
+                        background: active ? "var(--equipment-orange)" : "#dfe4e9",
                         margin: "10px 0 0 22px",
                       }}
                     />
