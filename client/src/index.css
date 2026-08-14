@@ -1467,3 +1467,27 @@ body,
 @media (max-width: 760px) {
   .header-dossier-search { position: fixed; top: 76px; right: 14px; left: 14px; width: auto; }
 }
+
+/* Crew allocation visibility. */
+.allocation-count-badge {
+  display: block;
+  width: fit-content;
+  margin-top: 3px;
+  color: #175f48;
+  font-size: 10px;
+  font-weight: 800;
+}
+.crew-allocation-status, .crew-booking-ids { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.booking-id-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ffd5ac;
+  border-radius: 999px;
+  background: #fff5eb;
+  color: #7a3c08;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 4px 6px;
+  white-space: nowrap;
+}

@@ -639,6 +639,7 @@ export function Shell({
   const [moreActionsOpen, setMoreActionsOpen] = useState(false);
   const [dossierSearchOpen, setDossierSearchOpen] = useState(false);
   const [dossierSearchQuery, setDossierSearchQuery] = useState("");
+  const canSearchDossiers = view === "overview" || view === "bookings" || view === "detail";
   const dossierSearchResults = useMemo(() => {
     const query = dossierSearchQuery.trim().toLowerCase();
     if (!query) return bookings.slice(0, 6);
@@ -651,6 +652,7 @@ export function Shell({
           booking.crane,
           booking.site,
           booking.stage,
+          booking.priority,
         ].some(value => value.toLowerCase().includes(query))
       )
       .slice(0, 6);
@@ -666,7 +668,7 @@ export function Shell({
   };
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      if (canSearchDossiers && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         openDossierSearch();
       }
@@ -674,7 +676,10 @@ export function Shell({
     };
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, []);
+  }, [canSearchDossiers]);
+  useEffect(() => {
+    if (!canSearchDossiers) setDossierSearchOpen(false);
+  }, [canSearchDossiers]);
   const notificationInput = useMemo(
     () =>
       user.role === "admin"
@@ -1005,7 +1010,7 @@ export function Shell({
             </div>
           </div>
           <div className="topbar-actions">
-            <button
+            {canSearchDossiers && <><button
               type="button"
               className="search-pill search-launcher"
               onClick={openDossierSearch}
@@ -1074,7 +1079,7 @@ export function Shell({
                   )}
                 </div>
               </div>
-            )}
+            )}</>}
             <div className="notification-wrap">
               <button
                 className="icon-button notification-trigger"
@@ -2145,6 +2150,8 @@ function BookingsView({
             booking.project,
             booking.crane,
             booking.site,
+            booking.stage,
+            booking.priority,
           ].some(value => value.toLowerCase().includes(normalized));
         return matchesFilter && matchesQuery;
       }),
@@ -3527,7 +3534,7 @@ function TrainingView({
       TRAINING_EMPLOYEES.filter(employee => {
         const matchesQuery =
           !query.trim() ||
-          `${employee.employeeName} ${employee.employeeId} ${employee.position}`
+          `${employee.employeeName} ${employee.employeeId} ${employee.position} ${JSON.stringify(employee.certifications)}`
             .toLowerCase()
             .includes(query.trim().toLowerCase());
         const certifications = employee.certifications;
@@ -5982,7 +5989,7 @@ function AttendanceView({
         deptFilter === "All" || employee.department === deptFilter;
       const matchesQuery =
         !normalized ||
-        [employee.name, employee.role, employee.department].some(v =>
+        [employee.name, employee.role, employee.department, record[employee.name]].some(v =>
           (v ?? "").toLowerCase().includes(normalized)
         );
       return matchesDept && matchesQuery;

@@ -261,3 +261,9 @@
 
 ## Coordinated Crew Assignment availability
 - [x] Derive Crew Assignment availability and Assigned filtering from persisted booking allocations so only allocated employees show Assigned.
+
+## Crew allocation visibility and page-local search
+- [x] Show each assigned employee’s booking IDs next to their assigned status and add allocation-count badges in Crew Assignment.
+- [x] Derive and display active versus upcoming booking assignment availability using booking mobilization and off-hire dates.
+- [x] Audit every portal search control and ensure it filters only the data rendered by its current page, with useful matching details.
+- [x] Add coverage, validate the integrated interactions, and save a verified checkpoint.
