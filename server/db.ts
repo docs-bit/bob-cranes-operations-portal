@@ -939,6 +939,7 @@ export async function createRentalEnquiry(input: {
   phone: string;
   projectLocation: string;
   equipmentInterest: string;
+  rentalDuration: string;
   liftDetails: string;
 }) {
   const db = await getDb();

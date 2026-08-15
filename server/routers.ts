@@ -56,6 +56,7 @@ import {
   normalizeDepartmentCode,
 } from "../shared/departmentDashboardRules";
 import { isValidDashboardGreetingTemplate } from "../shared/dashboardGreeting";
+import { RENTAL_DURATION_OPTIONS, RENTAL_EQUIPMENT_TYPES } from "../shared/rentalEnquiryOptions";
 
 db.seedInitialDataIfNeeded().catch(console.error);
 
@@ -374,7 +375,8 @@ export const appRouter = router({
         email: z.string().trim().email().max(320),
         phone: z.string().trim().min(7).max(48),
         projectLocation: z.string().trim().min(2).max(255),
-        equipmentInterest: z.string().trim().min(2).max(120),
+        equipmentInterest: z.enum(RENTAL_EQUIPMENT_TYPES),
+        rentalDuration: z.enum(RENTAL_DURATION_OPTIONS),
         liftDetails: z.string().trim().min(12).max(2000),
       }))
       .mutation(async ({ input }) => {
@@ -384,7 +386,7 @@ export const appRouter = router({
           userId: null,
           departmentCode: "sales",
           title: "New rental quote follow-up",
-          body: `${input.contactName} from ${input.companyName} requested ${input.equipmentInterest} for ${input.projectLocation}. Enquiry ${enquiry.id} is ready for Sales follow-up.`,
+          body: `${input.contactName} from ${input.companyName} requested ${input.equipmentInterest} for ${input.rentalDuration} at ${input.projectLocation}. Enquiry ${enquiry.id} is ready for Sales follow-up.`,
         });
         return enquiry;
       }),

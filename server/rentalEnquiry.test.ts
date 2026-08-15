@@ -26,6 +26,7 @@ describe("public rental enquiry", () => {
       phone: "+971 50 123 4567",
       projectLocation: "Dubai Industrial City",
       equipmentInterest: "Managed lifting service",
+      rentalDuration: "1–4 weeks",
       liftDetails: "Planned lifting support for a controlled plant maintenance mobilisation.",
     });
 
@@ -33,11 +34,15 @@ describe("public rental enquiry", () => {
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
       email: "amina@example.com",
       equipmentInterest: "Managed lifting service",
+      rentalDuration: "1–4 weeks",
     }));
     expect(notifySales).toHaveBeenCalledWith(expect.objectContaining({
       departmentCode: "sales",
       title: "New rental quote follow-up",
       body: expect.stringContaining("Gulf Project Works"),
+    }));
+    expect(notifySales).toHaveBeenCalledWith(expect.objectContaining({
+      body: expect.stringContaining("1–4 weeks"),
     }));
   });
 });

@@ -1,29 +1,44 @@
 import { trpc } from "@/lib/trpc";
 import { ArrowRight, BadgeCheck, BriefcaseBusiness, CalendarClock, Check, ChevronDown, ClipboardCheck, FileCheck2, HardHat, Layers3, MapPin, Menu, ShieldCheck, Truck, UsersRound, Wrench, X } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { RENTAL_DURATION_OPTIONS, RENTAL_EQUIPMENT_TYPES, type RentalDuration, type RentalEquipmentType } from "@shared/rentalEnquiryOptions";
 import "./RentalLanding.css";
 
 const BOB_MOBILE = "/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp";
 const BOB_BRIDGE = "/manus-storage/bob-bridge-project_264a6ce0.webp";
-export const RENTAL_ESTIMATE_EMAIL_BODY = [
+
+type EnquiryForm = { contactName: string; companyName: string; email: string; phone: string; projectLocation: string; equipmentInterest: RentalEquipmentType; rentalDuration: RentalDuration; liftDetails: string; };
+type RentalEstimateEmailInput = Partial<EnquiryForm>;
+
+export function createRentalEstimateEmailBody(input: RentalEstimateEmailInput = {}) {
+  const value = (field: keyof RentalEstimateEmailInput, fallback: string) => input[field]?.trim() || fallback;
+  return [
   "Hello BOB Cranes team,",
   "",
   "I would like to request a rental estimate.",
   "",
-  "Equipment type: [e.g. Mobile crane / Crawler crane / Lifting gear]",
-  "Rental duration: [e.g. 1 day / 1 week / 1 month]",
-  "Project location: [City / site]",
+  `Equipment type: ${value("equipmentInterest", "[Select equipment type]")}`,
+  `Rental duration: ${value("rentalDuration", "[Select rental duration]")}`,
+  `Project location: ${value("projectLocation", "[City / site]")}`,
   "Required start date: [DD/MM/YYYY]",
-  "Additional project requirements: [Load, access, crew, documentation or other notes]",
+  `Additional project requirements: ${value("liftDetails", "[Load, access, crew, documentation or other notes]")}`,
   "",
   "Regards,",
-  "Name: ",
-  "Company: ",
-  "Phone: ",
-].join("\n");
-export const RENTAL_ESTIMATE_MAILTO = `mailto:admin@bobcranes.ae?subject=${encodeURIComponent("Rental Estimate Request")}&body=${encodeURIComponent(RENTAL_ESTIMATE_EMAIL_BODY)}`;
+  `Name: ${value("contactName", "[Your name]")}`,
+  `Company: ${value("companyName", "[Company name]")}`,
+  `Email: ${value("email", "[Email address]")}`,
+  `Phone: ${value("phone", "[Phone number]")}`,
+  ].join("\n");
+}
+
+export function buildRentalEstimateMailto(input: RentalEstimateEmailInput = {}) {
+  return `mailto:admin@bobcranes.ae?subject=${encodeURIComponent("Rental Estimate Request")}&body=${encodeURIComponent(createRentalEstimateEmailBody(input))}`;
+}
+
+export const RENTAL_ESTIMATE_MAILTO = buildRentalEstimateMailto();
 
 const serviceCards = [
   [Truck, "Mobile crane rental", "Right-sized lifting capacity for planned site movements, maintenance and construction work."],
@@ -46,16 +61,24 @@ const processSteps = [
   ["03", "Mobilise with a controlled handoff.", "A booking dossier gives each responsible team a visible operational path."],
 ] as const;
 
-type EnquiryForm = { contactName: string; companyName: string; email: string; phone: string; projectLocation: string; equipmentInterest: string; liftDetails: string; };
-const emptyEnquiry: EnquiryForm = { contactName: "", companyName: "", email: "", phone: "", projectLocation: "", equipmentInterest: "Mobile crane rental", liftDetails: "" };
+const emptyEnquiry: EnquiryForm = { contactName: "", companyName: "", email: "", phone: "", projectLocation: "", equipmentInterest: "Mobile crane", rentalDuration: "To be confirmed", liftDetails: "" };
 const scrollToId = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 export default function RentalLanding() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const submitEnquiry = trpc.rental.submitEnquiry.useMutation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [form, setForm] = useState<EnquiryForm>(emptyEnquiry);
   const [submittedEnquiry, setSubmittedEnquiry] = useState<{ companyName: string; equipmentInterest: string } | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    setForm(current => ({
+      ...current,
+      contactName: current.contactName || user.name || "",
+      email: current.email || user.email || "",
+    }));
+  }, [user?.email, user?.id, user?.name]);
   const fieldErrors = {
     contactName: form.contactName.length > 0 && form.contactName.trim().length < 2 ? "Enter at least two characters." : "",
     companyName: form.companyName.length > 0 && form.companyName.trim().length < 2 ? "Enter your company name." : "",
@@ -72,7 +95,15 @@ export default function RentalLanding() {
     catch (error) { toast.error("We could not send the enquiry", { description: error instanceof Error ? error.message : "Please review the form and try again." }); }
   };
   const closeMenuAndScroll = (id: string) => { setMenuOpen(false); scrollToId(id); };
-  const openRentalEstimateEmail = () => { window.location.href = RENTAL_ESTIMATE_MAILTO; };
+  const openRentalEstimateEmail = () => {
+    const emailInput = {
+      ...form,
+      contactName: user?.name || form.contactName,
+      email: user?.email || form.email,
+    };
+    toast.info("Opening your email client", { description: "Your rental estimate request template is ready to review and send." });
+    window.location.href = buildRentalEstimateMailto(emailInput);
+  };
 
   return <main className="bob-rental" id="top">
     <header className="bob-nav-shell">
@@ -107,7 +138,7 @@ export default function RentalLanding() {
 
     <section className="bob-coverage bob-section"><div className="bob-frame bob-coverage-grid"><div className="bob-coverage-art"><img src={BOB_MOBILE} alt="BOB crane fleet" loading="lazy" /><div className="bob-coverage-badge"><MapPin size={18} /><span>Project-led support<br /><b>starts with scope</b></span></div></div><div><div className="bob-kicker"><i /> Support, connected</div><h2>One shared route for the people behind the lift.</h2><p>Our public enquiry begins the coordination conversation. The connected portal then provides workspaces for the teams handling readiness, documents, crew and dispatch.</p><div className="bob-role-grid"><span><BriefcaseBusiness size={15} /> Sales follow-up</span><span><FileCheck2 size={15} /> Documentation</span><span><UsersRound size={15} /> Crew assignment</span><span><Wrench size={15} /> Gear readiness</span><span><ShieldCheck size={15} /> HSE coordination</span><span><CalendarClock size={15} /> Mobilisation plan</span></div></div></div></section>
 
-    <section className="bob-enquiry" id="enquire"><div className="bob-frame bob-enquiry-grid"><div className="bob-enquiry-copy"><div className="bob-kicker light"><i /> Start your rental request</div><h2>Tell us what the project needs.</h2><p>Share the essentials now. Sales receives the complete enquiry as an actionable follow-up rather than an unstructured contact message.</p><div className="bob-enquiry-checks"><span><Check size={15} /> Equipment requirement</span><span><Check size={15} /> Project location and timing</span><span><Check size={15} /> Site and documentation context</span></div></div><form className="bob-enquiry-form" onSubmit={submit} noValidate>{submittedEnquiry && <div className="bob-enquiry-success" role="status"><Check size={16} /><span><strong>Quote request received.</strong> Sales has been notified to follow up with {submittedEnquiry.companyName} about {submittedEnquiry.equipmentInterest}.</span></div>}<div className="bob-form-row"><label><span>Full name</span><input required aria-invalid={Boolean(fieldErrors.contactName)} className={fieldErrors.contactName ? "invalid" : ""} value={form.contactName} onChange={event => updateForm("contactName", event.target.value)} placeholder="Your name" />{fieldErrors.contactName && <small>{fieldErrors.contactName}</small>}</label><label><span>Company</span><input required aria-invalid={Boolean(fieldErrors.companyName)} className={fieldErrors.companyName ? "invalid" : ""} value={form.companyName} onChange={event => updateForm("companyName", event.target.value)} placeholder="Company name" />{fieldErrors.companyName && <small>{fieldErrors.companyName}</small>}</label></div><div className="bob-form-row"><label><span>Work email</span><input required type="email" aria-invalid={Boolean(fieldErrors.email)} className={fieldErrors.email ? "invalid" : ""} value={form.email} onChange={event => updateForm("email", event.target.value)} placeholder="name@company.com" />{fieldErrors.email && <small>{fieldErrors.email}</small>}</label><label><span>Phone</span><input required type="tel" aria-invalid={Boolean(fieldErrors.phone)} className={fieldErrors.phone ? "invalid" : ""} value={form.phone} onChange={event => updateForm("phone", event.target.value)} placeholder="Phone number" />{fieldErrors.phone && <small>{fieldErrors.phone}</small>}</label></div><div className="bob-form-row"><label><span>Project location</span><input required aria-invalid={Boolean(fieldErrors.projectLocation)} className={fieldErrors.projectLocation ? "invalid" : ""} value={form.projectLocation} onChange={event => updateForm("projectLocation", event.target.value)} placeholder="City / site location" />{fieldErrors.projectLocation && <small>{fieldErrors.projectLocation}</small>}</label><label><span>Equipment interest</span><select value={form.equipmentInterest} onChange={event => updateForm("equipmentInterest", event.target.value)}><option>Mobile crane rental</option><option>Crawler crane / complex lift</option><option>Transport and trailers</option><option>Lifting gear and rigging</option><option>Managed lifting service</option></select></label></div><label><span>Lift or project details</span><textarea required minLength={12} aria-invalid={Boolean(fieldErrors.liftDetails)} className={fieldErrors.liftDetails ? "invalid" : ""} value={form.liftDetails} onChange={event => updateForm("liftDetails", event.target.value)} placeholder="Describe the load, timing, site access, documentation needs or anything the planning team should know." />{fieldErrors.liftDetails && <small>{fieldErrors.liftDetails}</small>}</label><button className="bob-button accent" type="submit" disabled={submitEnquiry.isPending || !formReady}>{submitEnquiry.isPending ? "Sending enquiry…" : "Send rental enquiry"}<ArrowRight size={16} /></button></form></div></section>
+    <section className="bob-enquiry" id="enquire"><div className="bob-frame bob-enquiry-grid"><div className="bob-enquiry-copy"><div className="bob-kicker light"><i /> Start your rental request</div><h2>Tell us what the project needs.</h2><p>Share the essentials now. Sales receives the complete enquiry as an actionable follow-up rather than an unstructured contact message.</p><div className="bob-enquiry-checks"><span><Check size={15} /> Equipment requirement</span><span><Check size={15} /> Project location and timing</span><span><Check size={15} /> Site and documentation context</span></div></div><form className="bob-enquiry-form" onSubmit={submit} noValidate>{submittedEnquiry && <div className="bob-enquiry-success" role="status"><Check size={16} /><span><strong>Quote request received.</strong> Sales has been notified to follow up with {submittedEnquiry.companyName} about {submittedEnquiry.equipmentInterest}.</span></div>}<div className="bob-form-row"><label><span>Full name</span><input required aria-invalid={Boolean(fieldErrors.contactName)} className={fieldErrors.contactName ? "invalid" : ""} value={form.contactName} onChange={event => updateForm("contactName", event.target.value)} placeholder="Your name" />{fieldErrors.contactName && <small>{fieldErrors.contactName}</small>}</label><label><span>Company</span><input required aria-invalid={Boolean(fieldErrors.companyName)} className={fieldErrors.companyName ? "invalid" : ""} value={form.companyName} onChange={event => updateForm("companyName", event.target.value)} placeholder="Company name" />{fieldErrors.companyName && <small>{fieldErrors.companyName}</small>}</label></div><div className="bob-form-row"><label><span>Work email</span><input required type="email" aria-invalid={Boolean(fieldErrors.email)} className={fieldErrors.email ? "invalid" : ""} value={form.email} onChange={event => updateForm("email", event.target.value)} placeholder="name@company.com" />{fieldErrors.email && <small>{fieldErrors.email}</small>}</label><label><span>Phone</span><input required type="tel" aria-invalid={Boolean(fieldErrors.phone)} className={fieldErrors.phone ? "invalid" : ""} value={form.phone} onChange={event => updateForm("phone", event.target.value)} placeholder="Phone number" />{fieldErrors.phone && <small>{fieldErrors.phone}</small>}</label></div><div className="bob-form-row"><label><span>Project location</span><input required aria-invalid={Boolean(fieldErrors.projectLocation)} className={fieldErrors.projectLocation ? "invalid" : ""} value={form.projectLocation} onChange={event => updateForm("projectLocation", event.target.value)} placeholder="City / site location" />{fieldErrors.projectLocation && <small>{fieldErrors.projectLocation}</small>}</label><label><span>Equipment type</span><select value={form.equipmentInterest} onChange={event => updateForm("equipmentInterest", event.target.value as RentalEquipmentType)}>{RENTAL_EQUIPMENT_TYPES.map(equipmentType => <option key={equipmentType} value={equipmentType}>{equipmentType}</option>)}</select></label></div><div className="bob-form-row"><label><span>Rental duration</span><select value={form.rentalDuration} onChange={event => updateForm("rentalDuration", event.target.value as RentalDuration)}>{RENTAL_DURATION_OPTIONS.map(duration => <option key={duration} value={duration}>{duration}</option>)}</select></label><div className="bob-form-context"><span>Estimate template</span><strong>{user ? "Your signed-in name and email will be included." : "Add your details to pre-fill the email template."}</strong></div></div><label><span>Lift or project details</span><textarea required minLength={12} aria-invalid={Boolean(fieldErrors.liftDetails)} className={fieldErrors.liftDetails ? "invalid" : ""} value={form.liftDetails} onChange={event => updateForm("liftDetails", event.target.value)} placeholder="Describe the load, timing, site access, documentation needs or anything the planning team should know." />{fieldErrors.liftDetails && <small>{fieldErrors.liftDetails}</small>}</label><button className="bob-button accent" type="submit" disabled={submitEnquiry.isPending || !formReady}>{submitEnquiry.isPending ? "Sending enquiry…" : "Send rental enquiry"}<ArrowRight size={16} /></button></form></div></section>
 
     <footer className="bob-footer"><div className="bob-frame"><div className="bob-final-cta"><div><div className="bob-kicker light"><i /> BOB Heavy Equipment Rental</div><h2>Ready to coordinate the next lift?</h2></div><button className="bob-button accent" onClick={openRentalEstimateEmail} aria-label="Email admin@bobcranes.ae for a rental estimate">Get a rental estimate <ArrowRight size={16} /></button></div><div className="bob-footer-grid"><div><div className="bob-brand bob-brand-full static"><img src="/manus-storage/bob-lifting-your-expectations_2beae224.webp" alt="BOB Cranes — Lifting Your Expectations" /></div><p>Crane rental and coordinated lifting support for project teams that need a more controlled operational path.</p></div><div><h3>Explore</h3><button onClick={() => scrollToId("services")}>Services</button><button onClick={() => scrollToId("projects")}>Capability</button><button onClick={() => scrollToId("process")}>Working process</button></div><div><h3>Start a conversation</h3><button onClick={() => scrollToId("enquire")}>Request quotation</button><button onClick={() => scrollToId("enquire")}>Discuss complex lift</button><button onClick={() => setLocation("/login")}>Operations portal</button></div></div><div className="bob-footer-bottom"><span>© {new Date().getFullYear()} BOB Heavy Equipment Rental. All rights reserved.</span><span>Crane · crew · gear · documents · dispatch</span></div></div></footer>
   </main>;

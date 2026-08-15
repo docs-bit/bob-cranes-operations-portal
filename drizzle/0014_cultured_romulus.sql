@@ -1,0 +1,1 @@
+ALTER TABLE `rental_enquiries` ADD `rentalDuration` varchar(80) DEFAULT 'To be confirmed' NOT NULL;

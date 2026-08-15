@@ -5,9 +5,15 @@ describe("public rental estimate call-to-action", () => {
   it("opens a pre-addressed email for the BOB administrator inbox", () => {
     const source = readFileSync(new URL("../client/src/pages/RentalLanding.tsx", import.meta.url), "utf8");
 
-    expect(source).toContain('mailto:admin@bobcranes.ae?subject=${encodeURIComponent("Rental Estimate Request")}&body=${encodeURIComponent(RENTAL_ESTIMATE_EMAIL_BODY)}');
-    expect(source).toContain('Equipment type: [e.g. Mobile crane / Crawler crane / Lifting gear]');
-    expect(source).toContain('Rental duration: [e.g. 1 day / 1 week / 1 month]');
+    expect(source).toContain('mailto:admin@bobcranes.ae?subject=${encodeURIComponent("Rental Estimate Request")}&body=${encodeURIComponent(createRentalEstimateEmailBody(input))}');
+    expect(source).toContain('Equipment type: ${value("equipmentInterest", "[Select equipment type]")}');
+    expect(source).toContain('Rental duration: ${value("rentalDuration", "[Select rental duration]")}');
+    expect(source).toContain('const { user } = useAuth();');
+    expect(source).toContain('toast.info("Opening your email client"');
+    expect(source).toContain('user?.name || form.contactName');
+    expect(source).toContain('user?.email || form.email');
+    expect(source).toContain('<span>Equipment type</span>');
+    expect(source).toContain('<span>Rental duration</span>');
     expect(source).toContain('onClick={openRentalEstimateEmail}');
     expect(source).toContain('aria-label="Email admin@bobcranes.ae for a rental estimate"');
   });

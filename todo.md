@@ -359,3 +359,10 @@
 
 ## Rental estimate email template
 - [x] Pre-fill the rental-estimate email body with a standard request template including equipment type and rental duration fields, then publish the verified update.
+
+## Rental estimate and enquiry enhancement
+- [x] Show a toast when the rental-estimate action opens the visitor’s email client.
+- [x] Pre-fill the rental-estimate email with authenticated contact details and selected equipment when the visitor has an active portal session.
+- [x] Add selectable rental duration and equipment type controls to the public enquiry form and persist the selections in the Sales workflow.
+- [x] Create and validate a reusable skill for safe rental-enquiry and mailto call-to-action enhancements.
+- [x] Add focused coverage, run release validation, and publish the completed enhancement.

@@ -200,6 +200,7 @@ export const rentalEnquiries = mysqlTable("rental_enquiries", {
   phone: varchar("phone", { length: 48 }).notNull(),
   projectLocation: varchar("projectLocation", { length: 255 }).notNull(),
   equipmentInterest: varchar("equipmentInterest", { length: 120 }).notNull(),
+  rentalDuration: varchar("rentalDuration", { length: 80 }).notNull().default("To be confirmed"),
   liftDetails: text("liftDetails").notNull(),
   status: varchar("status", { length: 32 }).notNull().default("New"),
   assignedToUserId: int("assignedToUserId"),

@@ -9,6 +9,7 @@ type RentalQuoteBrief = {
   phone: string;
   projectLocation: string;
   equipmentInterest: string;
+  rentalDuration?: string | null;
   liftDetails: string;
   createdAt: Date | string;
 };
@@ -81,7 +82,7 @@ export async function generateRentalQuotePdf(input: {
   page.drawRectangle({ x: MARGIN, y: y - 106, width: PAGE_WIDTH - MARGIN * 2, height: 106, color: rgb(1, 1, 1), borderColor: rgb(0.9, 0.86, 0.81), borderWidth: 0.8 });
   drawLabelValue(page, "Contact", input.enquiry.contactName, MARGIN + 14, y - 18, bold, regular);
   drawLabelValue(page, "Company", input.enquiry.companyName, MARGIN + 190, y - 18, bold, regular);
-  drawLabelValue(page, "Requested equipment", input.enquiry.equipmentInterest, MARGIN + 370, y - 18, bold, regular);
+  drawLabelValue(page, "Equipment / duration", `${input.enquiry.equipmentInterest} · ${input.enquiry.rentalDuration ?? "To be confirmed"}`, MARGIN + 370, y - 18, bold, regular);
   drawLabelValue(page, "Email", input.enquiry.email, MARGIN + 14, y - 67, bold, regular);
   drawLabelValue(page, "Phone", input.enquiry.phone, MARGIN + 190, y - 67, bold, regular);
   drawLabelValue(page, "Received", new Date(input.enquiry.createdAt).toLocaleDateString("en-GB"), MARGIN + 370, y - 67, bold, regular);
