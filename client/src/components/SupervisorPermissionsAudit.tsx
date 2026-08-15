@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { DEPARTMENTS } from "@shared/departmentAccess";
 import { Activity, BadgeCheck, ShieldCheck, UsersRound } from "lucide-react";
+import RuntimeMonitoringPanel from "./RuntimeMonitoringPanel";
 
 const labelForDepartment = (code: string | null | undefined) =>
   DEPARTMENTS.find(department => department.code === code)?.label ??
@@ -209,6 +210,8 @@ export default function SupervisorPermissionsAudit() {
           </div>
         </section>
       </div>
+
+      <RuntimeMonitoringPanel />
 
       <section className="panel" style={{ marginTop: 16 }}>
         <div className="panel-header">

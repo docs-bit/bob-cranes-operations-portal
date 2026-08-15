@@ -21,6 +21,10 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
+  componentDidCatch(error: Error) {
+    window.dispatchEvent(new CustomEvent("bob:runtime-error", { detail: { source: "react.boundary", message: error.message } }));
+  }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -33,11 +37,7 @@ class ErrorBoundary extends Component<Props, State> {
 
             <h2 className="error-boundary-title">An unexpected error occurred.</h2>
 
-            <div className="error-boundary-details">
-              <pre>
-                {this.state.error?.stack}
-              </pre>
-            </div>
+            <div className="error-boundary-details">The incident has been recorded for the operations team. Please reload and try again.</div>
 
             <button
               onClick={() => window.location.reload()}

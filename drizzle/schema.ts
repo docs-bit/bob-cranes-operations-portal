@@ -53,6 +53,16 @@ export const systemSettings = mysqlTable("system_settings", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const runtimeErrorEvents = mysqlTable("runtime_error_events", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  source: varchar("source", { length: 32 }).notNull(),
+  message: varchar("message", { length: 1000 }).notNull(),
+  path: varchar("path", { length: 512 }).notNull(),
+  fingerprint: varchar("fingerprint", { length: 64 }).notNull(),
+  userId: int("userId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const bookings = mysqlTable("bookings", {
   id: varchar("id", { length: 64 }).primaryKey(),
   clientName: varchar("clientName", { length: 255 }).notNull(),
@@ -171,6 +181,7 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type ClientFeedbackRecord = typeof clientFeedback.$inferSelect;
 export type SystemSetting = typeof systemSettings.$inferSelect;
+export type RuntimeErrorEvent = typeof runtimeErrorEvents.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type BookingCrewAllocation = typeof bookingCrewAllocations.$inferSelect;
 export type InsertBooking = typeof bookings.$inferInsert;

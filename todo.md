@@ -285,3 +285,10 @@
 ## Final ship-readiness verification
 - [x] Run current focused operational regression tests, TypeScript validation, production build, and runtime log review.
 - [x] Resolve any release-blocking issue and save a verified ship-ready checkpoint.
+
+## Crew CSV export, booking tooltips, and production monitoring
+- [x] Add a CSV export for the current Crew Assignment schedule and its active page filters.
+- [x] Add accessible booking-detail hover tooltips to Crew Assignment booking-ID chips.
+- [x] Add safe production runtime error monitoring and validate the capture path without exposing sensitive data.
+- [x] Extend and validate the portal-refinement-release skill for exports, tooltips, and runtime monitoring.
+- [x] Add focused coverage, complete release validation, and save a verified checkpoint.

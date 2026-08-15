@@ -40,6 +40,7 @@ import {
   verifyPassword,
 } from "./localAuth";
 import { storagePut } from "./storage";
+import { runtimeErrorFingerprint, sanitizeRuntimeMessage } from "../shared/runtimeMonitoring";
 
 db.seedInitialDataIfNeeded().catch(console.error);
 
@@ -485,6 +486,17 @@ export const appRouter = router({
       ctx.res.clearCookie(LOCAL_AUTH_COOKIE_NAME, cookieOptions);
       return { success: true } as const;
     }),
+  }),
+
+  runtimeMonitoring: router({
+    capture: publicProcedure
+      .input(z.object({ source: z.enum(["window.error", "unhandledrejection", "react.boundary"]), message: z.string().min(1).max(2000), path: z.string().max(512) }))
+      .mutation(async ({ input, ctx }) => {
+        const message = sanitizeRuntimeMessage(input.message);
+        const path = sanitizeRuntimeMessage(input.path, 512) || "/";
+        return await db.createRuntimeErrorEvent({ source: input.source, message, path, fingerprint: runtimeErrorFingerprint(input.source, message, path), userId: ctx.user?.id ?? null });
+      }),
+    list: adminProcedure.input(z.object({ limit: z.number().int().min(1).max(250).optional() }).optional()).query(async ({ input }) => await db.listRuntimeErrorEvents(input?.limit ?? 100)),
   }),
 
   clientFeedback: router({

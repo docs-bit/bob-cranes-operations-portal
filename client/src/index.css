@@ -1511,4 +1511,6 @@ body,
 .conflict-target-segment { background: #e6f5ed; color: #145c39; }
 .conflict-overlap-segment { background: #fff0ef; color: #a3271b; }
 .conflict-timeline-row small { color: #4c5561; font-size: 11px; }
+.booking-chip-tooltip { display: grid; max-width: 300px; gap: 3px; background: #172033 !important; color: #fff !important; line-height: 1.35; }
+.booking-chip-tooltip span { color: #dbe7f5; }
 @media (max-width: 900px) { .bulk-assignment-layout { grid-template-columns: 1fr; } }

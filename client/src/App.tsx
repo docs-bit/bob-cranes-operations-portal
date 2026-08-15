@@ -8,6 +8,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import RuntimeErrorReporter from "./components/RuntimeErrorReporter";
 
 function ProtectedPortal() {
   const { user, loading, refresh } = useAuth();
@@ -48,6 +49,7 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
+          <RuntimeErrorReporter />
           <Toaster />
           <Router />
         </TooltipProvider>

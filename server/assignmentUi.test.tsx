@@ -74,7 +74,7 @@ describe("Assignment edit UI flow", () => {
     expect(screen.getByTestId("assignment-feedback")).toHaveTextContent("Vineeth Vijayan|saved|BOB Booking-31511");
 
     await user.click(screen.getByRole("button", { name: "Remove selected crew" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "Assign selected crew" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByRole("button", { name: "Assign selected crew" }).some(button => !button.hasAttribute("disabled"))).toBe(true));
     expect(saveCrewAllocations).toHaveBeenCalledTimes(2);
     expect(saveCrewAllocations).toHaveBeenLastCalledWith({
       crewId: "cr-1",

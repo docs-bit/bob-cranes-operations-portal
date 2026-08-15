@@ -18,6 +18,7 @@ import {
   userActivityLogs,
   clientFeedback,
   systemSettings,
+  runtimeErrorEvents,
   bookings,
   bookingCrewAllocations,
   equipment,
@@ -343,6 +344,37 @@ export async function updateClientFeedbackStatus(
     .where(eq(clientFeedback.id, id))
     .limit(1);
   return result[0];
+}
+
+export async function createRuntimeErrorEvent(input: {
+  source: string;
+  message: string;
+  path: string;
+  fingerprint: string;
+  userId?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) return { id: null };
+  const id = `runtime-${nanoid(16)}`;
+  await db.insert(runtimeErrorEvents).values({
+    id,
+    source: input.source,
+    message: input.message,
+    path: input.path,
+    fingerprint: input.fingerprint,
+    userId: input.userId ?? null,
+  });
+  return { id };
+}
+
+export async function listRuntimeErrorEvents(limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(runtimeErrorEvents)
+    .orderBy(desc(runtimeErrorEvents.createdAt))
+    .limit(Math.min(Math.max(limit, 1), 250));
 }
 
 // ---- Bookings & Operations Queries ----
