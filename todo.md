@@ -356,3 +356,6 @@
 
 ## Rental estimate email action
 - [x] Make the public “Get a rental estimate” call-to-action open a pre-addressed email to admin@bobcranes.ae and publish the verified update.
+
+## Rental estimate email template
+- [x] Pre-fill the rental-estimate email body with a standard request template including equipment type and rental duration fields, then publish the verified update.

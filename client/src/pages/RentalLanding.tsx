@@ -7,7 +7,23 @@ import "./RentalLanding.css";
 
 const BOB_MOBILE = "/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp";
 const BOB_BRIDGE = "/manus-storage/bob-bridge-project_264a6ce0.webp";
-export const RENTAL_ESTIMATE_MAILTO = "mailto:admin@bobcranes.ae?subject=Rental%20Estimate%20Request";
+export const RENTAL_ESTIMATE_EMAIL_BODY = [
+  "Hello BOB Cranes team,",
+  "",
+  "I would like to request a rental estimate.",
+  "",
+  "Equipment type: [e.g. Mobile crane / Crawler crane / Lifting gear]",
+  "Rental duration: [e.g. 1 day / 1 week / 1 month]",
+  "Project location: [City / site]",
+  "Required start date: [DD/MM/YYYY]",
+  "Additional project requirements: [Load, access, crew, documentation or other notes]",
+  "",
+  "Regards,",
+  "Name: ",
+  "Company: ",
+  "Phone: ",
+].join("\n");
+export const RENTAL_ESTIMATE_MAILTO = `mailto:admin@bobcranes.ae?subject=${encodeURIComponent("Rental Estimate Request")}&body=${encodeURIComponent(RENTAL_ESTIMATE_EMAIL_BODY)}`;
 
 const serviceCards = [
   [Truck, "Mobile crane rental", "Right-sized lifting capacity for planned site movements, maintenance and construction work."],
