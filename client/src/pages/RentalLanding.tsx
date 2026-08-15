@@ -1,102 +1,37 @@
 import { trpc } from "@/lib/trpc";
-import {
-  ArrowRight,
-  BadgeCheck,
-  Check,
-  ChevronDown,
-  ClipboardCheck,
-  HardHat,
-  Menu,
-  ShieldCheck,
-  Truck,
-  X,
-} from "lucide-react";
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, CalendarClock, Check, ChevronDown, ClipboardCheck, FileCheck2, HardHat, Layers3, MapPin, Menu, ShieldCheck, Truck, UsersRound, Wrench, X } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import "./RentalLanding.css";
 
-const equipmentCategories = [
-  {
-    eyebrow: "01 · Mobile cranes",
-    title: "Reach every point on site.",
-    copy: "Mobile lifting support for planned construction, maintenance and day-to-day project requirements.",
-    image: "/manus-storage/bob-bridge-project_264a6ce0.webp",
-    tone: "dark",
-  },
-  {
-    eyebrow: "02 · Complex lifts",
-    title: "Built for controlled heavy lifts.",
-    copy: "Crawler-crane support, engineered lifting arrangements and coordinated site mobilisation for demanding scope.",
-    image: "/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp",
-    tone: "light",
-  },
-  {
-    eyebrow: "03 · Transport & support",
-    title: "The lift is only the start.",
-    copy: "Trailers, lifting gear, qualified crew and clear documentation stay connected throughout the project handoff.",
-    image: "/manus-storage/bob-bridge-project_264a6ce0.webp",
-    tone: "dark",
-  },
+const BOB_MOBILE = "/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp";
+const BOB_BRIDGE = "/manus-storage/bob-bridge-project_264a6ce0.webp";
+
+const serviceCards = [
+  [Truck, "Mobile crane rental", "Right-sized lifting capacity for planned site movements, maintenance and construction work."],
+  [Layers3, "Complex lift planning", "Controlled crane, crew, gear and documentation coordination for demanding scopes."],
+  [Wrench, "Lifting gear support", "Inspection-aware equipment selection and clear readiness checks before mobilisation."],
+  [UsersRound, "Qualified crew", "Operator, rigger, supervisor and banksman roles aligned to the lift brief."],
+  [FileCheck2, "Document control", "Required records, permits and client requirements stay visible in the project route."],
+  [BriefcaseBusiness, "Dispatch coordination", "One operating handoff from Sales to the teams responsible for readiness and delivery."],
 ] as const;
 
-const rentalPlans = [
-  {
-    label: "Flexible hire",
-    title: "Equipment rental",
-    copy: "For defined scopes that need the right asset, transparent documentation requirements and responsive coordination.",
-    points: ["Mobile crane options", "Lifting gear coordination", "Planned dispatch support"],
-    cta: "Discuss equipment hire",
-    featured: false,
-  },
-  {
-    label: "Most requested",
-    title: "Managed lifting service",
-    copy: "A coordinated lifting package with crane, crew, gear, compliance preparation and live operational handoffs.",
-    points: ["Certified crew allocation", "Project documentation workflow", "Mobilisation readiness review"],
-    cta: "Plan a managed lift",
-    featured: true,
-  },
-  {
-    label: "Complex projects",
-    title: "Engineered lift support",
-    copy: "For multi-party or high-control work requiring tailored planning, evidence checks and escalation visibility.",
-    points: ["Scope & lift review", "Multi-department coordination", "Dispatch-ready dossier"],
-    cta: "Speak to operations",
-    featured: false,
-  },
+const projectCards = [
+  [BOB_MOBILE, "Mobile crane fleet", "Equipment rental", "A practical starting point for equipment-led lift planning."],
+  [BOB_BRIDGE, "Bridge-lift support", "Controlled handoff", "Crew, transport and documentation work alongside the crane plan."],
+  [BOB_MOBILE, "Managed mobilisation", "Operations route", "A connected route from the first brief to dispatch readiness."],
 ] as const;
 
 const processSteps = [
-  ["01", "Brief the lift", "Share the site, timing, equipment need and project constraints. Our team captures the operational brief in one place."],
-  ["02", "Review readiness", "We align equipment, crew, lifting gear and the documentation path needed for a clear mobilisation decision."],
-  ["03", "Mobilise with control", "The working team receives a connected dossier, visible responsibilities and live department handoffs."],
-  ["04", "Close out clearly", "Completion, off-hire and final records stay traceable for the project team and future reference."],
+  ["01", "Share the brief. Plan the lift.", "The project team captures location, timing, equipment and site requirements."],
+  ["02", "Coordinate readiness before dispatch.", "Sales and operational departments clarify the assets, crew, gear and documents needed."],
+  ["03", "Mobilise with a controlled handoff.", "A booking dossier gives each responsible team a visible operational path."],
 ] as const;
 
-type EnquiryForm = {
-  contactName: string;
-  companyName: string;
-  email: string;
-  phone: string;
-  projectLocation: string;
-  equipmentInterest: string;
-  liftDetails: string;
-};
-
-const emptyEnquiry: EnquiryForm = {
-  contactName: "",
-  companyName: "",
-  email: "",
-  phone: "",
-  projectLocation: "",
-  equipmentInterest: "Mobile crane rental",
-  liftDetails: "",
-};
-
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
+type EnquiryForm = { contactName: string; companyName: string; email: string; phone: string; projectLocation: string; equipmentInterest: string; liftDetails: string; };
+const emptyEnquiry: EnquiryForm = { contactName: "", companyName: "", email: "", phone: "", projectLocation: "", equipmentInterest: "Mobile crane rental", liftDetails: "" };
+const scrollToId = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 export default function RentalLanding() {
   const [, setLocation] = useLocation();
@@ -104,7 +39,6 @@ export default function RentalLanding() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [form, setForm] = useState<EnquiryForm>(emptyEnquiry);
   const [submittedEnquiry, setSubmittedEnquiry] = useState<{ companyName: string; equipmentInterest: string } | null>(null);
-
   const fieldErrors = {
     contactName: form.contactName.length > 0 && form.contactName.trim().length < 2 ? "Enter at least two characters." : "",
     companyName: form.companyName.length > 0 && form.companyName.trim().length < 2 ? "Enter your company name." : "",
@@ -114,183 +48,49 @@ export default function RentalLanding() {
     liftDetails: form.liftDetails.length > 0 && form.liftDetails.trim().length < 12 ? "Add at least 12 characters so the Sales team can scope the lift." : "",
   };
   const formReady = Boolean(form.contactName.trim() && form.companyName.trim() && form.email.trim() && form.phone.trim() && form.projectLocation.trim() && form.liftDetails.trim()) && !Object.values(fieldErrors).some(Boolean);
-
-  const updateForm = (field: keyof EnquiryForm, value: string) => {
-    setSubmittedEnquiry(null);
-    setForm(current => ({ ...current, [field]: value }));
-  };
-
+  const updateForm = (field: keyof EnquiryForm, value: string) => { setSubmittedEnquiry(null); setForm(current => ({ ...current, [field]: value })); };
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    try {
-      await submitEnquiry.mutateAsync(form);
-      setSubmittedEnquiry({ companyName: form.companyName, equipmentInterest: form.equipmentInterest });
-      setForm(emptyEnquiry);
-      toast.success("Rental enquiry received", {
-        description: "The BOB team has the project brief and can follow up with the next steps.",
-      });
-    } catch (error) {
-      toast.error("We could not send the enquiry", {
-        description: error instanceof Error ? error.message : "Please review the form and try again.",
-      });
-    }
+    try { await submitEnquiry.mutateAsync(form); setSubmittedEnquiry({ companyName: form.companyName, equipmentInterest: form.equipmentInterest }); setForm(emptyEnquiry); toast.success("Rental enquiry received", { description: "Sales has been notified to begin the follow-up." }); }
+    catch (error) { toast.error("We could not send the enquiry", { description: error instanceof Error ? error.message : "Please review the form and try again." }); }
   };
+  const closeMenuAndScroll = (id: string) => { setMenuOpen(false); scrollToId(id); };
 
-  const closeMenuAndScroll = (id: string) => {
-    setMenuOpen(false);
-    scrollToId(id);
-  };
-
-  return (
-    <main className="rental-landing">
-      <header className="rental-header">
-        <button className="rental-brand" onClick={() => scrollToId("top")} aria-label="Back to BOB Heavy Equipment Rental home">
-          <img src="/manus-storage/bob-cranes-mark_c80bfee2.png" alt="" />
-          <span>BOB <b>HEAVY EQUIPMENT</b></span>
-        </button>
-        <nav className={`rental-nav ${menuOpen ? "open" : ""}`} aria-label="Primary navigation">
-          <button onClick={() => closeMenuAndScroll("fleet")}>Fleet</button>
-          <button onClick={() => closeMenuAndScroll("services")}>Services</button>
-          <button onClick={() => closeMenuAndScroll("how-it-works")}>How it works</button>
-          <button onClick={() => closeMenuAndScroll("enquire")}>Contact</button>
-          <button className="rental-nav-portal" onClick={() => setLocation("/login")}>Portal sign in <ArrowRight size={14} /></button>
+  return <main className="bob-rental" id="top">
+    <header className="bob-nav-shell">
+      <div className="bob-nav">
+        <button className="bob-brand" onClick={() => scrollToId("top")} aria-label="Back to BOB Heavy Equipment Rental home"><img src="/manus-storage/bob-cranes-mark_c80bfee2.png" alt="" /><span>BOB <b>HEAVY EQUIPMENT</b></span></button>
+        <nav className={menuOpen ? "bob-nav-links open" : "bob-nav-links"} aria-label="Primary navigation">
+          <button onClick={() => closeMenuAndScroll("services")}>Services</button><button onClick={() => closeMenuAndScroll("projects")}>Projects</button><button onClick={() => closeMenuAndScroll("process")}>Process</button><button onClick={() => closeMenuAndScroll("enquire")}>Contact</button>
+          <button className="bob-nav-portal" onClick={() => setLocation("/login")}>Portal sign in <ArrowRight size={13} /></button>
         </nav>
-        <button className="rental-menu-button" onClick={() => setMenuOpen(open => !open)} aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
-      </header>
+        <button className="bob-menu" onClick={() => setMenuOpen(open => !open)} aria-label={menuOpen ? "Close navigation" : "Open navigation"}>{menuOpen ? <X /> : <Menu />}</button>
+      </div>
+    </header>
 
-      <section className="rental-hero" id="top">
-        <div className="rental-hero-image" />
-        <div className="rental-hero-scrim" />
-        <div className="rental-container rental-hero-content">
-          <div className="rental-eyebrow rental-eyebrow-light"><span /> BOB Heavy Equipment Rental</div>
-          <h1>Every lift deserves <em>more</em> than equipment.</h1>
-          <p>Crane rental, lifting support and controlled project handoffs for teams that need readiness, traceability and practical site coordination.</p>
-          <div className="rental-hero-actions">
-            <button className="rental-button rental-button-light" onClick={() => scrollToId("enquire")}>Request a rental quote <ArrowRight size={16} /></button>
-            <button className="rental-button rental-button-ghost" onClick={() => scrollToId("fleet")}>Explore the fleet <ChevronDown size={16} /></button>
-          </div>
-        </div>
-        <aside className="rental-hero-proof" aria-label="Operational highlights">
-          <div><BadgeCheck size={16} /><span>Equipment-led planning</span></div>
-          <div><ShieldCheck size={16} /><span>Document-controlled readiness</span></div>
-          <div><HardHat size={16} /><span>Coordinated crew support</span></div>
-          <div><Truck size={16} /><span>Transport and mobilisation</span></div>
-        </aside>
-      </section>
+    <section className="bob-hero">
+      <img src={BOB_MOBILE} alt="BOB mobile crane ready for lifting operations" className="bob-hero-image" />
+      <div className="bob-hero-shade" />
+      <div className="bob-frame bob-hero-grid">
+        <div className="bob-hero-copy"><div className="bob-kicker light"><i /> Strong foundations for controlled lifting</div><h1>Every lift starts with <em>precision</em> planning.</h1><p>BOB Heavy Equipment Rental connects crane capacity, crew readiness, gear inspection and documentation into a clear project handoff.</p><div className="bob-actions"><button className="bob-button accent" onClick={() => scrollToId("enquire")}>Request a rental quote <ArrowRight size={16} /></button><button className="bob-button light" onClick={() => scrollToId("projects")}>Explore capability <ChevronDown size={16} /></button></div></div>
+        <aside className="bob-hero-card"><div className="bob-card-label"><BadgeCheck size={15} /> Operations-ready rental route</div><img src={BOB_BRIDGE} alt="BOB cranes supporting a bridge construction lift" /><div><strong>Crane, crew, gear and documents in one plan.</strong><button onClick={() => scrollToId("process")}>See how it works <ArrowRight size={14} /></button></div></aside>
+      </div>
+    </section>
 
-      <section className="rental-intro rental-section">
-        <div className="rental-container">
-          <div className="rental-statement-panel">
-            <div>
-              <div className="rental-eyebrow"><span /> Lift readiness, connected</div>
-              <h2>One operational path from enquiry to off-hire.</h2>
-            </div>
-            <p>BOB aligns equipment availability, crew assignments, lifting gear validity, client documentation and department actions in a connected operational workflow.</p>
-          </div>
-          <div className="rental-metric-strip" aria-label="BOB rental service highlights">
-            <div><strong>Crane</strong><span>rental options</span></div>
-            <div><strong>Crew</strong><span>readiness checks</span></div>
-            <div><strong>Gear</strong><span>certificate control</span></div>
-            <div><strong>Docs</strong><span>dispatch workflow</span></div>
-          </div>
-        </div>
-      </section>
+    <section className="bob-intro bob-section"><div className="bob-frame"><div className="bob-intro-top"><div className="bob-side-signal"><span>BOB</span><small>Operational rental coordination</small></div><div><div className="bob-kicker"><i /> Built for project teams</div><h2>Equipment is only one part of a successful lift.</h2><p>Start with a practical rental brief. The BOB workflow helps the right people coordinate equipment, site needs, personnel and paperwork before mobilisation.</p><button className="bob-inline-action" onClick={() => scrollToId("enquire")}>Discuss your requirement <ArrowRight size={14} /></button></div></div><div className="bob-metric-line" aria-label="Operational rental support"><div><span>01</span><strong>Rental brief</strong><small>Project scope captured</small></div><div><span>02</span><strong>Readiness review</strong><small>Assets and checks aligned</small></div><div><span>03</span><strong>Department handoff</strong><small>Visible working ownership</small></div><div><span>04</span><strong>Dispatch route</strong><small>Booking-led coordination</small></div></div></div></section>
 
-      <section className="rental-section rental-fleet-section" id="fleet">
-        <div className="rental-container">
-          <div className="rental-section-heading rental-section-heading-split">
-            <div><div className="rental-eyebrow"><span /> Equipment capability</div><h2>Fleet support for the work in front of you.</h2></div>
-            <p>Choose the support level that matches your lifting scope. Every enquiry begins with a practical review of site context, timing and required documentation.</p>
-          </div>
-          <div className="rental-equipment-grid">
-            {equipmentCategories.map((category, index) => (
-              <article className={`rental-equipment-card rental-equipment-card-${index + 1} ${category.tone}`} key={category.title}>
-                <img src={category.image} alt="" loading={index === 0 ? "eager" : "lazy"} />
-                <div className="rental-equipment-overlay" />
-                <div className="rental-equipment-copy">
-                  <div className="rental-card-eyebrow">{category.eyebrow}</div>
-                  <h3>{category.title}</h3>
-                  <p>{category.copy}</p>
-                  <button onClick={() => scrollToId("enquire")}>Discuss this requirement <ArrowRight size={15} /></button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+    <section className="bob-services bob-section" id="services"><div className="bob-frame"><div className="bob-section-head"><div><div className="bob-kicker"><i /> Our lift services</div><h2>Rental support that follows the work.</h2></div><button className="bob-inline-action" onClick={() => scrollToId("enquire")}>Start an enquiry <ArrowRight size={14} /></button></div><div className="bob-service-grid">{serviceCards.map(([Icon, title, copy]) => <article key={title}><Icon size={26} /><div><h3>{title}</h3><p>{copy}</p><button onClick={() => scrollToId("enquire")}>Learn more <ArrowRight size={13} /></button></div></article>)}</div><div className="bob-service-callout"><img src={BOB_BRIDGE} alt="Bridge construction lift supported by BOB Cranes" /><div><div className="bob-kicker"><i /> Rental planning route</div><h3>Prepare the scope before the crane arrives.</h3><p>Use the public enquiry to start the conversation, then let Sales and Operations turn it into a controlled booking route.</p><button className="bob-button dark" onClick={() => scrollToId("enquire")}>Plan a lift <ArrowRight size={15} /></button></div></div></div></section>
 
-      <section className="rental-band">
-        <img src="/manus-storage/bob-bridge-project_264a6ce0.webp" alt="BOB Cranes supporting a bridge construction lift" loading="lazy" />
-        <div className="rental-band-overlay" />
-        <div className="rental-container rental-band-content">
-          <div className="rental-eyebrow rental-eyebrow-light"><span /> Lift operations support</div>
-          <h2>From the first brief to a dispatch-ready lift.</h2>
-          <p>Equipment matters. So do the crew, the documents, the inspection status and the people who own each next step.</p>
-          <button className="rental-button rental-button-light" onClick={() => scrollToId("how-it-works")}>See the process <ArrowRight size={16} /></button>
-        </div>
-      </section>
+    <section className="bob-projects bob-section" id="projects"><div className="bob-frame"><div className="bob-section-head centered"><div className="bob-kicker"><i /> BOB project capability</div><h2>Equipment and operational support in context.</h2><p>Explore the types of support the BOB team coordinates around the lift—not stock claims or invented project outcomes.</p></div><div className="bob-project-grid">{projectCards.map(([image, title, tag, copy]) => <article key={title}><img src={image} alt="BOB Cranes equipment on site" loading="lazy" /><div><span>{tag}</span><h3>{title}</h3><p>{copy}</p><button onClick={() => scrollToId("enquire")} aria-label={`Discuss ${title}`}><ArrowRight size={15} /></button></div></article>)}</div></div></section>
 
-      <section className="rental-section rental-services" id="services">
-        <div className="rental-container">
-          <div className="rental-section-heading centered"><div className="rental-eyebrow"><span /> Rental support options</div><h2>A clearer way to plan lifting support.</h2><p>Start with the service model that best matches your scope. The BOB team can then shape the operational detail around the project.</p></div>
-          <div className="rental-plan-grid">
-            {rentalPlans.map(plan => (
-              <article className={`rental-plan ${plan.featured ? "featured" : ""}`} key={plan.title}>
-                <span className="rental-plan-label">{plan.label}</span>
-                <h3>{plan.title}</h3>
-                <p>{plan.copy}</p>
-                <ul>{plan.points.map(point => <li key={point}><Check size={14} />{point}</li>)}</ul>
-                <button onClick={() => scrollToId("enquire")}>{plan.cta}<ArrowRight size={15} /></button>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+    <section className="bob-assurance"><div className="bob-frame bob-assurance-grid"><div className="bob-assurance-cta"><div className="bob-kicker light"><i /> Need to start a lift?</div><h2>Give Sales the operational context, not just a crane size.</h2><p>Each rental enquiry becomes a structured follow-up in the Sales workspace, ready for a named owner and clear next action.</p><button className="bob-button light" onClick={() => scrollToId("enquire")}>Request a rental quote <ArrowRight size={15} /></button></div><div className="bob-assurance-card"><img src={BOB_MOBILE} alt="BOB heavy equipment mobile crane" loading="lazy" /><div className="bob-assurance-points"><span><ShieldCheck size={16} /> Readiness-led coordination</span><span><ClipboardCheck size={16} /> Booking dossier creation</span><span><HardHat size={16} /> Department ownership</span></div></div></div></section>
 
-      <section className="rental-section rental-process" id="how-it-works">
-        <div className="rental-container">
-          <div className="rental-process-feature">
-            <img src="/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp" alt="BOB Cranes mobile crane fleet" loading="lazy" />
-            <div><div className="rental-eyebrow"><span /> BOB lift protocol</div><h2>Work through each stage with confidence.</h2><p>BOB’s operations portal turns the project brief into a visible workflow, giving the right department the right responsibility at the right time.</p><button className="rental-text-link" onClick={() => setLocation("/login")}>Access the operations portal <ArrowRight size={15} /></button></div>
-          </div>
-          <div className="rental-process-list">
-            {processSteps.map(([number, title, copy]) => <article key={number}><span>{number}</span><div><h3>{title}</h3><p>{copy}</p></div></article>)}
-          </div>
-        </div>
-      </section>
+    <section className="bob-process bob-section" id="process"><div className="bob-frame bob-process-grid"><div><div className="bob-kicker"><i /> The BOB route</div><h2>A simple working process, built for site reality.</h2><p>BOB uses a connected workflow so Sales, documentation, crew, gear and operations work from the same project direction.</p><div className="bob-process-bars">{processSteps.map(([number, title, copy], index) => <article className={`step-${index + 1}`} key={number}><span>{number}</span><div><strong>{title}</strong><small>{copy}</small></div></article>)}</div></div><div className="bob-process-image"><img src={BOB_BRIDGE} alt="BOB coordinated bridge lift" loading="lazy" /><div><strong>Booking-led workflow</strong><span>From enquiry to dispatch preparation</span></div></div></div></section>
 
-      <section className="rental-confidence">
-        <div className="rental-container rental-confidence-grid">
-          <div><div className="rental-eyebrow"><span /> Practical project controls</div><h2>Information that stays connected to the lift.</h2><p>Our operational model gives project teams one place to coordinate the equipment, people and documents required before dispatch.</p><button className="rental-button rental-button-dark" onClick={() => scrollToId("enquire")}>Start a rental enquiry <ArrowRight size={16} /></button></div>
-          <div className="rental-confidence-list">
-            <div><ClipboardCheck size={18} /><span><strong>Clear documentation route</strong><small>Requirements, uploads and approvals can be tracked in a project dossier.</small></span></div>
-            <div><ShieldCheck size={18} /><span><strong>Compliance-aware selection</strong><small>Equipment and lifting gear can be checked against recorded inspection validity.</small></span></div>
-            <div><HardHat size={18} /><span><strong>Role-based coordination</strong><small>Sales, documentation, HSE and operations teams can work in their own connected spaces.</small></span></div>
-          </div>
-        </div>
-      </section>
+    <section className="bob-coverage bob-section"><div className="bob-frame bob-coverage-grid"><div className="bob-coverage-art"><img src={BOB_MOBILE} alt="BOB crane fleet" loading="lazy" /><div className="bob-coverage-badge"><MapPin size={18} /><span>Project-led support<br /><b>starts with scope</b></span></div></div><div><div className="bob-kicker"><i /> Support, connected</div><h2>One shared route for the people behind the lift.</h2><p>Our public enquiry begins the coordination conversation. The connected portal then provides workspaces for the teams handling readiness, documents, crew and dispatch.</p><div className="bob-role-grid"><span><BriefcaseBusiness size={15} /> Sales follow-up</span><span><FileCheck2 size={15} /> Documentation</span><span><UsersRound size={15} /> Crew assignment</span><span><Wrench size={15} /> Gear readiness</span><span><ShieldCheck size={15} /> HSE coordination</span><span><CalendarClock size={15} /> Mobilisation plan</span></div></div></div></section>
 
-      <section className="rental-enquiry" id="enquire">
-        <div className="rental-container rental-enquiry-grid">
-          <div className="rental-enquiry-copy"><div className="rental-eyebrow rental-eyebrow-light"><span /> Plan your next lift</div><h2>Tell us what the project needs.</h2><p>Share the essential project information and the BOB team can begin the right rental and readiness conversation.</p><div className="rental-enquiry-points"><span><Check size={15} />Equipment and capacity requirement</span><span><Check size={15} />Project location and mobilisation window</span><span><Check size={15} />Site, crew and documentation considerations</span></div></div>
-          <form className="rental-enquiry-form" onSubmit={submit} noValidate>
-            {submittedEnquiry && <div className="rental-enquiry-success" role="status"><Check size={16} /><span><strong>Quote request received.</strong> Sales has been notified to follow up with {submittedEnquiry.companyName} about {submittedEnquiry.equipmentInterest}.</span></div>}
-            <div className="rental-form-row"><label><span>Full name</span><input required aria-invalid={Boolean(fieldErrors.contactName)} className={fieldErrors.contactName ? "field-invalid" : ""} value={form.contactName} onChange={event => updateForm("contactName", event.target.value)} placeholder="Your name" />{fieldErrors.contactName && <small>{fieldErrors.contactName}</small>}</label><label><span>Company</span><input required aria-invalid={Boolean(fieldErrors.companyName)} className={fieldErrors.companyName ? "field-invalid" : ""} value={form.companyName} onChange={event => updateForm("companyName", event.target.value)} placeholder="Company name" />{fieldErrors.companyName && <small>{fieldErrors.companyName}</small>}</label></div>
-            <div className="rental-form-row"><label><span>Work email</span><input required type="email" aria-invalid={Boolean(fieldErrors.email)} className={fieldErrors.email ? "field-invalid" : ""} value={form.email} onChange={event => updateForm("email", event.target.value)} placeholder="name@company.com" />{fieldErrors.email && <small>{fieldErrors.email}</small>}</label><label><span>Phone</span><input required type="tel" aria-invalid={Boolean(fieldErrors.phone)} className={fieldErrors.phone ? "field-invalid" : ""} value={form.phone} onChange={event => updateForm("phone", event.target.value)} placeholder="Phone number" />{fieldErrors.phone && <small>{fieldErrors.phone}</small>}</label></div>
-            <div className="rental-form-row"><label><span>Project location</span><input required aria-invalid={Boolean(fieldErrors.projectLocation)} className={fieldErrors.projectLocation ? "field-invalid" : ""} value={form.projectLocation} onChange={event => updateForm("projectLocation", event.target.value)} placeholder="City / site location" />{fieldErrors.projectLocation && <small>{fieldErrors.projectLocation}</small>}</label><label><span>Equipment interest</span><select value={form.equipmentInterest} onChange={event => updateForm("equipmentInterest", event.target.value)}><option>Mobile crane rental</option><option>Crawler crane / complex lift</option><option>Transport and trailers</option><option>Lifting gear and rigging</option><option>Managed lifting service</option></select></label></div>
-            <label><span>Lift or project details</span><textarea required minLength={12} aria-invalid={Boolean(fieldErrors.liftDetails)} className={fieldErrors.liftDetails ? "field-invalid" : ""} value={form.liftDetails} onChange={event => updateForm("liftDetails", event.target.value)} placeholder="Describe the load, timing, site access, documentation needs or anything the planning team should know." />{fieldErrors.liftDetails && <small>{fieldErrors.liftDetails}</small>}</label>
-            <button className="rental-button rental-button-dark" type="submit" disabled={submitEnquiry.isPending || !formReady}>{submitEnquiry.isPending ? "Sending enquiry…" : "Send rental enquiry"}<ArrowRight size={16} /></button>
-          </form>
-        </div>
-      </section>
+    <section className="bob-enquiry" id="enquire"><div className="bob-frame bob-enquiry-grid"><div className="bob-enquiry-copy"><div className="bob-kicker light"><i /> Start your rental request</div><h2>Tell us what the project needs.</h2><p>Share the essentials now. Sales receives the complete enquiry as an actionable follow-up rather than an unstructured contact message.</p><div className="bob-enquiry-checks"><span><Check size={15} /> Equipment requirement</span><span><Check size={15} /> Project location and timing</span><span><Check size={15} /> Site and documentation context</span></div></div><form className="bob-enquiry-form" onSubmit={submit} noValidate>{submittedEnquiry && <div className="bob-enquiry-success" role="status"><Check size={16} /><span><strong>Quote request received.</strong> Sales has been notified to follow up with {submittedEnquiry.companyName} about {submittedEnquiry.equipmentInterest}.</span></div>}<div className="bob-form-row"><label><span>Full name</span><input required aria-invalid={Boolean(fieldErrors.contactName)} className={fieldErrors.contactName ? "invalid" : ""} value={form.contactName} onChange={event => updateForm("contactName", event.target.value)} placeholder="Your name" />{fieldErrors.contactName && <small>{fieldErrors.contactName}</small>}</label><label><span>Company</span><input required aria-invalid={Boolean(fieldErrors.companyName)} className={fieldErrors.companyName ? "invalid" : ""} value={form.companyName} onChange={event => updateForm("companyName", event.target.value)} placeholder="Company name" />{fieldErrors.companyName && <small>{fieldErrors.companyName}</small>}</label></div><div className="bob-form-row"><label><span>Work email</span><input required type="email" aria-invalid={Boolean(fieldErrors.email)} className={fieldErrors.email ? "invalid" : ""} value={form.email} onChange={event => updateForm("email", event.target.value)} placeholder="name@company.com" />{fieldErrors.email && <small>{fieldErrors.email}</small>}</label><label><span>Phone</span><input required type="tel" aria-invalid={Boolean(fieldErrors.phone)} className={fieldErrors.phone ? "invalid" : ""} value={form.phone} onChange={event => updateForm("phone", event.target.value)} placeholder="Phone number" />{fieldErrors.phone && <small>{fieldErrors.phone}</small>}</label></div><div className="bob-form-row"><label><span>Project location</span><input required aria-invalid={Boolean(fieldErrors.projectLocation)} className={fieldErrors.projectLocation ? "invalid" : ""} value={form.projectLocation} onChange={event => updateForm("projectLocation", event.target.value)} placeholder="City / site location" />{fieldErrors.projectLocation && <small>{fieldErrors.projectLocation}</small>}</label><label><span>Equipment interest</span><select value={form.equipmentInterest} onChange={event => updateForm("equipmentInterest", event.target.value)}><option>Mobile crane rental</option><option>Crawler crane / complex lift</option><option>Transport and trailers</option><option>Lifting gear and rigging</option><option>Managed lifting service</option></select></label></div><label><span>Lift or project details</span><textarea required minLength={12} aria-invalid={Boolean(fieldErrors.liftDetails)} className={fieldErrors.liftDetails ? "invalid" : ""} value={form.liftDetails} onChange={event => updateForm("liftDetails", event.target.value)} placeholder="Describe the load, timing, site access, documentation needs or anything the planning team should know." />{fieldErrors.liftDetails && <small>{fieldErrors.liftDetails}</small>}</label><button className="bob-button accent" type="submit" disabled={submitEnquiry.isPending || !formReady}>{submitEnquiry.isPending ? "Sending enquiry…" : "Send rental enquiry"}<ArrowRight size={16} /></button></form></div></section>
 
-      <footer className="rental-footer">
-        <div className="rental-container">
-          <div className="rental-final-cta"><div><div className="rental-eyebrow rental-eyebrow-light"><span /> BOB Heavy Equipment Rental</div><h2>Ready to coordinate the next lift?</h2></div><div><button className="rental-button rental-button-light" onClick={() => scrollToId("enquire")}>Request a rental quote <ArrowRight size={16} /></button><button className="rental-button rental-button-ghost" onClick={() => setLocation("/login")}>Portal sign in <ArrowRight size={16} /></button></div></div>
-          <div className="rental-footer-grid"><div><div className="rental-brand rental-brand-static"><img src="/manus-storage/bob-cranes-mark_c80bfee2.png" alt="BOB Cranes" /><span>BOB <b>HEAVY EQUIPMENT</b></span></div><p>Crane rental and coordinated lifting support for project teams that need a more controlled operational path.</p></div><div><h3>Equipment</h3><button onClick={() => scrollToId("fleet")}>Mobile cranes</button><button onClick={() => scrollToId("fleet")}>Crawler cranes</button><button onClick={() => scrollToId("fleet")}>Transport & trailers</button><button onClick={() => scrollToId("fleet")}>Lifting gear</button></div><div><h3>Services</h3><button onClick={() => scrollToId("services")}>Equipment rental</button><button onClick={() => scrollToId("services")}>Managed lifting</button><button onClick={() => scrollToId("how-it-works")}>Project workflow</button><button onClick={() => setLocation("/login")}>Operations portal</button></div><div><h3>Start a conversation</h3><button onClick={() => scrollToId("enquire")}>Request a quotation</button><button onClick={() => scrollToId("enquire")}>Discuss a complex lift</button><button onClick={() => scrollToId("enquire")}>Plan mobilisation</button></div></div>
-          <div className="rental-footer-bottom"><span>© {new Date().getFullYear()} BOB Heavy Equipment Rental. All rights reserved.</span><span>Operational support for crane, crew, gear and documentation coordination.</span></div>
-        </div>
-      </footer>
-    </main>
-  );
+    <footer className="bob-footer"><div className="bob-frame"><div className="bob-final-cta"><div><div className="bob-kicker light"><i /> BOB Heavy Equipment Rental</div><h2>Ready to coordinate the next lift?</h2></div><button className="bob-button accent" onClick={() => scrollToId("enquire")}>Get a rental estimate <ArrowRight size={16} /></button></div><div className="bob-footer-grid"><div><div className="bob-brand static"><img src="/manus-storage/bob-cranes-mark_c80bfee2.png" alt="BOB Cranes" /><span>BOB <b>HEAVY EQUIPMENT</b></span></div><p>Crane rental and coordinated lifting support for project teams that need a more controlled operational path.</p></div><div><h3>Explore</h3><button onClick={() => scrollToId("services")}>Services</button><button onClick={() => scrollToId("projects")}>Capability</button><button onClick={() => scrollToId("process")}>Working process</button></div><div><h3>Start a conversation</h3><button onClick={() => scrollToId("enquire")}>Request quotation</button><button onClick={() => scrollToId("enquire")}>Discuss complex lift</button><button onClick={() => setLocation("/login")}>Operations portal</button></div></div><div className="bob-footer-bottom"><span>© {new Date().getFullYear()} BOB Heavy Equipment Rental. All rights reserved.</span><span>Crane · crew · gear · documents · dispatch</span></div></div></footer>
+  </main>;
 }

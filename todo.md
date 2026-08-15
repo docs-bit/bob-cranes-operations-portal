@@ -328,3 +328,9 @@
 - [x] Add real-time field validation and an explicit submitted-success state to the public quote form.
 - [x] Replace the specified Transport & Support landing visual treatment with the supplied BOB bridge-lift imagery and add a landing-page return control to login.
 - [x] Add focused permission/workflow coverage, responsive visual verification, production validation, and a published checkpoint.
+
+## Reference-inspired BOB rental landing redesign
+- [x] Analyze the supplied long-form excavation-services reference and adapt its conversion hierarchy for BOB Heavy Equipment Rental.
+- [x] Rebuild the public landing-page layout with compact navigation, operational proof, services, project showcase, process, coverage, estimate CTA, and an industrial footer.
+- [x] Preserve working quote submission, Sales notifications, responsive layout, and portal access throughout the redesign.
+- [x] Complete desktop/mobile visual verification, functional validation, production build, and a published checkpoint.
