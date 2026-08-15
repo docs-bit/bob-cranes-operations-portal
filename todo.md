@@ -344,3 +344,6 @@
 - [x] Add the supplied full BOB logo to generated dispatch-bundle PDFs and quote documents without altering operational document content.
 - [x] Verify document generation and branded header rendering with focused coverage and production validation.
 - [x] Create and validate a reusable skill for safe full-logo updates across web and generated-document surfaces.
+
+## Dashboard greeting refinement
+- [x] Replace “Good morning” with “Hello” in the Operations Portal dashboard greeting and publish the verified text update.
