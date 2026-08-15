@@ -55,6 +55,7 @@ import {
   normalizeDepartmentDashboardConfig,
   normalizeDepartmentCode,
 } from "../shared/departmentDashboardRules";
+import { isValidDashboardGreetingTemplate } from "../shared/dashboardGreeting";
 
 db.seedInitialDataIfNeeded().catch(console.error);
 
@@ -608,6 +609,32 @@ export const appRouter = router({
     getActivityRetention: adminProcedure.query(async () => ({
       retentionDays: await db.getActivityRetentionDays(),
     })),
+    getDashboardGreeting: protectedProcedure.query(async () => ({
+      template: await db.getDashboardGreetingTemplate(),
+    })),
+    updateDashboardGreeting: adminProcedure
+      .input(
+        z.object({
+          template: z
+            .string()
+            .trim()
+            .refine(isValidDashboardGreetingTemplate, {
+              message: "Use 3–120 characters and include {name} to personalize the greeting.",
+            }),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const template = await db.setDashboardGreetingTemplate(
+          input.template.trim(),
+          ctx.user.id
+        );
+        await db.addUserActivity({
+          userId: ctx.user.id,
+          action: "dashboard_greeting_updated",
+          detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} updated the dashboard greeting template.`,
+        });
+        return { template };
+      }),
     updateActivityRetention: adminProcedure
       .input(
         z.object({

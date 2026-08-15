@@ -120,6 +120,21 @@ describe("governance and dispatch bundle contracts", () => {
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 
+  it("shares the greeting template with signed-in users but reserves greeting updates for administrators", async () => {
+    vi.spyOn(db, "getDashboardGreetingTemplate").mockResolvedValue("Welcome back, {name}");
+    vi.spyOn(db, "setDashboardGreetingTemplate").mockResolvedValue("Welcome back, {name}");
+    vi.spyOn(db, "addUserActivity").mockResolvedValue();
+    await expect(
+      appRouter.createCaller(context("user", "hse")).auth.getDashboardGreeting()
+    ).resolves.toEqual({ template: "Welcome back, {name}" });
+    await expect(
+      appRouter.createCaller(context("admin", "administrator")).auth.updateDashboardGreeting({ template: "Welcome back, {name}" })
+    ).resolves.toEqual({ template: "Welcome back, {name}" });
+    await expect(
+      appRouter.createCaller(context("supervisor", "hse")).auth.updateDashboardGreeting({ template: "Hello, {name}" })
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
   it("requires the Sales department before recording an eligible dispatch bundle request", async () => {
     vi.spyOn(db, "getBookingById").mockResolvedValue({
       id: "BOB-59116",

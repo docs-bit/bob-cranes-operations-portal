@@ -45,6 +45,7 @@ import {
   type DepartmentDashboardWidget,
   type WorkflowChecklistItem,
 } from "@shared/departmentDashboardRules";
+import { formatDashboardGreeting } from "@shared/dashboardGreeting";
 import {
   findEmployeeBookingConflicts,
   toggleEmployeeBookingAllocation,
@@ -903,8 +904,14 @@ export function Shell({
               <button
                 className="nav-item"
                 onClick={() => {
-                  setView("overview");
-                  setProfileOpen(true);
+                  setProfileOpen(false);
+                  setView("users");
+                  window.setTimeout(() => {
+                    document.getElementById("dashboard-greeting-settings")?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }, 0);
                 }}
               >
                 <Settings />
@@ -1926,6 +1933,7 @@ function Overview({
   attendanceRecords,
   setAttendanceRecords,
   user,
+  greetingTemplate,
   onSelectEmployee,
 }: {
   bookings: Booking[];
@@ -1939,7 +1947,9 @@ function Overview({
   user: {
     role: "admin" | "supervisor" | "user";
     departmentCode: string | null;
+    name?: string | null;
   };
+  greetingTemplate?: string | null;
   onSelectEmployee: (employeeId: string) => void;
 }) {
   const canCreateBooking =
@@ -1950,11 +1960,16 @@ function Overview({
       : departments.filter(
           ([name]) => DEPARTMENT_LABEL_TO_CODE[name] === user.departmentCode
         );
+  const activeDossiers = bookings.filter(booking => booking.stage !== "Dispatched");
+  const dispatchReviewDossiers = bookings.filter(booking => booking.stage === "Reviewed");
+  const complianceBlockers = documents.filter(
+    document => document.required && !["Uploaded", "Approved"].includes(document.state)
+  ).length;
   return (
     <div className="content">
       <PageHeading
         eyebrow="Operations control center"
-        title="Hello, Admin"
+        title={formatDashboardGreeting(greetingTemplate, user.name)}
         copy={
           user.role === "admin"
             ? "A live view of every crane booking, compliance blocker, and next action across BOB Cranes."
@@ -1973,6 +1988,14 @@ function Overview({
           )
         }
       />
+      <section className="daily-operations-summary" aria-label="Daily operations summary" data-testid="daily-operations-summary">
+        <div className="daily-operations-heading"><span>Today’s operations</span><small>Live dossier and compliance pulse</small></div>
+        <div className="daily-operations-items">
+          <article><strong>{activeDossiers.length}</strong><span>active dossiers</span></article>
+          <article><strong>{dispatchReviewDossiers.length}</strong><span>in Sales dispatch review</span></article>
+          <article className={complianceBlockers ? "attention" : "ready"}><strong>{complianceBlockers}</strong><span>{complianceBlockers === 1 ? "compliance item needs action" : "compliance items need action"}</span></article>
+        </div>
+      </section>
       <div className="metric-grid">
         <MetricCard
           label="Active dossiers"
@@ -7166,6 +7189,7 @@ export default function Home() {
     trpc.operations.completeBookingWorkstream.useMutation();
   const crewAllocationsQuery = trpc.operations.getCrewAllocations.useQuery();
   const provisionedDashboardsQuery = trpc.departments.listProvisioned.useQuery(undefined, { enabled: Boolean(user) });
+  const dashboardGreetingQuery = trpc.auth.getDashboardGreeting.useQuery(undefined, { enabled: Boolean(user) });
   const [view, setView] = useState<View>(() =>
     location === "/uploads"
       ? "uploads"
@@ -7438,6 +7462,7 @@ export default function Home() {
           attendanceRecords={attendanceRecords}
           setAttendanceRecords={setAttendanceRecords}
           user={user}
+          greetingTemplate={dashboardGreetingQuery.data?.template}
           onSelectEmployee={employeeId => {
             setSelectedTrainingEmployeeId(employeeId);
             setView("training");

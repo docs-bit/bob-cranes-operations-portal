@@ -347,3 +347,9 @@
 
 ## Dashboard greeting refinement
 - [x] Replace “Good morning” with “Hello” in the Operations Portal dashboard greeting and publish the verified text update.
+
+## Personalized dashboard greeting and daily summary
+- [x] Display the signed-in user’s preferred name in the Operations Cockpit greeting.
+- [x] Add a concise daily operations summary directly below the dashboard greeting using live booking and compliance data.
+- [x] Add an administrator-managed, persistent dashboard greeting-text setting with clear save and reset behavior.
+- [x] Add focused validation, run the full release checks, and publish the dashboard personalization update.

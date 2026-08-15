@@ -288,6 +288,34 @@ export async function setActivityRetentionDays(
   return await getActivityRetentionDays();
 }
 
+export async function getDashboardGreetingTemplate() {
+  const db = await getDb();
+  if (!db) return "Hello, {name}";
+  const result = await db
+    .select()
+    .from(systemSettings)
+    .where(eq(systemSettings.key, "dashboard_greeting_template"))
+    .limit(1);
+  const template = result[0]?.value?.trim();
+  return template?.includes("{name}") ? template : "Hello, {name}";
+}
+
+export async function setDashboardGreetingTemplate(template: string, updatedBy: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable for dashboard greeting settings.");
+  await db
+    .insert(systemSettings)
+    .values({
+      key: "dashboard_greeting_template",
+      value: template,
+      updatedBy,
+    })
+    .onDuplicateKeyUpdate({
+      set: { value: template, updatedBy },
+    });
+  return await getDashboardGreetingTemplate();
+}
+
 export async function purgeUserActivityBefore(cutoff: Date) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable for activity retention.");

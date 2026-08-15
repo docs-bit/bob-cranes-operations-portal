@@ -10,10 +10,12 @@ describe("Operations Cockpit header navigation", () => {
     expect(source).not.toContain('disabled={view === "overview"}');
   });
 
-  it("uses the requested neutral Hello greeting on the Operations Cockpit", () => {
+  it("personalizes the Operations Cockpit greeting with the saved template and signed-in name", () => {
     const source = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.url), "utf8");
 
-    expect(source).toContain('title="Hello, Admin"');
-    expect(source).not.toContain('title="Good morning, Admin"');
+    expect(source).toContain("title={formatDashboardGreeting(greetingTemplate, user.name)}");
+    expect(source).toContain('data-testid="daily-operations-summary"');
+    expect(source).toContain("greetingTemplate={dashboardGreetingQuery.data?.template}");
+    expect(source).toContain('document.getElementById("dashboard-greeting-settings")');
   });
 });
