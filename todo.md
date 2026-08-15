@@ -334,3 +334,8 @@
 - [x] Rebuild the public landing-page layout with compact navigation, operational proof, services, project showcase, process, coverage, estimate CTA, and an industrial footer.
 - [x] Preserve working quote submission, Sales notifications, responsive layout, and portal access throughout the redesign.
 - [x] Complete desktop/mobile visual verification, functional validation, production build, and a published checkpoint.
+
+## Supplied full BOB logo replacement
+- [x] Host the supplied “BOB Lifting Your Expectations” logo as a durable deployed asset.
+- [x] Replace existing BOB logo marks with the supplied full logo across public, portal, and sign-in branding surfaces.
+- [x] Verify responsive logo sizing and publish the visual-branding update.

@@ -836,11 +836,11 @@ export function Shell({
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-row">
-            <div className="brand-mark brand-logo">
+            <div className="brand-mark brand-logo full-bob-logo-frame">
               <img
-                className="brand-logo-image"
-                src="/manus-storage/bob-cranes-mark_c80bfee2.png"
-                alt="BOB Cranes"
+                className="brand-logo-image full-bob-logo"
+                src="/manus-storage/bob-lifting-your-expectations_2beae224.webp"
+                alt="BOB Cranes — Lifting Your Expectations"
               />
             </div>
             <div className="brand-copy">
@@ -5398,11 +5398,11 @@ export function ClientPortal({
     <div className="client-shell">
       <header className="client-topbar">
         <div className="brand-row">
-          <div className="brand-mark brand-logo">
+          <div className="brand-mark brand-logo full-bob-logo-frame">
             <img
-              className="brand-logo-image"
-              src="/manus-storage/bob-cranes-mark_c80bfee2.png"
-              alt="BOB Cranes"
+              className="brand-logo-image full-bob-logo"
+              src="/manus-storage/bob-lifting-your-expectations_2beae224.webp"
+              alt="BOB Cranes — Lifting Your Expectations"
             />
           </div>
           <div>
