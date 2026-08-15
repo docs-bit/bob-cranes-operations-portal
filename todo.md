@@ -281,3 +281,7 @@
 - [x] Display a visual conflict timeline for selected crew before bulk assignment is saved.
 - [x] Extend and validate the portal-refinement-release skill with bulk assignment and conflict-timeline guidance.
 - [x] Add focused coverage, verify the integrated workflow, and save the completed release checkpoint.
+
+## Final ship-readiness verification
+- [x] Run current focused operational regression tests, TypeScript validation, production build, and runtime log review.
+- [x] Resolve any release-blocking issue and save a verified ship-ready checkpoint.

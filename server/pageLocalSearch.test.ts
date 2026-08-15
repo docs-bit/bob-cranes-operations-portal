@@ -15,7 +15,7 @@ describe("page-local search behavior", () => {
     expect(home).toContain("booking.priority,");
     expect(home).toContain("JSON.stringify(employee.certifications)");
     expect(home).toContain("record[employee.name]");
-    expect(crew).toContain("bookingIdsByEmployeeId");
-    expect(crew).toContain("${employee.name} ${employee.sourceId} ${employee.role} ${employee.department} ${bookingIds.join(\" \")}");
+    expect(crew).toContain("bookingIdsByCrew");
+    expect(crew).toContain("${crew.name} ${crew.sourceId} ${crew.role} ${crew.department} ${crew.bookingIds.join(\" \")}");
   });
 });
