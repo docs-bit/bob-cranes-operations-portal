@@ -353,3 +353,6 @@
 - [x] Add a concise daily operations summary directly below the dashboard greeting using live booking and compliance data.
 - [x] Add an administrator-managed, persistent dashboard greeting-text setting with clear save and reset behavior.
 - [x] Add focused validation, run the full release checks, and publish the dashboard personalization update.
+
+## Rental estimate email action
+- [x] Make the public “Get a rental estimate” call-to-action open a pre-addressed email to admin@bobcranes.ae and publish the verified update.
