@@ -292,3 +292,9 @@
 - [x] Add safe production runtime error monitoring and validate the capture path without exposing sensitive data.
 - [x] Extend and validate the portal-refinement-release skill for exports, tooltips, and runtime monitoring.
 - [x] Add focused coverage, complete release validation, and save a verified checkpoint.
+
+## Configurable Crew CSV export
+- [x] Add a modal that lets users select which current Crew Assignment fields to include in a CSV export.
+- [x] Add an export-button loading spinner and disabled state during CSV generation.
+- [x] Extend and validate the portal-refinement-release skill for configurable export selection and feedback.
+- [x] Add focused coverage, verify the export flow, and save a verified checkpoint.

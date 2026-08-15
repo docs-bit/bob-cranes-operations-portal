@@ -30,6 +30,10 @@ describe("production runtime monitoring and Crew Assignment exports", () => {
     expect(crewWorkspace).toContain("exportCurrentScheduleCsv");
     expect(crewWorkspace).toContain("Export CSV");
     expect(crewWorkspace).toContain("text/csv;charset=utf-8");
+    expect(crewWorkspace).toContain("CsvColumnDialog");
+    expect(crewWorkspace).toContain("Choose CSV columns");
+    expect(crewWorkspace).toContain("Generating CSV…");
+    expect(crewWorkspace).toContain("csvColumns");
     expect(crewWorkspace).toContain("BookingIdChip");
     expect(crewWorkspace).toContain("booking-chip-tooltip");
     expect(reporter).toContain('window.addEventListener("error"');

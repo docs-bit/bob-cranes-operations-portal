@@ -1513,4 +1513,9 @@ body,
 .conflict-timeline-row small { color: #4c5561; font-size: 11px; }
 .booking-chip-tooltip { display: grid; max-width: 300px; gap: 3px; background: #172033 !important; color: #fff !important; line-height: 1.35; }
 .booking-chip-tooltip span { color: #dbe7f5; }
+.csv-column-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.csv-column-option { display: flex; align-items: center; gap: 8px; padding: 9px; border: 1px solid #e5e9ee; border-radius: 9px; color: #111827; font-size: 13px; cursor: pointer; }
+.csv-column-option:has(input:checked) { border-color: #f59f3a; background: #fff8ec; }
+.csv-column-actions { display: flex; gap: 8px; }
+@media (max-width: 560px) { .csv-column-grid { grid-template-columns: 1fr; } }
 @media (max-width: 900px) { .bulk-assignment-layout { grid-template-columns: 1fr; } }
