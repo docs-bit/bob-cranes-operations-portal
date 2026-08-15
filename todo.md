@@ -339,3 +339,8 @@
 - [x] Host the supplied “BOB Lifting Your Expectations” logo as a durable deployed asset.
 - [x] Replace existing BOB logo marks with the supplied full logo across public, portal, and sign-in branding surfaces.
 - [x] Verify responsive logo sizing and publish the visual-branding update.
+
+## Branded dispatch and quote documents
+- [x] Add the supplied full BOB logo to generated dispatch-bundle PDFs and quote documents without altering operational document content.
+- [x] Verify document generation and branded header rendering with focused coverage and production validation.
+- [x] Create and validate a reusable skill for safe full-logo updates across web and generated-document surfaces.

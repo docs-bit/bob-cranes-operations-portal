@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import type { DocumentItem } from "@shared/bookingRules";
+import { drawBobDocumentLogo, embedBobFullLogo } from "./pdfBrand";
 
 type DispatchBundleBooking = {
   id: string;
@@ -95,6 +96,8 @@ export async function generateDispatchBundlePdf(input: {
   input.onProgress?.(30, "Embedding document fonts");
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
   const regular = await pdf.embedFont(StandardFonts.Helvetica);
+  input.onProgress?.(42, "Applying BOB document branding");
+  const logo = await embedBobFullLogo(pdf);
   const page = pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
   const mint = rgb(0.08, 0.55, 0.44);
   const ink = rgb(0.08, 0.12, 0.14);
@@ -107,29 +110,15 @@ export async function generateDispatchBundlePdf(input: {
     height: 116,
     color: rgb(0.94, 0.98, 0.97),
   });
-  page.drawRectangle({
+  const logoWidth = drawBobDocumentLogo({
+    page,
+    logo,
+    bold,
     x: MARGIN,
-    y: PAGE_HEIGHT - 75,
-    width: 30,
-    height: 30,
-    color: mint,
-  });
-  page.drawText("B", {
-    x: MARGIN + 10,
-    y: PAGE_HEIGHT - 65,
-    font: bold,
-    size: 15,
-    color: rgb(1, 1, 1),
-  });
-  page.drawText("BOB CRANES", {
-    x: MARGIN + 42,
-    y: PAGE_HEIGHT - 57,
-    font: bold,
-    size: 15,
-    color: ink,
+    y: PAGE_HEIGHT - 93,
   });
   page.drawText("FINAL DISPATCH BUNDLE", {
-    x: MARGIN + 42,
+    x: MARGIN + logoWidth + 18,
     y: PAGE_HEIGHT - 75,
     font: bold,
     size: 8,
@@ -289,7 +278,16 @@ export async function generateDispatchBundlePdf(input: {
 
   if (y < 190) {
     const continuation = pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
-    y = PAGE_HEIGHT - 70;
+    drawBobDocumentLogo({
+      page: continuation,
+      logo,
+      bold,
+      x: MARGIN,
+      y: PAGE_HEIGHT - 50,
+      maxWidth: 118,
+      maxHeight: 38,
+    });
+    y = PAGE_HEIGHT - 94;
     continuation.drawText("BOB CRANES · DISPATCH BUNDLE", {
       x: MARGIN,
       y,

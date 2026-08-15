@@ -1,6 +1,12 @@
 /** @vitest-environment jsdom */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { generateDispatchBundlePdf } from "../client/src/lib/dispatchBundlePdf";
+import { BOB_FULL_LOGO_DOCUMENT_ASSET } from "../client/src/lib/pdfBrand";
+
+const onePixelPng = Uint8Array.from(
+  atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLBFwAAAABJRU5ErkJggg=="),
+  character => character.charCodeAt(0)
+);
 
 describe("dispatch bundle PDF download", () => {
   afterEach(() => vi.restoreAllMocks());
@@ -19,6 +25,8 @@ describe("dispatch bundle PDF download", () => {
     const click = vi
       .spyOn(HTMLAnchorElement.prototype, "click")
       .mockImplementation(() => {});
+    const fetchLogo = vi.fn(async () => new Response(onePixelPng, { status: 200 }));
+    vi.stubGlobal("fetch", fetchLogo);
 
     const progress = vi.fn();
     await expect(
@@ -58,6 +66,7 @@ describe("dispatch bundle PDF download", () => {
     expect(createObjectUrl).toHaveBeenCalledOnce();
     expect(click).toHaveBeenCalledOnce();
     expect(revokeObjectUrl).toHaveBeenCalledWith("blob:dispatch-bundle");
+    expect(fetchLogo).toHaveBeenCalledWith(BOB_FULL_LOGO_DOCUMENT_ASSET);
     expect(progress).toHaveBeenCalledWith(100, "Dispatch bundle ready");
   });
 });

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const logoPath = "/manus-storage/bob-cranes-mark_c80bfee2.png";
+const logoPath = "/manus-storage/bob-lifting-your-expectations_2beae224.webp";
 
 describe("supplied BOB Cranes logo integration", () => {
   it("uses the hosted logo in authenticated, client, sign-in, and loading brand surfaces", () => {
@@ -12,7 +12,7 @@ describe("supplied BOB Cranes logo integration", () => {
     expect(home.match(new RegExp(logoPath.replace(/[/.]/g, "\\$&"), "g"))?.length).toBe(2);
     expect(login).toContain(logoPath);
     expect(app).toContain(logoPath);
-    expect(home).toContain('alt="BOB Cranes"');
+    expect(home).toContain('alt="BOB Cranes — Lifting Your Expectations"');
   });
 
   it("defines responsive containment styles for the supplied logo mark", () => {
