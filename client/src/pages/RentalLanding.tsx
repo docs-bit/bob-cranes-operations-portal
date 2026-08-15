@@ -21,14 +21,14 @@ const equipmentCategories = [
     eyebrow: "01 · Mobile cranes",
     title: "Reach every point on site.",
     copy: "Mobile lifting support for planned construction, maintenance and day-to-day project requirements.",
-    image: "/manus-storage/bob-harbor-lift_81fb6329.jpg",
+    image: "/manus-storage/bob-bridge-project_264a6ce0.webp",
     tone: "dark",
   },
   {
     eyebrow: "02 · Complex lifts",
     title: "Built for controlled heavy lifts.",
     copy: "Crawler-crane support, engineered lifting arrangements and coordinated site mobilisation for demanding scope.",
-    image: "/manus-storage/bob-structural-lift_1bb41954.jpg",
+    image: "/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp",
     tone: "light",
   },
   {
@@ -206,7 +206,7 @@ export default function RentalLanding() {
       </section>
 
       <section className="rental-band">
-        <img src="/manus-storage/bob-bridge-lift_9aaf9ad5.jpg" alt="BOB Cranes supporting a bridge construction lift" loading="lazy" />
+        <img src="/manus-storage/bob-bridge-project_264a6ce0.webp" alt="BOB Cranes supporting a bridge construction lift" loading="lazy" />
         <div className="rental-band-overlay" />
         <div className="rental-container rental-band-content">
           <div className="rental-eyebrow rental-eyebrow-light"><span /> Lift operations support</div>
@@ -236,7 +236,7 @@ export default function RentalLanding() {
       <section className="rental-section rental-process" id="how-it-works">
         <div className="rental-container">
           <div className="rental-process-feature">
-            <img src="/manus-storage/bob-structural-lift_1bb41954.jpg" alt="BOB Cranes lifting structural equipment on site" loading="lazy" />
+            <img src="/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp" alt="BOB Cranes mobile crane fleet" loading="lazy" />
             <div><div className="rental-eyebrow"><span /> BOB lift protocol</div><h2>Work through each stage with confidence.</h2><p>BOB’s operations portal turns the project brief into a visible workflow, giving the right department the right responsibility at the right time.</p><button className="rental-text-link" onClick={() => setLocation("/login")}>Access the operations portal <ArrowRight size={15} /></button></div>
           </div>
           <div className="rental-process-list">

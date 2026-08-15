@@ -14,8 +14,9 @@
 }
 .rental-container { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
 .rental-header { height: 76px; position: absolute; z-index: 10; inset: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 max(24px, calc((100vw - 1180px)/2)); color: #fff; border-bottom: 1px solid rgba(255,255,255,.14); background: linear-gradient(180deg, rgba(0,0,0,.36), transparent); }
-.rental-brand { display: inline-flex; align-items: center; gap: 10px; padding: 0; background: transparent; color: inherit; cursor: pointer; font-size: 12px; font-weight: 800; letter-spacing: .02em; text-align: left; }
+.rental-brand { display: inline-flex; align-items: center; gap: 10px; min-width: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; font-size: 12px; font-weight: 800; letter-spacing: .02em; text-align: left; }
 .rental-brand img { width: 34px; height: 34px; object-fit: contain; border-radius: 8px; background: #fff; }
+.rental-brand span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rental-brand b { font-weight: 500; opacity: .8; }
 .rental-nav { display: flex; align-items: center; gap: 5px; }
 .rental-nav button, .rental-footer button { border: 0; background: transparent; color: inherit; padding: 8px 11px; cursor: pointer; font-size: 12px; font-weight: 600; }
@@ -23,7 +24,7 @@
 .rental-nav-portal { display: inline-flex; align-items: center; gap: 7px; margin-left: 12px; border-radius: 999px !important; background: #fff !important; color: #13110f !important; padding: 10px 15px !important; }
 .rental-menu-button { display: none; width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; }
 .rental-hero { position: relative; min-height: 735px; display: flex; align-items: flex-end; isolation: isolate; background: #17110e; color: #fff; }
-.rental-hero-image { position: absolute; inset: 0; background-image: url("/manus-storage/bob-mobile-crane-fleet_429368e0.jpg"); background-position: 54% center; background-size: cover; filter: saturate(.74) contrast(1.08) brightness(.62); z-index: -2; }
+.rental-hero-image { position: absolute; inset: 0; background-image: url("/manus-storage/bob-mobile-fleet-hero_7ad7f04b.webp"); background-position: 54% center; background-size: cover; filter: saturate(.74) contrast(1.08) brightness(.62); z-index: -2; }
 .rental-hero-scrim { position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(11,9,7,.88) 0%, rgba(11,9,7,.61) 39%, rgba(11,9,7,.08) 76%), linear-gradient(0deg, rgba(10,8,7,.76) 0%, transparent 45%); }
 .rental-hero-content { padding: 0 0 116px; max-width: 1180px; }
 .rental-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--rental-orange); font-size: 10px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
@@ -170,6 +171,8 @@
 }
 @media (max-width: 600px) {
   .rental-container { width: min(100% - 32px, 1180px); }
+  .rental-brand { max-width: calc(100vw - 94px); font-size: 10px; }
+  .rental-brand img { width: 31px; height: 31px; }
   .rental-section { padding: 76px 0; }
   .rental-hero { min-height: 720px; }
   .rental-hero-image { background-position: 65% center; }

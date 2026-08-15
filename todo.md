@@ -316,3 +316,8 @@
 - [x] Host the supplied BOB Cranes project images as deployment-safe landing-page assets.
 - [x] Replace the external stock landing photography with the supplied BOB project photographs in responsive hero and capability compositions.
 - [x] Verify desktop/mobile presentation, run production validation, and publish the visual update.
+
+## Rental quote follow-up and visual refinement
+- [x] Create a Sales follow-up notification whenever a public rental quote is submitted, with the submitted enquiry summary visible to authorised Sales users.
+- [x] Remove the overlapping landing-page header/brand treatment and use the newly supplied BOB visual assets in the appropriate landing placements.
+- [x] Add focused notification coverage, verify desktop/mobile layout, validate the production build, and publish the release.

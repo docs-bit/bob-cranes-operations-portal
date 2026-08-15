@@ -16,6 +16,7 @@ describe("public rental enquiry", () => {
 
   it("stores a bounded, validated equipment-rental enquiry without requiring portal sign-in", async () => {
     const create = vi.spyOn(db, "createRentalEnquiry").mockResolvedValue({ id: "rental-enquiry-test", status: "New" });
+    const notifySales = vi.spyOn(db, "addNotification").mockResolvedValue({} as any);
     const caller = appRouter.createCaller(publicContext());
 
     const result = await caller.rental.submitEnquiry({
@@ -32,6 +33,11 @@ describe("public rental enquiry", () => {
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
       email: "amina@example.com",
       equipmentInterest: "Managed lifting service",
+    }));
+    expect(notifySales).toHaveBeenCalledWith(expect.objectContaining({
+      departmentCode: "sales",
+      title: "New rental quote follow-up",
+      body: expect.stringContaining("Gulf Project Works"),
     }));
   });
 });

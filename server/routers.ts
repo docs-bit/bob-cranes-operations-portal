@@ -375,7 +375,17 @@ export const appRouter = router({
         equipmentInterest: z.string().trim().min(2).max(120),
         liftDetails: z.string().trim().min(12).max(2000),
       }))
-      .mutation(async ({ input }) => await db.createRentalEnquiry({ ...input, email: normalizeEmail(input.email) })),
+      .mutation(async ({ input }) => {
+        const enquiry = await db.createRentalEnquiry({ ...input, email: normalizeEmail(input.email) });
+        await db.addNotification({
+          id: `rental-enquiry-follow-up-${enquiry.id}`,
+          userId: null,
+          departmentCode: "sales",
+          title: "New rental quote follow-up",
+          body: `${input.contactName} from ${input.companyName} requested ${input.equipmentInterest} for ${input.projectLocation}. Enquiry ${enquiry.id} is ready for Sales follow-up.`,
+        });
+        return enquiry;
+      }),
   }),
   auth: router({
     setupStatus: publicProcedure.query(async () => ({
