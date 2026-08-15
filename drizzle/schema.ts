@@ -202,7 +202,10 @@ export const rentalEnquiries = mysqlTable("rental_enquiries", {
   equipmentInterest: varchar("equipmentInterest", { length: 120 }).notNull(),
   liftDetails: text("liftDetails").notNull(),
   status: varchar("status", { length: 32 }).notNull().default("New"),
+  assignedToUserId: int("assignedToUserId"),
+  convertedBookingId: varchar("convertedBookingId", { length: 64 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export const auditLogs = mysqlTable("audit_logs", {

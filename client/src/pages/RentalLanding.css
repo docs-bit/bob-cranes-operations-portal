@@ -134,6 +134,11 @@
 .rental-enquiry-form textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
 .rental-enquiry-form input::placeholder, .rental-enquiry-form textarea::placeholder { color: rgba(255,255,255,.37); }
 .rental-enquiry-form input:focus, .rental-enquiry-form select:focus, .rental-enquiry-form textarea:focus { border-color: var(--rental-gold); box-shadow: 0 0 0 3px rgba(245,173,71,.13); }
+.rental-enquiry-form .field-invalid { border-color: #ff816e; box-shadow: 0 0 0 3px rgba(255,129,110,.1); }
+.rental-enquiry-form label small { color: #ffaf9f; font-size: 10px; font-weight: 600; line-height: 1.35; }
+.rental-enquiry-success { display: flex; align-items: flex-start; gap: 9px; padding: 12px; border: 1px solid rgba(116, 211, 143, .42); border-radius: 10px; background: rgba(75, 174, 105, .15); color: #d8f7de; font-size: 11px; line-height: 1.5; }
+.rental-enquiry-success svg { flex: none; color: #83e59b; }
+.rental-enquiry-success strong { display: block; color: #fff; }
 .rental-enquiry-form .rental-button { justify-self: start; margin-top: 5px; background: var(--rental-orange); }
 .rental-enquiry-form .rental-button:hover { background: var(--rental-gold); color: #17120e; }
 .rental-enquiry-form .rental-button:disabled { cursor: wait; opacity: .7; }

@@ -35,7 +35,7 @@ const equipmentCategories = [
     eyebrow: "03 · Transport & support",
     title: "The lift is only the start.",
     copy: "Trailers, lifting gear, qualified crew and clear documentation stay connected throughout the project handoff.",
-    image: "/manus-storage/bob-bridge-lift_9aaf9ad5.jpg",
+    image: "/manus-storage/bob-bridge-project_264a6ce0.webp",
     tone: "dark",
   },
 ] as const;
@@ -103,14 +103,28 @@ export default function RentalLanding() {
   const submitEnquiry = trpc.rental.submitEnquiry.useMutation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [form, setForm] = useState<EnquiryForm>(emptyEnquiry);
+  const [submittedEnquiry, setSubmittedEnquiry] = useState<{ companyName: string; equipmentInterest: string } | null>(null);
 
-  const updateForm = (field: keyof EnquiryForm, value: string) =>
+  const fieldErrors = {
+    contactName: form.contactName.length > 0 && form.contactName.trim().length < 2 ? "Enter at least two characters." : "",
+    companyName: form.companyName.length > 0 && form.companyName.trim().length < 2 ? "Enter your company name." : "",
+    email: form.email.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) ? "Enter a valid work email." : "",
+    phone: form.phone.length > 0 && form.phone.trim().length < 7 ? "Enter a valid phone number." : "",
+    projectLocation: form.projectLocation.length > 0 && form.projectLocation.trim().length < 2 ? "Add a project location." : "",
+    liftDetails: form.liftDetails.length > 0 && form.liftDetails.trim().length < 12 ? "Add at least 12 characters so the Sales team can scope the lift." : "",
+  };
+  const formReady = Boolean(form.contactName.trim() && form.companyName.trim() && form.email.trim() && form.phone.trim() && form.projectLocation.trim() && form.liftDetails.trim()) && !Object.values(fieldErrors).some(Boolean);
+
+  const updateForm = (field: keyof EnquiryForm, value: string) => {
+    setSubmittedEnquiry(null);
     setForm(current => ({ ...current, [field]: value }));
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       await submitEnquiry.mutateAsync(form);
+      setSubmittedEnquiry({ companyName: form.companyName, equipmentInterest: form.equipmentInterest });
       setForm(emptyEnquiry);
       toast.success("Rental enquiry received", {
         description: "The BOB team has the project brief and can follow up with the next steps.",
@@ -259,12 +273,13 @@ export default function RentalLanding() {
       <section className="rental-enquiry" id="enquire">
         <div className="rental-container rental-enquiry-grid">
           <div className="rental-enquiry-copy"><div className="rental-eyebrow rental-eyebrow-light"><span /> Plan your next lift</div><h2>Tell us what the project needs.</h2><p>Share the essential project information and the BOB team can begin the right rental and readiness conversation.</p><div className="rental-enquiry-points"><span><Check size={15} />Equipment and capacity requirement</span><span><Check size={15} />Project location and mobilisation window</span><span><Check size={15} />Site, crew and documentation considerations</span></div></div>
-          <form className="rental-enquiry-form" onSubmit={submit}>
-            <div className="rental-form-row"><label><span>Full name</span><input required value={form.contactName} onChange={event => updateForm("contactName", event.target.value)} placeholder="Your name" /></label><label><span>Company</span><input required value={form.companyName} onChange={event => updateForm("companyName", event.target.value)} placeholder="Company name" /></label></div>
-            <div className="rental-form-row"><label><span>Work email</span><input required type="email" value={form.email} onChange={event => updateForm("email", event.target.value)} placeholder="name@company.com" /></label><label><span>Phone</span><input required type="tel" value={form.phone} onChange={event => updateForm("phone", event.target.value)} placeholder="Phone number" /></label></div>
-            <div className="rental-form-row"><label><span>Project location</span><input required value={form.projectLocation} onChange={event => updateForm("projectLocation", event.target.value)} placeholder="City / site location" /></label><label><span>Equipment interest</span><select value={form.equipmentInterest} onChange={event => updateForm("equipmentInterest", event.target.value)}><option>Mobile crane rental</option><option>Crawler crane / complex lift</option><option>Transport and trailers</option><option>Lifting gear and rigging</option><option>Managed lifting service</option></select></label></div>
-            <label><span>Lift or project details</span><textarea required minLength={12} value={form.liftDetails} onChange={event => updateForm("liftDetails", event.target.value)} placeholder="Describe the load, timing, site access, documentation needs or anything the planning team should know." /></label>
-            <button className="rental-button rental-button-dark" type="submit" disabled={submitEnquiry.isPending}>{submitEnquiry.isPending ? "Sending enquiry…" : "Send rental enquiry"}<ArrowRight size={16} /></button>
+          <form className="rental-enquiry-form" onSubmit={submit} noValidate>
+            {submittedEnquiry && <div className="rental-enquiry-success" role="status"><Check size={16} /><span><strong>Quote request received.</strong> Sales has been notified to follow up with {submittedEnquiry.companyName} about {submittedEnquiry.equipmentInterest}.</span></div>}
+            <div className="rental-form-row"><label><span>Full name</span><input required aria-invalid={Boolean(fieldErrors.contactName)} className={fieldErrors.contactName ? "field-invalid" : ""} value={form.contactName} onChange={event => updateForm("contactName", event.target.value)} placeholder="Your name" />{fieldErrors.contactName && <small>{fieldErrors.contactName}</small>}</label><label><span>Company</span><input required aria-invalid={Boolean(fieldErrors.companyName)} className={fieldErrors.companyName ? "field-invalid" : ""} value={form.companyName} onChange={event => updateForm("companyName", event.target.value)} placeholder="Company name" />{fieldErrors.companyName && <small>{fieldErrors.companyName}</small>}</label></div>
+            <div className="rental-form-row"><label><span>Work email</span><input required type="email" aria-invalid={Boolean(fieldErrors.email)} className={fieldErrors.email ? "field-invalid" : ""} value={form.email} onChange={event => updateForm("email", event.target.value)} placeholder="name@company.com" />{fieldErrors.email && <small>{fieldErrors.email}</small>}</label><label><span>Phone</span><input required type="tel" aria-invalid={Boolean(fieldErrors.phone)} className={fieldErrors.phone ? "field-invalid" : ""} value={form.phone} onChange={event => updateForm("phone", event.target.value)} placeholder="Phone number" />{fieldErrors.phone && <small>{fieldErrors.phone}</small>}</label></div>
+            <div className="rental-form-row"><label><span>Project location</span><input required aria-invalid={Boolean(fieldErrors.projectLocation)} className={fieldErrors.projectLocation ? "field-invalid" : ""} value={form.projectLocation} onChange={event => updateForm("projectLocation", event.target.value)} placeholder="City / site location" />{fieldErrors.projectLocation && <small>{fieldErrors.projectLocation}</small>}</label><label><span>Equipment interest</span><select value={form.equipmentInterest} onChange={event => updateForm("equipmentInterest", event.target.value)}><option>Mobile crane rental</option><option>Crawler crane / complex lift</option><option>Transport and trailers</option><option>Lifting gear and rigging</option><option>Managed lifting service</option></select></label></div>
+            <label><span>Lift or project details</span><textarea required minLength={12} aria-invalid={Boolean(fieldErrors.liftDetails)} className={fieldErrors.liftDetails ? "field-invalid" : ""} value={form.liftDetails} onChange={event => updateForm("liftDetails", event.target.value)} placeholder="Describe the load, timing, site access, documentation needs or anything the planning team should know." />{fieldErrors.liftDetails && <small>{fieldErrors.liftDetails}</small>}</label>
+            <button className="rental-button rental-button-dark" type="submit" disabled={submitEnquiry.isPending || !formReady}>{submitEnquiry.isPending ? "Sending enquiry…" : "Send rental enquiry"}<ArrowRight size={16} /></button>
           </form>
         </div>
       </section>

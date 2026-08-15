@@ -1,8 +1,9 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { Building2, LockKeyhole, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowLeft, Building2, LockKeyhole, ShieldCheck, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import "./Login.css";
 
 type LoginForm = {
   name: string;
@@ -79,6 +80,7 @@ export default function Login() {
 
       <section className="auth-card-wrap">
         <div className="auth-card">
+          <button className="auth-landing-back" type="button" onClick={() => setLocation("/")}><ArrowLeft size={14} /> Back to Heavy Equipment Rental</button>
           <div className="auth-card-icon">{setupMode ? <UserRound size={22} /> : <LockKeyhole size={22} />}</div>
           <h2>{setupMode ? "Set up the administrator account" : "Sign in to BOB Cranes"}</h2>
           <p>{setupMode ? "Create the first administrator account. Only administrators can register department users after setup." : "Use the email address and password provided by your administrator."}</p>

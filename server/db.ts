@@ -920,6 +920,55 @@ export async function createRentalEnquiry(input: {
   return { id, status: "New" as const };
 }
 
+export async function listRentalEnquiries(filters?: { status?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const status = filters?.status;
+  if (status && status !== "all") {
+    return await db
+      .select()
+      .from(rentalEnquiries)
+      .where(eq(rentalEnquiries.status, status))
+      .orderBy(desc(rentalEnquiries.updatedAt));
+  }
+  return await db.select().from(rentalEnquiries).orderBy(desc(rentalEnquiries.updatedAt));
+}
+
+export async function getRentalEnquiryById(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [enquiry] = await db
+    .select()
+    .from(rentalEnquiries)
+    .where(eq(rentalEnquiries.id, id))
+    .limit(1);
+  return enquiry;
+}
+
+export async function updateRentalEnquirySalesContext(input: {
+  id: string;
+  status?: string;
+  assignedToUserId?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const values: { status?: string; assignedToUserId?: number | null } = {};
+  if (input.status !== undefined) values.status = input.status;
+  if (input.assignedToUserId !== undefined) values.assignedToUserId = input.assignedToUserId;
+  await db.update(rentalEnquiries).set(values).where(eq(rentalEnquiries.id, input.id));
+  return await getRentalEnquiryById(input.id);
+}
+
+export async function markRentalEnquiryConverted(input: { id: string; bookingId: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(rentalEnquiries)
+    .set({ status: "Converted", convertedBookingId: input.bookingId })
+    .where(eq(rentalEnquiries.id, input.id));
+  return await getRentalEnquiryById(input.id);
+}
+
 export async function seedInitialDataIfNeeded() {
   const db = await getDb();
   if (!db) return;

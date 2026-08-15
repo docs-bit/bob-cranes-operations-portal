@@ -86,12 +86,14 @@ import SupervisorPermissionsAudit from "@/components/SupervisorPermissionsAudit"
 import { generateDispatchBundlePdf } from "@/lib/dispatchBundlePdf";
 import * as XLSX from "xlsx";
 import DepartmentUsersView from "@/components/DepartmentUsersView";
+import SalesEnquiryInbox from "@/components/SalesEnquiryInbox";
 import "./DepartmentWorkspace.css";
 import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
   Bell,
+  BriefcaseBusiness,
   CalendarDays,
   Check,
   CheckCircle2,
@@ -151,6 +153,7 @@ type View =
   | "detail"
   | "department"
   | "provisioned-dashboard"
+  | "sales-enquiries"
   | "users"
   | "supervisor-audit";
 
@@ -927,6 +930,13 @@ export function Shell({
               <div className="nav-section" style={{ marginTop: 22 }}>
                 Client tools
               </div>
+              <button
+                className={`nav-item ${view === "sales-enquiries" ? "active" : ""}`}
+                onClick={() => setView("sales-enquiries")}
+              >
+                <BriefcaseBusiness />
+                <span>Sales Enquiries</span>
+              </button>
               <button className="nav-item" onClick={onClient}>
                 <MessageCircle />
                 <span>Client Portal Preview</span>
@@ -7357,6 +7367,9 @@ export default function Home() {
     setLocation("/login");
   };
   const canView = (nextView: View) => {
+    if (nextView === "sales-enquiries") {
+      return Boolean(user && (user.role === "admin" || user.departmentCode === "sales"));
+    }
     if (nextView === "provisioned-dashboard") {
       return Boolean(user && activeProvisionedDepartmentCode && canAccessProvisionedDepartmentDashboard(user, activeProvisionedDepartmentCode));
     }
@@ -7534,6 +7547,29 @@ export default function Home() {
           canArchiveWorkflows={user.role === "admin"}
           onOpenDossier={openDetail}
           onManageTeam={() => guardedSetView("users")}
+        />
+      )}
+      {view === "sales-enquiries" && (user.role === "admin" || user.departmentCode === "sales") && (
+        <SalesEnquiryInbox
+          actor={user}
+          onOpenBooking={booking => {
+            const convertedBooking: Booking = {
+              id: booking.id,
+              client: booking.clientName ?? "Rental enquiry client",
+              project: booking.projectName ?? "Rental enquiry conversion",
+              crane: "To be confirmed",
+              site: "To be confirmed",
+              stage: (booking.stage as Stage | undefined) ?? "Created by Salesperson",
+              priority: (booking.priority as Booking["priority"] | undefined) ?? "Standard",
+              progress: 0,
+              mob: booking.mobilizationDate ?? "To be confirmed",
+              offHire: booking.offHireDate ?? "To be confirmed",
+              pm: booking.projectManager ?? "Sales follow-up",
+              crew: booking.clientContactName ?? "",
+            };
+            setBookings(current => [convertedBooking, ...current.filter(item => item.id !== convertedBooking.id)]);
+            openDetail(convertedBooking);
+          }}
         />
       )}
       {view === "detail" && activeBooking && (

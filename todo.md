@@ -321,3 +321,10 @@
 - [x] Create a Sales follow-up notification whenever a public rental quote is submitted, with the submitted enquiry summary visible to authorised Sales users.
 - [x] Remove the overlapping landing-page header/brand treatment and use the newly supplied BOB visual assets in the appropriate landing placements.
 - [x] Add focused notification coverage, verify desktop/mobile layout, validate the production build, and publish the release.
+
+## Sales enquiry inbox and quote-conversion workflow
+- [x] Add an access-controlled Sales enquiry inbox with request status filtering, supervisor assignment, and a detailed enquiry view.
+- [x] Add a one-click, traceable enquiry-to-booking conversion flow that carries verified quote details into a new sales booking.
+- [x] Add real-time field validation and an explicit submitted-success state to the public quote form.
+- [x] Replace the specified Transport & Support landing visual treatment with the supplied BOB bridge-lift imagery and add a landing-page return control to login.
+- [x] Add focused permission/workflow coverage, responsive visual verification, production validation, and a published checkpoint.
