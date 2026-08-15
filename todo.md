@@ -366,3 +366,9 @@
 - [x] Add selectable rental duration and equipment type controls to the public enquiry form and persist the selections in the Sales workflow.
 - [x] Create and validate a reusable skill for safe rental-enquiry and mailto call-to-action enhancements.
 - [x] Add focused coverage, run release validation, and publish the completed enhancement.
+
+## Sales response visibility and profile contact details
+- [x] Add optional company and phone fields to user profiles for authenticated rental-estimate email prefill.
+- [x] Display rental duration in the Sales enquiry table and selected-enquiry detail modal.
+- [x] Add a visual dashboard badge for public rental enquiries that are not yet assigned to a Sales owner.
+- [x] Add focused coverage, complete release checks, and publish the response-visibility update.

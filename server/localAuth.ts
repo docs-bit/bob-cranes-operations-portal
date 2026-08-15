@@ -69,6 +69,8 @@ export function toSessionUser(user: User) {
     id: user.id,
     name: user.name,
     email: user.localEmail ?? user.email,
+    companyName: user.companyName,
+    phone: user.phone,
     role: user.role,
     departmentCode: user.departmentCode,
     supervisorId: user.supervisorId,

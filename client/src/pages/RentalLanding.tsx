@@ -77,6 +77,8 @@ export default function RentalLanding() {
       ...current,
       contactName: current.contactName || user.name || "",
       email: current.email || user.email || "",
+      companyName: current.companyName || user.companyName || "",
+      phone: current.phone || user.phone || "",
     }));
   }, [user?.email, user?.id, user?.name]);
   const fieldErrors = {
@@ -100,6 +102,8 @@ export default function RentalLanding() {
       ...form,
       contactName: user?.name || form.contactName,
       email: user?.email || form.email,
+      companyName: user?.companyName || form.companyName,
+      phone: user?.phone || form.phone,
     };
     toast.info("Opening your email client", { description: "Your rental estimate request template is ready to review and send." });
     window.location.href = buildRentalEstimateMailto(emailInput);

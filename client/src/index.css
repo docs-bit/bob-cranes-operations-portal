@@ -1572,3 +1572,16 @@ body,
   .daily-operations-items { width: 100%; grid-template-columns: 1fr; gap: 8px; }
   .daily-operations-items article { padding-left: 0; border-left: 0; }
 }
+
+/* Rental estimate profile prefill and Sales response visibility */
+.profile-contact-settings { display: grid; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--equipment-line); }
+.profile-contact-settings label { display: grid; gap: 4px; color: var(--equipment-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.profile-contact-settings input { width: 100%; border: 1px solid var(--equipment-line); border-radius: 7px; padding: 8px 9px; background: #fff; color: var(--equipment-ink); font-size: 12px; }
+.profile-menu .profile-contact-settings button { justify-content: center; margin-top: 2px; padding: 8px 10px; border: 1px solid var(--equipment-orange); border-radius: 7px; background: var(--equipment-orange); color: #fff; font-size: 11px; font-weight: 700; }
+.profile-menu .profile-contact-settings button:hover { background: var(--equipment-orange-deep); color: #fff; }
+.unassigned-enquiry-status { display: flex; width: 100%; align-items: center; gap: 12px; margin: 14px 0 18px; padding: 12px 14px; border: 1px solid var(--equipment-line); border-radius: 12px; background: #fff; color: var(--equipment-ink); cursor: pointer; text-align: left; transition: transform .16s ease-out, border-color .16s ease-out, box-shadow .16s ease-out; }
+.unassigned-enquiry-status:hover { transform: translateY(-1px); border-color: var(--equipment-orange); box-shadow: 0 10px 24px rgba(41, 47, 57, .09); }
+.unassigned-enquiry-status > span:nth-child(2) { display: grid; min-width: 0; gap: 2px; }
+.unassigned-enquiry-status strong { font-size: 13px; }.unassigned-enquiry-status small { color: var(--equipment-muted); font-size: 11px; }.unassigned-enquiry-status > svg { margin-left: auto; color: var(--equipment-orange-deep); }.unassigned-enquiry-status.all-assigned .status-badge { background: #e8f7ef; color: #137a4b; }
+.sales-enquiry-duration { color: var(--equipment-orange-deep); font-size: 11px; font-weight: 700; }
+@media (max-width: 760px) { .unassigned-enquiry-status { align-items: flex-start; }.profile-contact-settings { padding-bottom: 14px; } }

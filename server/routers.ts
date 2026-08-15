@@ -469,6 +469,31 @@ export const appRouter = router({
     me: publicProcedure.query(opts =>
       opts.ctx.user ? toSessionUser(opts.ctx.user) : null
     ),
+    updateMyContactDetails: protectedProcedure
+      .input(
+        z.object({
+          companyName: z.string().trim().max(160).optional().or(z.literal("")),
+          phone: z.string().trim().max(48).optional().or(z.literal("")),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const user = await db.updateUserProfileContactDetails(ctx.user.id, {
+          companyName: input.companyName?.trim() || null,
+          phone: input.phone?.trim() || null,
+        });
+        if (!user)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Your profile could not be updated.",
+          });
+        await db.addUserActivity(
+          profileUpdateActivity(
+            ctx.user.id,
+            ctx.user.name ?? ctx.user.email ?? "Current user"
+          )
+        );
+        return toSessionUser(user);
+      }),
     bootstrapAdmin: publicProcedure
       .input(accountInput)
       .mutation(async ({ ctx, input }) => {

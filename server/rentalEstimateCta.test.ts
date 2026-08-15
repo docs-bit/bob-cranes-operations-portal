@@ -12,6 +12,10 @@ describe("public rental estimate call-to-action", () => {
     expect(source).toContain('toast.info("Opening your email client"');
     expect(source).toContain('user?.name || form.contactName');
     expect(source).toContain('user?.email || form.email');
+    expect(source).toContain('user?.companyName || form.companyName');
+    expect(source).toContain('user?.phone || form.phone');
+    expect(source).toContain('companyName: current.companyName || user.companyName || ""');
+    expect(source).toContain('phone: current.phone || user.phone || ""');
     expect(source).toContain('<span>Equipment type</span>');
     expect(source).toContain('<span>Rental duration</span>');
     expect(source).toContain('onClick={openRentalEstimateEmail}');

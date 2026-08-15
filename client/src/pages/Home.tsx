@@ -651,6 +651,8 @@ export function Shell({
     id: number;
     name: string | null;
     email: string | null;
+    companyName?: string | null;
+    phone?: string | null;
     role: "admin" | "supervisor" | "user";
     departmentCode: string | null;
     supervisorId?: number | null;
@@ -715,6 +717,24 @@ export function Shell({
   const clearNotificationsMutation =
     trpc.operations.clearNotifications.useMutation();
   const utils = trpc.useUtils();
+  const updateMyContactDetails = trpc.auth.updateMyContactDetails.useMutation();
+  const [profileContact, setProfileContact] = useState({
+    companyName: user.companyName ?? "",
+    phone: user.phone ?? "",
+  });
+  useEffect(() => {
+    setProfileContact({ companyName: user.companyName ?? "", phone: user.phone ?? "" });
+  }, [user.companyName, user.phone]);
+  const saveProfileContactDetails = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await updateMyContactDetails.mutateAsync(profileContact);
+      await utils.auth.me.invalidate();
+      toast.success("Profile contact details saved", { description: "Your company and phone can now pre-fill rental estimate emails." });
+    } catch (caught) {
+      toast.error("Profile update failed", { description: caught instanceof Error ? caught.message : "Please try again." });
+    }
+  };
   const notificationItems = notificationsQuery.data ?? [];
   const [urgencyFilter, setUrgencyFilter] = useState<
     "All" | "High" | "Warning" | "Standard"
@@ -1007,6 +1027,12 @@ export function Shell({
                     ))}
                   </div>
                 </div>
+                <form className="profile-contact-settings" onSubmit={saveProfileContactDetails}>
+                  <div className="profile-detail-label">Rental estimate contact</div>
+                  <label><span>Company</span><input value={profileContact.companyName} onChange={event => setProfileContact(current => ({ ...current, companyName: event.target.value }))} maxLength={160} placeholder="Optional company name" /></label>
+                  <label><span>Phone</span><input value={profileContact.phone} onChange={event => setProfileContact(current => ({ ...current, phone: event.target.value }))} maxLength={48} placeholder="Optional phone number" /></label>
+                  <button type="submit" disabled={updateMyContactDetails.isPending}>{updateMyContactDetails.isPending ? "Saving contact…" : "Save contact details"}</button>
+                </form>
                 {user.role !== "user" && (
                   <button
                     onClick={() => {
@@ -1934,6 +1960,8 @@ function Overview({
   setAttendanceRecords,
   user,
   greetingTemplate,
+  unassignedRentalEnquiries,
+  canViewSalesEnquiries,
   onSelectEmployee,
 }: {
   bookings: Booking[];
@@ -1950,6 +1978,8 @@ function Overview({
     name?: string | null;
   };
   greetingTemplate?: string | null;
+  unassignedRentalEnquiries: number;
+  canViewSalesEnquiries: boolean;
   onSelectEmployee: (employeeId: string) => void;
 }) {
   const canCreateBooking =
@@ -1996,6 +2026,13 @@ function Overview({
           <article className={complianceBlockers ? "attention" : "ready"}><strong>{complianceBlockers}</strong><span>{complianceBlockers === 1 ? "compliance item needs action" : "compliance items need action"}</span></article>
         </div>
       </section>
+      {canViewSalesEnquiries && (
+        <button type="button" className={`unassigned-enquiry-status ${unassignedRentalEnquiries ? "needs-response" : "all-assigned"}`} onClick={() => setView("sales-enquiries")} data-testid="unassigned-enquiry-status">
+          <span className="status-badge amber">{unassignedRentalEnquiries}</span>
+          <span><strong>{unassignedRentalEnquiries === 1 ? "Unassigned public enquiry" : "Unassigned public enquiries"}</strong><small>{unassignedRentalEnquiries ? "Assign a Sales owner to begin follow-up." : "Every open public enquiry has a Sales owner."}</small></span>
+          <ArrowRight size={15} />
+        </button>
+      )}
       <div className="metric-grid">
         <MetricCard
           label="Active dossiers"
@@ -7190,6 +7227,14 @@ export default function Home() {
   const crewAllocationsQuery = trpc.operations.getCrewAllocations.useQuery();
   const provisionedDashboardsQuery = trpc.departments.listProvisioned.useQuery(undefined, { enabled: Boolean(user) });
   const dashboardGreetingQuery = trpc.auth.getDashboardGreeting.useQuery(undefined, { enabled: Boolean(user) });
+  const canViewSalesEnquiries = Boolean(user && (user.role === "admin" || user.departmentCode === "sales"));
+  const salesEnquiriesQuery = trpc.salesEnquiries.list.useQuery(
+    { status: "all" },
+    { enabled: canViewSalesEnquiries }
+  );
+  const unassignedRentalEnquiries = (salesEnquiriesQuery.data ?? []).filter(
+    enquiry => !enquiry.assignedToUserId && enquiry.status !== "Converted" && enquiry.status !== "Closed"
+  ).length;
   const [view, setView] = useState<View>(() =>
     location === "/uploads"
       ? "uploads"
@@ -7463,6 +7508,8 @@ export default function Home() {
           setAttendanceRecords={setAttendanceRecords}
           user={user}
           greetingTemplate={dashboardGreetingQuery.data?.template}
+          unassignedRentalEnquiries={unassignedRentalEnquiries}
+          canViewSalesEnquiries={canViewSalesEnquiries}
           onSelectEmployee={employeeId => {
             setSelectedTrainingEmployeeId(employeeId);
             setView("training");

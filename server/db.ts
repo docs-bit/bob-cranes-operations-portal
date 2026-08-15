@@ -200,6 +200,19 @@ export async function updateLocalUser(
   return await getUserById(id);
 }
 
+export async function updateUserProfileContactDetails(
+  id: number,
+  input: { companyName: string | null; phone: string | null }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for profile update.");
+  await db
+    .update(users)
+    .set({ companyName: input.companyName, phone: input.phone })
+    .where(eq(users.id, id));
+  return await getUserById(id);
+}
+
 export async function setLocalUserActive(id: number, isActive: number) {
   const db = await getDb();
   if (!db) throw new Error("Database unavailable for account status update.");

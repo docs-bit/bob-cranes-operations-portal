@@ -11,7 +11,10 @@ vi.mock("../client/src/lib/trpc", () => ({
       getNotifications: { useQuery: () => ({ data: [] }) },
       clearNotifications: { useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }) },
     },
-    useUtils: () => ({ operations: { getNotifications: { invalidate: vi.fn() } } }),
+    auth: {
+      updateMyContactDetails: { useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }) },
+    },
+    useUtils: () => ({ operations: { getNotifications: { invalidate: vi.fn() } }, auth: { me: { invalidate: vi.fn() } } }),
   },
 }));
 

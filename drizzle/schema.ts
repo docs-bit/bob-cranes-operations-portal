@@ -13,6 +13,8 @@ export const users = mysqlTable("users", {
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  companyName: varchar("companyName", { length: 160 }),
+  phone: varchar("phone", { length: 48 }),
   localEmail: varchar("localEmail", { length: 320 }).unique(),
   passwordHash: varchar("passwordHash", { length: 255 }),
   departmentCode: varchar("departmentCode", { length: 32 }),
