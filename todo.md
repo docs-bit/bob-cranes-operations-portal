@@ -311,3 +311,8 @@
 - [x] Add a safe department archive and reactivation workflow that preserves assigned users, dashboards, and operational history.
 - [x] Add department-level workflow templates with required-document checklists and assigned-user guidance.
 - [x] Add focused tests, responsive visual verification, database migration validation, and a production checkpoint.
+
+## User-supplied BOB Cranes landing photographs
+- [x] Host the supplied BOB Cranes project images as deployment-safe landing-page assets.
+- [x] Replace the external stock landing photography with the supplied BOB project photographs in responsive hero and capability compositions.
+- [x] Verify desktop/mobile presentation, run production validation, and publish the visual update.
