@@ -30,6 +30,8 @@ import {
   notifications,
   departments,
   departmentDashboards,
+  departmentWorkflowTemplates,
+  rentalEnquiries,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -677,12 +679,12 @@ export type ProvisionedDepartmentDashboard = {
   updatedAt: Date;
 };
 
-export async function listProvisionedDepartmentDashboards(): Promise<
-  ProvisionedDepartmentDashboard[]
-> {
+export async function listProvisionedDepartmentDashboards(options: {
+  includeArchived?: boolean;
+} = {}): Promise<ProvisionedDepartmentDashboard[]> {
   const db = await getDb();
   if (!db) return [];
-  return await db
+  const query = db
     .select({
       code: departments.code,
       name: departments.name,
@@ -699,9 +701,10 @@ export async function listProvisionedDepartmentDashboards(): Promise<
     .innerJoin(
       departmentDashboards,
       eq(departments.code, departmentDashboards.departmentCode)
-    )
-    .where(eq(departments.active, 1))
-    .orderBy(departments.name);
+    );
+  return await (options.includeArchived
+    ? query.orderBy(departments.name)
+    : query.where(eq(departments.active, 1)).orderBy(departments.name));
 }
 
 export async function getProvisionedDepartmentDashboard(code: string): Promise<
@@ -767,6 +770,154 @@ export async function createProvisionedDepartmentDashboard(input: {
   const created = await getProvisionedDepartmentDashboard(input.code);
   if (!created) throw new Error("Department dashboard could not be provisioned.");
   return created;
+}
+
+export async function updateProvisionedDepartmentDashboardConfig(input: {
+  code: string;
+  description: string;
+  dashboardConfig: Record<string, unknown>;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(departmentDashboards)
+    .set({
+      description: input.description,
+      dashboardConfig: input.dashboardConfig,
+    })
+    .where(eq(departmentDashboards.departmentCode, input.code));
+  const updated = await getProvisionedDepartmentDashboard(input.code);
+  if (!updated) throw new Error("Department dashboard could not be updated.");
+  return updated;
+}
+
+export async function setProvisionedDepartmentActive(input: {
+  code: string;
+  active: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(departments)
+    .set({ active: input.active ? 1 : 0 })
+    .where(eq(departments.code, input.code));
+  const updated = await getProvisionedDepartmentDashboard(input.code);
+  if (!updated) throw new Error("Department dashboard could not be updated.");
+  return updated;
+}
+
+export type DepartmentWorkflowTemplate = {
+  id: string;
+  departmentCode: string;
+  name: string;
+  description: string;
+  checklist: unknown;
+  active: number;
+  createdBy: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export async function listDepartmentWorkflowTemplates(input: {
+  departmentCode: string;
+  includeArchived?: boolean;
+}): Promise<DepartmentWorkflowTemplate[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const query = db
+    .select()
+    .from(departmentWorkflowTemplates)
+    .where(eq(departmentWorkflowTemplates.departmentCode, input.departmentCode));
+  const rows = await query.orderBy(desc(departmentWorkflowTemplates.updatedAt));
+  return input.includeArchived ? rows : rows.filter(template => template.active === 1);
+}
+
+export async function createDepartmentWorkflowTemplate(input: {
+  departmentCode: string;
+  name: string;
+  description: string;
+  checklist: Array<Record<string, unknown>>;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const id = `workflow-${nanoid(14)}`;
+  await db.insert(departmentWorkflowTemplates).values({
+    id,
+    departmentCode: input.departmentCode,
+    name: input.name,
+    description: input.description,
+    checklist: input.checklist,
+    active: 1,
+    createdBy: input.createdBy,
+  });
+  const [template] = await db
+    .select()
+    .from(departmentWorkflowTemplates)
+    .where(eq(departmentWorkflowTemplates.id, id))
+    .limit(1);
+  if (!template) throw new Error("Workflow template could not be created.");
+  return template;
+}
+
+export async function updateDepartmentWorkflowTemplate(input: {
+  id: string;
+  name: string;
+  description: string;
+  checklist: Array<Record<string, unknown>>;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(departmentWorkflowTemplates)
+    .set({
+      name: input.name,
+      description: input.description,
+      checklist: input.checklist,
+    })
+    .where(eq(departmentWorkflowTemplates.id, input.id));
+  const [template] = await db
+    .select()
+    .from(departmentWorkflowTemplates)
+    .where(eq(departmentWorkflowTemplates.id, input.id))
+    .limit(1);
+  if (!template) throw new Error("Workflow template could not be updated.");
+  return template;
+}
+
+export async function setDepartmentWorkflowTemplateActive(input: {
+  id: string;
+  active: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(departmentWorkflowTemplates)
+    .set({ active: input.active ? 1 : 0 })
+    .where(eq(departmentWorkflowTemplates.id, input.id));
+  const [template] = await db
+    .select()
+    .from(departmentWorkflowTemplates)
+    .where(eq(departmentWorkflowTemplates.id, input.id))
+    .limit(1);
+  if (!template) throw new Error("Workflow template could not be updated.");
+  return template;
+}
+
+export async function createRentalEnquiry(input: {
+  contactName: string;
+  companyName: string;
+  email: string;
+  phone: string;
+  projectLocation: string;
+  equipmentInterest: string;
+  liftDetails: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const id = `rental-enquiry-${nanoid(14)}`;
+  await db.insert(rentalEnquiries).values({ id, ...input, status: "New" });
+  return { id, status: "New" as const };
 }
 
 export async function seedInitialDataIfNeeded() {

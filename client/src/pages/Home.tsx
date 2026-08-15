@@ -36,7 +36,14 @@ import {
 } from "@shared/departmentAccess";
 import {
   canAccessProvisionedDepartmentDashboard,
+  DEPARTMENT_DASHBOARD_METRICS,
+  DEPARTMENT_DASHBOARD_WIDGETS,
+  defaultWorkflowChecklist,
+  normalizeDepartmentDashboardConfig,
   type DepartmentDashboardConfig,
+  type DepartmentDashboardMetric,
+  type DepartmentDashboardWidget,
+  type WorkflowChecklistItem,
 } from "@shared/departmentDashboardRules";
 import {
   findEmployeeBookingConflicts,
@@ -79,6 +86,7 @@ import SupervisorPermissionsAudit from "@/components/SupervisorPermissionsAudit"
 import { generateDispatchBundlePdf } from "@/lib/dispatchBundlePdf";
 import * as XLSX from "xlsx";
 import DepartmentUsersView from "@/components/DepartmentUsersView";
+import "./DepartmentWorkspace.css";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -6995,10 +7003,108 @@ function DepartmentView({
   );
 }
 
+function DepartmentWorkspaceControls({
+  dashboard,
+  config,
+  canManage,
+  canArchiveWorkflows,
+  showWorkflow,
+}: {
+  dashboard: { code: string; name: string };
+  config: DepartmentDashboardConfig;
+  canManage: boolean;
+  canArchiveWorkflows: boolean;
+  showWorkflow: boolean;
+}) {
+  const utils = trpc.useUtils();
+  const workflowInput = useMemo(() => ({ departmentCode: dashboard.code }), [dashboard.code]);
+  const templatesQuery = trpc.departments.listWorkflowTemplates.useQuery(workflowInput);
+  const updateConfig = trpc.departments.updateDashboardConfig.useMutation();
+  const createWorkflow = trpc.departments.createWorkflowTemplate.useMutation();
+  const setWorkflowActive = trpc.departments.setWorkflowTemplateActive.useMutation();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [templateOpen, setTemplateOpen] = useState(false);
+  const [overviewLabel, setOverviewLabel] = useState(config.overviewLabel);
+  const [objective, setObjective] = useState(config.objective);
+  const [widgets, setWidgets] = useState<DepartmentDashboardWidget[]>(config.widgets);
+  const [metrics, setMetrics] = useState<[DepartmentDashboardMetric, DepartmentDashboardMetric]>(config.metrics);
+  const [templateName, setTemplateName] = useState("");
+  const [templateDescription, setTemplateDescription] = useState("");
+  const [checklist, setChecklist] = useState<WorkflowChecklistItem[]>(() => defaultWorkflowChecklist(config.workstream));
+
+  useEffect(() => {
+    setOverviewLabel(config.overviewLabel);
+    setObjective(config.objective);
+    setWidgets(config.widgets);
+    setMetrics(config.metrics);
+    setChecklist(defaultWorkflowChecklist(config.workstream));
+  }, [config]);
+
+  const toggleWidget = (widget: DepartmentDashboardWidget) => {
+    setWidgets(current => current.includes(widget) ? current.filter(item => item !== widget) : [...current, widget]);
+  };
+  const saveConfig = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await updateConfig.mutateAsync({ code: dashboard.code, overviewLabel, objective, widgets, metrics });
+      await utils.departments.listProvisioned.invalidate();
+      toast.success("Dashboard widgets saved", { description: `${dashboard.name} now uses the selected metric and widget layout.` });
+      setSettingsOpen(false);
+    } catch (error) {
+      toast.error("Dashboard configuration could not be saved", { description: error instanceof Error ? error.message : "Review the workspace settings and try again." });
+    }
+  };
+  const createTemplate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await createWorkflow.mutateAsync({ departmentCode: dashboard.code, name: templateName, description: templateDescription, checklist });
+      await utils.departments.listWorkflowTemplates.invalidate(workflowInput);
+      setTemplateName("");
+      setTemplateDescription("");
+      setChecklist(defaultWorkflowChecklist(config.workstream));
+      setTemplateOpen(false);
+      toast.success("Workflow template created", { description: "The required document checklist is now available to this department." });
+    } catch (error) {
+      toast.error("Workflow template could not be created", { description: error instanceof Error ? error.message : "Review the checklist and try again." });
+    }
+  };
+  const setTemplateStatus = async (id: string, active: boolean) => {
+    try {
+      await setWorkflowActive.mutateAsync({ id, departmentCode: dashboard.code, active });
+      await utils.departments.listWorkflowTemplates.invalidate(workflowInput);
+      toast.success(active ? "Workflow restored" : "Workflow archived", { description: "Workflow history has been retained." });
+    } catch (error) {
+      toast.error("Workflow status could not be updated", { description: error instanceof Error ? error.message : "Please try again." });
+    }
+  };
+  const metricOptions: Array<{ value: DepartmentDashboardMetric; label: string }> = [
+    { value: "active_dossiers", label: "Active dossiers" }, { value: "priority_dossiers", label: "Priority dossiers" }, { value: "assigned_team", label: "Assigned team" }, { value: "total_dossiers", label: "Total dossiers" },
+  ];
+
+  return <>
+    <section className="panel department-workspace-controls" style={{ marginTop: 16 }}>
+      <div className="panel-header"><div><div className="panel-title"><Settings size={16} /> Workspace configuration</div><div className="panel-meta">{canManage ? "Select the dashboard widgets and metric emphasis most useful for this department." : "This workspace’s widgets are configured by its supervisor or an administrator."}</div></div>{canManage && <button className="secondary-button compact-button" type="button" onClick={() => setSettingsOpen(open => !open)}>{settingsOpen ? "Close settings" : "Edit widgets"}</button>}</div>
+      {settingsOpen && canManage && <form className="panel-body department-config-form" onSubmit={saveConfig}>
+        <label className="wide"><span>Workspace title</span><input className="form-input" value={overviewLabel} onChange={event => setOverviewLabel(event.target.value)} minLength={3} maxLength={160} required /></label>
+        <label className="wide"><span>Operational objective</span><textarea className="form-textarea" value={objective} onChange={event => setObjective(event.target.value)} minLength={12} maxLength={600} required /></label>
+        <div className="wide"><span className="department-control-label">Visible widgets</span><div className="department-widget-options">{DEPARTMENT_DASHBOARD_WIDGETS.map(widget => <label key={widget}><input type="checkbox" checked={widgets.includes(widget)} onChange={() => toggleWidget(widget)} /><span>{widget.replaceAll("_", " ")}</span></label>)}</div></div>
+        <label><span>Primary metric</span><select className="form-select" value={metrics[0]} onChange={event => setMetrics([event.target.value as DepartmentDashboardMetric, metrics[1]])}>{metricOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+        <label><span>Secondary metric</span><select className="form-select" value={metrics[1]} onChange={event => setMetrics([metrics[0], event.target.value as DepartmentDashboardMetric])}>{metricOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+        <button className="primary-button" type="submit" disabled={updateConfig.isPending || !widgets.length}>{updateConfig.isPending ? "Saving widgets…" : "Save workspace layout"}</button>
+      </form>}
+    </section>
+    {showWorkflow && <section className="panel department-workflow-library" style={{ marginTop: 16 }}><div className="panel-header"><div><div className="panel-title"><FileText size={16} /> Workflow templates & document checklists</div><div className="panel-meta">Standardise required evidence and assigned-user guidance before work begins.</div></div>{canManage && <button className="secondary-button compact-button" type="button" onClick={() => setTemplateOpen(open => !open)}><Plus size={13} /> {templateOpen ? "Close editor" : "New template"}</button>}</div>
+      {templateOpen && canManage && <form className="panel-body department-config-form" onSubmit={createTemplate}><label><span>Template name</span><input className="form-input" value={templateName} onChange={event => setTemplateName(event.target.value)} placeholder="e.g. Standard mobilisation pack" minLength={3} maxLength={160} required /></label><label><span>Purpose</span><input className="form-input" value={templateDescription} onChange={event => setTemplateDescription(event.target.value)} placeholder="When should this checklist be used?" minLength={12} maxLength={800} required /></label><div className="wide"><span className="department-control-label">Required document checklist</span><div className="workflow-checklist-editor">{checklist.map((item, index) => <div key={item.id} className="workflow-checklist-row"><input className="form-input" value={item.label} onChange={event => setChecklist(current => current.map((entry, entryIndex) => entryIndex === index ? { ...entry, label: event.target.value } : entry))} aria-label={`Checklist item ${index + 1}`} /><label className="workflow-required"><input type="checkbox" checked={item.required} onChange={event => setChecklist(current => current.map((entry, entryIndex) => entryIndex === index ? { ...entry, required: event.target.checked } : entry))} /> Required</label><button className="icon-action-button danger" type="button" onClick={() => setChecklist(current => current.length > 1 ? current.filter((_, entryIndex) => entryIndex !== index) : current)} aria-label={`Remove ${item.label}`}><X size={14} /></button></div>)}<button className="secondary-button compact-button" type="button" onClick={() => setChecklist(current => [...current, { id: `custom-${Date.now()}`, label: "New required document", category: "Department", required: true, guidance: "Confirm and attach this document before handoff." }])}><Plus size={13} /> Add checklist item</button></div></div><button className="primary-button" type="submit" disabled={createWorkflow.isPending || !checklist.length}>{createWorkflow.isPending ? "Creating workflow…" : "Create workflow template"}</button></form>}
+      <div className="panel-body workflow-template-list">{templatesQuery.isLoading ? <div className="empty-state">Loading workflow templates…</div> : templatesQuery.data?.length ? templatesQuery.data.map(template => { const items = Array.isArray(template.checklist) ? template.checklist as WorkflowChecklistItem[] : []; return <article className={`workflow-template-card ${template.active !== 1 ? "archived" : ""}`} key={template.id}><div className="workflow-template-heading"><div><strong>{template.name}</strong><p>{template.description}</p></div><span className={`status-badge ${template.active === 1 ? "green" : "gray"}`}>{template.active === 1 ? "Active" : "Archived"}</span></div><ul>{items.map(item => <li key={item.id}><Check size={13} />{item.label}{item.required && <span>Required</span>}</li>)}</ul>{canManage && <div className="workflow-template-actions"><button className="secondary-button compact-button" type="button" onClick={() => setChecklist(items.length ? items : defaultWorkflowChecklist(config.workstream))}>Use checklist as a starting point</button>{canArchiveWorkflows && <button className="secondary-button compact-button" type="button" onClick={() => void setTemplateStatus(template.id, template.active !== 1)} disabled={setWorkflowActive.isPending}>{template.active === 1 ? "Archive" : "Restore"}</button>}</div>}</article>; }) : <div className="empty-state">No department workflow templates yet. {canManage ? "Create one to standardise document checks and handoffs." : "Your supervisor can add a template when the department is ready."}</div>}</div>
+    </section>}
+  </>;
+}
+
 function ProvisionedDepartmentDashboard({
   dashboard,
   bookings,
   canManageTeam,
+  canArchiveWorkflows,
   onOpenDossier,
   onManageTeam,
 }: {
@@ -7011,21 +7117,33 @@ function ProvisionedDepartmentDashboard({
   };
   bookings: Booking[];
   canManageTeam: boolean;
+  canArchiveWorkflows: boolean;
   onOpenDossier: (booking: Booking) => void;
   onManageTeam: () => void;
 }) {
   const membersQuery = trpc.auth.listUsers.useQuery();
-  const config = dashboard.dashboardConfig as DepartmentDashboardConfig;
+  const config = normalizeDepartmentDashboardConfig(dashboard.dashboardConfig, { name: dashboard.name });
   const activeBookings = bookings.filter((booking) => booking.stage !== "Dispatched");
   const priorityBookings = activeBookings.filter((booking) => booking.priority === "Critical" || booking.priority === "High");
   const departmentMembers = (membersQuery.data ?? []).filter((member) => member.departmentCode === dashboard.code && member.isActive === 1);
   const accentMap: Record<string, string> = { orange: "#d94c12", blue: "#0a66c2", green: "#137a4b", violet: "#6d4ac6" };
   const accent = accentMap[dashboard.accent] ?? accentMap.orange;
   const firstDossier = activeBookings[0] ?? bookings[0];
+  const metricValue: Record<DepartmentDashboardMetric, { value: string; foot: string }> = {
+    active_dossiers: { value: String(activeBookings.length), foot: "Across active BOB dossiers" },
+    priority_dossiers: { value: String(priorityBookings.length), foot: "Priority actions need attention" },
+    assigned_team: { value: String(departmentMembers.length), foot: "Named accounts assigned here" },
+    total_dossiers: { value: String(bookings.length), foot: "All visible BOB dossiers" },
+  };
+  const metricLabels: Record<DepartmentDashboardMetric, string> = { active_dossiers: config.primaryMetricLabel, priority_dossiers: config.secondaryMetricLabel, assigned_team: "Active department team", total_dossiers: "Total dossiers" };
+  const primaryMetric = config.metrics[0];
+  const secondaryMetric = config.metrics[1];
+  const visibleWidgets = new Set(config.widgets);
   return <div className="content" data-testid="provisioned-department-dashboard">
     <div className="page-heading" style={{ borderLeft: `4px solid ${accent}`, paddingLeft: 16 }}><div><div className="eyebrow">Provisioned department workspace</div><h1 className="page-title">{dashboard.name}</h1><p className="page-copy">{dashboard.description}</p></div><div className="status-badge blue"><LayoutDashboard size={12} /> Dedicated dashboard</div></div>
-    <div className="metric-grid"><MetricCard label={config.primaryMetricLabel} value={String(activeBookings.length)} foot="Across active BOB dossiers" icon={<ClipboardCheck size={13} />} tone="green" /><MetricCard label={config.secondaryMetricLabel} value={String(priorityBookings.length)} foot="Priority actions need attention" icon={<AlertTriangle size={13} />} tone="red" /><MetricCard label="Active department team" value={String(departmentMembers.length)} foot="Named accounts assigned here" icon={<Users size={13} />} tone="green" /><MetricCard label="Workspace status" value="Ready" foot="Dashboard provisioned and isolated" icon={<CheckCircle2 size={13} />} tone="green" /></div>
-    <div className="detail-grid"><section className="panel"><div className="panel-header"><div><div className="panel-title">{config.overviewLabel}</div><div className="panel-meta">{config.objective}</div></div><span className="status-badge amber">{config.workstream}</span></div><div className="panel-body"><div className="notification"><div className="title">Controlled department access</div><div className="body">This dashboard is linked to the <strong>{dashboard.code}</strong> department code. Only its assigned users, supervisor, and administrators can open this workspace.</div></div><div className="workflow-actions" style={{ marginTop: 16 }}><button className="primary-button" type="button" onClick={() => firstDossier && onOpenDossier(firstDossier)} disabled={!firstDossier}><ClipboardCheck size={14} /> {config.quickActions[0]}</button><button className="secondary-button" type="button" onClick={onManageTeam} disabled={!canManageTeam}><Users size={14} /> {canManageTeam ? config.quickActions[1] : "Supervisor access required"}</button></div></div></section><section className="panel"><div className="panel-header"><div><div className="panel-title">Department handoff queue</div><div className="panel-meta">Dossiers are shared with the department’s configured operational focus.</div></div><span className="status-badge blue">{activeBookings.length} active</span></div><div className="panel-body activity-list">{activeBookings.slice(0, 4).map((booking) => <button className="activity-row" type="button" key={booking.id} onClick={() => onOpenDossier(booking)}><div className="activity-icon" style={{ color: accent }}><ClipboardCheck size={14} /></div><div className="activity-copy"><div><strong>{booking.id}</strong><span className="activity-action">{booking.client}</span></div><p>{booking.project} · {booking.stage}</p></div><span className="status-badge gray">{booking.priority}</span></button>)}{!activeBookings.length && <div className="empty-state">No active dossiers are currently awaiting this department’s attention.</div>}</div></section></div>
+    <div className="metric-grid"><MetricCard label={metricLabels[primaryMetric]} value={metricValue[primaryMetric].value} foot={metricValue[primaryMetric].foot} icon={<ClipboardCheck size={13} />} tone="green" /><MetricCard label={metricLabels[secondaryMetric]} value={metricValue[secondaryMetric].value} foot={metricValue[secondaryMetric].foot} icon={<AlertTriangle size={13} />} tone="red" /><MetricCard label="Active department team" value={String(departmentMembers.length)} foot="Named accounts assigned here" icon={<Users size={13} />} tone="green" /><MetricCard label="Workspace status" value="Ready" foot="Dashboard provisioned and isolated" icon={<CheckCircle2 size={13} />} tone="green" /></div>
+    <div className="detail-grid">{visibleWidgets.has("team_readiness") && <section className="panel"><div className="panel-header"><div><div className="panel-title">{config.overviewLabel}</div><div className="panel-meta">{config.objective}</div></div><span className="status-badge amber">{config.workstream}</span></div><div className="panel-body"><div className="notification"><div className="title">Controlled department access</div><div className="body">This dashboard is linked to the <strong>{dashboard.code}</strong> department code. Only its assigned users, supervisor, and administrators can open this workspace.</div></div><div className="workflow-actions" style={{ marginTop: 16 }}><button className="primary-button" type="button" onClick={() => firstDossier && onOpenDossier(firstDossier)} disabled={!firstDossier}><ClipboardCheck size={14} /> {config.quickActions[0]}</button><button className="secondary-button" type="button" onClick={onManageTeam} disabled={!canManageTeam}><Users size={14} /> {canManageTeam ? config.quickActions[1] : "Supervisor access required"}</button></div></div></section>}{visibleWidgets.has("handoff_queue") && <section className="panel"><div className="panel-header"><div><div className="panel-title">Department handoff queue</div><div className="panel-meta">Dossiers are shared with the department’s configured operational focus.</div></div><span className="status-badge blue">{activeBookings.length} active</span></div><div className="panel-body activity-list">{activeBookings.slice(0, 4).map((booking) => <button className="activity-row" type="button" key={booking.id} onClick={() => onOpenDossier(booking)}><div className="activity-icon" style={{ color: accent }}><ClipboardCheck size={14} /></div><div className="activity-copy"><div><strong>{booking.id}</strong><span className="activity-action">{booking.client}</span></div><p>{booking.project} · {booking.stage}</p></div><span className="status-badge gray">{booking.priority}</span></button>)}{!activeBookings.length && <div className="empty-state">No active dossiers are currently awaiting this department’s attention.</div>}</div></section>}</div>
+    <DepartmentWorkspaceControls dashboard={dashboard} config={config} canManage={canManageTeam} canArchiveWorkflows={canArchiveWorkflows} showWorkflow={visibleWidgets.has("workflow_library")} />
   </div>;
 }
 
@@ -7413,6 +7531,7 @@ export default function Home() {
           dashboard={activeProvisionedDashboard}
           bookings={bookings}
           canManageTeam={user.role === "admin" || user.role === "supervisor"}
+          canArchiveWorkflows={user.role === "admin"}
           onOpenDossier={openDetail}
           onManageTeam={() => guardedSetView("users")}
         />

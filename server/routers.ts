@@ -43,11 +43,16 @@ import { storagePut } from "./storage";
 import { runtimeErrorFingerprint, sanitizeRuntimeMessage } from "../shared/runtimeMonitoring";
 import {
   canAccessProvisionedDepartmentDashboard,
+  canManageProvisionedDepartmentDashboard,
   createDepartmentDashboardConfig,
   DEPARTMENT_DASHBOARD_ACCENTS,
   DEPARTMENT_DASHBOARD_ICONS,
+  DEPARTMENT_DASHBOARD_METRICS,
+  DEPARTMENT_DASHBOARD_WIDGETS,
   DEPARTMENT_WORKSTREAMS,
+  defaultWorkflowChecklist,
   isValidProvisionedDepartmentCode,
+  normalizeDepartmentDashboardConfig,
   normalizeDepartmentCode,
 } from "../shared/departmentDashboardRules";
 
@@ -125,15 +130,38 @@ function requireAccountManagementAccess(
   });
 }
 
+const workflowChecklistInput = z.object({
+  id: z.string().trim().min(2).max(64),
+  label: z.string().trim().min(2).max(160),
+  category: z.string().trim().min(2).max(80),
+  required: z.boolean(),
+  guidance: z.string().trim().min(2).max(600),
+});
+
+async function requireActiveProvisionedDepartment(code: string) {
+  const dashboard = await db.getProvisionedDepartmentDashboard(code);
+  if (!dashboard || dashboard.active !== 1) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Choose an active department dashboard before assigning access.",
+    });
+  }
+  return dashboard;
+}
+
 export const appRouter = router({
   system: systemRouter,
   departments: router({
     listProvisioned: protectedProcedure.query(async ({ ctx }) => {
-      const dashboards = await db.listProvisionedDepartmentDashboards();
+      const dashboards = await db.listProvisionedDepartmentDashboards({
+        includeArchived: ctx.user.role === "admin",
+      });
       return ctx.user.role === "admin"
         ? dashboards
         : dashboards.filter(
-            dashboard => dashboard.code === ctx.user.departmentCode
+            dashboard =>
+              dashboard.active === 1 &&
+              dashboard.code === ctx.user.departmentCode
           );
     }),
     getProvisioned: protectedProcedure
@@ -153,6 +181,12 @@ export const appRouter = router({
             code: "NOT_FOUND",
             message: "This provisioned department dashboard was not found.",
           });
+        if (dashboard.active !== 1 && ctx.user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "This department workspace is archived and unavailable.",
+          });
+        }
         return dashboard;
       }),
     createProvisioned: adminProcedure
@@ -212,6 +246,136 @@ export const appRouter = router({
           });
         }
       }),
+    updateDashboardConfig: protectedProcedure
+      .input(
+        z.object({
+          code: z.string().trim().min(3).max(16),
+          overviewLabel: z.string().trim().min(3).max(160),
+          objective: z.string().trim().min(12).max(600),
+          widgets: z.array(z.enum(DEPARTMENT_DASHBOARD_WIDGETS)).min(1).max(DEPARTMENT_DASHBOARD_WIDGETS.length),
+          metrics: z.tuple([
+            z.enum(DEPARTMENT_DASHBOARD_METRICS),
+            z.enum(DEPARTMENT_DASHBOARD_METRICS),
+          ]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!canManageProvisionedDepartmentDashboard(ctx.user, input.code)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Only this department’s supervisor or an administrator can configure its dashboard." });
+        }
+        const dashboard = await requireActiveProvisionedDepartment(input.code);
+        const current = normalizeDepartmentDashboardConfig(
+          dashboard.dashboardConfig,
+          { name: dashboard.name }
+        );
+        const updated = await db.updateProvisionedDepartmentDashboardConfig({
+          code: input.code,
+          description: dashboard.description,
+          dashboardConfig: {
+            ...current,
+            overviewLabel: input.overviewLabel,
+            objective: input.objective,
+            widgets: input.widgets,
+            metrics: input.metrics,
+          },
+        });
+        await db.addUserActivity({
+          userId: ctx.user.id,
+          action: "department_dashboard_configured",
+          detail: `${ctx.user.name ?? ctx.user.email ?? "A department lead"} updated the ${dashboard.name} dashboard widgets and metrics.`,
+        });
+        return updated;
+      }),
+    setProvisionedActive: adminProcedure
+      .input(z.object({ code: z.string().trim().min(3).max(16), active: z.boolean() }))
+      .mutation(async ({ ctx, input }) => {
+        const dashboard = await db.getProvisionedDepartmentDashboard(input.code);
+        if (!dashboard) throw new TRPCError({ code: "NOT_FOUND", message: "This department dashboard was not found." });
+        const updated = await db.setProvisionedDepartmentActive(input);
+        await db.addUserActivity({
+          userId: ctx.user.id,
+          action: input.active ? "department_reactivated" : "department_archived",
+          detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} ${input.active ? "reactivated" : "archived"} the ${dashboard.name} department without deleting its history.`,
+        });
+        return updated;
+      }),
+    listWorkflowTemplates: protectedProcedure
+      .input(z.object({ departmentCode: z.string().trim().min(3).max(16) }))
+      .query(async ({ ctx, input }) => {
+        if (!canAccessProvisionedDepartmentDashboard(ctx.user, input.departmentCode)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Your account cannot access this department workflow library." });
+        }
+        const dashboard = await db.getProvisionedDepartmentDashboard(input.departmentCode);
+        if (!dashboard) throw new TRPCError({ code: "NOT_FOUND", message: "This department dashboard was not found." });
+        if (dashboard.active !== 1 && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "This department workspace is archived." });
+        }
+        return await db.listDepartmentWorkflowTemplates({
+          departmentCode: input.departmentCode,
+          includeArchived: ctx.user.role === "admin",
+        });
+      }),
+    createWorkflowTemplate: protectedProcedure
+      .input(z.object({
+        departmentCode: z.string().trim().min(3).max(16),
+        name: z.string().trim().min(3).max(160),
+        description: z.string().trim().min(12).max(800),
+        checklist: z.array(workflowChecklistInput).min(1).max(16),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!canManageProvisionedDepartmentDashboard(ctx.user, input.departmentCode)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Only this department’s supervisor or an administrator can create workflow templates." });
+        }
+        await requireActiveProvisionedDepartment(input.departmentCode);
+        const template = await db.createDepartmentWorkflowTemplate({ ...input, createdBy: ctx.user.id });
+        await db.addUserActivity({ userId: ctx.user.id, action: "department_workflow_created", detail: `${ctx.user.name ?? ctx.user.email ?? "A department lead"} created the ${template.name} workflow template.` });
+        return template;
+      }),
+    updateWorkflowTemplate: protectedProcedure
+      .input(z.object({
+        id: z.string().trim().min(4).max(64),
+        departmentCode: z.string().trim().min(3).max(16),
+        name: z.string().trim().min(3).max(160),
+        description: z.string().trim().min(12).max(800),
+        checklist: z.array(workflowChecklistInput).min(1).max(16),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!canManageProvisionedDepartmentDashboard(ctx.user, input.departmentCode)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Only this department’s supervisor or an administrator can update workflow templates." });
+        }
+        await requireActiveProvisionedDepartment(input.departmentCode);
+        const templates = await db.listDepartmentWorkflowTemplates({ departmentCode: input.departmentCode, includeArchived: true });
+        if (!templates.some(template => template.id === input.id)) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "This workflow template was not found in the selected department." });
+        }
+        return await db.updateDepartmentWorkflowTemplate(input);
+      }),
+    setWorkflowTemplateActive: adminProcedure
+      .input(z.object({ id: z.string().trim().min(4).max(64), departmentCode: z.string().trim().min(3).max(16), active: z.boolean() }))
+      .mutation(async ({ ctx, input }) => {
+        const templates = await db.listDepartmentWorkflowTemplates({ departmentCode: input.departmentCode, includeArchived: true });
+        const template = templates.find(item => item.id === input.id);
+        if (!template) throw new TRPCError({ code: "NOT_FOUND", message: "This workflow template was not found." });
+        const updated = await db.setDepartmentWorkflowTemplateActive({ id: input.id, active: input.active });
+        await db.addUserActivity({ userId: ctx.user.id, action: input.active ? "department_workflow_reactivated" : "department_workflow_archived", detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} ${input.active ? "restored" : "archived"} the ${template.name} workflow template.` });
+        return updated;
+      }),
+    defaultWorkflowChecklist: protectedProcedure
+      .input(z.object({ workstream: z.enum(DEPARTMENT_WORKSTREAMS) }))
+      .query(({ input }) => defaultWorkflowChecklist(input.workstream)),
+  }),
+  rental: router({
+    submitEnquiry: publicProcedure
+      .input(z.object({
+        contactName: z.string().trim().min(2).max(160),
+        companyName: z.string().trim().min(2).max(160),
+        email: z.string().trim().email().max(320),
+        phone: z.string().trim().min(7).max(48),
+        projectLocation: z.string().trim().min(2).max(255),
+        equipmentInterest: z.string().trim().min(2).max(120),
+        liftDetails: z.string().trim().min(12).max(2000),
+      }))
+      .mutation(async ({ input }) => await db.createRentalEnquiry({ ...input, email: normalizeEmail(input.email) })),
   }),
   auth: router({
     setupStatus: publicProcedure.query(async () => ({
@@ -258,6 +422,21 @@ export const appRouter = router({
             code: "UNAUTHORIZED",
             message: "Invalid email or password.",
           });
+        }
+        if (
+          user.role !== "admin" &&
+          user.departmentCode &&
+          !isDepartmentCode(user.departmentCode)
+        ) {
+          const dashboard = await db.getProvisionedDepartmentDashboard(
+            user.departmentCode
+          );
+          if (!dashboard || dashboard.active !== 1) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "Invalid email or password.",
+            });
+          }
         }
         await db.updateUserLastSignedIn(user.id);
         await db.addUserActivity(signInActivity(user.id));
@@ -403,15 +582,8 @@ export const appRouter = router({
             message:
               "Use the administrator setup flow for the administrator department.",
           });
-        if (
-          !isDepartmentCode(input.departmentCode) &&
-          !(await db.getProvisionedDepartmentDashboard(input.departmentCode))
-        ) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Choose a valid department dashboard before creating an account.",
-          });
-        }
+        if (!isDepartmentCode(input.departmentCode))
+          await requireActiveProvisionedDepartment(input.departmentCode);
         const email = normalizeEmail(input.email);
         if (await db.getUserByLocalEmail(email)) {
           throw new TRPCError({
@@ -484,16 +656,8 @@ export const appRouter = router({
           });
         const departmentCode =
           input.role === "admin" ? "administrator" : input.departmentCode;
-        if (
-          input.role !== "admin" &&
-          !isDepartmentCode(departmentCode) &&
-          !(await db.getProvisionedDepartmentDashboard(departmentCode))
-        ) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Choose a valid department dashboard before moving this account.",
-          });
-        }
+        if (input.role !== "admin" && !isDepartmentCode(departmentCode))
+          await requireActiveProvisionedDepartment(departmentCode);
         const user = await db.updateLocalUser(input.id, {
           name: input.name,
           email,

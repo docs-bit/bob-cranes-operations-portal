@@ -180,6 +180,31 @@ export const departmentDashboards = mysqlTable("department_dashboards", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const departmentWorkflowTemplates = mysqlTable("department_workflow_templates", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  departmentCode: varchar("departmentCode", { length: 16 }).notNull(),
+  name: varchar("name", { length: 160 }).notNull(),
+  description: text("description").notNull(),
+  checklist: json("checklist").notNull(),
+  active: int("active").notNull().default(1),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const rentalEnquiries = mysqlTable("rental_enquiries", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  contactName: varchar("contactName", { length: 160 }).notNull(),
+  companyName: varchar("companyName", { length: 160 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 48 }).notNull(),
+  projectLocation: varchar("projectLocation", { length: 255 }).notNull(),
+  equipmentInterest: varchar("equipmentInterest", { length: 120 }).notNull(),
+  liftDetails: text("liftDetails").notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("New"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const auditLogs = mysqlTable("audit_logs", {
   id: varchar("id", { length: 64 }).primaryKey(),
   actor: varchar("actor", { length: 255 }).notNull(),
@@ -205,4 +230,6 @@ export type ChatMessageRecord = typeof chatMessages.$inferSelect;
 export type NotificationRecord = typeof notifications.$inferSelect;
 export type DepartmentRecord = typeof departments.$inferSelect;
 export type DepartmentDashboardRecord = typeof departmentDashboards.$inferSelect;
+export type DepartmentWorkflowTemplateRecord = typeof departmentWorkflowTemplates.$inferSelect;
+export type RentalEnquiryRecord = typeof rentalEnquiries.$inferSelect;
 export type AuditLogRecord = typeof auditLogs.$inferSelect;

@@ -303,3 +303,11 @@
 - [x] Provision a distinct department dashboard configuration whenever an administrator creates a department.
 - [x] Link department navigation and authorized users to the appropriate department-specific operational dashboard.
 - [x] Add automated coverage for dashboard provisioning and access isolation, then save a verified checkpoint.
+
+## BOB Heavy Equipment Rental landing page and department lifecycle controls
+- [x] Analyze the supplied landing-page reference and establish an accessible responsive visual system for BOB Heavy Equipment Rental.
+- [x] Create a polished public BOB Heavy Equipment Rental landing page with equipment categories, fleet capabilities, safety/service proof points, enquiry actions, and portal sign-in access.
+- [x] Add supervisor-editable department dashboard widgets with permission-safe metric and layout controls.
+- [x] Add a safe department archive and reactivation workflow that preserves assigned users, dashboards, and operational history.
+- [x] Add department-level workflow templates with required-document checklists and assigned-user guidance.
+- [x] Add focused tests, responsive visual verification, database migration validation, and a production checkpoint.

@@ -1,0 +1,28 @@
+.department-workspace-controls .panel-title,
+.department-workflow-library .panel-title { display: flex; align-items: center; gap: 8px; }
+.department-config-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.department-config-form label { display: grid; gap: 6px; color: #5e6671; font-size: 11px; font-weight: 700; }
+.department-control-label { display: block; margin-bottom: 8px; color: #5e6671; font-size: 11px; font-weight: 700; }
+.department-widget-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.department-widget-options label { display: inline-flex; grid-auto-flow: column; align-items: center; gap: 7px; border: 1px solid var(--equipment-line, #e5e5e7); border-radius: 999px; padding: 8px 10px; background: #fffaf5; color: #37404a; text-transform: capitalize; cursor: pointer; }
+.department-widget-options input { width: 14px; height: 14px; accent-color: var(--equipment-orange, #ff9b3d); }
+.workflow-checklist-editor { display: grid; gap: 8px; }
+.workflow-checklist-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 34px; gap: 8px; align-items: center; }
+.workflow-checklist-row .workflow-required { display: inline-flex; grid-auto-flow: column; align-items: center; gap: 5px; white-space: nowrap; font-size: 10px; }
+.workflow-template-list { display: grid; gap: 11px; }
+.workflow-template-card { padding: 15px; border: 1px solid var(--equipment-line, #e5e5e7); border-radius: 13px; background: #fff; }
+.workflow-template-card.archived { opacity: .64; background: #fafafa; }
+.workflow-template-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.workflow-template-heading strong { color: #20242a; font-size: 13px; }
+.workflow-template-heading p { margin: 5px 0 0; color: #69727d; font-size: 11px; line-height: 1.45; }
+.workflow-template-card ul { display: grid; gap: 7px; margin: 14px 0 0; padding: 0; list-style: none; }
+.workflow-template-card li { display: flex; align-items: center; gap: 7px; color: #4e5762; font-size: 11px; }
+.workflow-template-card li > svg { color: var(--equipment-orange, #ff9b3d); }
+.workflow-template-card li > span { margin-left: auto; border-radius: 999px; padding: 3px 6px; background: #fff0df; color: #b55c12; font-size: 9px; font-weight: 800; }
+.workflow-template-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+@media (max-width: 700px) {
+  .department-config-form { grid-template-columns: 1fr; }
+  .workflow-checklist-row { grid-template-columns: minmax(0, 1fr) 32px; }
+  .workflow-checklist-row .workflow-required { grid-column: 1 / -1; }
+  .workflow-template-heading { display: grid; }
+}

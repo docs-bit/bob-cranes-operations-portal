@@ -30,7 +30,7 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (user) setLocation("/");
+    if (user) setLocation("/portal");
   }, [setLocation, user]);
 
   const update = (field: keyof LoginForm, value: string) => {
@@ -52,7 +52,7 @@ export default function Login() {
         : await login.mutateAsync({ email: form.email, password: form.password });
       utils.auth.me.setData(undefined, account);
       await utils.auth.me.invalidate();
-      setLocation("/");
+      setLocation("/portal");
     } catch (caught) {
       setError(readableError(caught));
     }

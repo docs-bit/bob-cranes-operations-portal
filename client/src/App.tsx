@@ -8,6 +8,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import RentalLanding from "./pages/RentalLanding";
 import RuntimeErrorReporter from "./components/RuntimeErrorReporter";
 
 function ProtectedPortal() {
@@ -30,7 +31,8 @@ function ProtectedPortal() {
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={ProtectedPortal} />
+      <Route path={"/"} component={RentalLanding} />
+      <Route path={"/portal"} component={ProtectedPortal} />
       <Route path={"/uploads"} component={ProtectedPortal} />
       <Route path={"/attendance"} component={ProtectedPortal} />
       <Route path={"/training"} component={ProtectedPortal} />
