@@ -4,7 +4,16 @@ import { nextAccountActiveState, requiresDeactivationConfirmation } from "@share
 import { activityToCsv } from "@shared/activityExport";
 import { activityFilterInput, isValidActivityDate } from "@shared/activityFilterRules";
 import { filterAccounts } from "@shared/userManagementRules";
-import { CheckCircle2, Download, Edit3, KeyRound, Power, Search, ShieldCheck, UserPlus, UsersRound, X, Activity, AlertTriangle, CalendarRange, Crown, RotateCcw, Settings2, Trash2 } from "lucide-react";
+import {
+  DEPARTMENT_DASHBOARD_ACCENTS,
+  DEPARTMENT_DASHBOARD_ICONS,
+  DEPARTMENT_WORKSTREAMS,
+  normalizeDepartmentCode,
+  type DepartmentDashboardAccent,
+  type DepartmentDashboardIcon,
+  type DepartmentWorkstream,
+} from "@shared/departmentDashboardRules";
+import { CheckCircle2, Download, Edit3, KeyRound, Power, Search, ShieldCheck, UserPlus, UsersRound, X, Activity, AlertTriangle, CalendarRange, Crown, RotateCcw, Settings2, Trash2, Building2, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 
@@ -24,21 +33,37 @@ type AccountEditorForm = {
   role: PortalRole;
 };
 
-type DepartmentUsersViewProps = {
-  actor: { id: number; role: PortalRole; departmentCode: string | null };
+type DepartmentForm = {
+  name: string;
+  code: string;
+  description: string;
+  accent: DepartmentDashboardAccent;
+  icon: DepartmentDashboardIcon;
+  workstream: DepartmentWorkstream;
 };
 
-const departmentLabel = (code: string | null | undefined) => DEPARTMENTS.find((department) => department.code === code)?.label ?? "Unassigned";
+type DepartmentUsersViewProps = {
+  actor: { id: number; role: PortalRole; departmentCode: string | null };
+  onOpenDashboard?: (departmentCode: string) => void;
+};
+
 const initials = (value: string) => value.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase() || "U";
 const displayDate = (value: Date | string | null | undefined) => value ? new Date(value).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Never";
 const displayDateTime = (value: Date | string | null | undefined) => value ? new Date(value).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "Unknown";
 const activityLabel = (action: string) => ({ sign_in: "Signed in", profile_update: "Profile updated", account_deactivated: "Account deactivated", account_activated: "Account reactivated" }[action] ?? action.replaceAll("_", " "));
 
-export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps) {
+export default function DepartmentUsersView({ actor, onOpenDashboard }: DepartmentUsersViewProps) {
   const isAdmin = actor.role === "admin";
   const isSupervisor = actor.role === "supervisor";
   const scopedDepartmentCode = isSupervisor ? actor.departmentCode ?? "sales" : "sales";
-  const manageableDepartments = useMemo(() => DEPARTMENTS.filter((department) => department.code !== "administrator" && (!isSupervisor || department.code === actor.departmentCode)), [actor.departmentCode, isSupervisor]);
+  const provisionedDepartmentsQuery = trpc.departments.listProvisioned.useQuery();
+  const provisionedDepartments = provisionedDepartmentsQuery.data ?? [];
+  const allDepartments = useMemo(() => [
+    ...DEPARTMENTS.map((department) => ({ code: department.code, label: department.label })),
+    ...provisionedDepartments.map((department) => ({ code: department.code, label: department.name })),
+  ], [provisionedDepartments]);
+  const departmentLabel = (code: string | null | undefined) => allDepartments.find((department) => department.code === code)?.label ?? "Unassigned";
+  const manageableDepartments = useMemo(() => allDepartments.filter((department) => department.code !== "administrator" && (!isSupervisor || department.code === actor.departmentCode)), [actor.departmentCode, allDepartments, isSupervisor]);
   const [activityFrom, setActivityFrom] = useState("");
   const [activityTo, setActivityTo] = useState("");
   const hasInvalidActivityDate = Boolean((activityFrom && !isValidActivityDate(activityFrom)) || (activityTo && !isValidActivityDate(activityTo)));
@@ -51,6 +76,7 @@ export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps)
   const retentionQuery = trpc.auth.getActivityRetention.useQuery(undefined, { enabled: isAdmin });
   const updateRetention = trpc.auth.updateActivityRetention.useMutation();
   const purgeExpiredActivity = trpc.auth.purgeExpiredActivity.useMutation();
+  const createDepartment = trpc.departments.createProvisioned.useMutation();
   const utils = trpc.useUtils();
   const [form, setForm] = useState<AccountForm>({ name: "", email: "", password: "", departmentCode: scopedDepartmentCode, role: "user" });
   const [editForm, setEditForm] = useState<AccountEditorForm>({ name: "", email: "", password: "", departmentCode: scopedDepartmentCode, role: "user" });
@@ -61,9 +87,10 @@ export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps)
   const [departmentFilter, setDepartmentFilter] = useState(isSupervisor ? scopedDepartmentCode : "all");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [departmentForm, setDepartmentForm] = useState<DepartmentForm>({ name: "", code: "", description: "", accent: "orange", icon: "LayoutDashboard", workstream: "operations" });
 
   const accounts = usersQuery.data ?? [];
-  const filteredAccounts = useMemo(() => filterAccounts(accounts, search, departmentFilter, statusFilter, departmentLabel), [accounts, search, statusFilter, departmentFilter]);
+  const filteredAccounts = useMemo(() => filterAccounts(accounts, search, departmentFilter, statusFilter, departmentLabel), [accounts, search, statusFilter, departmentFilter, allDepartments]);
   const notify = (nextMessage: string, nextError = "") => { setMessage(nextMessage); setError(nextError); };
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -76,6 +103,23 @@ export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps)
       await Promise.all([utils.auth.listUsers.invalidate(), utils.auth.listActivity.invalidate()]);
     } catch (caught) {
       notify("", caught instanceof Error ? caught.message : "The department account could not be created.");
+    }
+  };
+
+  const submitDepartment = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    notify("");
+    try {
+      const created = await createDepartment.mutateAsync({
+        ...departmentForm,
+        code: normalizeDepartmentCode(departmentForm.code),
+      });
+      setDepartmentForm({ name: "", code: "", description: "", accent: "orange", icon: "LayoutDashboard", workstream: "operations" });
+      notify(`${created.name} now has its own access-controlled operational workspace and is ready for supervisor assignment.`);
+      toast.success("Department dashboard provisioned", { description: `${created.name} is available as a dedicated workspace.` });
+      await Promise.all([utils.departments.listProvisioned.invalidate(), utils.auth.listActivity.invalidate()]);
+    } catch (caught) {
+      notify("", caught instanceof Error ? caught.message : "The department dashboard could not be provisioned.");
     }
   };
 
@@ -166,6 +210,8 @@ export default function DepartmentUsersView({ actor }: DepartmentUsersViewProps)
     <div className="metric-grid account-metrics"><div className="metric-card"><div className="metric-label">Visible accounts</div><div className="metric-value">{accounts.length}</div><div className="metric-foot">{isAdmin ? "All local identities" : `${departmentLabel(scopedDepartmentCode)} identities`}</div></div><div className="metric-card"><div className="metric-label">Active</div><div className="metric-value">{activeCount}</div><div className="metric-foot">Can sign in now</div></div><div className="metric-card"><div className="metric-label">Deactivated</div><div className="metric-value">{inactiveCount}</div><div className="metric-foot">Access paused</div></div><div className="metric-card"><div className="metric-label">Supervisors</div><div className="metric-value">{accounts.filter((account) => account.role === "supervisor").length}</div><div className="metric-foot">Department leads</div></div></div>
     {message && <div className="account-success" role="status"><CheckCircle2 size={15} />{message}</div>}
     {error && <div className="account-error" role="alert">{error}</div>}
+    {isAdmin && <section className="panel" style={{ marginBottom: 16 }}><div className="panel-header"><div><div className="panel-title"><Building2 size={16} /> Create a department dashboard</div><div className="panel-meta">Every new department is provisioned with a distinct, access-controlled operational workspace.</div></div><span className="status-badge amber">Admin only</span></div><form className="panel-body account-form" onSubmit={submitDepartment}><label><span>Department name</span><input className="form-input" value={departmentForm.name} onChange={(event) => setDepartmentForm((current) => ({ ...current, name: event.target.value }))} placeholder="e.g. Quality Assurance" required /></label><label><span>Department code</span><input className="form-input" value={departmentForm.code} onChange={(event) => setDepartmentForm((current) => ({ ...current, code: normalizeDepartmentCode(event.target.value) }))} placeholder="e.g. quality-team" pattern="[a-z][a-z0-9-]{2,15}" title="3–16 lowercase letters, numbers, or hyphens" required /></label><label><span>Dashboard focus</span><select className="form-select" value={departmentForm.workstream} onChange={(event) => setDepartmentForm((current) => ({ ...current, workstream: event.target.value as DepartmentWorkstream }))}>{DEPARTMENT_WORKSTREAMS.map((workstream) => <option key={workstream} value={workstream}>{workstream[0].toUpperCase() + workstream.slice(1)}</option>)}</select></label><label><span>Accent</span><select className="form-select" value={departmentForm.accent} onChange={(event) => setDepartmentForm((current) => ({ ...current, accent: event.target.value as DepartmentDashboardAccent }))}>{DEPARTMENT_DASHBOARD_ACCENTS.map((accent) => <option key={accent} value={accent}>{accent[0].toUpperCase() + accent.slice(1)}</option>)}</select></label><label><span>Workspace icon</span><select className="form-select" value={departmentForm.icon} onChange={(event) => setDepartmentForm((current) => ({ ...current, icon: event.target.value as DepartmentDashboardIcon }))}>{DEPARTMENT_DASHBOARD_ICONS.map((icon) => <option key={icon} value={icon}>{icon}</option>)}</select></label><label><span>Operational objective</span><textarea className="form-input" rows={2} value={departmentForm.description} onChange={(event) => setDepartmentForm((current) => ({ ...current, description: event.target.value }))} placeholder="Describe the department’s primary responsibility and handoff scope." minLength={12} maxLength={600} required /></label><button className="primary-button" type="submit" disabled={createDepartment.isPending}><LayoutDashboard size={14} />{createDepartment.isPending ? "Provisioning dashboard…" : "Create department dashboard"}</button></form></section>}
+    {isAdmin && <section className="panel" style={{ marginBottom: 16 }}><div className="panel-header"><div><div className="panel-title"><LayoutDashboard size={16} /> Provisioned department workspaces</div><div className="panel-meta">New departments remain isolated until you assign a supervisor or department user.</div></div><span className="status-badge blue">{provisionedDepartments.length} provisioned</span></div><div className="panel-body">{provisionedDepartmentsQuery.isLoading ? <div className="empty-state">Loading department workspaces…</div> : provisionedDepartments.length ? <div className="account-list">{provisionedDepartments.map((department) => <div className="account-row" key={department.code}><div className="avatar">{initials(department.name)}</div><div className="account-main"><div className="compliance-name">{department.name}</div><div className="compliance-sub">{department.description}</div><div className="account-tags"><span className={`status-badge ${department.accent === "orange" ? "amber" : "blue"}`}>{department.code}</span><span className="status-badge gray">Dedicated dashboard</span></div></div><div className="account-actions"><button className="secondary-button compact-button" type="button" onClick={() => onOpenDashboard?.(department.code)}><LayoutDashboard size={13} /> Open dashboard</button></div></div>)}</div> : <div className="empty-state">No additional department dashboards have been provisioned. Create one above to begin.</div>}</div></section>}
     <div className="detail-grid" style={{ marginBottom: 16 }}>
       <section className="panel"><div className="panel-header"><div><div className="panel-title"><CalendarRange size={16} /> Activity period</div><div className="panel-meta">Filter before reviewing or exporting account activity.</div></div><button className="secondary-button compact-button" type="button" onClick={resetActivityRange} disabled={!activityFrom && !activityTo}><RotateCcw size={13} /> Clear dates</button></div><div className="panel-body account-toolbar"><label className="form-field"><span>From date</span><input className="form-input" type="date" value={activityFrom} onChange={(event) => setActivityFrom(event.target.value)} aria-label="Activity start date" /></label><label className="form-field"><span>To date</span><input className="form-input" type="date" value={activityTo} onChange={(event) => setActivityTo(event.target.value)} aria-label="Activity end date" /></label><span className={`status-badge ${hasInvalidActivityDate ? "amber" : "blue"}`}>{hasInvalidActivityDate ? "Enter a valid date" : activityQuery.isFetching ? "Filtering…" : `${activity.length} matching events`}</span></div></section>
       {isAdmin && <section className="panel"><div className="panel-header"><div><div className="panel-title"><Settings2 size={16} /> Activity retention</div><div className="panel-meta">Retention does not delete history automatically; a separate, confirmed purge is required.</div></div><span className="status-badge amber">Admin only</span></div><div className="panel-body account-toolbar"><label className="form-field"><span>Retain events</span><select className="form-select" value={retentionQuery.data?.retentionDays ?? 365} onChange={(event) => void saveRetention(Number(event.target.value))} disabled={retentionQuery.isLoading || updateRetention.isPending} aria-label="Activity log retention period">{[30, 90, 180, 365, 730].map((days) => <option value={days} key={days}>{days} days</option>)}</select></label><button className="danger-button" type="button" onClick={() => void purgeExpired()} disabled={purgeExpiredActivity.isPending || retentionQuery.isLoading}><Trash2 size={13} />{purgeExpiredActivity.isPending ? "Purging…" : "Purge expired events"}</button></div></section>}

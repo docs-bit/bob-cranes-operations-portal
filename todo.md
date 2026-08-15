@@ -298,3 +298,8 @@
 - [x] Add an export-button loading spinner and disabled state during CSV generation.
 - [x] Extend and validate the portal-refinement-release skill for configurable export selection and feedback.
 - [x] Add focused coverage, verify the export flow, and save a verified checkpoint.
+
+## Administrator-provisioned department dashboards
+- [x] Provision a distinct department dashboard configuration whenever an administrator creates a department.
+- [x] Link department navigation and authorized users to the appropriate department-specific operational dashboard.
+- [x] Add automated coverage for dashboard provisioning and access isolation, then save a verified checkpoint.

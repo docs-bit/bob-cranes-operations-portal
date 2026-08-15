@@ -35,6 +35,10 @@ import {
   roleLabel,
 } from "@shared/departmentAccess";
 import {
+  canAccessProvisionedDepartmentDashboard,
+  type DepartmentDashboardConfig,
+} from "@shared/departmentDashboardRules";
+import {
   findEmployeeBookingConflicts,
   toggleEmployeeBookingAllocation,
   type EmployeeAllocation,
@@ -138,6 +142,7 @@ type View =
   | "uploads"
   | "detail"
   | "department"
+  | "provisioned-dashboard"
   | "users"
   | "supervisor-audit";
 
@@ -609,6 +614,9 @@ export function Shell({
   onBack,
   onClient,
   onDepartment,
+  provisionedDashboards = [],
+  activeProvisionedDepartmentCode = null,
+  onProvisionedDashboard = () => undefined,
   departmentLabel,
   bookings,
   onOpenDossier,
@@ -621,6 +629,9 @@ export function Shell({
   onBack: () => void;
   onClient: () => void;
   onDepartment: (department: string) => void;
+  provisionedDashboards?: Array<{ code: string; name: string; accent: string }>;
+  activeProvisionedDepartmentCode?: string | null;
+  onProvisionedDashboard?: (departmentCode: string) => void;
   departmentLabel: string | null;
   bookings: Booking[];
   onOpenDossier: (booking: Booking) => void;
@@ -796,11 +807,18 @@ export function Shell({
       : departmentItems.filter(
           department => department.code === user.departmentCode
         );
+  const permittedProvisionedDashboards =
+    user.role === "admin"
+      ? provisionedDashboards
+      : provisionedDashboards.filter(
+          department => department.code === user.departmentCode
+        );
   const userName = user.name?.trim() || "BOB Cranes user";
   const userDepartment =
     user.role === "admin"
       ? "Administrator"
-      : (DEPARTMENTS.find(department => department.code === user.departmentCode)
+      : (provisionedDashboards.find(department => department.code === user.departmentCode)
+          ?.name ?? DEPARTMENTS.find(department => department.code === user.departmentCode)
           ?.label ?? "Department user");
   return (
     <div className="app-shell">
@@ -843,6 +861,16 @@ export function Shell({
             >
               {department.icon}
               <span>{department.label}</span>
+            </button>
+          ))}
+          {permittedProvisionedDashboards.map(department => (
+            <button
+              className={`nav-item ${view === "provisioned-dashboard" && activeProvisionedDepartmentCode === department.code ? "active" : ""}`}
+              key={department.code}
+              onClick={() => onProvisionedDashboard(department.code)}
+            >
+              <LayoutDashboard />
+              <span>{department.name}</span>
             </button>
           ))}
           {user.role === "admin" && (
@@ -997,8 +1025,10 @@ export function Shell({
                     ? "New Booking"
                     : view === "detail"
                       ? "Booking Dossier"
-                      : view === "department"
+                  : view === "department"
                         ? departmentLabel
+                        : view === "provisioned-dashboard"
+                          ? provisionedDashboards.find(department => department.code === activeProvisionedDepartmentCode)?.name ?? "Department dashboard"
                         : view === "training"
                           ? "Training Register"
                           : view === "uploads"
@@ -6965,6 +6995,40 @@ function DepartmentView({
   );
 }
 
+function ProvisionedDepartmentDashboard({
+  dashboard,
+  bookings,
+  canManageTeam,
+  onOpenDossier,
+  onManageTeam,
+}: {
+  dashboard: {
+    code: string;
+    name: string;
+    description: string;
+    accent: string;
+    dashboardConfig: unknown;
+  };
+  bookings: Booking[];
+  canManageTeam: boolean;
+  onOpenDossier: (booking: Booking) => void;
+  onManageTeam: () => void;
+}) {
+  const membersQuery = trpc.auth.listUsers.useQuery();
+  const config = dashboard.dashboardConfig as DepartmentDashboardConfig;
+  const activeBookings = bookings.filter((booking) => booking.stage !== "Dispatched");
+  const priorityBookings = activeBookings.filter((booking) => booking.priority === "Critical" || booking.priority === "High");
+  const departmentMembers = (membersQuery.data ?? []).filter((member) => member.departmentCode === dashboard.code && member.isActive === 1);
+  const accentMap: Record<string, string> = { orange: "#d94c12", blue: "#0a66c2", green: "#137a4b", violet: "#6d4ac6" };
+  const accent = accentMap[dashboard.accent] ?? accentMap.orange;
+  const firstDossier = activeBookings[0] ?? bookings[0];
+  return <div className="content" data-testid="provisioned-department-dashboard">
+    <div className="page-heading" style={{ borderLeft: `4px solid ${accent}`, paddingLeft: 16 }}><div><div className="eyebrow">Provisioned department workspace</div><h1 className="page-title">{dashboard.name}</h1><p className="page-copy">{dashboard.description}</p></div><div className="status-badge blue"><LayoutDashboard size={12} /> Dedicated dashboard</div></div>
+    <div className="metric-grid"><MetricCard label={config.primaryMetricLabel} value={String(activeBookings.length)} foot="Across active BOB dossiers" icon={<ClipboardCheck size={13} />} tone="green" /><MetricCard label={config.secondaryMetricLabel} value={String(priorityBookings.length)} foot="Priority actions need attention" icon={<AlertTriangle size={13} />} tone="red" /><MetricCard label="Active department team" value={String(departmentMembers.length)} foot="Named accounts assigned here" icon={<Users size={13} />} tone="green" /><MetricCard label="Workspace status" value="Ready" foot="Dashboard provisioned and isolated" icon={<CheckCircle2 size={13} />} tone="green" /></div>
+    <div className="detail-grid"><section className="panel"><div className="panel-header"><div><div className="panel-title">{config.overviewLabel}</div><div className="panel-meta">{config.objective}</div></div><span className="status-badge amber">{config.workstream}</span></div><div className="panel-body"><div className="notification"><div className="title">Controlled department access</div><div className="body">This dashboard is linked to the <strong>{dashboard.code}</strong> department code. Only its assigned users, supervisor, and administrators can open this workspace.</div></div><div className="workflow-actions" style={{ marginTop: 16 }}><button className="primary-button" type="button" onClick={() => firstDossier && onOpenDossier(firstDossier)} disabled={!firstDossier}><ClipboardCheck size={14} /> {config.quickActions[0]}</button><button className="secondary-button" type="button" onClick={onManageTeam} disabled={!canManageTeam}><Users size={14} /> {canManageTeam ? config.quickActions[1] : "Supervisor access required"}</button></div></div></section><section className="panel"><div className="panel-header"><div><div className="panel-title">Department handoff queue</div><div className="panel-meta">Dossiers are shared with the department’s configured operational focus.</div></div><span className="status-badge blue">{activeBookings.length} active</span></div><div className="panel-body activity-list">{activeBookings.slice(0, 4).map((booking) => <button className="activity-row" type="button" key={booking.id} onClick={() => onOpenDossier(booking)}><div className="activity-icon" style={{ color: accent }}><ClipboardCheck size={14} /></div><div className="activity-copy"><div><strong>{booking.id}</strong><span className="activity-action">{booking.client}</span></div><p>{booking.project} · {booking.stage}</p></div><span className="status-badge gray">{booking.priority}</span></button>)}{!activeBookings.length && <div className="empty-state">No active dossiers are currently awaiting this department’s attention.</div>}</div></section></div>
+  </div>;
+}
+
 export default function Home() {
   const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
@@ -6973,6 +7037,7 @@ export default function Home() {
   const completeWorkstreamMutation =
     trpc.operations.completeBookingWorkstream.useMutation();
   const crewAllocationsQuery = trpc.operations.getCrewAllocations.useQuery();
+  const provisionedDashboardsQuery = trpc.departments.listProvisioned.useQuery(undefined, { enabled: Boolean(user) });
   const [view, setView] = useState<View>(() =>
     location === "/uploads"
       ? "uploads"
@@ -7035,6 +7100,7 @@ export default function Home() {
   >(null);
   const [activeBooking, setActiveBooking] = useState<Booking | null>(null);
   const [activeDepartment, setActiveDepartment] = useState<string | null>(null);
+  const [activeProvisionedDepartmentCode, setActiveProvisionedDepartmentCode] = useState<string | null>(null);
   const [focusedAssignmentBookingId, setFocusedAssignmentBookingId] = useState<
     string | null
   >(null);
@@ -7159,25 +7225,47 @@ export default function Home() {
     setActiveBooking(null);
     setView("department");
   };
+  const openProvisionedDashboard = (departmentCode: string) => {
+    if (!user || !canAccessProvisionedDepartmentDashboard(user, departmentCode)) return;
+    const exists = (provisionedDashboardsQuery.data ?? []).some((dashboard) => dashboard.code === departmentCode);
+    if (!exists) return;
+    setActiveBooking(null);
+    setActiveDepartment(null);
+    setActiveProvisionedDepartmentCode(departmentCode);
+    setView("provisioned-dashboard");
+  };
   const signOut = async () => {
     await logout();
     setLocation("/login");
   };
-  const canView = (nextView: View) =>
-    canAccessWorkspaceView(
+  const canView = (nextView: View) => {
+    if (nextView === "provisioned-dashboard") {
+      return Boolean(user && activeProvisionedDepartmentCode && canAccessProvisionedDepartmentDashboard(user, activeProvisionedDepartmentCode));
+    }
+    return canAccessWorkspaceView(
       user ?? { role: "user", departmentCode: null },
       nextView
     );
+  };
   useEffect(() => {
     if (user && !canView(view)) setView("overview");
   }, [user, view]);
+  useEffect(() => {
+    if (!user || user.role === "admin" || view !== "overview") return;
+    const dashboard = (provisionedDashboardsQuery.data ?? []).find((item) => item.code === user.departmentCode);
+    if (!dashboard) return;
+    setActiveProvisionedDepartmentCode(dashboard.code);
+    setView("provisioned-dashboard");
+  }, [provisionedDashboardsQuery.data, user, view]);
   if (!user) return null;
   const guardedSetView = (nextView: View) => {
     if (nextView !== "crew") setFocusedAssignmentBookingId(null);
     setActiveBooking(null);
     setActiveDepartment(null);
+    if (nextView !== "provisioned-dashboard") setActiveProvisionedDepartmentCode(null);
     setView(canView(nextView) ? nextView : "overview");
   };
+  const activeProvisionedDashboard = (provisionedDashboardsQuery.data ?? []).find((dashboard) => dashboard.code === activeProvisionedDepartmentCode) ?? null;
   return (
     <Shell
       view={view}
@@ -7196,10 +7284,14 @@ export default function Home() {
         }
         setActiveBooking(null);
         setActiveDepartment(null);
+        setActiveProvisionedDepartmentCode(null);
         setView(view === "detail" ? "bookings" : "overview");
       }}
       onClient={() => setLocation("/client/portal-bob-31511")}
       onDepartment={openDepartment}
+      provisionedDashboards={provisionedDashboardsQuery.data ?? []}
+      activeProvisionedDepartmentCode={activeProvisionedDepartmentCode}
+      onProvisionedDashboard={openProvisionedDashboard}
       departmentLabel={activeDepartment}
       bookings={bookings}
       onOpenDossier={openDetail}
@@ -7296,7 +7388,7 @@ export default function Home() {
           />
         )}
       {view === "users" && user.role !== "user" && (
-        <DepartmentUsersView actor={user} />
+        <DepartmentUsersView actor={user} onOpenDashboard={openProvisionedDashboard} />
       )}
       {view === "supervisor-audit" && user.role === "admin" && (
         <SupervisorPermissionsAudit />
@@ -7315,6 +7407,15 @@ export default function Home() {
             completedWorkstreams={completedWorkstreams}
           />
         </>
+      )}
+      {view === "provisioned-dashboard" && activeProvisionedDashboard && (
+        <ProvisionedDepartmentDashboard
+          dashboard={activeProvisionedDashboard}
+          bookings={bookings}
+          canManageTeam={user.role === "admin" || user.role === "supervisor"}
+          onOpenDossier={openDetail}
+          onManageTeam={() => guardedSetView("users")}
+        />
       )}
       {view === "detail" && activeBooking && (
         <BookingDetail

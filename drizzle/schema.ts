@@ -169,6 +169,17 @@ export const departments = mysqlTable("departments", {
   active: int("active").notNull().default(1),
 });
 
+export const departmentDashboards = mysqlTable("department_dashboards", {
+  departmentCode: varchar("departmentCode", { length: 16 }).primaryKey(),
+  description: text("description").notNull(),
+  accent: varchar("accent", { length: 32 }).notNull().default("orange"),
+  icon: varchar("icon", { length: 48 }).notNull().default("LayoutDashboard"),
+  dashboardConfig: json("dashboardConfig").notNull(),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export const auditLogs = mysqlTable("audit_logs", {
   id: varchar("id", { length: 64 }).primaryKey(),
   actor: varchar("actor", { length: 255 }).notNull(),
@@ -193,4 +204,5 @@ export type DocumentItemRecord = typeof documents.$inferSelect;
 export type ChatMessageRecord = typeof chatMessages.$inferSelect;
 export type NotificationRecord = typeof notifications.$inferSelect;
 export type DepartmentRecord = typeof departments.$inferSelect;
+export type DepartmentDashboardRecord = typeof departmentDashboards.$inferSelect;
 export type AuditLogRecord = typeof auditLogs.$inferSelect;

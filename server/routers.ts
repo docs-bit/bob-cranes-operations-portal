@@ -41,6 +41,15 @@ import {
 } from "./localAuth";
 import { storagePut } from "./storage";
 import { runtimeErrorFingerprint, sanitizeRuntimeMessage } from "../shared/runtimeMonitoring";
+import {
+  canAccessProvisionedDepartmentDashboard,
+  createDepartmentDashboardConfig,
+  DEPARTMENT_DASHBOARD_ACCENTS,
+  DEPARTMENT_DASHBOARD_ICONS,
+  DEPARTMENT_WORKSTREAMS,
+  isValidProvisionedDepartmentCode,
+  normalizeDepartmentCode,
+} from "../shared/departmentDashboardRules";
 
 db.seedInitialDataIfNeeded().catch(console.error);
 
@@ -48,9 +57,7 @@ const accountInput = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(320),
   password: z.string().min(10).max(160),
-  departmentCode: z
-    .string()
-    .refine(isDepartmentCode, "Choose a valid department."),
+  departmentCode: z.string().trim().min(3).max(16),
 });
 
 const registrationInput = accountInput.extend({
@@ -120,6 +127,92 @@ function requireAccountManagementAccess(
 
 export const appRouter = router({
   system: systemRouter,
+  departments: router({
+    listProvisioned: protectedProcedure.query(async ({ ctx }) => {
+      const dashboards = await db.listProvisionedDepartmentDashboards();
+      return ctx.user.role === "admin"
+        ? dashboards
+        : dashboards.filter(
+            dashboard => dashboard.code === ctx.user.departmentCode
+          );
+    }),
+    getProvisioned: protectedProcedure
+      .input(z.object({ code: z.string().trim().min(3).max(16) }))
+      .query(async ({ ctx, input }) => {
+        if (
+          !canAccessProvisionedDepartmentDashboard(ctx.user, input.code)
+        ) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Your account cannot access this department dashboard.",
+          });
+        }
+        const dashboard = await db.getProvisionedDepartmentDashboard(input.code);
+        if (!dashboard)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "This provisioned department dashboard was not found.",
+          });
+        return dashboard;
+      }),
+    createProvisioned: adminProcedure
+      .input(
+        z.object({
+          name: z.string().trim().min(3).max(120),
+          code: z.string().trim().min(3).max(32),
+          description: z.string().trim().min(12).max(600),
+          accent: z.enum(DEPARTMENT_DASHBOARD_ACCENTS),
+          icon: z.enum(DEPARTMENT_DASHBOARD_ICONS),
+          workstream: z.enum(DEPARTMENT_WORKSTREAMS),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const code = normalizeDepartmentCode(input.code);
+        if (!isValidProvisionedDepartmentCode(code) || isDepartmentCode(code)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Use a new 3–16 character department code with lowercase letters, numbers, or hyphens.",
+          });
+        }
+        try {
+          const dashboardConfig = createDepartmentDashboardConfig({
+            name: input.name,
+            workstream: input.workstream,
+          });
+          const created = await db.createProvisionedDepartmentDashboard({
+            code,
+            name: input.name,
+            description: input.description,
+            accent: input.accent,
+            icon: input.icon,
+            dashboardConfig,
+            createdBy: ctx.user.id,
+          });
+          await db.addUserActivity({
+            userId: ctx.user.id,
+            action: "department_created",
+            detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} provisioned the ${input.name} department dashboard.`,
+          });
+          await db.addNotification({
+            id: `department-provisioned-${code}-${Date.now()}`,
+            departmentCode: code,
+            title: `${input.name} dashboard is ready`,
+            body: "Assign a supervisor and department users to begin working in this workspace.",
+          });
+          return created;
+        } catch (caught) {
+          if (caught instanceof TRPCError) throw caught;
+          throw new TRPCError({
+            code: "CONFLICT",
+            message:
+              caught instanceof Error
+                ? caught.message
+                : "The department could not be provisioned.",
+          });
+        }
+      }),
+  }),
   auth: router({
     setupStatus: publicProcedure.query(async () => ({
       needsAdminSetup: (await db.countLocalUsers()) === 0,
@@ -310,6 +403,15 @@ export const appRouter = router({
             message:
               "Use the administrator setup flow for the administrator department.",
           });
+        if (
+          !isDepartmentCode(input.departmentCode) &&
+          !(await db.getProvisionedDepartmentDashboard(input.departmentCode))
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Choose a valid department dashboard before creating an account.",
+          });
+        }
         const email = normalizeEmail(input.email);
         if (await db.getUserByLocalEmail(email)) {
           throw new TRPCError({
@@ -334,9 +436,7 @@ export const appRouter = router({
           id: z.number().int().positive(),
           name: z.string().trim().min(2).max(120),
           email: z.string().trim().email().max(320),
-          departmentCode: z
-            .string()
-            .refine(isDepartmentCode, "Choose a valid department."),
+          departmentCode: z.string().trim().min(3).max(16),
           role: z.enum(["user", "supervisor", "admin"]),
           password: z.string().min(10).max(160).optional().or(z.literal("")),
         })
@@ -384,6 +484,16 @@ export const appRouter = router({
           });
         const departmentCode =
           input.role === "admin" ? "administrator" : input.departmentCode;
+        if (
+          input.role !== "admin" &&
+          !isDepartmentCode(departmentCode) &&
+          !(await db.getProvisionedDepartmentDashboard(departmentCode))
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Choose a valid department dashboard before moving this account.",
+          });
+        }
         const user = await db.updateLocalUser(input.id, {
           name: input.name,
           email,

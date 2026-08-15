@@ -28,6 +28,8 @@ import {
   documents,
   chatMessages,
   notifications,
+  departments,
+  departmentDashboards,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -660,6 +662,111 @@ export async function markAllNotificationsRead(filters?: {
     return;
   }
   await db.update(notifications).set({ read: 1 });
+}
+
+export type ProvisionedDepartmentDashboard = {
+  code: string;
+  name: string;
+  active: number;
+  description: string;
+  accent: string;
+  icon: string;
+  dashboardConfig: unknown;
+  createdBy: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export async function listProvisionedDepartmentDashboards(): Promise<
+  ProvisionedDepartmentDashboard[]
+> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select({
+      code: departments.code,
+      name: departments.name,
+      active: departments.active,
+      description: departmentDashboards.description,
+      accent: departmentDashboards.accent,
+      icon: departmentDashboards.icon,
+      dashboardConfig: departmentDashboards.dashboardConfig,
+      createdBy: departmentDashboards.createdBy,
+      createdAt: departmentDashboards.createdAt,
+      updatedAt: departmentDashboards.updatedAt,
+    })
+    .from(departments)
+    .innerJoin(
+      departmentDashboards,
+      eq(departments.code, departmentDashboards.departmentCode)
+    )
+    .where(eq(departments.active, 1))
+    .orderBy(departments.name);
+}
+
+export async function getProvisionedDepartmentDashboard(code: string): Promise<
+  ProvisionedDepartmentDashboard | undefined
+> {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db
+    .select({
+      code: departments.code,
+      name: departments.name,
+      active: departments.active,
+      description: departmentDashboards.description,
+      accent: departmentDashboards.accent,
+      icon: departmentDashboards.icon,
+      dashboardConfig: departmentDashboards.dashboardConfig,
+      createdBy: departmentDashboards.createdBy,
+      createdAt: departmentDashboards.createdAt,
+      updatedAt: departmentDashboards.updatedAt,
+    })
+    .from(departments)
+    .innerJoin(
+      departmentDashboards,
+      eq(departments.code, departmentDashboards.departmentCode)
+    )
+    .where(eq(departments.code, code))
+    .limit(1);
+  return result[0];
+}
+
+export async function createProvisionedDepartmentDashboard(input: {
+  code: string;
+  name: string;
+  description: string;
+  accent: string;
+  icon: string;
+  dashboardConfig: Record<string, unknown>;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const existing = await db
+    .select({ code: departments.code })
+    .from(departments)
+    .where(eq(departments.code, input.code))
+    .limit(1);
+  if (existing[0]) throw new Error("A department already uses this code.");
+  await db.transaction(async transaction => {
+    await transaction.insert(departments).values({
+      code: input.code,
+      name: input.name,
+      active: 1,
+    });
+    await transaction.insert(departmentDashboards).values({
+      departmentCode: input.code,
+      description: input.description,
+      accent: input.accent,
+      icon: input.icon,
+      dashboardConfig: input.dashboardConfig,
+      createdBy: input.createdBy,
+    });
+  });
+  const created = await getProvisionedDepartmentDashboard(input.code);
+  if (!created) throw new Error("Department dashboard could not be provisioned.");
+  return created;
 }
 
 export async function seedInitialDataIfNeeded() {

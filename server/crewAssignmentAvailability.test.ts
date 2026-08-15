@@ -21,10 +21,10 @@ describe("allocation-aware Crew Assignment availability", () => {
   });
 
   it("wires allocation-aware availability into the Crew Assignment filter and row data", () => {
-    expect(workspaceSource).toContain("const availabilityByEmployeeId = useMemo");
+    expect(workspaceSource).toContain("const bookingIdsByCrew = useMemo");
     expect(workspaceSource).toContain("allocationAwareAvailability(");
-    expect(workspaceSource).toContain("const matchesAvailability = availability === \"All\" || resolvedAvailability === availability");
-    expect(workspaceSource).toContain("availability: availabilityByEmployeeId.get(employee.id) ?? employee.availability");
+    expect(workspaceSource).toContain("availability === \"All\" || crew.availability === availability");
+    expect(workspaceSource).toContain("dateAvailability(crew, bookingIds, bookings, availabilityDate)");
   });
 
   it("distinguishes active and upcoming allocated bookings from their booking dates", () => {
@@ -44,7 +44,7 @@ describe("allocation-aware Crew Assignment availability", () => {
   it("renders allocation count, booking ID, and date-aware timing details in Crew Assignment", () => {
     expect(workspaceSource).toContain("allocation-count-badge");
     expect(workspaceSource).toContain("booking-id-chip");
-    expect(workspaceSource).toContain("timingForDate(bookingIds, bookings, availabilityDate)");
+    expect(workspaceSource).toContain("summarizeAllocationTiming(crew.bookingIds, bookings");
     expect(workspaceSource).toContain("Active booking");
     expect(workspaceSource).toContain("Upcoming booking");
   });

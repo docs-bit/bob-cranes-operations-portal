@@ -26,8 +26,11 @@ describe("assignment editor focus rules", () => {
     expect(homeSource).toContain("focusedBookingId={focusedAssignmentBookingId}");
     expect(homeSource).toContain("onAllocationSaved");
     expect(homeSource).toContain("assignmentSavedMessage={assignmentSavedMessage}");
-    expect(homeSource).toContain("const dossierCrew = assignedCrew.length ? assignedCrew : legacyCrews.slice(0, 4)");
-    expect(homeSource).toContain("allocation.crewId ? allocation.crewId === crew.id : allocation.employeeName === crew.name");
+    expect(homeSource).toContain("const dossierCrew = assignedCrew.length");
+    expect(homeSource).toContain("? assignedCrew");
+    expect(homeSource).toContain(": legacyCrews.slice(0, 4)");
+    expect(homeSource).toContain("allocation.crewId === crew.id");
+    expect(homeSource).toContain("allocation.employeeName === crew.name");
   });
 
   it("supports the save handler's assign then remove cycle without mutating prior state", () => {

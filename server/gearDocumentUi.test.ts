@@ -19,7 +19,8 @@ describe("lifting gear document workflow wiring", () => {
     const app = readFileSync(new URL("../client/src/App.tsx", import.meta.url), "utf8");
     expect(router).toContain("uploadGearDocument");
     expect(router).toContain('requireDepartmentAccess(ctx.user, "lifting-gears")');
-    expect(router).toContain("storagePut(`lifting-gears/");
+    expect(router).toContain("storagePut(");
+    expect(router).toContain("`lifting-gears/${ctx.user.id}/");
     expect(app).toContain('<Route path={"/gear"} component={ProtectedPortal} />');
   });
 });
