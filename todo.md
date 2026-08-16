@@ -372,3 +372,6 @@
 - [x] Display rental duration in the Sales enquiry table and selected-enquiry detail modal.
 - [x] Add a visual dashboard badge for public rental enquiries that are not yet assigned to a Sales owner.
 - [x] Add focused coverage, complete release checks, and publish the response-visibility update.
+
+## Final ship-readiness verification
+- [x] Re-validate the latest published portal build, inspect current runtime signals, and publish a final ship-readiness checkpoint.
