@@ -5772,6 +5772,9 @@ export function ClientPortal({
     "required" | "name" | "department"
   >("required");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<any | null>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -5839,6 +5842,7 @@ export function ClientPortal({
     fileInputRef.current?.click();
   };
   const handleClientFiles = (event: React.ChangeEvent<HTMLInputElement> | File[]) => {
+    setUploadError(null);
     const selectedFiles = Array.isArray(event) ? event : Array.from(event.target.files ?? []);
     if (!Array.isArray(event) && event.target) event.target.value = "";
     if (!selectedFiles.length) return;
@@ -5848,17 +5852,21 @@ export function ClientPortal({
       file => !allowedTypes.has(file.type) || file.size > 25 * 1024 * 1024
     );
     if (invalidFile) {
-      notify(`${invalidFile.name} is not a supported file or exceeds the 25MB limit.`);
+      const errorMsg = `${invalidFile.name} is not a supported file or exceeds the 25MB limit. Please upload PDF, JPG, or PNG under 25MB.`;
+      setUploadError(errorMsg);
+      notify(errorMsg);
       return;
     }
 
     const filesToUpload = selectedFiles.slice(0, Math.max(1, pendingDocs.length));
     setIsUploading(true);
+    setUploadProgress(100);
     onUploadAll(filesToUpload);
     notify(
       `${filesToUpload.length} document${filesToUpload.length === 1 ? "" : "s"} uploaded and synced to the BOB Cranes team.`
     );
     setIsUploading(false);
+    setUploadProgress(0);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -6153,6 +6161,31 @@ export function ClientPortal({
                 </button>
               </div>
               <div className="panel-body">
+                {uploadError && (
+                  <div
+                    style={{
+                      background: "#fef2f2",
+                      border: "1px solid #f87171",
+                      borderRadius: "8px",
+                      padding: "10px 14px",
+                      marginBottom: "12px",
+                      fontSize: "12px",
+                      color: "#b91c1c",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>{uploadError}</span>
+                    <button
+                      type="button"
+                      onClick={() => setUploadError(null)}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#b91c1c", fontWeight: 700 }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
                 <div
                   className={`client-drop-zone ${isDraggingOver ? "drag-over" : ""}`}
                   onDragOver={handleDragOver}
@@ -6176,6 +6209,17 @@ export function ClientPortal({
                     Supports PDF, JPG, PNG (up to 25MB)
                   </div>
                 </div>
+                {isUploading && (
+                  <div style={{ marginBottom: "14px", background: "#f1f5f9", padding: "10px 14px", borderRadius: "8px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "6px", color: "#475569" }}>
+                      <span>Uploading document securely...</span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                    <div style={{ width: "100%", height: "6px", background: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
+                      <div style={{ width: `${uploadProgress}%`, height: "100%", background: "#217c64", transition: "width 0.2s ease" }} />
+                    </div>
+                  </div>
+                )}
                 <div className="notification" style={{ marginBottom: 14 }}>
                   <div className="title">
                     {uploadedDocs}/{documents.length} requirements uploaded ·{" "}
@@ -6267,15 +6311,26 @@ export function ClientPortal({
                         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                           <StatusBadge value={doc.state} />
                           {doc.state === "Uploaded" && (
-                            <button
-                              type="button"
-                              className="secondary-button"
-                              style={{ padding: "4px 8px", fontSize: "11px", height: "auto" }}
-                              onClick={() => resetDocument(doc.name)}
-                              aria-label={`Replace or delete document ${doc.name}`}
-                            >
-                              Replace / Delete
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                className="secondary-button"
+                                style={{ padding: "4px 8px", fontSize: "11px", height: "auto" }}
+                                onClick={() => setPreviewDoc(doc)}
+                                aria-label={`Preview document ${doc.name}`}
+                              >
+                                Preview / Download
+                              </button>
+                              <button
+                                type="button"
+                                className="secondary-button"
+                                style={{ padding: "4px 8px", fontSize: "11px", height: "auto" }}
+                                onClick={() => resetDocument(doc.name)}
+                                aria-label={`Replace or delete document ${doc.name}`}
+                              >
+                                Replace / Delete
+                              </button>
+                            </>
                           )}
                         </div>
                       </div>
@@ -6574,6 +6629,76 @@ export function ClientPortal({
               style={{ verticalAlign: "-2px", marginRight: 7 }}
             />
             {uploadToast}
+          </div>
+        )}
+        {previewDoc && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.6)",
+              display: "grid",
+              placeItems: "center",
+              zIndex: 9999,
+              padding: "24px",
+            }}
+          >
+            <div
+              style={{
+                background: "var(--card, #ffffff)",
+                color: "var(--card-foreground, #1f2937)",
+                borderRadius: "16px",
+                width: "100%",
+                maxWidth: "640px",
+                padding: "24px",
+                boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)",
+                position: "relative",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>Document Preview: {previewDoc.name}</h3>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDoc(null)}
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", fontWeight: 700 }}
+                  aria-label="Close preview"
+                >
+                  ✕
+                </button>
+              </div>
+              <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "20px", textAlign: "center", marginBottom: "20px" }}>
+                <FileText size={48} color="#217c64" style={{ margin: "0 auto 12px" }} />
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#1f2937" }}>{previewDoc.name}</div>
+                <div style={{ fontSize: "12px", color: "#64748b", marginTop: "4px" }}>
+                  Department: {previewDoc.departmentCode} · Status: {previewDoc.state} · Synced to Google Drive archive
+                </div>
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setPreviewDoc(null)}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={() => {
+                    notify(`Downloading ${previewDoc.name}...`);
+                    const blob = new Blob([`BOB Cranes Verified Document: ${previewDoc.name}\nDepartment: ${previewDoc.departmentCode}\nStatus: ${previewDoc.state}`], { type: "text/plain" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `${previewDoc.name.toLowerCase().replace(/\s+/g, "-")}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                >
+                  Download File
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>

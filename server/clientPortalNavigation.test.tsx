@@ -55,6 +55,23 @@ describe("Client Response Portal navigation", () => {
     expect(onUploadAll).toHaveBeenCalled();
   });
 
+  it("allows previewing and downloading uploaded documents in a modal", async () => {
+    const user = userEvent.setup();
+    render(<ClientPortal
+      booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
+      documents={[{ id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Uploaded", required: true }] as any}
+      onUpdate={vi.fn()}
+      onUploadAll={vi.fn()}
+      onBackToInternal={vi.fn()}
+    />);
+    await user.click(screen.getByRole("button", { name: /required documents/i }));
+    const previewButton = screen.getByRole("button", { name: /preview document site access pass/i });
+    expect(previewButton).toBeInTheDocument();
+    await user.click(previewButton);
+    expect(screen.getByText(/document preview: site access pass/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /download file/i })).toBeInTheDocument();
+  });
+
   it("always exposes a header return control and invokes the internal navigation callback", async () => {
     const user = userEvent.setup();
     const onBackToInternal = vi.fn();

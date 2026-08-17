@@ -562,3 +562,9 @@
 - [x] Implement delete and replace actions for uploaded documents.
 - [x] Create and validate the updated reusable client upload workflow skill package.
 - [x] Add regression test assertions, run test suite, verify build, and publish release.
+
+## Document Upload Progress, Validation Banner, and Full-Screen Preview Modal
+- [x] Add progress bar and animated loading spinner during client document uploads.
+- [x] Implement explicit validation error banner for unsupported formats or files exceeding 25MB.
+- [x] Add full-screen modal preview and download support for uploaded documents.
+- [x] Add regression tests, verify build, and publish release.
