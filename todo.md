@@ -397,7 +397,7 @@
 - [ ] Add focused tests, run the full validation suite, and publish the release.
 
 ## Frontend performance optimization (Option 1)
-- [ ] Audit large imports and eagerly loaded workspaces in `Home.tsx` and `App.tsx`.
-- [ ] Introduce React lazy loading and Suspense boundaries with skeleton placeholders for secondary views.
-- [ ] Defer loading of heavy static datasets until needed or split them cleanly.
-- [ ] Run test suite, production build size check, and publish updated checkpoint.
+- [x] Audit large imports and eagerly loaded workspaces in `Home.tsx` and `App.tsx`.
+- [x] Introduce React lazy loading and Suspense boundaries with skeleton placeholders for secondary views.
+- [x] Defer loading of heavy static datasets until needed or split them cleanly.
+- [x] Run test suite, production build size check, and publish updated checkpoint.
