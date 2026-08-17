@@ -537,3 +537,10 @@
 - [x] Implement a home dashboard summary widget for active bookings and available crew.
 - [x] Add a dark-mode toggle to the application header.
 - [x] Add regression test assertions, run test suite, verify build, and publish release.
+
+## System theme mode, metric navigation, PDF export, and skill packaging
+- [x] Update ThemeContext to support a 'System' theme option matching OS preference.
+- [x] Make home dashboard summary metrics and cards clickable to open relevant filtered views.
+- [x] Implement filtered booking PDF export alongside existing CSV export.
+- [x] Create and validate the updated reusable workflow skill package.
+- [x] Add regression test assertions, run test suite, verify build, and publish release.

@@ -2520,7 +2520,7 @@ function BookingsView({
     const csv = [
       ["Booking ID", "Client", "Project", "Crane", "Site", "Status", "Priority", "Documents %", "Mobilization", "Off-hire"],
       ...rows,
-    ].map(row => row.map(quote).join(",")).join("\\r\\n");
+    ].map(row => row.map(quote).join(",")).join("\r\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -2529,6 +2529,55 @@ function BookingsView({
     link.click();
     URL.revokeObjectURL(url);
     toast.success(`${visibleBookings.length} booking${visibleBookings.length === 1 ? "" : "s"} exported to CSV`);
+  };
+
+  const exportBookingsPdf = async () => {
+    try {
+      const { PDFDocument, rgb } = await import("pdf-lib");
+      const pdfDoc = await PDFDocument.create();
+      let page = pdfDoc.addPage([842, 595]); // A4 landscape
+      const { height } = page.getSize();
+      
+      page.drawText("BOB Cranes — Filtered Booking Dossiers Report", { x: 40, y: height - 40, size: 18, color: rgb(0.12, 0.35, 0.28) });
+      page.drawText(`Generated: ${new Date().toLocaleString()} · Filter: ${filter} · Sorted: ${sortBy} · Total: ${visibleBookings.length} dossiers`, { x: 40, y: height - 62, size: 10, color: rgb(0.4, 0.4, 0.4) });
+      
+      let y = height - 95;
+      page.drawText("ID", { x: 40, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
+      page.drawText("Client / Project", { x: 120, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
+      page.drawText("Crane & Site", { x: 320, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
+      page.drawText("Stage", { x: 520, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
+      page.drawText("Mobilization", { x: 680, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
+      
+      y -= 16;
+      page.drawLine({ start: { x: 40, y }, end: { x: 800, y }, thickness: 1, color: rgb(0.8, 0.85, 0.83) });
+      y -= 20;
+      
+      for (const booking of visibleBookings.slice(0, 22)) {
+        if (y < 50) {
+          page = pdfDoc.addPage([842, 595]);
+          y = height - 50;
+        }
+        page.drawText(booking.id, { x: 40, y, size: 9, color: rgb(0.1, 0.1, 0.1) });
+        page.drawText(`${booking.client} (${booking.project ?? ""})`.slice(0, 45), { x: 120, y, size: 9, color: rgb(0.1, 0.1, 0.1) });
+        page.drawText(`${booking.crane ?? ""} · ${booking.site ?? ""}`.slice(0, 45), { x: 320, y, size: 9, color: rgb(0.1, 0.1, 0.1) });
+        page.drawText(booking.stage ?? "Draft", { x: 520, y, size: 9, color: rgb(0.1, 0.1, 0.1) });
+        page.drawText(booking.mob, { x: 680, y, size: 9, color: rgb(0.1, 0.1, 0.1) });
+        y -= 22;
+      }
+      
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `bob-bookings-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success(`${visibleBookings.length} booking dossiers exported to PDF.`);
+    } catch (err) {
+      console.error(err);
+      toast.error("PDF export failed. Please try CSV export.");
+    }
   };
 
   return (
@@ -2589,15 +2638,26 @@ function BookingsView({
                 </button>
               )}
             </label>
-            <button
-              type="button"
-              className="secondary-button booking-export-button"
-              onClick={exportBookings}
-              disabled={!visibleBookings.length || isLoading}
-              aria-label="Export filtered booking dossiers to CSV"
-            >
-              <Download size={14} /> Export to CSV
-            </button>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                type="button"
+                className="secondary-button booking-export-button"
+                onClick={exportBookings}
+                disabled={!visibleBookings.length || isLoading}
+                aria-label="Export filtered booking dossiers to CSV"
+              >
+                <Download size={14} /> Export CSV
+              </button>
+              <button
+                type="button"
+                className="secondary-button booking-export-button"
+                onClick={exportBookingsPdf}
+                disabled={!visibleBookings.length || isLoading}
+                aria-label="Export filtered booking dossiers to PDF"
+              >
+                <Download size={14} /> Export PDF
+              </button>
+            </div>
             <label className="booking-sort-control">
               <span>Sort by</span>
               <select
