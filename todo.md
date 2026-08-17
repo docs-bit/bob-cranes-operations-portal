@@ -413,3 +413,9 @@
 - [x] Ensure PerformanceTelemetry and RuntimeErrorReporter gracefully handle server connection states or route calls only when appropriate.
 - [x] Add unit test coverage and verify the public rental landing page mutation flow.
 - [x] Build, checkpoint, and deliver the fixed release.
+
+## Web Vitals analytics, telemetry rate-limiting, and Playwright E2E tests
+- [x] Add an admin Web Vitals analytics view for inspecting LCP, FID, and CLS over time.
+- [x] Implement token-bucket rate limiting on public runtime telemetry submissions.
+- [x] Add Playwright end-to-end flow test specs for landing page, enquiry submission, and portal sign-in.
+- [x] Run full test suite, production build, and publish final verified release.

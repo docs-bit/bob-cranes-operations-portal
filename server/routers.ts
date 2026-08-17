@@ -40,6 +40,7 @@ import {
   verifyPassword,
 } from "./localAuth";
 import { storagePut } from "./storage";
+import { checkTelemetryRateLimit } from "./_core/rateLimiter";
 import { runtimeErrorFingerprint, sanitizeRuntimeMessage } from "../shared/runtimeMonitoring";
 import {
   canAccessProvisionedDepartmentDashboard,
@@ -940,6 +941,9 @@ export const appRouter = router({
     capture: publicProcedure
       .input(z.object({ source: z.enum(["window.error", "unhandledrejection", "react.boundary"]), message: z.string().min(1).max(2000), path: z.string().max(512) }))
       .mutation(async ({ input, ctx }) => {
+        if (!checkTelemetryRateLimit(ctx.user ? `user-${ctx.user.id}` : "public")) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Telemetry rate limit exceeded. Please try again later." });
+        }
         const message = sanitizeRuntimeMessage(input.message);
         const path = sanitizeRuntimeMessage(input.path, 512) || "/";
         return await db.createRuntimeErrorEvent({ source: input.source, message, path, fingerprint: runtimeErrorFingerprint(input.source, message, path), userId: ctx.user?.id ?? null });
