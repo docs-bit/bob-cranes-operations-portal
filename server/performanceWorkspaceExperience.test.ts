@@ -13,6 +13,10 @@ describe("performance workspace experience", () => {
     expect(analytics).toContain("Export CSV");
     expect(analytics).toContain("Export PDF");
     expect(analytics).toContain("formatTrendValue");
+    expect(analytics).toContain("ReferenceArea");
+    expect(analytics).toContain("VITAL_THRESHOLDS");
+    expect(analytics).toContain("Custom range");
+    expect(analytics).toContain("customStartDate");
     expect(analytics).toContain("pdf-lib");
   });
 
@@ -25,6 +29,10 @@ describe("performance workspace experience", () => {
     expect(workspace).toContain("searchSuggestions");
     expect(workspace).toContain("department-search-suggestions");
     expect(workspace).toContain("aria-autocomplete=\"list\"");
+    expect(workspace).toContain("ArrowDown");
+    expect(workspace).toContain("ArrowUp");
+    expect(workspace).toContain("highlightQuery");
+    expect(workspace).toContain("aria-activedescendant");
     expect(styles).toContain(".dark .app-shell");
   });
 

@@ -1639,3 +1639,25 @@ body,
 .dark .department-search-suggestion { color: #edf4f7; }
 .dark .department-search-suggestion:hover, .dark .department-search-suggestion:focus-visible { background: #1a3445; }
 .dark .department-search-suggestion span { color: #a8bac5; }
+
+.web-vitals-custom-range { display: flex; align-items: center; gap: 6px; }
+.web-vitals-custom-range label { display: inline-flex; align-items: center; gap: 4px; color: #6e6e73; font-size: 10px; }
+.web-vitals-custom-range input { min-height: 30px; border: 1px solid #d0d0cc; border-radius: 7px; background: #fff; color: #1d1d1f; padding: 0 7px; font: inherit; }
+.web-vitals-threshold-legend { display: flex; flex-wrap: wrap; gap: 8px 13px; margin-top: 4px; color: #6e6e73; font-size: 10px; }
+.web-vitals-threshold-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.threshold-dot { width: 7px; height: 7px; display: inline-block; border-radius: 999px; }
+.threshold-dot.good { background: #16a34a; }
+.threshold-dot.warning { background: #d97706; }
+.threshold-dot.poor { background: #dc2626; }
+.department-search-suggestion.active { background: #edf6ff; }
+.department-search-suggestion mark { padding: 0 1px; border-radius: 2px; background: #ffe49a; color: inherit; }
+.dark .web-vitals-custom-range label { color: #a8bac5; }
+.dark .web-vitals-custom-range input { border-color: #2d4656; background: #162733; color: #edf4f7; }
+.dark .web-vitals-threshold-legend { color: #a8bac5; }
+.dark .department-search-suggestion.active { background: #1a3445; }
+.dark .department-search-suggestion mark { background: #735a1f; color: #fff6d6; }
+@media (max-width: 720px) {
+  .web-vitals-custom-range { width: 100%; }
+  .web-vitals-custom-range label { flex: 1; }
+  .web-vitals-custom-range input { width: 100%; }
+}

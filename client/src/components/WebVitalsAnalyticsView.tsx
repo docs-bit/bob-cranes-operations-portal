@@ -3,7 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { Activity, Calendar, Download, Gauge, RefreshCw, TrendingUp } from "lucide-react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
 const vitalsChartConfig = {
@@ -12,8 +12,14 @@ const vitalsChartConfig = {
   cls: { label: "CLS", theme: { light: "#187451", dark: "#58d68d" } },
 } satisfies ChartConfig;
 
-type DateRange = "all" | "today" | "7days";
+type DateRange = "all" | "today" | "7days" | "custom";
 type TrendKey = "lcp" | "fid" | "cls";
+
+const VITAL_THRESHOLDS: Record<TrendKey, { good: number; needsImprovement: number; unit: string }> = {
+  lcp: { good: 2500, needsImprovement: 4000, unit: "ms" },
+  fid: { good: 100, needsImprovement: 300, unit: "ms" },
+  cls: { good: 0.1, needsImprovement: 0.25, unit: "" },
+};
 
 const metricNumber = (value: string) => Number.parseFloat(value.replace(/[^0-9.]/g, ""));
 const formatDay = (value: Date | string) => new Intl.DateTimeFormat("en-GB", { month: "short", day: "numeric" }).format(new Date(value));
@@ -24,15 +30,24 @@ export default function WebVitalsAnalyticsView() {
   const metrics = telemetryQuery.data ?? [];
   const [dateRange, setDateRange] = useState<DateRange>("all");
   const [pdfReportLoading, setPdfReportLoading] = useState(false);
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
 
   const filteredMetrics = useMemo(() => {
     const now = Date.now();
+    const customStart = customStartDate ? new Date(`${customStartDate}T00:00:00`).getTime() : null;
+    const customEnd = customEndDate ? new Date(`${customEndDate}T23:59:59.999`).getTime() : null;
     return metrics.filter(metric => {
+      const capturedAt = new Date(metric.createdAt).getTime();
       if (dateRange === "all") return true;
-      const ageDays = (now - new Date(metric.createdAt).getTime()) / 86_400_000;
+      if (dateRange === "custom") {
+        if (customStart === null || customEnd === null || customStart > customEnd) return false;
+        return capturedAt >= customStart && capturedAt <= customEnd;
+      }
+      const ageDays = (now - capturedAt) / 86_400_000;
       return dateRange === "today" ? ageDays <= 1 : ageDays <= 7;
     });
-  }, [dateRange, metrics]);
+  }, [customEndDate, customStartDate, dateRange, metrics]);
 
   const chartData = useMemo(() => {
     const grouped = new Map<string, { day: string; sort: number; lcp: number[]; fid: number[]; cls: number[] }>();
@@ -92,7 +107,7 @@ export default function WebVitalsAnalyticsView() {
       const accent = rgb(0.84, 0.36, 0.14);
       const navy = rgb(0.05, 0.13, 0.19);
       const muted = rgb(0.36, 0.41, 0.44);
-      const rangeLabel = dateRange === "all" ? "All time" : dateRange === "today" ? "Past 24 hours" : "Past 7 days";
+      const rangeLabel = dateRange === "all" ? "All time" : dateRange === "today" ? "Past 24 hours" : dateRange === "7days" ? "Past 7 days" : `Custom: ${customStartDate || "start"} to ${customEndDate || "end"}`;
       const drawHeader = (page: ReturnType<typeof pdfDocument.addPage>, continuation = false) => {
         page.drawRectangle({ x: 0, y: 790, width: pageSize[0], height: 52, color: navy });
         page.drawText("BOB CRANES", { x: margin, y: 812, size: 18, font: bold, color: rgb(1, 1, 1) });
@@ -154,26 +169,45 @@ export default function WebVitalsAnalyticsView() {
     }
   };
 
-  const TrendChart = ({ dataKey, label, suffix = "" }: { dataKey: TrendKey; label: string; suffix?: string }) => (
-    <div className="web-vitals-chart-card">
-      <div className="web-vitals-chart-heading"><span>{label}</span><small>{chartData.length ? "Daily average" : "Awaiting samples"}</small></div>
-      <ChartContainer config={vitalsChartConfig} className="h-[190px] w-full">
-        <LineChart accessibilityLayer data={chartData} margin={{ left: -16, right: 8, top: 10, bottom: 0 }}>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" />
-          <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
-          <YAxis tickLine={false} axisLine={false} tickMargin={8} width={42} />
-          <ChartTooltip content={<ChartTooltipContent labelFormatter={value => `Day: ${value}`} formatter={value => formatTrendValue(value, dataKey, suffix)} />} />
-          <Line dataKey={dataKey} type="monotone" stroke={`var(--color-${dataKey})`} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} connectNulls />
-        </LineChart>
-      </ChartContainer>
-    </div>
-  );
+  const TrendChart = ({ dataKey, label, suffix = "" }: { dataKey: TrendKey; label: string; suffix?: string }) => {
+    const threshold = VITAL_THRESHOLDS[dataKey];
+    const observedMax = Math.max(...chartData.map(point => Number(point[dataKey]) || 0), threshold.needsImprovement);
+    const chartMax = Math.max(observedMax * 1.12, threshold.needsImprovement * 1.15);
+    return (
+      <div className="web-vitals-chart-card">
+        <div className="web-vitals-chart-heading"><span>{label}</span><small>{chartData.length ? "Daily average" : "Awaiting samples"}</small></div>
+        <ChartContainer config={vitalsChartConfig} className="h-[190px] w-full">
+          <LineChart accessibilityLayer data={chartData} margin={{ left: -16, right: 8, top: 10, bottom: 0 }}>
+            <ReferenceArea y1={0} y2={threshold.good} fill="#16a34a" fillOpacity={0.08} ifOverflow="extendDomain" />
+            <ReferenceArea y1={threshold.good} y2={threshold.needsImprovement} fill="#d97706" fillOpacity={0.08} ifOverflow="extendDomain" />
+            <ReferenceArea y1={threshold.needsImprovement} y2={chartMax} fill="#dc2626" fillOpacity={0.07} ifOverflow="extendDomain" />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+            <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
+            <YAxis domain={[0, chartMax]} tickLine={false} axisLine={false} tickMargin={8} width={42} />
+            <ReferenceLine y={threshold.good} stroke="#16a34a" strokeDasharray="4 4" label={{ value: `Good ≤ ${formatTrendValue(threshold.good, dataKey, suffix)}`, position: "insideTopRight", fill: "#15803d", fontSize: 9 }} />
+            <ReferenceLine y={threshold.needsImprovement} stroke="#d97706" strokeDasharray="4 4" label={{ value: `Needs improvement ≤ ${formatTrendValue(threshold.needsImprovement, dataKey, suffix)}`, position: "insideTopRight", fill: "#b45309", fontSize: 9 }} />
+            <ChartTooltip content={<ChartTooltipContent labelFormatter={value => `Day: ${value}`} formatter={value => formatTrendValue(value, dataKey, suffix)} />} />
+            <Line dataKey={dataKey} type="monotone" stroke={`var(--color-${dataKey})`} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} connectNulls />
+          </LineChart>
+        </ChartContainer>
+        <div className="web-vitals-threshold-legend" aria-label={`${label} performance thresholds`}>
+          <span><i className="threshold-dot good" /> Good ≤ {formatTrendValue(threshold.good, dataKey, suffix)}</span>
+          <span><i className="threshold-dot warning" /> Needs improvement ≤ {formatTrendValue(threshold.needsImprovement, dataKey, suffix)}</span>
+          <span><i className="threshold-dot poor" /> Poor above threshold</span>
+        </div>
+      </div>
+    );
+  };
 
   return <div className="content">
     <div className="page-heading">
       <div><div className="eyebrow">Performance Intelligence</div><h1 className="page-title">Web Vitals Analytics</h1><p className="page-copy">Real-user LCP, FID, and CLS are grouped into daily trend lines for the selected reporting period.</p></div>
       <div className="web-vitals-actions">
-        <label className="web-vitals-range"><Calendar size={14} aria-hidden="true" /><span className="sr-only">Select reporting date range</span><select value={dateRange} onChange={event => setDateRange(event.target.value as DateRange)}><option value="all">All time</option><option value="today">Past 24 hours</option><option value="7days">Past 7 days</option></select></label>
+        <label className="web-vitals-range"><Calendar size={14} aria-hidden="true" /><span className="sr-only">Select reporting date range</span><select value={dateRange} onChange={event => setDateRange(event.target.value as DateRange)}><option value="all">All time</option><option value="today">Past 24 hours</option><option value="7days">Past 7 days</option><option value="custom">Custom range</option></select></label>
+        {dateRange === "custom" && <div className="web-vitals-custom-range" aria-label="Custom Web Vitals date range">
+          <label><span>From</span><input type="date" value={customStartDate} onChange={event => setCustomStartDate(event.target.value)} aria-label="Custom range start date" /></label>
+          <label><span>To</span><input type="date" value={customEndDate} onChange={event => setCustomEndDate(event.target.value)} aria-label="Custom range end date" /></label>
+        </div>}
         <button type="button" className="secondary-button compact-button" onClick={exportCsv} disabled={!filteredMetrics.length}><Download size={13} /> Export CSV</button>
         <button type="button" className="secondary-button compact-button" onClick={() => void exportPdf()} disabled={!filteredMetrics.length || pdfReportLoading}><Download size={13} /> {pdfReportLoading ? "Preparing PDF…" : "Export PDF"}</button>
         <button type="button" className="secondary-button compact-button" onClick={() => void telemetryQuery.refetch()} disabled={telemetryQuery.isFetching}><RefreshCw size={13} /> {telemetryQuery.isFetching ? "Refreshing…" : "Refresh"}</button>

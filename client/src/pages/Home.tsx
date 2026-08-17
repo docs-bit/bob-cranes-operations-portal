@@ -6848,6 +6848,7 @@ function DepartmentView({
 }) {
   const [workspaceQuery, setWorkspaceQuery] = useState("");
   const [searchSuggestionsOpen, setSearchSuggestionsOpen] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [priorityFilter, setPriorityFilter] = useState<"all" | Booking["priority"]>("all");
   const [readinessFilter, setReadinessFilter] = useState<"all" | "ready" | "action">("all");
   const departmentCode =
@@ -6886,6 +6887,18 @@ function DepartmentView({
       .filter(booking => `${booking.id} ${booking.client} ${booking.project} ${booking.site} ${booking.crane}`.toLowerCase().includes(query))
       .slice(0, 5);
   }, [queue, workspaceQuery]);
+  const selectSuggestion = (booking: Booking) => {
+    setWorkspaceQuery(booking.id);
+    setSearchSuggestionsOpen(false);
+    setActiveSuggestionIndex(-1);
+  };
+  const highlightQuery = (value: string) => {
+    const query = workspaceQuery.trim();
+    if (!query) return value;
+    const start = value.toLowerCase().indexOf(query.toLowerCase());
+    if (start < 0) return value;
+    return <>{value.slice(0, start)}<mark>{value.slice(start, start + query.length)}</mark>{value.slice(start + query.length)}</>;
+  };
   const visibleQueue = queue.filter(booking => {
     const searchText = `${booking.id} ${booking.client} ${booking.project} ${booking.site} ${booking.crane}`.toLowerCase();
     const matchesQuery = searchText.includes(workspaceQuery.trim().toLowerCase());
@@ -7001,32 +7014,53 @@ function DepartmentView({
                     value={workspaceQuery}
                     onChange={event => {
                       setWorkspaceQuery(event.target.value);
+                      setActiveSuggestionIndex(0);
                       setSearchSuggestionsOpen(true);
                     }}
-                    onFocus={() => setSearchSuggestionsOpen(true)}
+                    onFocus={() => {
+                      setActiveSuggestionIndex(searchSuggestions.length ? 0 : -1);
+                      setSearchSuggestionsOpen(true);
+                    }}
                     onBlur={() => window.setTimeout(() => setSearchSuggestionsOpen(false), 120)}
+                    onKeyDown={event => {
+                      if (!searchSuggestionsOpen || !searchSuggestions.length) return;
+                      if (event.key === "ArrowDown") {
+                        event.preventDefault();
+                        setActiveSuggestionIndex(index => (index + 1) % searchSuggestions.length);
+                      } else if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        setActiveSuggestionIndex(index => (index - 1 + searchSuggestions.length) % searchSuggestions.length);
+                      } else if (event.key === "Enter" && activeSuggestionIndex >= 0) {
+                        event.preventDefault();
+                        selectSuggestion(searchSuggestions[activeSuggestionIndex]);
+                      } else if (event.key === "Escape") {
+                        setSearchSuggestionsOpen(false);
+                        setActiveSuggestionIndex(-1);
+                      }
+                    }}
                     placeholder="Search dossier, client, site or crane"
                     aria-label="Search operational queue"
                     aria-autocomplete="list"
                     aria-controls="department-search-suggestions"
+                    aria-activedescendant={activeSuggestionIndex >= 0 ? `department-search-suggestion-${activeSuggestionIndex}` : undefined}
                   />
                 </label>
                 {searchSuggestionsOpen && searchSuggestions.length > 0 && (
                   <div id="department-search-suggestions" className="department-search-suggestions" role="listbox" aria-label="Matching operations">
-                    {searchSuggestions.map(booking => (
+                    {searchSuggestions.map((booking, index) => (
                       <button
                         key={booking.id}
+                        id={`department-search-suggestion-${index}`}
                         type="button"
                         role="option"
-                        className="department-search-suggestion"
+                        aria-selected={index === activeSuggestionIndex}
+                        className={`department-search-suggestion${index === activeSuggestionIndex ? " active" : ""}`}
                         onMouseDown={event => event.preventDefault()}
-                        onClick={() => {
-                          setWorkspaceQuery(booking.id);
-                          setSearchSuggestionsOpen(false);
-                        }}
+                        onMouseEnter={() => setActiveSuggestionIndex(index)}
+                        onClick={() => selectSuggestion(booking)}
                       >
-                        <strong>{booking.id}</strong>
-                        <span>{booking.client} · {booking.project}</span>
+                        <strong>{highlightQuery(booking.id)}</strong>
+                        <span>{highlightQuery(`${booking.client} · ${booking.project}`)}</span>
                       </button>
                     ))}
                   </div>

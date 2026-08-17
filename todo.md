@@ -446,3 +446,9 @@
 - [x] Add real-time autocomplete suggestions to the departmental workspace search bar.
 - [x] Update and re-validate the reusable performance-workspace-operations skill.
 - [x] Run test suite, production build, and publish final verified release.
+
+## Threshold Overlays, Custom Date Ranges, and Keyboard Autocomplete
+- [x] Add color-coded performance threshold reference lines and zones to Web Vitals charts.
+- [x] Implement selectable custom date range filters with start/end date inputs in WebVitalsAnalyticsView.
+- [x] Add keyboard arrow navigation, enter-to-select, and highlighted query substring matching to departmental autocomplete suggestions.
+- [x] Run test suite, production build, and publish final verified release.
