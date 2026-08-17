@@ -2,20 +2,20 @@ import { useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 
 export default function PerformanceTelemetry() {
-  const capture = trpc.runtimeMonitoring.capture.useMutation();
+  const capture = trpc.telemetry.capture.useMutation();
   const reportedRef = useRef(new Set<string>());
 
   useEffect(() => {
     if (typeof window === "undefined" || !("PerformanceObserver" in window)) return;
 
-    const sendMetric = (metricName: string, value: string) => {
+    const sendMetric = (metricName: "LCP" | "FID" | "CLS", metricValue: string) => {
       const key = `${metricName}:${window.location.pathname}`;
       if (reportedRef.current.has(key)) return;
       reportedRef.current.add(key);
       try {
         capture.mutate({
-          source: "window.error",
-          message: `[Performance Metric] ${metricName}: ${value}`,
+          metricName,
+          metricValue,
           path: window.location.pathname.slice(0, 512),
         });
       } catch {

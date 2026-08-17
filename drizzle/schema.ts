@@ -65,6 +65,15 @@ export const runtimeErrorEvents = mysqlTable("runtime_error_events", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const telemetryEvents = mysqlTable("telemetry_events", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  metricName: varchar("metricName", { length: 64 }).notNull(),
+  metricValue: varchar("metricValue", { length: 64 }).notNull(),
+  path: varchar("path", { length: 512 }).notNull(),
+  userId: int("userId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const bookings = mysqlTable("bookings", {
   id: varchar("id", { length: 64 }).primaryKey(),
   clientName: varchar("clientName", { length: 255 }).notNull(),

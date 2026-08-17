@@ -951,6 +951,19 @@ export const appRouter = router({
     list: adminProcedure.input(z.object({ limit: z.number().int().min(1).max(250).optional() }).optional()).query(async ({ input }) => await db.listRuntimeErrorEvents(input?.limit ?? 100)),
   }),
 
+  telemetry: router({
+    capture: publicProcedure
+      .input(z.object({ metricName: z.enum(["LCP", "FID", "CLS", "INP", "TTFB"]), metricValue: z.string().min(1).max(64), path: z.string().max(512) }))
+      .mutation(async ({ input, ctx }) => {
+        if (!checkTelemetryRateLimit(ctx.user ? `user-${ctx.user.id}` : "public")) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Telemetry rate limit exceeded." });
+        }
+        const path = sanitizeRuntimeMessage(input.path, 512) || "/";
+        return await db.createTelemetryEvent({ metricName: input.metricName, metricValue: input.metricValue, path, userId: ctx.user?.id ?? null });
+      }),
+    list: adminProcedure.input(z.object({ limit: z.number().int().min(1).max(500).optional() }).optional()).query(async ({ input }) => await db.listTelemetryEvents(input?.limit ?? 250)),
+  }),
+
   clientFeedback: router({
     submit: publicProcedure
       .input(

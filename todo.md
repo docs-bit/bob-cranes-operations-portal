@@ -419,3 +419,10 @@
 - [x] Implement token-bucket rate limiting on public runtime telemetry submissions.
 - [x] Add Playwright end-to-end flow test specs for landing page, enquiry submission, and portal sign-in.
 - [x] Run full test suite, production build, and publish final verified release.
+
+## Advanced Enhancements: Accessibility, Code-Splitting, & Telemetry Persistence
+- [x] Add accessibility enhancements (focus trap, ARIA announcements, keyboard navigation).
+- [x] Implement granular lazy-loading and code-splitting for departmental workspaces.
+- [x] Create dedicated `telemetry_events` table migration and database helpers.
+- [x] Update WebVitalsAnalyticsView and routers to persist and query dedicated telemetry rows.
+- [x] Run full test suite, migration verification, production build, and publish final release.

@@ -19,6 +19,7 @@ import {
   clientFeedback,
   systemSettings,
   runtimeErrorEvents,
+  telemetryEvents,
   bookings,
   bookingCrewAllocations,
   equipment,
@@ -421,6 +422,35 @@ export async function listRuntimeErrorEvents(limit = 100) {
     .from(runtimeErrorEvents)
     .orderBy(desc(runtimeErrorEvents.createdAt))
     .limit(Math.min(Math.max(limit, 1), 250));
+}
+
+export async function createTelemetryEvent(input: {
+  metricName: string;
+  metricValue: string;
+  path: string;
+  userId?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) return { id: null };
+  const id = `tel-${nanoid(16)}`;
+  await db.insert(telemetryEvents).values({
+    id,
+    metricName: input.metricName,
+    metricValue: input.metricValue,
+    path: input.path,
+    userId: input.userId ?? null,
+  });
+  return { id };
+}
+
+export async function listTelemetryEvents(limit = 250) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(telemetryEvents)
+    .orderBy(desc(telemetryEvents.createdAt))
+    .limit(Math.min(Math.max(limit, 1), 500));
 }
 
 // ---- Bookings & Operations Queries ----
