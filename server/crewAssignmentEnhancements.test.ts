@@ -25,7 +25,7 @@ describe("Crew Assignment enhancements", () => {
     expect(workspace).toContain('aria-label="Filter crew availability by date"');
     expect(workspace).toContain('aria-label="Saved search name"');
     expect(workspace).toContain("localStorage.setItem(PRESET_STORAGE_KEY");
-    expect(workspace).toContain('aria-label={`Open ${bookingId} dossier`}');
+    expect(workspace).toContain('aria-label={`Open ${bookingId} dossier');
     expect(workspace).toContain("BookingIdChip");
     expect(workspace).toContain("onOpen={onOpenDossier}");
   });

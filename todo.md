@@ -494,3 +494,9 @@
 - [x] Replace any remaining booking-only React keys with duplicate-safe composite keys while preserving booking interaction behavior.
 - [x] Add key-audit regression coverage and verify `/portal` with tests, build, and runtime QA.
 - [x] Save and publish the verified duplicate-key repair checkpoint.
+
+## Duplicate-key repair skill and crew assignment enhancements
+- [x] Implement status-colored booking chips and hover summaries in CrewAssignmentWorkspace.
+- [x] Add a Clear Filters action next to the crew search bar to reset search, department, and availability filters.
+- [x] Initialize and write the reusable duplicate-key repair skill using the skill-creator guidelines and quick-validate.
+- [x] Add regression assertions, run full tests, verify build, and publish the completed release.

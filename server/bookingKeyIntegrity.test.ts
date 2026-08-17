@@ -28,6 +28,12 @@ describe("crew assignment booking render identity", () => {
     expect(crewSource).toContain("key={`booking-chip-${id}-${index}`}");
     expect(crewSource).toContain("key={`booking-allocation-${booking.id}-${index}`}");
   });
+
+  it("includes status color-coding, hover summaries, and a clear filters action", () => {
+    expect(crewSource).toContain("status-${tone}");
+    expect(crewSource).toContain("TooltipContent");
+    expect(crewSource).toContain("Clear filters");
+  });
 });
 
 describe("bookings list discovery controls", () => {
