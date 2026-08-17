@@ -476,3 +476,9 @@
 - [x] Add an accessible sorting dropdown to order bookings by mobilization date, workflow status, or booking ID.
 - [x] Add a bookings-list skeleton loading state in Home.tsx while booking data is being fetched.
 - [x] Add regression coverage and verify the updated bookings list with type checks, tests, build, and visual QA.
+
+## Portal maximum update depth repair
+- [x] Inspect `/portal` runtime logs and Home.tsx effects for the render loop.
+- [x] Fix the unstable effect dependency or state feedback loop without changing workflow behavior.
+- [x] Add regression coverage and verify `/portal` with type checks, tests, build, and runtime QA.
+- [x] Save and publish the verified portal repair checkpoint.

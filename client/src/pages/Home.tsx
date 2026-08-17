@@ -6963,17 +6963,17 @@ function DepartmentView({
   const config =
     departmentPortalConfigs[departmentCode] ??
     departmentPortalConfigs.administrator;
-  const stageNames = [config.entryStage, config.secondaryStage].filter(
-    Boolean
-  ) as Stage[];
-  const stageQueue = bookings.filter(booking =>
-    stageNames.includes(booking.stage)
+  const stageNames = useMemo(
+    () => [config.entryStage, config.secondaryStage].filter(Boolean) as Stage[],
+    [config.entryStage, config.secondaryStage]
   );
-  const queue = (
-    stageQueue.length
+  const queue = useMemo(() => {
+    const stageQueue = bookings.filter(booking => stageNames.includes(booking.stage));
+    return (stageQueue.length
       ? stageQueue
       : bookings.filter(booking => booking.progress < 100)
-  ).slice(0, 4);
+    ).slice(0, 4);
+  }, [bookings, stageNames]);
   const readyCount = queue.filter(booking =>
     config.parallelCode
       ? completedWorkstreams[booking.id]?.includes(config.parallelCode)
@@ -7496,7 +7496,10 @@ function ProvisionedDepartmentDashboard({
   onManageTeam: () => void;
 }) {
   const membersQuery = trpc.auth.listUsers.useQuery();
-  const config = normalizeDepartmentDashboardConfig(dashboard.dashboardConfig, { name: dashboard.name });
+  const config = useMemo(
+    () => normalizeDepartmentDashboardConfig(dashboard.dashboardConfig, { name: dashboard.name }),
+    [dashboard.dashboardConfig, dashboard.name]
+  );
   const activeBookings = bookings.filter((booking) => booking.stage !== "Dispatched");
   const priorityBookings = activeBookings.filter((booking) => booking.priority === "Critical" || booking.priority === "High");
   const departmentMembers = (membersQuery.data ?? []).filter((member) => member.departmentCode === dashboard.code && member.isActive === 1);
