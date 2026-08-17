@@ -1162,11 +1162,11 @@ export function Shell({
                 </div>
                 <div className="header-dossier-search-results">
                   {dossierSearchResults.length ? (
-                    dossierSearchResults.map(booking => (
+                    dossierSearchResults.map((booking, index) => (
                       <button
                         type="button"
                         className="header-dossier-search-result"
-                        key={booking.id}
+                        key={`dossier-search-${booking.id}-${index}`}
                         onClick={() => chooseDossierSearchResult(booking)}
                       >
                         <span>
@@ -1789,10 +1789,10 @@ function Pipeline({
                   </div>
                 </div>
                 {columnBookings.length ? (
-                  columnBookings.map(booking => (
+                  columnBookings.map((booking, index) => (
                     <div
                       className="booking-card"
-                      key={booking.id}
+                      key={`board-${booking.id}-${index}`}
                       onClick={() => setDetail(booking)}
                       role="button"
                       tabIndex={0}
@@ -2362,9 +2362,9 @@ function BookingsView({
               </tr>
             </thead>
             <tbody>
-              {visibleBookings.map(booking => (
+              {visibleBookings.map((booking, index) => (
                 <tr
-                  key={booking.id}
+                  key={`booking-table-${booking.id}-${index}`}
                   onClick={() => setDetail(booking)}
                   style={{ cursor: "pointer" }}
                   tabIndex={0}
@@ -3119,10 +3119,10 @@ function DocsView({
                   booking.stage === "All Docs Submitted" ||
                   booking.stage === "Reviewed"
               )
-              .map(booking => (
+              .map((booking, index) => (
                 <div
                   className="activity-item"
-                  key={booking.id}
+                  key={`activity-${booking.id}-${index}`}
                   onClick={() => setDetail(booking)}
                   style={{ cursor: "pointer" }}
                 >
@@ -3422,7 +3422,7 @@ function CrewViewLegacy({
           </div>
           <div className="panel-body">
             <div className="booking-allocation-list">
-              {visibleBookings.map(booking => {
+              {visibleBookings.map((booking, index) => {
                 const persisted = Boolean(persistedBookingIdForUi(booking.id));
                 const assigned = employeeAllocations.some(
                   allocation => allocation.bookingId === booking.id
@@ -3438,7 +3438,7 @@ function CrewViewLegacy({
                 return (
                   <div
                     className={`booking-allocation-row ${assigned ? "selected" : ""}`}
-                    key={booking.id}
+                    key={`allocation-${booking.id}-${index}`}
                   >
                     <div>
                       <strong>{booking.id}</strong>
@@ -7114,7 +7114,7 @@ function DepartmentView({
                     </>}
                     {searchSuggestionsLoading ? <div className="department-search-loading" role="status"><LoaderCircle size={14} aria-hidden="true" /> Finding matching operations…</div> : searchSuggestions.map((booking, index) => (
                       <button
-                        key={booking.id}
+                        key={`suggestion-${booking.id}-${index}`}
                         id={`department-search-suggestion-${index}`}
                         type="button"
                         role="option"
@@ -7145,7 +7145,7 @@ function DepartmentView({
             </div>
             <div className="compliance-list">
               {visibleQueue.length ? (
-                visibleQueue.map(booking => {
+                visibleQueue.map((booking, index) => {
                   const parallelDone = config.parallelCode
                     ? completedWorkstreams[booking.id]?.includes(
                         config.parallelCode
@@ -7159,7 +7159,7 @@ function DepartmentView({
                     config.secondaryNextStage === "All Docs Submitted" &&
                     allParallelDone;
                   return (
-                    <div className="department-queue-row" key={booking.id}>
+                    <div className="department-queue-row" key={`department-queue-${booking.id}-${index}`}>
                       <button
                         className="compliance-row"
                         onClick={() => setDetail(booking)}
@@ -7419,7 +7419,7 @@ function ProvisionedDepartmentDashboard({
   return <div className="content" data-testid="provisioned-department-dashboard">
     <div className="page-heading" style={{ borderLeft: `4px solid ${accent}`, paddingLeft: 16 }}><div><div className="eyebrow">Provisioned department workspace</div><h1 className="page-title">{dashboard.name}</h1><p className="page-copy">{dashboard.description}</p></div><div className="status-badge blue"><LayoutDashboard size={12} /> Dedicated dashboard</div></div>
     <div className="metric-grid"><MetricCard label={metricLabels[primaryMetric]} value={metricValue[primaryMetric].value} foot={metricValue[primaryMetric].foot} icon={<ClipboardCheck size={13} />} tone="green" /><MetricCard label={metricLabels[secondaryMetric]} value={metricValue[secondaryMetric].value} foot={metricValue[secondaryMetric].foot} icon={<AlertTriangle size={13} />} tone="red" /><MetricCard label="Active department team" value={String(departmentMembers.length)} foot="Named accounts assigned here" icon={<Users size={13} />} tone="green" /><MetricCard label="Workspace status" value="Ready" foot="Dashboard provisioned and isolated" icon={<CheckCircle2 size={13} />} tone="green" /></div>
-    <div className="detail-grid">{visibleWidgets.has("team_readiness") && <section className="panel"><div className="panel-header"><div><div className="panel-title">{config.overviewLabel}</div><div className="panel-meta">{config.objective}</div></div><span className="status-badge amber">{config.workstream}</span></div><div className="panel-body"><div className="notification"><div className="title">Controlled department access</div><div className="body">This dashboard is linked to the <strong>{dashboard.code}</strong> department code. Only its assigned users, supervisor, and administrators can open this workspace.</div></div><div className="workflow-actions" style={{ marginTop: 16 }}><button className="primary-button" type="button" onClick={() => firstDossier && onOpenDossier(firstDossier)} disabled={!firstDossier}><ClipboardCheck size={14} /> {config.quickActions[0]}</button><button className="secondary-button" type="button" onClick={onManageTeam} disabled={!canManageTeam}><Users size={14} /> {canManageTeam ? config.quickActions[1] : "Supervisor access required"}</button></div></div></section>}{visibleWidgets.has("handoff_queue") && <section className="panel"><div className="panel-header"><div><div className="panel-title">Department handoff queue</div><div className="panel-meta">Dossiers are shared with the department’s configured operational focus.</div></div><span className="status-badge blue">{activeBookings.length} active</span></div><div className="panel-body activity-list">{activeBookings.slice(0, 4).map((booking) => <button className="activity-row" type="button" key={booking.id} onClick={() => onOpenDossier(booking)}><div className="activity-icon" style={{ color: accent }}><ClipboardCheck size={14} /></div><div className="activity-copy"><div><strong>{booking.id}</strong><span className="activity-action">{booking.client}</span></div><p>{booking.project} · {booking.stage}</p></div><span className="status-badge gray">{booking.priority}</span></button>)}{!activeBookings.length && <div className="empty-state">No active dossiers are currently awaiting this department’s attention.</div>}</div></section>}</div>
+    <div className="detail-grid">{visibleWidgets.has("team_readiness") && <section className="panel"><div className="panel-header"><div><div className="panel-title">{config.overviewLabel}</div><div className="panel-meta">{config.objective}</div></div><span className="status-badge amber">{config.workstream}</span></div><div className="panel-body"><div className="notification"><div className="title">Controlled department access</div><div className="body">This dashboard is linked to the <strong>{dashboard.code}</strong> department code. Only its assigned users, supervisor, and administrators can open this workspace.</div></div><div className="workflow-actions" style={{ marginTop: 16 }}><button className="primary-button" type="button" onClick={() => firstDossier && onOpenDossier(firstDossier)} disabled={!firstDossier}><ClipboardCheck size={14} /> {config.quickActions[0]}</button><button className="secondary-button" type="button" onClick={onManageTeam} disabled={!canManageTeam}><Users size={14} /> {canManageTeam ? config.quickActions[1] : "Supervisor access required"}</button></div></div></section>}{visibleWidgets.has("handoff_queue") && <section className="panel"><div className="panel-header"><div><div className="panel-title">Department handoff queue</div><div className="panel-meta">Dossiers are shared with the department’s configured operational focus.</div></div><span className="status-badge blue">{activeBookings.length} active</span></div><div className="panel-body activity-list">{activeBookings.slice(0, 4).map((booking, index) => <button className="activity-row" type="button" key={`handoff-${booking.id}-${index}`} onClick={() => onOpenDossier(booking)}><div className="activity-icon" style={{ color: accent }}><ClipboardCheck size={14} /></div><div className="activity-copy"><div><strong>{booking.id}</strong><span className="activity-action">{booking.client}</span></div><p>{booking.project} · {booking.stage}</p></div><span className="status-badge gray">{booking.priority}</span></button>)}{!activeBookings.length && <div className="empty-state">No active dossiers are currently awaiting this department’s attention.</div>}</div></section>}</div>
     <DepartmentWorkspaceControls dashboard={dashboard} config={config} canManage={canManageTeam} canArchiveWorkflows={canArchiveWorkflows} showWorkflow={visibleWidgets.has("workflow_library")} />
   </div>;
 }
@@ -7462,7 +7462,7 @@ export default function Home() {
               : "overview"
   );
   const [workspaceLoading, setWorkspaceLoading] = useState(false);
-  const [bookings, setBookings] = useState<Booking[]>(initialBookings);
+  const [bookings, setBookings] = useState<Booking[]>(() => Array.from(new Map(initialBookings.map(booking => [booking.id, booking])).values()));
   const [uploadDocuments, setUploadDocuments] = useState<DocumentItem[]>(
     initialUploadDocuments
   );
@@ -7531,9 +7531,7 @@ export default function Home() {
     return () => window.clearTimeout(timer);
   }, [activeDepartment, activeProvisionedDepartmentCode, view]);
   const updateBooking = (nextBooking: Booking) => {
-    setBookings(current =>
-      current.map(item => (item.id === nextBooking.id ? nextBooking : item))
-    );
+    setBookings(current => [nextBooking, ...current.filter(item => item.id !== nextBooking.id)]);
     setActiveBooking(nextBooking);
   };
   const isClient = location.startsWith("/client");
@@ -7561,7 +7559,7 @@ export default function Home() {
     setView("detail");
   };
   const createBooking = (booking: Booking) => {
-    setBookings(current => [booking, ...current]);
+    setBookings(current => [booking, ...current.filter(item => item.id !== booking.id)]);
     setActiveBooking(booking);
     setView("detail");
   };
@@ -7588,9 +7586,7 @@ export default function Home() {
           Math.max(booking.progress + 12, booking.progress)
         ),
       };
-      setBookings(current =>
-        current.map(item => (item.id === booking.id ? nextBooking : item))
-      );
+      setBookings(current => [nextBooking, ...current.filter(item => item.id !== booking.id)]);
       setActiveBooking(nextBooking);
       setView("detail");
       toast.success(`Dossier moved to ${result.stage}`, {

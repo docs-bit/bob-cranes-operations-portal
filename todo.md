@@ -465,3 +465,8 @@
 - [x] Add a clear-search button and persistent recent search history dropdown in departmental search.
 - [x] Add previous-period percentage change comparisons to the Web Vitals threshold summary table.
 - [x] Run test suite, production build, and publish final verified release.
+
+## Duplicate Booking Key Fix
+- [ ] Locate every occurrence of booking mapping/rendering keys in `Home.tsx` and ensure composite or unique keys (`${booking.id}-${index}` or unique IDs).
+- [ ] Add regression test coverage checking for unique keys across rendered booking lists.
+- [ ] Run test suite, production build, and publish final repaired release.
