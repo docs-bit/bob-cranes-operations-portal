@@ -5764,21 +5764,30 @@ function BookingDetail({
   );
 }
 
+type ClientDocumentTaxonomy = {
+  categories: Array<{ id: number; name: string; description?: string | null }>;
+  tags: Array<{ id: number; name: string; categoryId?: number | null }>;
+};
+
 type ClientPortalProps = {
   booking: Booking;
   documents: DocumentItem[];
+  taxonomy?: ClientDocumentTaxonomy;
   onUpdate: (booking: Booking) => void;
-  onUploadAll: (files?: File[], documentId?: string) => void;
+  onUploadAll: (files?: File[], documentId?: string) => Promise<void> | void;
   onUpdateDocuments?: (documents: DocumentItem[]) => void;
+  onPersistDocumentMetadata?: (document: DocumentItem) => Promise<void>;
   onBackToInternal: () => void;
 };
 
 export function ClientPortal({
   booking,
   documents,
+  taxonomy,
   onUpdate,
   onUploadAll,
   onUpdateDocuments,
+  onPersistDocumentMetadata,
   onBackToInternal,
 }: ClientPortalProps) {
   const crews = legacyCrews;
@@ -5802,7 +5811,12 @@ export function ClientPortal({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadQueue, setUploadQueue] = useState<Record<string, { fileName: string; progress: number; status: "queued" | "uploading" | "complete" | "error"; error?: string }>>({});
   const [previewDoc, setPreviewDoc] = useState<any | null>(null);
+  useEffect(() => {
+    const entries = Object.values(uploadQueue);
+    if (entries.length) setUploadProgress(Math.round(entries.reduce((total, entry) => total + entry.progress, 0) / entries.length));
+  }, [uploadQueue]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -5828,6 +5842,14 @@ export function ClientPortal({
           booking.progress,
           Math.round((uploadedDocs / documents.length) * 100)
         );
+  const taxonomyCategories = useMemo(
+    () => Array.from(new Set([...(taxonomy?.categories.map(category => category.name) ?? []), ...CLIENT_DOCUMENT_CATEGORIES])),
+    [taxonomy?.categories]
+  );
+  const taxonomyTags = useMemo(
+    () => Array.from(new Set([...(taxonomy?.tags.map(tag => tag.name) ?? []), ...documents.flatMap(document => document.tags ?? [])])).toSorted((left, right) => left.localeCompare(right)),
+    [documents, taxonomy?.tags]
+  );
   const documentRecords = useMemo(
     () => documents.map(document => ({
       ...document,
@@ -5836,10 +5858,7 @@ export function ClientPortal({
     })),
     [documentOverrides, documents]
   );
-  const availableDocumentTags = useMemo(
-    () => Array.from(new Set(documentRecords.flatMap(document => document.tags ?? []))).toSorted((left, right) => left.localeCompare(right)),
-    [documentRecords]
-  );
+  const availableDocumentTags = taxonomyTags;
   const visibleClientDocuments = useMemo(() => {
     const query = documentSearch.trim().toLocaleLowerCase();
     const stateRank = (state: DocumentItem["state"]) =>
@@ -5867,19 +5886,30 @@ export function ClientPortal({
       });
   }, [documentCategory, documentRecords, documentSearch, documentSort, documentTag]);
   const updateDocumentMetadata = (documentId: string, patch: Partial<DocumentItem>) => {
+    const currentDocument = documentRecords.find(document => document.id === documentId);
+    if (!currentDocument) return;
+    const nextDocument = {
+      ...currentDocument,
+      ...patch,
+      tags: patch.tags ? Array.from(new Set(patch.tags.map(tag => tag.trim()).filter(Boolean))) : currentDocument.tags ?? [],
+    };
     setDocumentOverrides(current => ({
       ...current,
       [documentId]: {
         ...current[documentId],
         ...patch,
-        ...(patch.tags ? { tags: Array.from(new Set(patch.tags.map(tag => tag.trim()).filter(Boolean))) } : {}),
+        tags: nextDocument.tags,
       },
     }));
     onUpdateDocuments?.(documents.map(document =>
-      document.id === documentId
-        ? { ...document, ...patch, tags: patch.tags ?? document.tags ?? [] }
-        : document
+      document.id === documentId ? nextDocument : document
     ));
+    const persistPromise = onPersistDocumentMetadata?.(nextDocument);
+    if (persistPromise) {
+      void persistPromise.catch(() => {
+        notify("Document metadata could not be saved. The local change is still visible until you retry.");
+      });
+    }
   };
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -5897,14 +5927,15 @@ export function ClientPortal({
     if (pendingDocs.length === 0 || isUploading) return;
     fileInputRef.current?.click();
   };
-  const handleClientFiles = (event: React.ChangeEvent<HTMLInputElement> | File[]) => {
+  const handleClientFiles = async (event: React.ChangeEvent<HTMLInputElement> | File[]) => {
     setUploadError(null);
     const selectedFiles = Array.isArray(event) ? event : Array.from(event.target.files ?? []);
     if (!Array.isArray(event) && event.target) event.target.value = "";
     if (!selectedFiles.length) return;
 
     const allowedTypes = new Set(["application/pdf", "image/jpeg", "image/png"]);
-    const invalidFile = selectedFiles.find(
+    const filesToUpload = selectedFiles.slice(0, Math.max(1, pendingDocs.length));
+    const invalidFile = filesToUpload.find(
       file => !allowedTypes.has(file.type) || file.size > 25 * 1024 * 1024
     );
     if (invalidFile) {
@@ -5914,15 +5945,32 @@ export function ClientPortal({
       return;
     }
 
-    const filesToUpload = selectedFiles.slice(0, Math.max(1, pendingDocs.length));
+    const queue = Object.fromEntries(filesToUpload.map((file, index) => [
+      pendingDocs[index].id,
+      { fileName: file.name, progress: 0, status: "queued" as const },
+    ]));
+    setUploadQueue(queue);
     setIsUploading(true);
-    setUploadProgress(100);
-    onUploadAll(filesToUpload);
-    notify(
-      `${filesToUpload.length} document${filesToUpload.length === 1 ? "" : "s"} uploaded and synced to the BOB Cranes team.`
-    );
-    setIsUploading(false);
     setUploadProgress(0);
+    try {
+      await Promise.all(filesToUpload.map(async (file, index) => {
+        const documentId = pendingDocs[index].id;
+        setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], status: "uploading", progress: 15 } }));
+        await new Promise<void>(resolve => window.setTimeout(resolve, 90 + index * 35));
+        setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], progress: 55 } }));
+        await onUploadAll([file], documentId);
+        setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], status: "complete", progress: 100 } }));
+      }));
+      notify(`${filesToUpload.length} document${filesToUpload.length === 1 ? "" : "s"} uploaded and synced to the BOB Cranes team.`);
+    } catch (caught) {
+      const errorMsg = caught instanceof Error ? caught.message : "One or more documents could not be uploaded.";
+      setUploadError(errorMsg);
+      notify(errorMsg);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(100);
+      window.setTimeout(() => setUploadQueue({}), 900);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -6282,11 +6330,25 @@ export function ClientPortal({
                 {isUploading && (
                   <div style={{ marginBottom: "14px", background: "#f1f5f9", padding: "10px 14px", borderRadius: "8px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "6px", color: "#475569" }}>
-                      <span>Uploading document securely...</span>
+                      <span>Uploading {Object.keys(uploadQueue).length} document{Object.keys(uploadQueue).length === 1 ? "" : "s"} concurrently…</span>
                       <span>{uploadProgress}%</span>
                     </div>
-                    <div style={{ width: "100%", height: "6px", background: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
+                    <div style={{ width: "100%", height: "6px", background: "#e2e8f0", borderRadius: "3px", overflow: "hidden", marginBottom: 10 }}>
                       <div style={{ width: `${uploadProgress}%`, height: "100%", background: "#217c64", transition: "width 0.2s ease" }} />
+                    </div>
+                    <div style={{ display: "grid", gap: 8 }}>
+                      {Object.entries(uploadQueue).map(([documentId, item]) => (
+                        <div key={documentId} style={{ display: "grid", gap: 4 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 11, color: "#334155" }}>
+                            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.fileName}</span>
+                            <span>{item.status === "complete" ? "Complete" : item.status === "error" ? "Failed" : `${item.progress}%`}</span>
+                          </div>
+                          <div style={{ width: "100%", height: 4, background: "#dbe4e8", borderRadius: 3, overflow: "hidden" }}>
+                            <div style={{ width: `${item.progress}%`, height: "100%", background: item.status === "error" ? "#dc2626" : "#217c64", transition: "width 0.2s ease" }} />
+                          </div>
+                          {item.error && <span style={{ color: "#b91c1c", fontSize: 10 }}>{item.error}</span>}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -6323,7 +6385,7 @@ export function ClientPortal({
                       aria-label="Filter documents by category"
                     >
                       <option>All categories</option>
-                      {CLIENT_DOCUMENT_CATEGORIES.map(category => <option key={category}>{category}</option>)}
+                      {taxonomyCategories.map(category => <option key={category}>{category}</option>)}
                     </select>
                   </label>
                   <label className="form-field">
@@ -6418,7 +6480,7 @@ export function ClientPortal({
                                 aria-label={`Category for ${doc.name}`}
                                 style={{ height: 28, minWidth: 132, padding: "0 7px", fontSize: 11 }}
                               >
-                                {CLIENT_DOCUMENT_CATEGORIES.map(category => <option key={category}>{category}</option>)}
+                                {taxonomyCategories.map(category => <option key={category}>{category}</option>)}
                               </select>
                               {(doc.tags ?? []).map(tag => <span className="status-badge gray" key={`${doc.id}-${tag}`}>{tag}</span>)}
                               <input
@@ -8194,6 +8256,15 @@ function ProvisionedDepartmentDashboard({
 export default function Home() {
   const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
+  const isClient = location.startsWith("/client");
+  const clientDocumentBookingId = persistedBookingIdForUi("BOB Booking-31511") ?? "BOB-59116";
+  const clientTaxonomyQuery = trpc.documents.getTaxonomy.useQuery(undefined, { enabled: Boolean(user && isClient) });
+  const clientMetadataQuery = trpc.documents.getMetadata.useQuery(
+    { bookingId: clientDocumentBookingId },
+    { enabled: Boolean(user && isClient) }
+  );
+  const saveDocumentMetadataMutation = trpc.documents.saveMetadata.useMutation();
+  const deleteDocumentMetadataMutation = trpc.documents.deleteMetadata.useMutation();
   const advanceBookingStageMutation =
     trpc.operations.advanceBookingStage.useMutation();
   const completeWorkstreamMutation =
@@ -8307,37 +8378,86 @@ export default function Home() {
     setBookings(current => [nextBooking, ...current.filter(item => item.id !== nextBooking.id)]);
     setActiveBooking(nextBooking);
   };
-  const isClient = location.startsWith("/client");
   const groupedCount = useMemo(() => bookings.length, [bookings.length]);
   const clientBooking =
     bookings.find(booking => booking.id === "BOB Booking-31511") ?? bookings[0];
+  useEffect(() => {
+    if (!isClient || !clientMetadataQuery.data?.length) return;
+    const persistedById = new Map(clientMetadataQuery.data.map(record => [record.id, record]));
+    setUploadDocuments(current => {
+      let changed = false;
+      const next = current.map(document => {
+        const persisted = persistedById.get(document.id);
+        if (!persisted) return document;
+        const hydrated = {
+          ...document,
+          state: persisted.state as DocumentItem["state"],
+          category: persisted.category ?? document.category,
+          tags: persisted.tags ?? document.tags ?? [],
+          fileName: persisted.fileName ?? document.fileName,
+          fileType: persisted.fileType ?? document.fileType,
+          fileSize: persisted.fileSize ?? document.fileSize,
+        };
+        if (JSON.stringify(hydrated) !== JSON.stringify(document)) changed = true;
+        return hydrated;
+      });
+      return changed ? next : current;
+    });
+  }, [clientMetadataQuery.data, isClient]);
+  const persistClientDocumentMetadata = async (document: DocumentItem) => {
+    await saveDocumentMetadataMutation.mutateAsync({
+      id: document.id,
+      bookingId: clientDocumentBookingId,
+      name: document.name,
+      departmentCode: document.departmentCode,
+      state: document.state,
+      category: document.category ?? null,
+      tags: document.tags ?? [],
+      fileName: document.fileName ?? null,
+      fileType: document.fileType ?? null,
+      fileSize: document.fileSize ?? null,
+    });
+    await clientMetadataQuery.refetch();
+  };
   if (isClient && clientBooking)
     return (
       <ClientPortal
         booking={clientBooking}
         documents={uploadDocuments}
+        taxonomy={clientTaxonomyQuery.data}
         onUpdate={updateBooking}
         onUpdateDocuments={setUploadDocuments}
-        onUploadAll={(files, documentId) =>
-          setUploadDocuments(current => {
-            if (documentId && (!files || files.length === 0)) {
-              return current.map(doc =>
-                doc.id === documentId
-                  ? { ...doc, state: "Required", fileName: undefined, fileType: undefined, fileSize: undefined }
-                  : doc
-              );
-            }
-            const filesToUpload = files ?? [];
-            if (filesToUpload.length === 0) return current;
-            let uploaded = 0;
-            return current.map(doc => {
-              if (doc.state !== "Required" || uploaded >= filesToUpload.length) return doc;
-              const file = filesToUpload[uploaded];
-              uploaded += 1;
-              return { ...doc, state: "Uploaded", fileName: file.name, fileType: file.type, fileSize: file.size };
-            });
-          })
-        }
+        onPersistDocumentMetadata={persistClientDocumentMetadata}
+        onUploadAll={async (files, documentId) => {
+          if (documentId && (!files || files.length === 0)) {
+            const existing = uploadDocuments.find(document => document.id === documentId);
+            setUploadDocuments(current => current.map(doc =>
+              doc.id === documentId
+                ? { ...doc, state: "Required", fileName: undefined, fileType: undefined, fileSize: undefined }
+                : doc
+            ));
+            await deleteDocumentMetadataMutation.mutateAsync({ id: documentId });
+            if (existing) await clientMetadataQuery.refetch();
+            return;
+          }
+          const filesToUpload = files ?? [];
+          if (!filesToUpload.length) return;
+          if (documentId) {
+            const target = uploadDocuments.find(document => document.id === documentId);
+            const file = filesToUpload[0];
+            if (!target) return;
+            const nextDocument = { ...target, state: "Uploaded" as const, fileName: file.name, fileType: file.type, fileSize: file.size };
+            setUploadDocuments(current => current.map(document => document.id === documentId ? nextDocument : document));
+            await persistClientDocumentMetadata(nextDocument);
+            return;
+          }
+          const assignments = uploadDocuments.filter(document => document.state === "Required").slice(0, filesToUpload.length).map((document, index) => ({ document, file: filesToUpload[index] }));
+          setUploadDocuments(current => current.map(document => {
+            const assignment = assignments.find(item => item.document.id === document.id);
+            return assignment ? { ...document, state: "Uploaded", fileName: assignment.file.name, fileType: assignment.file.type, fileSize: assignment.file.size } : document;
+          }));
+          await Promise.all(assignments.map(({ document, file }) => persistClientDocumentMetadata({ ...document, state: "Uploaded", fileName: file.name, fileType: file.type, fileSize: file.size })));
+        }}
         onBackToInternal={() => setLocation("/")}
       />
     );

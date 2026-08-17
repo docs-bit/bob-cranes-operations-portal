@@ -127,6 +127,13 @@
       "when": 1786952186817,
       "tag": "0017_outgoing_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1786976410499,
+      "tag": "0018_elite_spacker_dave",
+      "breakpoints": true
     }
   ]
 }

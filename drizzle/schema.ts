@@ -258,3 +258,36 @@ export type DepartmentWorkflowTemplateRecord = typeof departmentWorkflowTemplate
 export type RentalEnquiryRecord = typeof rentalEnquiries.$inferSelect;
 export type RentalEnquiryEventRecord = typeof rentalEnquiryEvents.$inferSelect;
 export type AuditLogRecord = typeof auditLogs.$inferSelect;
+
+export const documentTaxonomyCategories = mysqlTable("document_taxonomy_categories", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 128 }).notNull().unique(),
+  description: text("description"),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const documentTaxonomyTags = mysqlTable("document_taxonomy_tags", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 64 }).notNull().unique(),
+  categoryId: int("categoryId"),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const persistedDocumentMetadata = mysqlTable("persisted_document_metadata", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  departmentCode: varchar("departmentCode", { length: 32 }).notNull(),
+  state: varchar("state", { length: 64 }).notNull().default("Required"),
+  category: varchar("category", { length: 128 }),
+  tagsJson: json("tagsJson"),
+  fileName: varchar("fileName", { length: 255 }),
+  fileType: varchar("fileType", { length: 128 }),
+  fileSize: int("fileSize"),
+  uploadedBy: int("uploadedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});

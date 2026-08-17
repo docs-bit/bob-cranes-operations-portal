@@ -81,6 +81,17 @@ export default function DepartmentUsersView({ actor, onOpenDashboard }: Departme
   const purgeExpiredActivity = trpc.auth.purgeExpiredActivity.useMutation();
   const createDepartment = trpc.departments.createProvisioned.useMutation();
   const setDepartmentActive = trpc.departments.setProvisionedActive.useMutation();
+  const documentTaxonomyQuery = trpc.documents.getTaxonomy.useQuery();
+  const createCategoryMutation = trpc.documents.createCategory.useMutation();
+  const updateCategoryMutation = trpc.documents.updateCategory.useMutation();
+  const deleteCategoryMutation = trpc.documents.deleteCategory.useMutation();
+  const createTagMutation = trpc.documents.createTag.useMutation();
+  const updateTagMutation = trpc.documents.updateTag.useMutation();
+  const deleteTagMutation = trpc.documents.deleteTag.useMutation();
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryDesc, setNewCategoryDesc] = useState("");
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagCategoryId, setNewTagCategoryId] = useState<number | null>(null);
   const utils = trpc.useUtils();
   const [form, setForm] = useState<AccountForm>({ name: "", email: "", password: "", departmentCode: scopedDepartmentCode, role: "user" });
   const [editForm, setEditForm] = useState<AccountEditorForm>({ name: "", email: "", password: "", departmentCode: scopedDepartmentCode, role: "user" });
@@ -239,6 +250,57 @@ export default function DepartmentUsersView({ actor, onOpenDashboard }: Departme
     }
   };
 
+  const handleCreateCategory = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!newCategoryName.trim()) return;
+    try {
+      await createCategoryMutation.mutateAsync({ name: newCategoryName.trim(), description: newCategoryDesc.trim() || null });
+      setNewCategoryName("");
+      setNewCategoryDesc("");
+      await utils.documents.getTaxonomy.invalidate();
+      toast.success("Category created", { description: "New document category is now available across the portal." });
+    } catch (caught) {
+      toast.error("Failed to create category", { description: caught instanceof Error ? caught.message : "Try again." });
+    }
+  };
+
+  const handleCreateTag = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!newTagName.trim()) return;
+    try {
+      await createTagMutation.mutateAsync({ name: newTagName.trim(), categoryId: newTagCategoryId });
+      setNewTagName("");
+      await utils.documents.getTaxonomy.invalidate();
+      toast.success("Tag created", { description: "New document tag is now available." });
+    } catch (caught) {
+      toast.error("Failed to create tag", { description: caught instanceof Error ? caught.message : "Try again." });
+    }
+  };
+
+  const renameCategory = async (category: { id: number; name: string; description?: string | null }) => {
+    const name = window.prompt("Rename category", category.name)?.trim();
+    if (!name || name === category.name) return;
+    try {
+      await updateCategoryMutation.mutateAsync({ id: category.id, name, description: category.description ?? null });
+      await utils.documents.getTaxonomy.invalidate();
+      toast.success("Category updated");
+    } catch (caught) {
+      toast.error("Failed to update category", { description: caught instanceof Error ? caught.message : "Try again." });
+    }
+  };
+
+  const renameTag = async (tag: { id: number; name: string; categoryId?: number | null }) => {
+    const name = window.prompt("Rename tag", tag.name)?.trim();
+    if (!name || name === tag.name) return;
+    try {
+      await updateTagMutation.mutateAsync({ id: tag.id, name, categoryId: tag.categoryId ?? null });
+      await utils.documents.getTaxonomy.invalidate();
+      toast.success("Tag updated");
+    } catch (caught) {
+      toast.error("Failed to update tag", { description: caught instanceof Error ? caught.message : "Try again." });
+    }
+  };
+
   const title = isAdmin ? "User & supervisor management" : `${departmentLabel(scopedDepartmentCode)} user management`;
   const copy = isAdmin ? "Assign one supervisor per department, create unique credentials, and control access without deleting account history." : "Create and manage unique login credentials for users in your department. Supervisors cannot access other departments.";
 
@@ -257,6 +319,66 @@ export default function DepartmentUsersView({ actor, onOpenDashboard }: Departme
       {isAdmin && <section className="panel"><div className="panel-header"><div><div className="panel-title"><Settings2 size={16} /> Activity retention</div><div className="panel-meta">Retention does not delete history automatically; a separate, confirmed purge is required.</div></div><span className="status-badge amber">Admin only</span></div><div className="panel-body account-toolbar"><label className="form-field"><span>Retain events</span><select className="form-select" value={retentionQuery.data?.retentionDays ?? 365} onChange={(event) => void saveRetention(Number(event.target.value))} disabled={retentionQuery.isLoading || updateRetention.isPending} aria-label="Activity log retention period">{[30, 90, 180, 365, 730].map((days) => <option value={days} key={days}>{days} days</option>)}</select></label><button className="danger-button" type="button" onClick={() => void purgeExpired()} disabled={purgeExpiredActivity.isPending || retentionQuery.isLoading}><Trash2 size={13} />{purgeExpiredActivity.isPending ? "Purging…" : "Purge expired events"}</button></div></section>}
     </div>
     {isAdmin && <section className="panel" id="dashboard-greeting-settings" style={{ marginBottom: 16 }} data-testid="dashboard-greeting-settings"><div className="panel-header"><div><div className="panel-title"><Settings2 size={16} /> Dashboard greeting</div><div className="panel-meta">Use <code>{"{name}"}</code> to display each signed-in user’s preferred name.</div></div><span className="status-badge amber">Admin only</span></div><form className="panel-body account-toolbar" onSubmit={saveDashboardGreeting}><label className="form-field" style={{ flex: 1 }}><span>Greeting text</span><input className="form-input" value={greetingTemplate} onChange={(event) => setGreetingTemplate(event.target.value)} minLength={3} maxLength={120} required aria-label="Dashboard greeting text" /></label><div className="greeting-settings-preview"><span>Preview</span><strong>{formatDashboardGreeting(greetingTemplate, "Alex Morgan")}</strong></div><button className="primary-button" type="submit" disabled={dashboardGreetingQuery.isLoading || updateDashboardGreeting.isPending}>{updateDashboardGreeting.isPending ? "Saving greeting…" : "Save greeting"}</button><button className="secondary-button" type="button" onClick={() => setGreetingTemplate(DEFAULT_DASHBOARD_GREETING_TEMPLATE)} disabled={updateDashboardGreeting.isPending}>Reset</button></form></section>}
+    <section className="panel" style={{ marginBottom: 16 }}>
+      <div className="panel-header">
+        <div>
+          <div className="panel-title"><Building2 size={16} /> Document taxonomy & categorization</div>
+          <div className="panel-meta">Standardize document categories and tags across client uploads and department reviews.</div>
+        </div>
+        <span className="status-badge blue">{documentTaxonomyQuery.data?.categories.length ?? 0} categories</span>
+      </div>
+      <div className="panel-body" style={{ display: "grid", gap: 16, gridTemplateColumns: "1fr 1fr" }}>
+        <form onSubmit={handleCreateCategory} style={{ display: "grid", gap: 10 }}>
+          <div className="compliance-name" style={{ fontWeight: 650 }}>Add document category</div>
+          <label className="form-field">
+            <span>Category name</span>
+            <input className="form-input" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} placeholder="e.g. Compliance Certificates" required />
+          </label>
+          <label className="form-field">
+            <span>Description</span>
+            <input className="form-input" value={newCategoryDesc} onChange={e => setNewCategoryDesc(e.target.value)} placeholder="Brief description of this category" />
+          </label>
+          <button className="primary-button" type="submit" disabled={createCategoryMutation.isPending}>
+            {createCategoryMutation.isPending ? "Creating..." : "Create category"}
+          </button>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+            {(documentTaxonomyQuery.data?.categories ?? []).map(cat => (
+              <span key={cat.id} className="status-badge blue" style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                {cat.name}
+                <button type="button" onClick={() => void renameCategory(cat)} aria-label={`Rename category ${cat.name}`} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0 }}><Edit3 size={11} /></button>
+                <button type="button" onClick={() => void deleteCategoryMutation.mutateAsync({ id: cat.id }).then(() => documentTaxonomyQuery.refetch())} aria-label={`Delete category ${cat.name}`} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0 }}>×</button>
+              </span>
+            ))}
+          </div>
+        </form>
+        <form onSubmit={handleCreateTag} style={{ display: "grid", gap: 10 }}>
+          <div className="compliance-name" style={{ fontWeight: 650 }}>Add document tag</div>
+          <label className="form-field">
+            <span>Tag name</span>
+            <input className="form-input" value={newTagName} onChange={e => setNewTagName(e.target.value)} placeholder="e.g. Urgent / Priority" required />
+          </label>
+          <label className="form-field">
+            <span>Parent category</span>
+            <select className="form-select" value={newTagCategoryId ?? ""} onChange={e => setNewTagCategoryId(e.target.value ? Number(e.target.value) : null)}>
+              <option value="">General tag</option>
+              {(documentTaxonomyQuery.data?.categories ?? []).map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+            </select>
+          </label>
+          <button className="primary-button" type="submit" disabled={createTagMutation.isPending}>
+            {createTagMutation.isPending ? "Creating..." : "Create tag"}
+          </button>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+            {(documentTaxonomyQuery.data?.tags ?? []).map(tag => (
+              <span key={tag.id} className="status-badge gray" style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                #{tag.name}
+                <button type="button" onClick={() => void renameTag(tag)} aria-label={`Rename tag ${tag.name}`} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0 }}><Edit3 size={11} /></button>
+                <button type="button" onClick={() => void deleteTagMutation.mutateAsync({ id: tag.id }).then(() => documentTaxonomyQuery.refetch())} aria-label={`Delete tag ${tag.name}`} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0 }}>×</button>
+              </span>
+            ))}
+          </div>
+        </form>
+      </div>
+    </section>
     <section className="panel user-activity-panel"><div className="panel-header"><div><div className="panel-title"><Activity size={16} /> Recent account activity</div><div className="panel-meta">{isAdmin ? "All departments" : `${departmentLabel(scopedDepartmentCode)} only`} · sign-ins, profile changes, and access status changes.</div></div><div className="activity-header-actions"><span className="status-badge blue">{activity.length} events</span><button className="secondary-button compact-button" type="button" onClick={exportActivity} disabled={!activity.length}><Download size={13} /> Export CSV</button></div></div><div className="panel-body activity-list">{activityQuery.isLoading ? <div className="empty-state">Loading activity…</div> : activityQuery.error ? <div className="account-error">Unable to load account activity.</div> : activity.length ? activity.slice(0, 8).map((event) => <div className="activity-row" key={event.id}><div className="activity-icon"><Activity size={14} /></div><div className="activity-copy"><div><strong>{event.userName ?? event.userEmail ?? "Unknown user"}</strong><span className="activity-action">{activityLabel(event.action)}</span></div><p>{event.detail}</p></div><time>{displayDateTime(event.createdAt)}</time></div>) : <div className="empty-state">No account activity has been recorded yet.</div>}</div></section>
     <div className="department-user-layout">
       <section className="panel"><div className="panel-header"><div><div className="panel-title">{isAdmin ? "Add a supervisor or department user" : "Add a department user"}</div><div className="panel-meta">Each account receives a unique email/password login and access only to its department portal.</div></div>{isAdmin ? <Crown size={17} /> : <UserPlus size={17} />}</div><form className="panel-body account-form" onSubmit={submit}><label><span>Full name</span><input className="form-input" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="Team member name" required /></label><label><span>Work email</span><input className="form-input" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} placeholder="name@bobcranes.com" required /></label><label><span>Unique password</span><input className="form-input" type="password" minLength={10} value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} placeholder="At least 10 characters" required /></label><label><span>Department</span><select className="form-select" value={form.departmentCode} onChange={(event) => setForm((current) => ({ ...current, departmentCode: event.target.value }))} disabled={isSupervisor}>{manageableDepartments.map((department) => <option value={department.code} key={department.code}>{department.label}</option>)}</select></label>{isAdmin && <label><span>Account level</span><select className="form-select" value={form.role} onChange={(event) => setForm((current) => ({ ...current, role: event.target.value as AccountForm["role"] }))}><option value="user">Department user</option><option value="supervisor">Department supervisor</option></select></label>}<button className="primary-button" type="submit" disabled={registerUser.isPending}><UserPlus size={14} />{registerUser.isPending ? "Creating account…" : `Create ${form.role === "supervisor" ? "supervisor" : "department user"}`}</button></form></section>

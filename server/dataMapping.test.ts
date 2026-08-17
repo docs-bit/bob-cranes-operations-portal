@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyMappingPreference, autoMapColumns, createMappingPreference, mapSpreadsheetRows, missingRequiredFields, type ImportField } from "../shared/dataMapping";
+import { applyMappingPreference, autoMapColumns, createMappingPreference, disambiguateHeaders, mapSpreadsheetRows, missingRequiredFields, type ImportField } from "../shared/dataMapping";
 
 const fields: ImportField[] = [
   { id: "clientName", label: "Client Name", required: true, aliases: ["client"] },
@@ -45,5 +45,9 @@ describe("department data mapping", () => {
     expect(application.changedHeaders).toEqual(["LPO"]);
     expect(application.fullyCompatible).toBe(false);
     expect(missingRequiredFields(fields, application.mapping).map((field) => field.id)).toEqual(["lpoReference"]);
+  });
+
+  it("keeps duplicate and blank spreadsheet headers addressable for mapping", () => {
+    expect(disambiguateHeaders(["Status", "Status", "", "Client"])).toEqual(["Status", "Status (2)", "Column 3", "Client"]);
   });
 });

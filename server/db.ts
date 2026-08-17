@@ -34,6 +34,9 @@ import {
   departmentWorkflowTemplates,
   rentalEnquiries,
   rentalEnquiryEvents,
+  documentTaxonomyCategories,
+  documentTaxonomyTags,
+  persistedDocumentMetadata,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1523,4 +1526,160 @@ export async function seedInitialDataIfNeeded() {
       },
     ]);
   }
+}
+
+export type PersistedDocumentMetadataInput = {
+  id: string;
+  bookingId: string;
+  name: string;
+  departmentCode: string;
+  state: string;
+  category?: string | null;
+  tags?: string[];
+  fileName?: string | null;
+  fileType?: string | null;
+  fileSize?: number | null;
+  uploadedBy?: number | null;
+};
+
+function normalizeTags(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((tag): tag is string => typeof tag === "string").map(tag => tag.trim()).filter(Boolean);
+}
+
+export async function listDocumentTaxonomy() {
+  const db = await getDb();
+  if (!db) return { categories: [], tags: [] };
+  const [categories, tags] = await Promise.all([
+    db.select().from(documentTaxonomyCategories).orderBy(documentTaxonomyCategories.name),
+    db.select().from(documentTaxonomyTags).orderBy(documentTaxonomyTags.name),
+  ]);
+  return { categories, tags };
+}
+
+export async function createDocumentCategory(input: { name: string; description?: string | null; createdBy?: number | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document category creation.");
+  await db.insert(documentTaxonomyCategories).values({
+    name: input.name,
+    description: input.description ?? null,
+    createdBy: input.createdBy ?? null,
+  });
+  const result = await db.select().from(documentTaxonomyCategories).where(eq(documentTaxonomyCategories.name, input.name)).limit(1);
+  return result[0];
+}
+
+export async function updateDocumentCategory(input: { id: number; name: string; description?: string | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document category update.");
+  await db.update(documentTaxonomyCategories).set({ name: input.name, description: input.description ?? null }).where(eq(documentTaxonomyCategories.id, input.id));
+  const result = await db.select().from(documentTaxonomyCategories).where(eq(documentTaxonomyCategories.id, input.id)).limit(1);
+  return result[0];
+}
+
+export async function deleteDocumentCategory(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document category deletion.");
+  await db.delete(documentTaxonomyCategories).where(eq(documentTaxonomyCategories.id, id));
+  return { success: true };
+}
+
+export async function createDocumentTag(input: { name: string; categoryId?: number | null; createdBy?: number | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document tag creation.");
+  await db.insert(documentTaxonomyTags).values({
+    name: input.name,
+    categoryId: input.categoryId ?? null,
+    createdBy: input.createdBy ?? null,
+  });
+  const result = await db.select().from(documentTaxonomyTags).where(eq(documentTaxonomyTags.name, input.name)).limit(1);
+  return result[0];
+}
+
+export async function updateDocumentTag(input: { id: number; name: string; categoryId?: number | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document tag update.");
+  await db.update(documentTaxonomyTags).set({ name: input.name, categoryId: input.categoryId ?? null }).where(eq(documentTaxonomyTags.id, input.id));
+  const result = await db.select().from(documentTaxonomyTags).where(eq(documentTaxonomyTags.id, input.id)).limit(1);
+  return result[0];
+}
+
+export async function deleteDocumentTag(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document tag deletion.");
+  await db.delete(documentTaxonomyTags).where(eq(documentTaxonomyTags.id, id));
+  return { success: true };
+}
+
+export async function listPersistedDocumentMetadata(bookingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const records = await db
+    .select()
+    .from(persistedDocumentMetadata)
+    .where(eq(persistedDocumentMetadata.bookingId, bookingId));
+  return records.map(record => ({
+    ...record,
+    tags: normalizeTags(record.tagsJson),
+  }));
+}
+
+export async function upsertPersistedDocumentMetadata(input: PersistedDocumentMetadataInput) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document metadata persistence.");
+  const values = {
+    id: input.id,
+    bookingId: input.bookingId,
+    name: input.name,
+    departmentCode: input.departmentCode,
+    state: input.state,
+    category: input.category ?? null,
+    tagsJson: input.tags ? JSON.stringify(input.tags) : null,
+    fileName: input.fileName ?? null,
+    fileType: input.fileType ?? null,
+    fileSize: input.fileSize ?? null,
+    uploadedBy: input.uploadedBy ?? null,
+  };
+  await db
+    .insert(persistedDocumentMetadata)
+    .values(values)
+    .onDuplicateKeyUpdate({
+      set: {
+        state: values.state,
+        category: values.category,
+        tagsJson: values.tagsJson,
+        fileName: values.fileName,
+        fileType: values.fileType,
+        fileSize: values.fileSize,
+        uploadedBy: values.uploadedBy,
+      },
+    });
+  const result = await db.select().from(persistedDocumentMetadata).where(eq(persistedDocumentMetadata.id, input.id)).limit(1);
+  return {
+    ...result[0],
+    tags: normalizeTags(result[0].tagsJson),
+  };
+}
+
+export async function seedDocumentTaxonomy() {
+  const db = await getDb();
+  if (!db) return;
+  const defaults = [
+    { name: "Safety & HSE", description: "Safety plans, approvals, and site controls." },
+    { name: "Commercial", description: "LPOs, licenses, and commercial documentation." },
+    { name: "Crew & Competency", description: "Crew certificates, training, and competency records." },
+    { name: "Access & Permits", description: "Site access passes and permits." },
+    { name: "Transport & Delivery", description: "Delivery notes and transport records." },
+    { name: "Other", description: "Other client-submitted documents." },
+  ];
+  for (const category of defaults) {
+    await db.insert(documentTaxonomyCategories).values(category).onDuplicateKeyUpdate({ set: { description: category.description } });
+  }
+}
+
+export async function deletePersistedDocumentMetadata(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for document metadata deletion.");
+  await db.delete(persistedDocumentMetadata).where(eq(persistedDocumentMetadata.id, id));
+  return { success: true };
 }

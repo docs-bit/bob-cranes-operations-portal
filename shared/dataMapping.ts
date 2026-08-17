@@ -24,6 +24,16 @@ export type PreferenceApplication = {
   fullyCompatible: boolean;
 };
 
+export function disambiguateHeaders(headers: string[]): string[] {
+  const counts = new Map<string, number>();
+  return headers.map((rawHeader, index) => {
+    const base = rawHeader.trim() || `Column ${index + 1}`;
+    const count = (counts.get(base) ?? 0) + 1;
+    counts.set(base, count);
+    return count === 1 ? base : `${base} (${count})`;
+  });
+}
+
 const field = (id: string, label: string, required: boolean, aliases: string[] = []): ImportField => ({ id, label, required, aliases });
 
 export const departmentImportFields: Record<string, ImportField[]> = {

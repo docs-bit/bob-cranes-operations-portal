@@ -5810,3 +5810,10 @@
 ## Final implementation tasks active
 - [x] Add document categories and tags.
 - [x] Add document
+
+## Database persistence, supervisor taxonomy, concurrent multi-file upload, and Excel import repair
+- [x] Create dedicated database tables for client document metadata (categories and tags).
+- [x] Implement supervisor category and tag management interface.
+- [x] Add concurrent multi-file upload progress bars to the client portal dropzone.
+- [x] Repair Excel data upload parsing, mapping, and department indexing workflow.
+- [x] Run migrations, verify all unit tests and TypeScript checks, and publish checkpoint.
