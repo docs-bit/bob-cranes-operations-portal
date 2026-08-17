@@ -375,3 +375,9 @@
 
 ## Final ship-readiness verification
 - [x] Re-validate the latest published portal build, inspect current runtime signals, and publish a final ship-readiness checkpoint.
+
+## Sales enquiry response controls
+- [x] Add rental-duration and unassigned-status filters to the Sales enquiry table.
+- [x] Add a client quick-reply button in the enquiry detail modal with a pre-filled email.
+- [x] Add a subtle pulse animation to the unassigned public-enquiry dashboard badge.
+- [x] Add focused tests, complete release validation, and publish the update.

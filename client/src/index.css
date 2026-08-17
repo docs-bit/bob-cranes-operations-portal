@@ -1585,3 +1585,7 @@ body,
 .unassigned-enquiry-status strong { font-size: 13px; }.unassigned-enquiry-status small { color: var(--equipment-muted); font-size: 11px; }.unassigned-enquiry-status > svg { margin-left: auto; color: var(--equipment-orange-deep); }.unassigned-enquiry-status.all-assigned .status-badge { background: #e8f7ef; color: #137a4b; }
 .sales-enquiry-duration { color: var(--equipment-orange-deep); font-size: 11px; font-weight: 700; }
 @media (max-width: 760px) { .unassigned-enquiry-status { align-items: flex-start; }.profile-contact-settings { padding-bottom: 14px; } }
+
+.unassigned-enquiry-status.needs-response { animation: unassigned-enquiry-pulse 2.4s ease-in-out infinite; }
+@keyframes unassigned-enquiry-pulse { 0%, 100% { box-shadow: 0 10px 24px rgba(41, 47, 57, .09); } 50% { box-shadow: 0 10px 26px rgba(233, 111, 36, .24), 0 0 0 4px rgba(233, 111, 36, .08); } }
+@media (prefers-reduced-motion: reduce) { .unassigned-enquiry-status.needs-response { animation: none; } }
