@@ -2389,6 +2389,8 @@ function BookingsView({
   const [filter, setFilter] = useState<BookingFilter>(initialParams.filter);
   const [query, setQuery] = useState(initialParams.query);
   const [sortBy, setSortBy] = useState<BookingSort>(initialParams.sortBy);
+  const [bookingPage, setBookingPage] = useState(1);
+  const bookingsPerPage = 10;
 
   useEffect(() => {
     const nextParams = parseBookingListParams(locationSearch);
@@ -2447,6 +2449,20 @@ function BookingsView({
       return sortBy === "date-desc" ? -result : result;
     });
   }, [bookings, filter, query, sortBy]);
+
+  const totalBookingPages = Math.max(1, Math.ceil(visibleBookings.length / bookingsPerPage));
+  const paginatedBookings = useMemo(
+    () => visibleBookings.slice((bookingPage - 1) * bookingsPerPage, bookingPage * bookingsPerPage),
+    [bookingPage, bookingsPerPage, visibleBookings]
+  );
+
+  useEffect(() => {
+    setBookingPage(current => Math.min(current, totalBookingPages));
+  }, [totalBookingPages]);
+
+  useEffect(() => {
+    setBookingPage(1);
+  }, [filter, query, sortBy]);
 
   const exportBookings = () => {
     const quote = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
@@ -2576,7 +2592,7 @@ function BookingsView({
                 </tr>
               </thead>
               <tbody>
-                {visibleBookings.map((booking, index) => (
+                {paginatedBookings.map((booking, index) => (
                   <tr
                     key={`booking-table-${booking.id}-${index}`}
                     onClick={() => setDetail(booking)}
@@ -2631,6 +2647,34 @@ function BookingsView({
                   setSortBy("date-asc");
                 }}
               />
+            )}
+            {visibleBookings.length > 0 && (
+              <div className="booking-pagination" aria-label="Bookings pagination">
+                <span className="muted">
+                  Showing {(bookingPage - 1) * bookingsPerPage + 1}–{Math.min(bookingPage * bookingsPerPage, visibleBookings.length)} of {visibleBookings.length} bookings
+                </span>
+                <div className="booking-pagination-controls">
+                  <button
+                    type="button"
+                    className="secondary-button compact-button"
+                    onClick={() => setBookingPage(page => Math.max(1, page - 1))}
+                    disabled={bookingPage === 1}
+                    aria-label="Previous bookings page"
+                  >
+                    Previous
+                  </button>
+                  <span className="booking-pagination-page">Page {bookingPage} of {totalBookingPages}</span>
+                  <button
+                    type="button"
+                    className="secondary-button compact-button"
+                    onClick={() => setBookingPage(page => Math.min(totalBookingPages, page + 1))}
+                    disabled={bookingPage === totalBookingPages}
+                    aria-label="Next bookings page"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}

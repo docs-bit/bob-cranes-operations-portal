@@ -10,7 +10,18 @@ import { focusAssignmentBooking } from "@shared/assignmentRules";
 import { allocationAwareAvailability, summarizeAllocationTiming } from "@shared/crewAssignmentAvailability";
 import { buildBulkConflictSummary } from "@shared/bulkCrewAssignmentRules";
 
-type Booking = { id: string; client: string; project?: string; mob: string; offHire: string };
+type Booking = {
+  id: string;
+  client: string;
+  project?: string;
+  mob: string;
+  offHire: string;
+  stage?: string;
+  priority?: string;
+  crane?: string;
+  site?: string;
+  progress?: number;
+};
 type Availability = "All" | "Present" | "On Leave" | "Assigned" | "Upcoming booking" | "Completed booking" | "Off-Site" | "Scheduled booking";
 type CrewSearchPreset = { id: string; name: string; query: string; department: string; availability: Availability; date: string };
 type RosterCrew = Omit<(typeof CREW_ASSIGNMENT_ROSTER)[number], "availability"> & { bookingIds: string[]; availability: string };
@@ -36,7 +47,7 @@ function BookingDetailsDialog({
   onOpenDossier,
   onBookingUpdated,
 }: {
-  booking?: Booking & { site?: string; crane?: string; priority?: string; progress?: number; offHire?: string };
+  booking?: Booking;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onOpenDossier: (id: string) => void;
@@ -173,7 +184,7 @@ function BookingIdChip({
   onOpen,
 }: {
   bookingId: string;
-  booking?: Booking & { site?: string; crane?: string; priority?: string; progress?: number; offHire?: string };
+  booking?: Booking;
   onOpen: (id: string) => void;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -241,7 +252,7 @@ function CsvColumnDialog({ open, onOpenChange, selected, onSelectedChange, onExp
 export function CrewView({ bookings, setBookings, allocations, setAllocations, focusedBookingId, onAddWorkman, onAllocationSaved, onOpenDossier = () => undefined }: { bookings: Booking[]; setBookings?: React.Dispatch<React.SetStateAction<Booking[]>>; allocations: EmployeeAllocation[]; setAllocations: React.Dispatch<React.SetStateAction<EmployeeAllocation[]>>; focusedBookingId?: string | null; onAddWorkman: () => void; onAllocationSaved: (details: { bookingId: string; employeeName: string; action: "saved" | "removed" }) => void; onOpenDossier?: (bookingId: string) => void }) {
   const saveAllocation = trpc.operations.saveCrewAllocations.useMutation();
   const focusedCrewId = allocations.find(allocation => allocation.bookingId === focusedBookingId)?.crewId;
-  const [query, setQuery] = useState(""); const [department, setDepartment] = useState("All"); const [availability, setAvailability] = useState<Availability>("All"); const [availabilityDate, setAvailabilityDate] = useState(todayKey);
+  const [query, setQuery] = useState(""); const [availableCrewQuery, setAvailableCrewQuery] = useState(""); const [department, setDepartment] = useState("All"); const [availability, setAvailability] = useState<Availability>("All"); const [availabilityDate, setAvailabilityDate] = useState(todayKey);
   const [selectedCrewId, setSelectedCrewId] = useState(focusedCrewId ?? CREW_ASSIGNMENT_ROSTER[0]?.id ?? ""); const [bulkIds, setBulkIds] = useState<string[]>([]); const [presetName, setPresetName] = useState(""); const [savedPresets, setSavedPresets] = useState<CrewSearchPreset[]>([]);
   const [csvDialogOpen, setCsvDialogOpen] = useState(false); const [csvColumns, setCsvColumns] = useState<CsvColumnKey[]>(DEFAULT_EXPORT_COLUMNS); const [exporting, setExporting] = useState(false);
   const focusedBooking = bookings.find(booking => booking.id === focusedBookingId) ?? null;
@@ -268,8 +279,10 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
     return roster.filter(crew => {
       const matchesAvailability = availability === "All" || crew.availability === availability;
       const matchesDepartment = department === "All" || crew.department === department;
+      const crewNeedle = availableCrewQuery.trim().toLowerCase();
       const matchesQuery = !needle || `${crew.name} ${crew.sourceId} ${crew.role} ${crew.department} ${crew.bookingIds.join(" ")}`.toLowerCase().includes(needle);
-      if (!matchesAvailability || !matchesDepartment || !matchesQuery) return false;
+      const matchesAvailableCrewQuery = !crewNeedle || `${crew.name} ${crew.role}`.toLowerCase().includes(crewNeedle);
+      if (!matchesAvailability || !matchesDepartment || !matchesQuery || !matchesAvailableCrewQuery) return false;
       if (quickStatusFilter === "all") return true;
       const crewBookings = crew.bookingIds.map(id => bookings.find(item => item.id === id)).filter((item): item is Booking & { stage?: string } => Boolean(item));
       if (quickStatusFilter === "dispatched") {
@@ -283,10 +296,11 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
       }
       return true;
     });
-  }, [availability, bookings, department, quickStatusFilter, query, roster]);
+  }, [availability, availableCrewQuery, bookings, department, quickStatusFilter, query, roster]);
 
   const activeFilterCount =
     (query.trim() ? 1 : 0) +
+    (availableCrewQuery.trim() ? 1 : 0) +
     (department !== "All" ? 1 : 0) +
     (availability !== "All" ? 1 : 0) +
     (availabilityDate !== todayKey() ? 1 : 0) +
@@ -310,6 +324,15 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
       value={query}
       onChange={event => setQuery(event.target.value)}
       placeholder="Search name, ID, role, booking, or department"
+    />
+  </label>
+  <label className="search-pill booking-search">
+    <Users size={14} />
+    <input
+      aria-label="Search available crew members by name or role"
+      value={availableCrewQuery}
+      onChange={event => setAvailableCrewQuery(event.target.value)}
+      placeholder="Search available crew by name or role"
     />
   </label>
   <select
@@ -339,6 +362,7 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
       className="secondary-button compact-button"
       onClick={() => {
         setQuery("");
+        setAvailableCrewQuery("");
         setDepartment("All");
         setAvailability("All");
         setAvailabilityDate(todayKey());
@@ -480,6 +504,7 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
       if (!toPersistedBookingId(targetBooking.id)) {
         return toast.info("This preview dossier cannot receive durable assignments.");
       }
+      const previousIds = crew.bookingIds;
       const next = crew.bookingIds.includes(targetBooking.id)
         ? crew.bookingIds
         : [...crew.bookingIds, targetBooking.id];
@@ -487,7 +512,22 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
         const result = await persistCrew(crew, next);
         mergeCrewResult(crew.id, result);
         onAllocationSaved({ bookingId: targetBooking.id, employeeName: crew.name, action: "saved" });
-        toast.success(`Dropped ${crew.name} onto ${targetBooking.id}.`);
+        toast.success(`Dropped ${crew.name} onto ${targetBooking.id}.`, {
+          description: "The assignment was saved successfully.",
+          action: {
+            label: "Undo",
+            onClick: async () => {
+              try {
+                const undoResult = await persistCrew(crew, previousIds);
+                mergeCrewResult(crew.id, undoResult);
+                onAllocationSaved({ bookingId: targetBooking.id, employeeName: crew.name, action: "removed" });
+                toast.success(`Undid ${crew.name}'s assignment to ${targetBooking.id}.`);
+              } catch {
+                toast.error("Undo could not be saved. Please review the assignment manually.");
+              }
+            },
+          },
+        });
       } catch {
         toast.error("Drop assignment could not be saved.");
       }
@@ -496,7 +536,7 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
     <div className="panel-title" style={{ fontSize: 14, color: "#1d725f", marginBottom: 4 }}>
       Drop Zone · Assign Crew to {targetBooking?.id}
     </div>
-    <p className="muted" style={{ fontSize: 12, margin: 0 }}>
+      <p className="muted" style={{ fontSize: 12, margin: 0 }}>
       Drag any crew member from the table above and drop them here to instantly assign them to {targetBooking?.id}.
     </p>
   </div>

@@ -513,3 +513,9 @@
 - [x] Add an 'Edit Booking' form inside BookingDetailsDialog to update priority and mobilization dates.
 - [x] Create and validate the updated reusable crew-assignment workflow skill package.
 - [x] Add regression tests, run full test suite, verify build, and publish the release.
+
+## Undoable assignment toast, booking pagination, and personnel search
+- [x] Add an undo action button to drag-and-drop assignment toast notifications.
+- [x] Implement pagination controls at the bottom of the filtered bookings list.
+- [x] Add a search input above the available crew members list for filtering personnel by name or role.
+- [x] Add regression test assertions, run full test suite, verify build, and publish checkpoint.

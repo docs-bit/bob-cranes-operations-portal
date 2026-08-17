@@ -1744,3 +1744,13 @@ body,
 .booking-details-modal-grid div { background: #f8faf9; border: 1px solid #d7e4df; border-radius: 10px; padding: 10px 12px; }
 .booking-details-modal-grid span { display: block; font-size: 11px; margin-bottom: 2px; }
 .booking-details-modal-grid strong { font-size: 13px; color: var(--analytics-ink); }
+
+/* Booking list pagination */
+.booking-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-top: 1px solid var(--analytics-line); background: #fbfdfc; }
+.booking-pagination-controls { display: flex; align-items: center; gap: 8px; }
+.booking-pagination-page { min-width: 92px; text-align: center; font-size: 12px; color: var(--analytics-muted); }
+.compact-button { min-height: 30px; padding: 6px 10px; }
+@media (max-width: 720px) {
+  .booking-pagination { align-items: flex-start; flex-direction: column; }
+  .booking-pagination-controls { width: 100%; justify-content: space-between; }
+}
