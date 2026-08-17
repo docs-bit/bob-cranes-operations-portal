@@ -550,3 +550,8 @@
 - [x] Add hover animations and descriptive tooltips to dashboard summary cards.
 - [x] Implement smooth CSS transition animations across light, dark, and system themes.
 - [x] Add regression assertions, run test suite, verify build, and publish release.
+
+## Client portal document upload repair
+- [x] Inspect client portal upload button implementation in Home.tsx.
+- [x] Implement file picker trigger and upload mutation handler for 'Upload remaining'.
+- [x] Add regression test assertions and verify with build and test checks.

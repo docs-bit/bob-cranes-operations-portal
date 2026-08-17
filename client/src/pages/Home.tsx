@@ -5745,7 +5745,7 @@ type ClientPortalProps = {
   booking: Booking;
   documents: DocumentItem[];
   onUpdate: (booking: Booking) => void;
-  onUploadAll: () => void;
+  onUploadAll: (files?: File[]) => void;
   onBackToInternal: () => void;
 };
 
@@ -5771,6 +5771,8 @@ export function ClientPortal({
   const [documentSort, setDocumentSort] = useState<
     "required" | "name" | "department"
   >("required");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState([
     {
       from: "Documentation",
@@ -5831,10 +5833,30 @@ export function ClientPortal({
     setTimeout(() => setUploadToast(""), 2800);
   };
   const uploadBatch = () => {
-    onUploadAll();
-    notify(
-      "Batch upload accepted across Documentation, HSE, Accounts, and Transportation."
+    if (pendingDocs.length === 0 || isUploading) return;
+    fileInputRef.current?.click();
+  };
+  const handleClientFiles = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    if (!selectedFiles.length) return;
+
+    const allowedTypes = new Set(["application/pdf", "image/jpeg", "image/png"]);
+    const invalidFile = selectedFiles.find(
+      file => !allowedTypes.has(file.type) || file.size > 25 * 1024 * 1024
     );
+    if (invalidFile) {
+      notify(`${invalidFile.name} is not a supported file or exceeds the 25MB limit.`);
+      return;
+    }
+
+    const filesToUpload = selectedFiles.slice(0, pendingDocs.length);
+    setIsUploading(true);
+    onUploadAll(filesToUpload);
+    notify(
+      `${filesToUpload.length} document${filesToUpload.length === 1 ? "" : "s"} uploaded and synced to the BOB Cranes team.`
+    );
+    setIsUploading(false);
   };
   const submitDocuments = () => {
     if (pendingDocs.length > 0) return;
@@ -6074,10 +6096,20 @@ export function ClientPortal({
                     Accepted formats: PDF, JPG, PNG · max 25MB
                   </div>
                 </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                  multiple
+                  onChange={handleClientFiles}
+                  hidden
+                  aria-label="Choose client documents to upload"
+                />
                 <button
                   className="primary-button"
                   onClick={uploadBatch}
-                  disabled={pendingDocs.length === 0}
+                  disabled={pendingDocs.length === 0 || isUploading}
+                  type="button"
                 >
                   {pendingDocs.length === 0 ? (
                     <CheckCircle2 size={14} />
@@ -6086,7 +6118,9 @@ export function ClientPortal({
                   )}
                   {pendingDocs.length === 0
                     ? "All uploaded"
-                    : "Upload remaining"}
+                    : isUploading
+                      ? "Uploading…"
+                      : "Upload remaining"}
                 </button>
               </div>
               <div className="panel-body">
@@ -7937,12 +7971,16 @@ export default function Home() {
         booking={clientBooking}
         documents={uploadDocuments}
         onUpdate={updateBooking}
-        onUploadAll={() =>
-          setUploadDocuments(current =>
-            current.map(doc =>
-              doc.state === "Required" ? { ...doc, state: "Uploaded" } : doc
-            )
-          )
+        onUploadAll={files =>
+          setUploadDocuments(current => {
+            const uploadCount = files?.length ?? current.filter(doc => doc.state === "Required").length;
+            let uploaded = 0;
+            return current.map(doc => {
+              if (doc.state !== "Required" || uploaded >= uploadCount) return doc;
+              uploaded += 1;
+              return { ...doc, state: "Uploaded" };
+            });
+          })
         }
         onBackToInternal={() => setLocation("/")}
       />
