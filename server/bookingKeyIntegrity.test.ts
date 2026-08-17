@@ -19,6 +19,17 @@ describe("booking render identity", () => {
   });
 });
 
+describe("crew assignment booking render identity", () => {
+  const crewSource = readFileSync(resolve(process.cwd(), "client/src/components/CrewAssignmentWorkspace.tsx"), "utf8");
+
+  it("does not use repeated booking IDs as standalone React keys", () => {
+    expect(crewSource).not.toContain("<BookingIdChip key={id}");
+    expect(crewSource).not.toContain("key={booking.id}");
+    expect(crewSource).toContain("key={`booking-chip-${id}-${index}`}");
+    expect(crewSource).toContain("key={`booking-allocation-${booking.id}-${index}`}");
+  });
+});
+
 describe("bookings list discovery controls", () => {
   const homeSource = readFileSync(resolve(process.cwd(), "client/src/pages/Home.tsx"), "utf8");
 

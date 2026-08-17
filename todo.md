@@ -488,3 +488,9 @@
 - [x] Sync booking search, status filter, and sorting state with URL parameters for shareable views.
 - [x] Add an Export to CSV action next to the booking search bar for the current filtered results.
 - [x] Add regression coverage and verify the updated bookings workspace with tests, build, visual QA, and a published checkpoint.
+
+## Duplicate booking key repair follow-up
+- [x] Audit every booking-keyed render path that can show repeated dossiers such as BOB Booking-31390, BOB Booking-31421, and BOB Booking-31511.
+- [x] Replace any remaining booking-only React keys with duplicate-safe composite keys while preserving booking interaction behavior.
+- [x] Add key-audit regression coverage and verify `/portal` with tests, build, and runtime QA.
+- [x] Save and publish the verified duplicate-key repair checkpoint.
