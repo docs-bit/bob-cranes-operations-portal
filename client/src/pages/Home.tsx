@@ -1961,6 +1961,8 @@ function Overview({
   user,
   greetingTemplate,
   unassignedRentalEnquiries,
+  unassignedOldestWaitHours,
+  salesSlaConfig,
   canViewSalesEnquiries,
   onSelectEmployee,
 }: {
@@ -1979,11 +1981,20 @@ function Overview({
   };
   greetingTemplate?: string | null;
   unassignedRentalEnquiries: number;
+  unassignedOldestWaitHours: number;
+  salesSlaConfig: { warningHours: number; criticalHours: number };
   canViewSalesEnquiries: boolean;
   onSelectEmployee: (employeeId: string) => void;
 }) {
   const canCreateBooking =
     user.role === "admin" || user.departmentCode === "sales";
+  const unassignedSeverity = unassignedRentalEnquiries === 0
+    ? "all-assigned"
+    : unassignedOldestWaitHours >= salesSlaConfig.criticalHours
+      ? "critical"
+      : unassignedOldestWaitHours >= salesSlaConfig.warningHours
+        ? "warning"
+        : "needs-response";
   const visibleDepartments =
     user.role === "admin"
       ? departments
@@ -2027,9 +2038,9 @@ function Overview({
         </div>
       </section>
       {canViewSalesEnquiries && (
-        <button type="button" className={`unassigned-enquiry-status ${unassignedRentalEnquiries ? "needs-response" : "all-assigned"}`} onClick={() => setView("sales-enquiries")} data-testid="unassigned-enquiry-status">
-          <span className="status-badge amber">{unassignedRentalEnquiries}</span>
-          <span><strong>{unassignedRentalEnquiries === 1 ? "Unassigned public enquiry" : "Unassigned public enquiries"}</strong><small>{unassignedRentalEnquiries ? "Assign a Sales owner to begin follow-up." : "Every open public enquiry has a Sales owner."}</small></span>
+        <button type="button" className={`unassigned-enquiry-status ${unassignedSeverity}`} onClick={() => setView("sales-enquiries")} data-testid="unassigned-enquiry-status">
+          <span className={`status-badge ${unassignedSeverity === "critical" ? "red" : unassignedSeverity === "warning" ? "amber" : "green"}`}>{unassignedRentalEnquiries}</span>
+          <span><strong>{unassignedRentalEnquiries === 1 ? "Unassigned public enquiry" : "Unassigned public enquiries"}</strong><small>{unassignedRentalEnquiries ? `${unassignedSeverity === "critical" ? "Critical" : unassignedSeverity === "warning" ? "Warning" : "Within SLA"} · oldest waiting ${Math.round(unassignedOldestWaitHours)}h · thresholds ${salesSlaConfig.warningHours}h / ${salesSlaConfig.criticalHours}h` : "Every open public enquiry has a Sales owner."}</small></span>
           <ArrowRight size={15} />
         </button>
       )}
@@ -7232,9 +7243,15 @@ export default function Home() {
     { status: "all" },
     { enabled: canViewSalesEnquiries }
   );
-  const unassignedRentalEnquiries = (salesEnquiriesQuery.data ?? []).filter(
+  const salesSlaQuery = trpc.salesEnquiries.getSlaConfig.useQuery(undefined, { enabled: canViewSalesEnquiries });
+  const salesSlaConfig = salesSlaQuery.data ?? { warningHours: 4, criticalHours: 24 };
+  const unassignedSalesEnquiries = (salesEnquiriesQuery.data ?? []).filter(
     enquiry => !enquiry.assignedToUserId && enquiry.status !== "Converted" && enquiry.status !== "Closed"
-  ).length;
+  );
+  const unassignedRentalEnquiries = unassignedSalesEnquiries.length;
+  const unassignedOldestWaitHours = unassignedSalesEnquiries.length
+    ? Math.max(0, (Date.now() - Math.min(...unassignedSalesEnquiries.map(enquiry => new Date(enquiry.createdAt).getTime()))) / 3_600_000)
+    : 0;
   const [view, setView] = useState<View>(() =>
     location === "/uploads"
       ? "uploads"
@@ -7509,6 +7526,8 @@ export default function Home() {
           user={user}
           greetingTemplate={dashboardGreetingQuery.data?.template}
           unassignedRentalEnquiries={unassignedRentalEnquiries}
+          unassignedOldestWaitHours={unassignedOldestWaitHours}
+          salesSlaConfig={salesSlaConfig}
           canViewSalesEnquiries={canViewSalesEnquiries}
           onSelectEmployee={employeeId => {
             setSelectedTrainingEmployeeId(employeeId);

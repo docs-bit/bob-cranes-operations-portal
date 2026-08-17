@@ -32,6 +32,7 @@ import {
   departmentDashboards,
   departmentWorkflowTemplates,
   rentalEnquiries,
+  rentalEnquiryEvents,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1009,6 +1010,66 @@ export async function markRentalEnquiryConverted(input: { id: string; bookingId:
     .set({ status: "Converted", convertedBookingId: input.bookingId })
     .where(eq(rentalEnquiries.id, input.id));
   return await getRentalEnquiryById(input.id);
+}
+
+export type SalesEnquirySlaConfig = {
+  warningHours: number;
+  criticalHours: number;
+};
+
+const DEFAULT_SALES_ENQUIRY_SLA: SalesEnquirySlaConfig = {
+  warningHours: 4,
+  criticalHours: 24,
+};
+
+export async function getSalesEnquirySlaConfig(): Promise<SalesEnquirySlaConfig> {
+  const db = await getDb();
+  if (!db) return DEFAULT_SALES_ENQUIRY_SLA;
+  const rows = await db
+    .select()
+    .from(systemSettings)
+    .where(or(eq(systemSettings.key, "sales_enquiry_sla_warning_hours"), eq(systemSettings.key, "sales_enquiry_sla_critical_hours")));
+  const warningHours = Number(rows.find(row => row.key === "sales_enquiry_sla_warning_hours")?.value);
+  const criticalHours = Number(rows.find(row => row.key === "sales_enquiry_sla_critical_hours")?.value);
+  if (!Number.isFinite(warningHours) || !Number.isFinite(criticalHours) || warningHours < 1 || criticalHours <= warningHours) return DEFAULT_SALES_ENQUIRY_SLA;
+  return { warningHours, criticalHours };
+}
+
+export async function setSalesEnquirySlaConfig(config: SalesEnquirySlaConfig, updatedBy: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable for Sales SLA settings.");
+  await db.insert(systemSettings).values([
+    { key: "sales_enquiry_sla_warning_hours", value: String(config.warningHours), updatedBy },
+    { key: "sales_enquiry_sla_critical_hours", value: String(config.criticalHours), updatedBy },
+  ]).onDuplicateKeyUpdate({ set: { value: String(config.warningHours), updatedBy } });
+  await db.update(systemSettings).set({ value: String(config.criticalHours), updatedBy }).where(eq(systemSettings.key, "sales_enquiry_sla_critical_hours"));
+  return await getSalesEnquirySlaConfig();
+}
+
+export async function createRentalEnquiryEvent(input: {
+  rentalEnquiryId: string;
+  actorUserId: number;
+  eventType: string;
+  summary: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available for enquiry audit event.");
+  const id = `rental-enquiry-event-${nanoid(14)}`;
+  await db.insert(rentalEnquiryEvents).values({ id, ...input });
+  return await getRentalEnquiryEventById(id);
+}
+
+export async function getRentalEnquiryEventById(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available for enquiry audit event.");
+  const [event] = await db.select().from(rentalEnquiryEvents).where(eq(rentalEnquiryEvents.id, id)).limit(1);
+  return event;
+}
+
+export async function listRentalEnquiryEvents(rentalEnquiryId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available for enquiry audit events.");
+  return await db.select().from(rentalEnquiryEvents).where(eq(rentalEnquiryEvents.rentalEnquiryId, rentalEnquiryId)).orderBy(desc(rentalEnquiryEvents.createdAt));
 }
 
 export async function seedInitialDataIfNeeded() {

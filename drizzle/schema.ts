@@ -211,6 +211,15 @@ export const rentalEnquiries = mysqlTable("rental_enquiries", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const rentalEnquiryEvents = mysqlTable("rental_enquiry_events", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  rentalEnquiryId: varchar("rentalEnquiryId", { length: 64 }).notNull(),
+  actorUserId: int("actorUserId").notNull(),
+  eventType: varchar("eventType", { length: 64 }).notNull(),
+  summary: text("summary").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const auditLogs = mysqlTable("audit_logs", {
   id: varchar("id", { length: 64 }).primaryKey(),
   actor: varchar("actor", { length: 255 }).notNull(),
@@ -238,4 +247,5 @@ export type DepartmentRecord = typeof departments.$inferSelect;
 export type DepartmentDashboardRecord = typeof departmentDashboards.$inferSelect;
 export type DepartmentWorkflowTemplateRecord = typeof departmentWorkflowTemplates.$inferSelect;
 export type RentalEnquiryRecord = typeof rentalEnquiries.$inferSelect;
+export type RentalEnquiryEventRecord = typeof rentalEnquiryEvents.$inferSelect;
 export type AuditLogRecord = typeof auditLogs.$inferSelect;

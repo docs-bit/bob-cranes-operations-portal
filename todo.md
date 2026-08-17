@@ -381,3 +381,10 @@
 - [x] Add a client quick-reply button in the enquiry detail modal with a pre-filled email.
 - [x] Add a subtle pulse animation to the unassigned public-enquiry dashboard badge.
 - [x] Add focused tests, complete release validation, and publish the update.
+
+## Sales response-controls expansion
+- [x] Add administrator-configurable SLA thresholds that drive unassigned-enquiry badge severity.
+- [x] Record sent quick-reply emails in the enquiry detail audit trail.
+- [x] Add saved Sales filter presets for rental duration and owner status combinations.
+- [x] Create and validate a reusable skill for Sales response-control enhancements.
+- [x] Add focused coverage, complete release validation, and publish the update.

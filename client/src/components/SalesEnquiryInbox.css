@@ -21,4 +21,15 @@
 .sales-enquiry-notes { margin: 0 24px; padding: 15px; border-radius: 11px; background: #fff6ed; }
 .sales-enquiry-notes p { margin: 9px 0 0; color: #4d5660; font-size: 13px; line-height: 1.58; white-space: pre-wrap; }
 .sales-enquiry-detail-actions { display: flex; flex-wrap: wrap; gap: 9px; justify-content: flex-end; padding: 22px 24px; }
-@media (max-width: 620px) { .sales-enquiry-toolbar { align-items: start; flex-direction: column; } .sales-enquiry-toolbar .form-select { min-width: 0; } .sales-enquiry-detail-header, .sales-enquiry-detail-actions { padding: 18px; } .sales-enquiry-detail-grid { grid-template-columns: 1fr; padding: 16px 18px; } .sales-enquiry-notes { margin: 0 18px; } .sales-enquiry-detail-actions { justify-content: stretch; } .sales-enquiry-detail-actions button { flex: 1; } }
+.sales-enquiry-preset-toolbar, .sales-enquiry-sla-toolbar { display: flex; align-items: end; gap: .75rem; flex-wrap: wrap; margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--border); }
+.sales-enquiry-preset-toolbar label, .sales-enquiry-sla-toolbar label { display: grid; gap: .3rem; min-width: 150px; }
+.sales-enquiry-preset-toolbar label span, .sales-enquiry-sla-toolbar label span { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted-foreground); }
+.sales-enquiry-sla-toolbar .eyebrow { margin-right: auto; }
+.sales-enquiry-audit { margin: 1rem 24px 0; padding: .9rem; border: 1px solid var(--border); border-radius: 12px; background: color-mix(in srgb, var(--muted) 35%, transparent); }
+.sales-enquiry-audit-list { display: grid; gap: .6rem; margin-top: .65rem; }
+.sales-enquiry-audit-list > div { display: grid; gap: .18rem; padding: .55rem .7rem; border-left: 2px solid var(--primary); background: var(--card); border-radius: 0 8px 8px 0; }
+.sales-enquiry-audit-list strong { font-size: .8rem; }
+.sales-enquiry-audit-list span { font-size: .78rem; color: var(--muted-foreground); }
+.sales-enquiry-audit-list small { font-size: .68rem; color: var(--muted-foreground); }
+@media (max-width: 720px) { .sales-enquiry-sla-toolbar .eyebrow { width: 100%; } .sales-enquiry-preset-toolbar > * { flex: 1 1 100%; } }
+@media (max-width: 620px) { .sales-enquiry-toolbar { align-items: start; flex-direction: column; } .sales-enquiry-toolbar .form-select { min-width: 0; } .sales-enquiry-detail-header, .sales-enquiry-detail-actions { padding: 18px; } .sales-enquiry-detail-grid { grid-template-columns: 1fr; padding: 16px 18px; } .sales-enquiry-notes, .sales-enquiry-audit { margin-left: 18px; margin-right: 18px; } .sales-enquiry-detail-actions { justify-content: stretch; } .sales-enquiry-detail-actions button { flex: 1; } }

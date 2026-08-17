@@ -433,6 +433,44 @@ export const appRouter = router({
         if (input.assignedToUserId) await db.addNotification({ id: `sales-enquiry-assigned-${input.id}-${Date.now()}`, userId: input.assignedToUserId, departmentCode: "sales", title: "Rental enquiry assigned to you", body: `${enquiry.contactName} · ${enquiry.equipmentInterest} · ${enquiry.projectLocation}.` });
         return updated;
       }),
+    getAuditEvents: protectedProcedure
+      .input(z.object({ id: z.string().trim().min(4).max(64) }))
+      .query(async ({ ctx, input }) => {
+        requireDepartmentAccess(ctx.user, "sales");
+        const enquiry = await db.getRentalEnquiryById(input.id);
+        if (!enquiry) throw new TRPCError({ code: "NOT_FOUND", message: "Sales enquiry not found." });
+        return await db.listRentalEnquiryEvents(input.id);
+      }),
+    recordQuickReply: protectedProcedure
+      .input(z.object({ id: z.string().trim().min(4).max(64) }))
+      .mutation(async ({ ctx, input }) => {
+        requireDepartmentAccess(ctx.user, "sales");
+        const enquiry = await db.getRentalEnquiryById(input.id);
+        if (!enquiry) throw new TRPCError({ code: "NOT_FOUND", message: "Sales enquiry not found." });
+        const event = await db.createRentalEnquiryEvent({
+          rentalEnquiryId: input.id,
+          actorUserId: ctx.user.id,
+          eventType: "quick_reply_sent",
+          summary: `Quick reply email opened for ${enquiry.contactName} at ${enquiry.email}.`,
+        });
+        await db.addUserActivity({ userId: ctx.user.id, action: "sales_enquiry_quick_reply_sent", detail: `${ctx.user.name ?? ctx.user.email ?? "Sales user"} opened a quick reply for enquiry ${input.id}.` });
+        return event;
+      }),
+    getSlaConfig: protectedProcedure
+      .query(async ({ ctx }) => {
+        requireDepartmentAccess(ctx.user, "sales");
+        return await db.getSalesEnquirySlaConfig();
+      }),
+    updateSlaConfig: protectedProcedure
+      .input(z.object({ warningHours: z.number().int().min(1).max(168), criticalHours: z.number().int().min(2).max(336) }))
+      .mutation(async ({ ctx, input }) => {
+        requireDepartmentAccess(ctx.user, "sales");
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Only administrators can update Sales SLA thresholds." });
+        if (input.criticalHours <= input.warningHours) throw new TRPCError({ code: "BAD_REQUEST", message: "Critical threshold must be greater than warning threshold." });
+        const config = await db.setSalesEnquirySlaConfig(input, ctx.user.id);
+        await db.addUserActivity({ userId: ctx.user.id, action: "sales_enquiry_sla_updated", detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} set Sales SLA thresholds to ${input.warningHours}h warning and ${input.criticalHours}h critical.` });
+        return config;
+      }),
     convertToBooking: protectedProcedure
       .input(z.object({ id: z.string().trim().min(4).max(64) }))
       .mutation(async ({ ctx, input }) => {
