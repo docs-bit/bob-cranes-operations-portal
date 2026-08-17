@@ -38,12 +38,18 @@ describe("Crew Assignment enhancements", () => {
     expect(workspace).toContain('aria-label="Search available crew members by name or role"');
     expect(workspace).toContain('label: "Undo"');
     expect(workspace).toContain('aria-label="Filter available crew by current availability"');
+    expect(workspace).toContain('aria-label="Filter crew by role"');
+    expect(workspace).toContain("matchesRole");
     expect(workspace).toContain("Confirm undo assignment");
     expect(workspace).toContain("Confirm undo");
     expect(home).toContain("booking-pagination");
     expect(home).toContain("paginatedBookings");
     expect(home).toContain("Bookings per page");
     expect(home).toContain('<option value={50}>50</option>');
+    expect(home).toContain("bob-bookings-page-size-v1");
+    expect(workspace).toContain("UndoAssignmentToast");
+    expect(workspace).toContain("Undo available for");
+    expect(workspace).toContain("undo-toast-progress");
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {

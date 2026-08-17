@@ -2390,7 +2390,11 @@ function BookingsView({
   const [query, setQuery] = useState(initialParams.query);
   const [sortBy, setSortBy] = useState<BookingSort>(initialParams.sortBy);
   const [bookingPage, setBookingPage] = useState(1);
-  const [bookingsPerPage, setBookingsPerPage] = useState<10 | 20 | 50>(10);
+  const [bookingsPerPage, setBookingsPerPage] = useState<10 | 20 | 50>(() => {
+    if (typeof window === "undefined") return 10;
+    const stored = Number(window.localStorage.getItem("bob-bookings-page-size-v1"));
+    return stored === 20 || stored === 50 ? stored : 10;
+  });
 
   useEffect(() => {
     const nextParams = parseBookingListParams(locationSearch);
@@ -2463,6 +2467,14 @@ function BookingsView({
   useEffect(() => {
     setBookingPage(1);
   }, [bookingsPerPage, filter, query, sortBy]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("bob-bookings-page-size-v1", String(bookingsPerPage));
+    } catch {
+      // Local storage may be unavailable in privacy-restricted browser contexts.
+    }
+  }, [bookingsPerPage]);
 
   const exportBookings = () => {
     const quote = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
