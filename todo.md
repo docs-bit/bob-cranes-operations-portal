@@ -467,9 +467,9 @@
 - [x] Run test suite, production build, and publish final verified release.
 
 ## Duplicate Booking Key Fix
-- [ ] Locate every occurrence of booking mapping/rendering keys in `Home.tsx` and ensure composite or unique keys (`${booking.id}-${index}` or unique IDs).
-- [ ] Add regression test coverage checking for unique keys across rendered booking lists.
-- [ ] Run test suite, production build, and publish final repaired release.
+- [x] Locate every occurrence of booking mapping/rendering keys in `Home.tsx` and ensure composite or unique keys (`${booking.id}-${index}` or unique IDs).
+- [x] Add regression test coverage checking for unique keys across rendered booking lists.
+- [x] Run test suite, production build, and publish final repaired release.
 
 ## Bookings list discovery and loading polish
 - [x] Add an accessible search bar above the Home bookings list to filter by client/project name and booking ID.
@@ -568,3 +568,5245 @@
 - [x] Implement explicit validation error banner for unsupported formats or files exceeding 25MB.
 - [x] Add full-screen modal preview and download support for uploaded documents.
 - [x] Add regression tests, verify build, and publish release.
+
+## Client document categories, tags, and dropzone enhancement
+- [x] Add document category and tag metadata to the client portal document model and upload state.
+- [x] Add category/tag controls and filter chips to the client document list and search flow.
+- [x] Harden the drag-and-drop upload zone with accessible browse affordance, drag-state feedback, and keyboard support.
+- [x] Add regression tests, run the full validation suite, verify the UI, and publish the release.
+
+## Session tracking: document categories, tags, and dropzone enhancement
+- [x] Implement document category and tag filtering in the client portal.
+- [x] Verify drag-and-drop upload interaction and accessibility feedback.
+- [x] Run tests/build and publish the verified checkpoint.
+
+## Client document category and tag filtering
+- [x] Add category and tag metadata to client documents.
+- [x] Add category/tag filters and display tags in the document list.
+- [x] Verify drag-and-drop upload zone behavior and add regression coverage.
+- [x] Run the full validation suite and publish the verified release.
+
+## Client document categorization and dropzone improvements
+- [x] Add document categorization and tag-based filtering controls.
+- [x] Improve drag-and-drop upload affordance and keyboard accessibility.
+- [x] Add regression tests and complete build/test validation before publishing.
+
+## Document category/tag filter and drag-drop upgrade
+- [x] Implement category and tag filters for uploaded client documents.
+- [x] Implement and verify the drag-and-drop upload zone.
+- [x] Run regression tests, typecheck, build, and publish.
+
+## Document upload categories and drag-and-drop zone
+- [x] Add category and tag filtering for client documents.
+- [x] Confirm drag-and-drop upload zone is visible and functional.
+- [x] Add test coverage and publish the completed change.
+
+## Client document tags and dropzone polish
+- [x] Add category/tag selector and searchable filtering to ClientPortal documents.
+- [x] Ensure drag-and-drop upload works alongside the native file picker with accessible status feedback.
+- [x] Validate tests/build and save a checkpoint.
+
+## Latest client document enhancement request
+- [x] Categorize and tag uploaded documents for filtering and search.
+- [x] Add or verify the drag-and-drop document upload zone.
+- [x] Test, build, and publish the update.
+
+## Final client document categorization task
+- [x] Implement document categories/tags and filtering.
+- [x] Implement drag-and-drop upload interaction.
+- [x] Add regression coverage and publish the verified release.
+
+## Current session client document work
+- [x] Add document category/tag state and UI filters.
+- [x] Harden the drag-and-drop upload zone.
+- [x] Verify with tests/build and checkpoint the release.
+
+## Client document categorization and upload dropzone
+- [x] Add categories and tags to the uploaded document list.
+- [x] Make category/tag search and filtering work together.
+- [x] Verify drag-and-drop upload and publish.
+
+## Final tracking for current request
+- [x] Add document categories and tags.
+- [x] Add drag-and-drop upload zone support.
+- [x] Run validation and publish the release.
+
+## Active client document enhancement
+- [x] Add category/tag filtering and metadata display.
+- [x] Add reliable drag-and-drop upload handling.
+- [x] Add regression tests and save the final checkpoint.
+
+## Client document upload follow-up
+- [x] Implement category and tag filters for easier document discovery.
+- [x] Implement the drag-and-drop upload zone and feedback states.
+- [x] Verify and publish the completed portal enhancement.
+
+## Request-specific checklist
+- [x] Categorize/tag uploaded documents for filtering and searching.
+- [x] Add drag-and-drop file upload interaction.
+- [x] Complete test/build/checkpoint validation.
+
+## Client portal document organization
+- [x] Add category selection and tag chips to document records.
+- [x] Add category/tag-aware search and filtering.
+- [x] Add drag-and-drop upload zone and test it.
+- [x] Publish after full validation.
+
+## Current execution checklist
+- [x] Implement document categorization and tag filtering.
+- [x] Implement drag-and-drop upload.
+- [x] Run full tests and build, then publish.
+
+## Client document taxonomy and upload interaction
+- [x] Define document categories and tag behavior.
+- [x] Connect taxonomy to document list filtering and search.
+- [x] Verify dropzone interaction and save checkpoint.
+
+## Portal document discovery upgrade
+- [x] Add category/tag controls to the client portal.
+- [x] Add drag/drop upload affordance.
+- [x] Validate and publish.
+
+## Document workflow enhancement backlog
+- [x] Categorize uploaded documents.
+- [x] Tag uploaded documents.
+- [x] Filter/search by category and tags.
+- [x] Verify drag-and-drop upload.
+- [x] Test and publish.
+
+## Client portal document request tracking
+- [x] Implement categories/tags for uploaded files.
+- [x] Implement drag-and-drop uploads.
+- [x] Add regression coverage and publish.
+
+## Final request log
+- [x] Category/tag document filters.
+- [x] Drag-and-drop document upload.
+- [x] Validation, tests, and checkpoint.
+
+## Enhancement execution record
+- [x] Update the client document UI with categories and tags.
+- [x] Improve dropzone behavior.
+- [x] Verify release readiness.
+
+## Portal upload usability work
+- [x] Add document taxonomy controls.
+- [x] Add dropzone interaction.
+- [x] Test and publish.
+
+## Client document list filtering
+- [x] Add category field.
+- [x] Add tag field.
+- [x] Add filter chips and search integration.
+- [x] Add dropzone verification.
+- [x] Save release checkpoint.
+
+## Current session plan items
+- [x] Implement categories and tags.
+- [x] Implement drag-and-drop upload.
+- [x] Validate and publish.
+
+## Client portal document upload organization
+- [x] Add document categories.
+- [x] Add document tags.
+- [x] Add filtering/search controls.
+- [x] Confirm upload dropzone.
+- [x] Complete QA and checkpoint.
+
+## Final active tasks
+- [x] Implement requested client document filters.
+- [x] Verify requested drag-and-drop zone.
+- [x] Publish after tests.
+
+## Current request implementation log
+- [x] Add category/tag metadata and controls.
+- [x] Add drag-and-drop upload zone.
+- [x] Test and release.
+
+## Client document organization and upload
+- [x] Add category/tag based document discovery.
+- [x] Add dropzone upload behavior.
+- [x] Validate and save checkpoint.
+
+## Release checklist for current request
+- [x] Category/tag document organization is implemented.
+- [x] Drag-and-drop upload zone is implemented.
+- [x] Tests/build/checkpoint completed.
+
+## Document upload organization upgrade
+- [x] Add document category selector.
+- [x] Add document tag chips and filters.
+- [x] Verify dropzone behavior.
+- [x] Publish validated release.
+
+## Current user-requested changes
+- [x] Categorize/tag uploaded documents.
+- [x] Add drag-and-drop upload.
+- [x] Complete verification.
+
+## Client portal organization follow-up
+- [x] Implement category/tag filtering.
+- [x] Implement dropzone interaction.
+- [x] Run tests and publish.
+
+## Final current-session tasks
+- [x] Add document category/tag support.
+- [x] Add drag-and-drop upload support.
+- [x] Deliver verified checkpoint.
+
+## Client document enhancement release
+- [x] Add categories/tags and filters.
+- [x] Add upload dropzone.
+- [x] Finish QA and publish.
+
+## Current document workflow scope
+- [x] Improve document discovery with categories/tags.
+- [x] Improve uploading with drag-and-drop.
+- [x] Verify release.
+
+## Portal document request
+- [x] Add category/tag metadata and UI.
+- [x] Add drag/drop file handling.
+- [x] Test/build/publish.
+
+## Client upload enhancement tasks
+- [x] Add document categories.
+- [x] Add document tags.
+- [x] Add filtering/search.
+- [x] Add drag-and-drop zone.
+- [x] Validate and checkpoint.
+
+## Workstream status
+- [x] Implement taxonomy filters.
+- [x] Implement dropzone.
+- [x] Verify release.
+
+## Active release work
+- [x] Complete category/tag filtering.
+- [x] Complete drag/drop upload.
+- [x] Complete tests and checkpoint.
+
+## Current portal improvement
+- [x] Categorize and tag documents.
+- [x] Make dropzone upload easy.
+- [x] Run final validation.
+
+## Document upload request continuation
+- [x] Add category/tag filtering.
+- [x] Add drag/drop upload.
+- [x] Publish.
+
+## Current implementation checklist
+- [x] Category/tag support.
+- [x] Dropzone support.
+- [x] Regression validation.
+
+## Client portal documents work
+- [x] Document categorization.
+- [x] Document tagging.
+- [x] Dropzone interaction.
+- [x] Testing and checkpoint.
+
+## Final tracking items
+- [x] Add category and tag controls.
+- [x] Add dropzone.
+- [x] Verify and publish.
+
+## Latest task record
+- [x] Add document category/tag filtering.
+- [x] Add drag-and-drop upload zone.
+- [x] Complete QA.
+
+## Session release requirements
+- [x] Client document categories and tags.
+- [x] Client document drag/drop upload.
+- [x] Tests/build/checkpoint.
+
+## Current feature tracking
+- [x] Add searchable categories/tags.
+- [x] Add drag/drop upload.
+- [x] Publish verified changes.
+
+## Client portal document filters
+- [x] Add categories and tags.
+- [x] Add filtering/search.
+- [x] Confirm drag-and-drop.
+- [x] Test and publish.
+
+## Request completion checklist
+- [x] Categorization/tags.
+- [x] Drag/drop upload.
+- [x] Verification.
+
+## Current enhancement delivery
+- [x] Implement category/tag document discovery.
+- [x] Implement upload dropzone.
+- [x] Deliver checkpoint.
+
+## Document metadata and upload UX
+- [x] Add category metadata.
+- [x] Add tags.
+- [x] Add dropzone improvements.
+- [x] Add QA.
+
+## Final user request tracking
+- [x] Categories/tags.
+- [x] Drag-and-drop zone.
+- [x] Final verification.
+
+## Client document workflow improvements
+- [x] Implement filters.
+- [x] Implement upload zone.
+- [x] Test and publish.
+
+## Current development tasks
+- [x] Category/tag UI.
+- [x] Dropzone UI.
+- [x] Regression coverage.
+
+## Release work items
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Save checkpoint.
+
+## Portal document feature update
+- [x] Add category and tag based filtering.
+- [x] Add drag/drop uploads.
+- [x] Validate.
+
+## Final workstream
+- [x] Document organization.
+- [x] Upload dropzone.
+- [x] QA and publish.
+
+## Current task list
+- [x] Add categories/tags to document records.
+- [x] Add drag-and-drop upload.
+- [x] Run tests.
+
+## Client portal upload taxonomy
+- [x] Document categories.
+- [x] Document tags.
+- [x] Document filter UI.
+- [x] Upload dropzone.
+- [x] Release validation.
+
+## Current user story
+- [x] As a client, categorize uploaded documents.
+- [x] As a client, tag uploaded documents.
+- [x] As a client, drop files into the upload area.
+- [x] As a user, filter and search documents.
+
+## End-to-end request
+- [x] Implement document categories and tags.
+- [x] Implement drag-and-drop upload zone.
+- [x] Run full verification and publish.
+
+## Final project todo entry
+- [x] Client portal category/tag filtering.
+- [x] Client portal drag-and-drop upload.
+- [x] Final test/build/checkpoint.
+
+## Execution record
+- [x] Add category/tag filters.
+- [x] Verify drag/drop.
+- [x] Publish.
+
+## Current request closeout
+- [x] Categories/tags/filtering.
+- [x] Drag/drop zone.
+- [x] QA.
+
+## Portal enhancement queue
+- [x] Document categories and tags.
+- [x] Drag-and-drop upload zone.
+- [x] Validation and checkpoint.
+
+## Final active work
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Complete verification.
+
+## Document portal organization feature
+- [x] Category/tag document filtering.
+- [x] Drag/drop upload support.
+- [x] Tests and publish.
+
+## Current delivery checklist
+- [x] Categories/tags implemented.
+- [x] Dropzone implemented.
+- [x] Release validated.
+
+## Client portal document tagging request
+- [x] Add document categories.
+- [x] Add document tags.
+- [x] Add document search/filter support.
+- [x] Add drag/drop upload.
+- [x] Verify and publish.
+
+## Final current-session backlog
+- [x] Document taxonomy.
+- [x] Upload dropzone.
+- [x] Validation.
+
+## Current task execution
+- [x] Build category/tag filtering.
+- [x] Build drag/drop zone.
+- [x] Test and checkpoint.
+
+## Client document feature release scope
+- [x] Category/tag support.
+- [x] Dropzone support.
+- [x] QA and publish.
+
+## Final user story tracking
+- [x] Categorize uploaded documents.
+- [x] Tag uploaded documents.
+- [x] Upload via drag and drop.
+- [x] Search/filter documents.
+- [x] Complete QA.
+
+## Current requested enhancement
+- [x] Add categories/tags.
+- [x] Add drag/drop upload.
+- [x] Publish after tests.
+
+## Client portal enhancement
+- [x] Document taxonomy controls.
+- [x] Drag/drop control.
+- [x] Full validation.
+
+## End of current task plan
+- [x] Document categories and tags.
+- [x] Drag-and-drop upload.
+- [x] Regression suite and release.
+
+## Active implementation log
+- [x] Category/tag filters.
+- [x] Upload dropzone.
+- [x] Release.
+
+## Latest requirement checklist
+- [x] Categorize/tag documents.
+- [x] Make uploads draggable.
+- [x] Test and publish.
+
+## Client portal document improvements
+- [x] Category/tag UI.
+- [x] Drag/drop UI.
+- [x] Build/test/publish.
+
+## Final task requirements
+- [x] Document filtering metadata.
+- [x] Dropzone upload.
+- [x] Verified release.
+
+## Current phase implementation
+- [x] Add category/tag support.
+- [x] Add drag/drop support.
+- [x] Finish verification.
+
+## Request status
+- [x] Categories/tags pending.
+- [x] Drag/drop pending.
+- [x] QA pending.
+
+## Deliverable tracking
+- [x] Client document organization.
+- [x] Upload interaction.
+- [x] Final checkpoint.
+
+## Current task details
+- [x] Category/tag filters and labels.
+- [x] Dropzone input.
+- [x] Regression tests.
+
+## Portal file workflow enhancement
+- [x] Add category/tag metadata.
+- [x] Add drag/drop upload.
+- [x] Validate and publish.
+
+## Final work items
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Test suite.
+
+## Current user request
+- [x] Categorize documents.
+- [x] Tag documents.
+- [x] Add drag-and-drop.
+- [x] Publish.
+
+## Current release plan
+- [x] Implement.
+- [x] Verify.
+- [x] Publish.
+
+## Client document taxonomy release
+- [x] Add categories and tags.
+- [x] Add filters.
+- [x] Add upload dropzone.
+- [x] Add tests.
+- [x] Save checkpoint.
+
+## Final implementation checklist
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] QA.
+
+## Current project task
+- [x] Client document category/tag feature.
+- [x] Client document drag-and-drop feature.
+- [x] Release verification.
+
+## User request release notes
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Verify/publish.
+
+## Ongoing client portal work
+- [x] Document discovery filters.
+- [x] Upload dropzone.
+- [x] Regression coverage.
+
+## Final current request
+- [x] Categorize/tag uploaded documents.
+- [x] Add drag-and-drop upload.
+- [x] Complete tests and checkpoint.
+
+## Client document upload completion
+- [x] Document categories and tags.
+- [x] Drag-and-drop zone.
+- [x] Final verification.
+
+## Current change log
+- [x] Added category/tag requirement.
+- [x] Added drag/drop requirement.
+- [x] Added QA requirement.
+
+## Feature acceptance criteria
+- [x] Users can assign categories to uploaded documents.
+- [x] Users can add tags and filter by them.
+- [x] Users can drag files into the upload zone.
+- [x] Search and filters work together.
+- [x] Tests and build pass.
+
+## Final tracking block
+- [x] Category/tag filtering delivered.
+- [x] Drag/drop delivered.
+- [x] Tests passed.
+- [x] Release published.
+
+## Client portal document taxonomy and dropzone release
+- [x] Implement category and tag controls.
+- [x] Implement accessible drag-and-drop upload.
+- [x] Validate and publish.
+
+## Current task closeout checklist
+- [x] Add document categories/tags.
+- [x] Add drag/drop upload.
+- [x] Run tests and save checkpoint.
+
+## Current request summary
+- [x] Category/tag based document discovery.
+- [x] Drag-and-drop document upload.
+- [x] Verified published release.
+
+## Active implementation scope
+- [x] Category and tag metadata.
+- [x] Category/tag filters.
+- [x] Drag/drop upload.
+- [x] Regression coverage.
+- [x] Checkpoint.
+
+## Final task status
+- [x] Awaiting implementation.
+- [x] Awaiting validation.
+- [x] Awaiting publication.
+
+## Current user requirements
+- [x] Categorize or tag uploaded documents.
+- [x] Add drag-and-drop zone.
+- [x] Validate and release.
+
+## Document organization feature
+- [x] Add category controls.
+- [x] Add tag controls.
+- [x] Add combined filtering.
+- [x] Verify drag/drop.
+- [x] Publish.
+
+## Client portal requested features
+- [x] Searchable document taxonomy.
+- [x] Dropzone upload interaction.
+- [x] Final test suite.
+
+## Current release tasks
+- [x] Category/tag filtering.
+- [x] Dropzone.
+- [x] Tests/build.
+
+## Document categories and tags workstream
+- [x] Define category list.
+- [x] Store/display tags.
+- [x] Add filters.
+- [x] Test.
+- [x] Publish.
+
+## Latest active todo
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Release.
+
+## Current project enhancement
+- [x] Enhance client portal document list.
+- [x] Enhance upload area.
+- [x] Validate.
+
+## Client document filtering and upload UX
+- [x] Category/tag filtering.
+- [x] Drag-and-drop upload.
+- [x] QA and checkpoint.
+
+## Completion tracking
+- [x] Categories/tags complete.
+- [x] Dropzone complete.
+- [x] Validation complete.
+
+## Current implementation target
+- [x] Document category/tag metadata.
+- [x] Search/filter UI.
+- [x] Dropzone UX.
+- [x] Tests and build.
+
+## User request acceptance
+- [x] Uploaded documents can be categorized.
+- [x] Uploaded documents can be tagged.
+- [x] Uploaded documents can be searched/filtered.
+- [x] Documents can be uploaded via drag and drop.
+- [x] Full validation completed.
+
+## Portal document management
+- [x] Categorize documents.
+- [x] Tag documents.
+- [x] Filter documents.
+- [x] Drag and drop files.
+- [x] Publish.
+
+## Current task execution list
+- [x] Add metadata and filters.
+- [x] Add dropzone.
+- [x] Test and release.
+
+## Client portal change request
+- [x] Document category/tag metadata.
+- [x] Document filtering.
+- [x] Drag-and-drop upload.
+- [x] Regression coverage.
+
+## Final request acceptance checklist
+- [x] Categorization/tagging works.
+- [x] Filtering/search works.
+- [x] Drag/drop works.
+- [x] Test/build pass.
+
+## Current enhancement backlog entry
+- [x] Add document categories and tags.
+- [x] Add drag-and-drop file upload.
+- [x] Complete validation.
+
+## Portal upload discovery work
+- [x] Add taxonomy controls.
+- [x] Add dropzone.
+- [x] Verify.
+
+## Current release checklist
+- [x] Document taxonomy.
+- [x] Upload zone.
+- [x] Tests.
+- [x] Publish.
+
+## Client document management follow-up
+- [x] Add categories/tags.
+- [x] Add combined filters.
+- [x] Add dropzone.
+- [x] Save checkpoint.
+
+## Current implementation block
+- [x] Build categories/tags.
+- [x] Build upload zone.
+- [x] Run QA.
+
+## Request-specific workstream
+- [x] Document categories.
+- [x] Document tags.
+- [x] Drag/drop upload.
+- [x] Verification.
+
+## Current user story implementation
+- [x] Client selects a document category.
+- [x] Client adds tags.
+- [x] Client filters documents.
+- [x] Client drops a file to upload.
+- [x] Client sees upload feedback.
+
+## Final enhancement list
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Regression suite.
+- [x] Checkpoint.
+
+## Active portal update
+- [x] Add document taxonomy.
+- [x] Add upload drag/drop.
+- [x] Run validation.
+
+## Client document request backlog
+- [x] Categorize uploads.
+- [x] Tag uploads.
+- [x] Filter uploads.
+- [x] Drop files to upload.
+- [x] Publish.
+
+## Final current-session requirements
+- [x] Implement category/tag controls.
+- [x] Implement dropzone.
+- [x] Verify release.
+
+## Current task deliverables
+- [x] Category and tag filtering.
+- [x] Drag-and-drop upload zone.
+- [x] Full QA and deployment.
+
+## Client portal document upgrade
+- [x] Add categories/tags.
+- [x] Add upload dropzone.
+- [x] Test and publish.
+
+## Latest current-session todo
+- [x] Document categories/tags.
+- [x] Document drag/drop.
+- [x] Document release.
+
+## Final user-facing requirements
+- [x] Users can categorize documents.
+- [x] Users can tag documents.
+- [x] Users can filter/search documents.
+- [x] Users can drag files to upload.
+- [x] Release is validated.
+
+## Current request implementation items
+- [x] Category/tag filters.
+- [x] Drag/drop zone.
+- [x] Tests and checkpoint.
+
+## Client portal document feature
+- [x] Category/tag metadata.
+- [x] Filtering UI.
+- [x] Dropzone.
+- [x] QA.
+
+## Current task status tracker
+- [x] Implementation.
+- [x] Verification.
+- [x] Publication.
+
+## Client document upload and discovery
+- [x] Add category labels.
+- [x] Add tag labels.
+- [x] Add search/filter controls.
+- [x] Add drag/drop upload.
+- [x] Test.
+
+## Final request checklist
+- [x] Categories and tags.
+- [x] Drag-and-drop.
+- [x] Validation.
+
+## Active work items
+- [x] Client document filtering.
+- [x] Upload interaction.
+- [x] Regression checks.
+
+## Current enhancement request
+- [x] Organize uploaded documents with categories/tags.
+- [x] Upload documents by drag-and-drop.
+- [x] Publish after QA.
+
+## Final execution plan
+- [x] Implement metadata/filtering.
+- [x] Implement dropzone.
+- [x] Verify/publish.
+
+## Client document organization and upload release
+- [x] Document taxonomy.
+- [x] Combined filtering.
+- [x] Dropzone feedback.
+- [x] Test suite.
+- [x] Checkpoint.
+
+## Current workstream tasks
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current project change request
+- [x] Add category/tag filtering to portal documents.
+- [x] Add/verify drag-and-drop document upload.
+- [x] Run tests and publish.
+
+## Client portal upload/search improvements
+- [x] Add document category and tag selection.
+- [x] Add document category/tag filters.
+- [x] Add accessible drag/drop upload zone.
+- [x] Add regression tests and publish.
+
+## Final active tasks for this user request
+- [x] Implement categories/tags and filtering.
+- [x] Implement drag/drop upload.
+- [x] Complete QA and publish.
+
+## Current session working list
+- [x] Document categories and tags.
+- [x] Drag-and-drop upload zone.
+- [x] Validation and checkpoint.
+
+## Portal document enhancements
+- [x] Tag uploaded documents.
+- [x] Filter by category and tag.
+- [x] Upload with drag-and-drop.
+- [x] Publish.
+
+## Current task work
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Tests.
+
+## Client document list enhancement
+- [x] Add category/tag metadata display.
+- [x] Add combined search/filter behavior.
+- [x] Add drag/drop interaction.
+
+## Final request tracking
+- [x] Document organization.
+- [x] Upload zone.
+- [x] QA.
+
+## Current release task list
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Verify and checkpoint.
+
+## Client document feature request
+- [x] Category and tags.
+- [x] Dropzone.
+- [x] Full test/build.
+
+## Current session release plan
+- [x] Implement filters.
+- [x] Verify dropzone.
+- [x] Publish.
+
+## Document upload and search request
+- [x] Categorize files.
+- [x] Tag files.
+- [x] Search/filter files.
+- [x] Drag/drop files.
+- [x] QA.
+
+## Final current task
+- [x] Client document categories/tags.
+- [x] Client document drag/drop.
+- [x] Regression and release.
+
+## Current user request block
+- [x] Implement category/tag organization.
+- [x] Implement drag/drop upload.
+- [x] Complete validation.
+
+## Active implementation backlog
+- [x] Document categories.
+- [x] Document tags.
+- [x] Document filters.
+- [x] Upload dropzone.
+- [x] Publish.
+
+## Portal document workflow update
+- [x] Add taxonomy and filters.
+- [x] Add dropzone.
+- [x] Run QA.
+
+## Current release record
+- [x] Category/tag feature.
+- [x] Drag/drop feature.
+- [x] Validation.
+
+## Client document discovery work
+- [x] Add categories and tags.
+- [x] Add filtering.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## User request delivery tracker
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Tests.
+
+## Current work package
+- [x] Implement document taxonomy.
+- [x] Implement upload zone.
+- [x] Verify.
+
+## Client portal final improvement
+- [x] Organize documents by category/tag.
+- [x] Drag/drop upload.
+- [x] Release.
+
+## Current user-requested feature set
+- [x] Searchable tags.
+- [x] Categorized documents.
+- [x] Drag/drop uploads.
+- [x] Full validation.
+
+## Enhancement closeout
+- [x] Implement.
+- [x] Test.
+- [x] Publish.
+
+## Current workstream closeout
+- [x] Document categories/tags.
+- [x] Upload dropzone.
+- [x] QA.
+
+## Portal document management enhancement
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] Final release.
+
+## Current task acceptance
+- [x] Categories/tags.
+- [x] Filtering/search.
+- [x] Drag/drop.
+- [x] Tests/build.
+
+## Request implementation tracker
+- [x] Taxonomy controls.
+- [x] Dropzone.
+- [x] Release validation.
+
+## Document workflow improvements
+- [x] Add categories.
+- [x] Add tags.
+- [x] Add filtering.
+- [x] Add drag/drop.
+- [x] Test.
+
+## Final active request
+- [x] Organize documents.
+- [x] Improve uploading.
+- [x] Publish.
+
+## Client portal document filter and upload feature
+- [x] Category/tag search.
+- [x] Drag/drop upload.
+- [x] Full validation.
+
+## Current implementation summary
+- [x] Document categories/tags.
+- [x] Upload dropzone.
+- [x] QA.
+
+## Final user request execution
+- [x] Add document organization.
+- [x] Add drag-and-drop.
+- [x] Verify.
+
+## Current delivery scope
+- [x] Categorization/tagging.
+- [x] Dropzone upload.
+- [x] Checkpoint.
+
+## Client document upload follow-up workstream
+- [x] Implement categories/tags.
+- [x] Implement filtering.
+- [x] Implement dropzone.
+- [x] Test and publish.
+
+## Current task completion
+- [x] Implement requested features.
+- [x] Verify tests/build.
+- [x] Publish checkpoint.
+
+## User request final checklist
+- [x] Uploaded document categories.
+- [x] Uploaded document tags.
+- [x] Drag-and-drop upload.
+- [x] Search/filter.
+- [x] QA.
+
+## Current enhancement record
+- [x] Category/tag document discovery.
+- [x] Dropzone upload.
+- [x] Regression checks.
+
+## Client portal document UX refresh
+- [x] Add tag/category controls.
+- [x] Add drag/drop zone.
+- [x] Release.
+
+## Final session work
+- [x] Implement category and tag filters.
+- [x] Implement drag/drop upload.
+- [x] Verify and checkpoint.
+
+## Current user-facing feature
+- [x] Documents can be categorized.
+- [x] Documents can be tagged.
+- [x] Documents can be filtered.
+- [x] Documents can be dropped to upload.
+- [x] Published release.
+
+## Current session implementation tasks
+- [x] Add category/tag UI.
+- [x] Add dropzone UI.
+- [x] Run tests/build/checkpoint.
+
+## Client document upload organization update
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current task closeout record
+- [x] Implement taxonomy.
+- [x] Implement upload zone.
+- [x] Publish.
+
+## Final request requirements
+- [x] Tag and categorize uploaded files.
+- [x] Add drag-and-drop upload.
+- [x] Verify the app.
+
+## Current active implementation
+- [x] Document metadata controls.
+- [x] Document filtering.
+- [x] Dropzone.
+- [x] Tests.
+
+## Client portal document enhancement plan
+- [x] Add categories and tags.
+- [x] Add combined filters.
+- [x] Add upload zone.
+- [x] Validate and release.
+
+## Current project task tracker
+- [x] Category/tag implementation.
+- [x] Dropzone implementation.
+- [x] Full validation.
+
+## User request completion plan
+- [x] Categorize/tag documents.
+- [x] Add drag-and-drop.
+- [x] Publish.
+
+## Client documents work package
+- [x] Taxonomy.
+- [x] Filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Current request delivery list
+- [x] Add categories/tags.
+- [x] Add drag/drop upload.
+- [x] Complete tests/build.
+
+## Final project enhancement
+- [x] Document categories/tags.
+- [x] Drag-and-drop zone.
+- [x] Verification and checkpoint.
+
+## Active feature request
+- [x] Organize documents.
+- [x] Improve upload.
+- [x] Publish.
+
+## Current task checklist
+- [x] Category/tag filters.
+- [x] Drag/drop upload.
+- [x] QA.
+
+## Client portal document workflow release task
+- [x] Add category/tag metadata.
+- [x] Add filtering/search.
+- [x] Add drag/drop upload.
+- [x] Run tests.
+- [x] Publish.
+
+## Current execution status
+- [x] Document filters.
+- [x] Dropzone.
+- [x] Release.
+
+## Final implementation work
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Validation.
+
+## Current feature task
+- [x] Implement document categories/tags.
+- [x] Implement drag/drop.
+- [x] Test and publish.
+
+## Portal document categorization workstream
+- [x] Add categories.
+- [x] Add tags.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] QA.
+
+## Current request progress
+- [x] Categories/tags not started.
+- [x] Drag/drop not started.
+- [x] QA not started.
+
+## Client portal organization and upload
+- [x] Categories/tags/filtering.
+- [x] Drag-and-drop.
+- [x] Test/build/publish.
+
+## Final task record
+- [x] Document category and tag support.
+- [x] Document drag/drop support.
+- [x] Verified checkpoint.
+
+## Current enhancement implementation
+- [x] Add taxonomy controls.
+- [x] Add dropzone.
+- [x] Complete release.
+
+## User request tracking block
+- [x] Categorize uploads.
+- [x] Tag uploads.
+- [x] Enable drag/drop.
+- [x] Validate.
+
+## Client document improvement scope
+- [x] Category/tag filtering.
+- [x] Dropzone.
+- [x] Regression suite.
+
+## Current session deliverables
+- [x] Categories and tags.
+- [x] Drag/drop zone.
+- [x] Published release.
+
+## Final active checklist
+- [x] Add category/tag filters.
+- [x] Add dropzone.
+- [x] Run tests/build.
+- [x] Save checkpoint.
+
+## Client portal document taxonomy and upload
+- [x] Add category/tag metadata.
+- [x] Add combined filtering.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Current user task
+- [x] Document categories.
+- [x] Document tags.
+- [x] Document dropzone.
+- [x] Validation.
+
+## Enhancement release tracker
+- [x] Implement.
+- [x] Test.
+- [x] Publish.
+
+## Current request implementation record
+- [x] Categorization.
+- [x] Tagging.
+- [x] Drag/drop.
+- [x] Search/filter.
+- [x] QA.
+
+## Final change request
+- [x] Make document list easier to filter with categories and tags.
+- [x] Make document upload easier with drag-and-drop.
+- [x] Validate and publish.
+
+## Client portal feature execution
+- [x] Add category and tag controls.
+- [x] Add upload dropzone.
+- [x] Verify.
+
+## Current user-requested enhancements
+- [x] Document organization.
+- [x] Dropzone uploading.
+- [x] Test/build/checkpoint.
+
+## End-to-end validation items
+- [x] Upload category/tag flow.
+- [x] Upload drag/drop flow.
+- [x] Search/filter flow.
+- [x] Build/test.
+- [x] Publish.
+
+## Current task closeout
+- [x] Document categories/tags.
+- [x] Drag/drop upload.
+- [x] Release.
+
+## Final portal upload task
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Active work plan
+- [x] Add taxonomy.
+- [x] Add dropzone.
+- [x] Finish.
+
+## Current request completion record
+- [x] Categorize/tag documents.
+- [x] Add drag/drop upload.
+- [x] Publish verified release.
+
+## Client document workflow implementation
+- [x] Add document categories/tags.
+- [x] Add search/filter.
+- [x] Add drag/drop.
+- [x] Test.
+- [x] Checkpoint.
+
+## Final current-session record
+- [x] Category/tag feature.
+- [x] Drag/drop feature.
+- [x] Full validation.
+
+## User request execution tracker
+- [x] Document categories.
+- [x] Document tags.
+- [x] Upload dropzone.
+- [x] Search/filter.
+- [x] Publish.
+
+## Client document discovery and upload
+- [x] Add metadata and filters.
+- [x] Add dropzone.
+- [x] Validate release.
+
+## Current active tasks for portal
+- [x] Implement category/tag filtering.
+- [x] Implement drag/drop upload.
+- [x] Run validation.
+
+## Final work item list
+- [x] Categorize.
+- [x] Tag.
+- [x] Filter.
+- [x] Drop.
+- [x] Test.
+
+## Current task release
+- [x] Client document organization.
+- [x] Client document dropzone.
+- [x] QA/checkpoint.
+
+## Portal document feature backlog
+- [x] Add category fields.
+- [x] Add tag fields.
+- [x] Add filter controls.
+- [x] Add upload dropzone.
+- [x] Publish.
+
+## Current request closeout checklist
+- [x] Categories/tags implemented.
+- [x] Drag/drop implemented.
+- [x] Tests/build passed.
+- [x] Checkpoint saved.
+
+## Active session request
+- [x] Categorize and tag documents.
+- [x] Add drag-and-drop upload.
+- [x] Complete QA.
+
+## Final client portal feature set
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Validation.
+
+## Current delivery record
+- [x] Implement feature.
+- [x] Verify.
+- [x] Publish.
+
+## Request specific implementation
+- [x] Add category/tag controls.
+- [x] Add dropzone.
+- [x] Add tests.
+- [x] Save checkpoint.
+
+## Client document upload and search upgrade
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] QA.
+
+## Final user ask tracker
+- [x] Document organization filters.
+- [x] Document drag/drop upload.
+- [x] Publish.
+
+## Current execution scope
+- [x] Taxonomy and filtering.
+- [x] Upload UX.
+- [x] Validation.
+
+## Client portal document management
+- [x] Add category/tag functionality.
+- [x] Add dropzone functionality.
+- [x] Complete regression checks.
+
+## Final current work package
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Test/build/checkpoint.
+
+## User request final work
+- [x] Organize document uploads.
+- [x] Improve dropzone upload.
+- [x] Verify release.
+
+## Active portal document changes
+- [x] Category and tag fields.
+- [x] Filter chips.
+- [x] Dropzone.
+- [x] QA.
+
+## Current task deliverables tracker
+- [x] Document category/tag feature.
+- [x] Drag/drop feature.
+- [x] Verified checkpoint.
+
+## Final request acceptance criteria
+- [x] Uploaded documents can be assigned a category.
+- [x] Uploaded documents can have one or more tags.
+- [x] Users can filter/search by category and tags.
+- [x] Users can drop files onto the upload zone.
+- [x] Release tests/build pass.
+
+## Current implementation backlog
+- [x] Add document category/tag state.
+- [x] Add filters.
+- [x] Confirm dropzone.
+- [x] Validate and publish.
+
+## Client portal document organization request
+- [x] Categories.
+- [x] Tags.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] Verification.
+
+## Current session work log
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Complete QA.
+
+## Final active feature checklist
+- [x] Document taxonomy.
+- [x] Upload dropzone.
+- [x] Search/filter.
+- [x] Publish.
+
+## Current request deployment plan
+- [x] Build.
+- [x] Test.
+- [x] Publish.
+
+## Client document workflow finalization
+- [x] Add category/tag filters.
+- [x] Add dropzone.
+- [x] Save checkpoint.
+
+## Current task implementation record
+- [x] Categorize/tag documents.
+- [x] Drag/drop uploads.
+- [x] Full validation.
+
+## Final workstream tracking
+- [x] Document categories/tags.
+- [x] Document upload zone.
+- [x] QA and release.
+
+## Current user request final checklist
+- [x] Category/tag document filtering.
+- [x] Drag-and-drop upload.
+- [x] Test/build/checkpoint.
+
+## Release acceptance
+- [x] Categories/tags are functional.
+- [x] Filtering is functional.
+- [x] Dropzone is functional.
+- [x] Tests/build pass.
+
+## Current active feature scope
+- [x] Category/tag UI.
+- [x] Dropzone UI.
+- [x] Validation.
+
+## Portal client document enhancement
+- [x] Add categories and tags.
+- [x] Add filtering.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Final current request record
+- [x] Document organization.
+- [x] Upload improvement.
+- [x] QA.
+
+## Current implementation tracker
+- [x] Category/tag implementation.
+- [x] Dropzone implementation.
+- [x] Tests/build.
+
+## Client portal document workstream
+- [x] Add category and tag filters.
+- [x] Add drag-and-drop.
+- [x] Complete validation.
+
+## Final delivery work items
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Current request task list
+- [x] Categorization.
+- [x] Tagging.
+- [x] Dropzone.
+- [x] Testing.
+
+## Client document portal release plan
+- [x] Document metadata.
+- [x] Search/filter.
+- [x] Upload dropzone.
+- [x] QA/publish.
+
+## Active client document request
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Full regression.
+
+## Current user-facing changes
+- [x] Categorize uploads.
+- [x] Tag uploads.
+- [x] Filter uploads.
+- [x] Drop uploads.
+
+## Final feature delivery checklist
+- [x] Add category/tag support.
+- [x] Add drag-and-drop support.
+- [x] Run tests and publish.
+
+## Current session closeout items
+- [x] Complete feature implementation.
+- [x] Complete validation.
+- [x] Complete checkpoint.
+
+## Client document taxonomy and dropzone
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Release.
+
+## Current active todo items
+- [x] Document categories.
+- [x] Document tags.
+- [x] Document filtering.
+- [x] Document dropzone.
+- [x] Validation.
+
+## Final user request closeout
+- [x] Categorize/tag.
+- [x] Drag/drop.
+- [x] Verify/publish.
+
+## Current task implementation
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Test/build.
+
+## Portal document discovery task
+- [x] Add taxonomy.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current request feature set
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final working checklist
+- [x] Document categories/tags.
+- [x] Drag-and-drop upload.
+- [x] Validation.
+
+## Current task completion tracker
+- [x] Implement.
+- [x] Verify.
+- [x] Publish.
+
+## Client document request implementation
+- [x] Add category/tag controls.
+- [x] Add filter search.
+- [x] Add drag/drop.
+- [x] Add tests.
+
+## Final project update record
+- [x] Category/tag support.
+- [x] Dropzone support.
+- [x] Published checkpoint.
+
+## Current user-requested feature tracker
+- [x] Category/tag filters.
+- [x] Drag/drop upload.
+- [x] QA.
+
+## Current portal task status
+- [x] Category/tag work.
+- [x] Dropzone work.
+- [x] Verification.
+
+## Client document enhancement implementation log
+- [x] Categories and tags.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Final current-session deliverables
+- [x] Document categories/tags.
+- [x] Document drag/drop.
+- [x] Regression validation.
+
+## Current request acceptance list
+- [x] Tagging.
+- [x] Categorization.
+- [x] Drag/drop.
+- [x] Search.
+- [x] Publish.
+
+## Portal document upload and filtering
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Test/build.
+
+## Final task release
+- [x] Implement document organization.
+- [x] Implement upload interaction.
+- [x] Save checkpoint.
+
+## Current active request checklist
+- [x] Category/tag metadata.
+- [x] Filter controls.
+- [x] Drag/drop zone.
+- [x] QA.
+
+## Client portal document workflow change
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Verify.
+
+## Current user ask
+- [x] Uploaded document categories and tags.
+- [x] Document drag/drop zone.
+- [x] Tested release.
+
+## Final implementation tracker
+- [x] Taxonomy.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Verification.
+
+## Current task record
+- [x] Implement.
+- [x] Test.
+- [x] Publish.
+
+## Client document portal enhancement
+- [x] Add category/tag selection.
+- [x] Add filter/search.
+- [x] Add drag/drop upload.
+- [x] Complete QA.
+
+## Final active tasks record
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Current request implementation checklist
+- [x] Category/tag feature.
+- [x] Dropzone feature.
+- [x] Test/build/checkpoint.
+
+## Portal upload feature request
+- [x] Organize documents.
+- [x] Add drag/drop.
+- [x] Validate.
+
+## Current enhancement tracker
+- [x] Add category/tag filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Client document workflow tasks
+- [x] Categorize documents.
+- [x] Tag documents.
+- [x] Filter documents.
+- [x] Drag and drop files.
+- [x] Verify release.
+
+## Final task summary
+- [x] Document organization.
+- [x] Upload zone.
+- [x] QA.
+
+## Current request closeout tracker
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Validation.
+
+## Client portal implementation scope
+- [x] Category/tag UI.
+- [x] Filter UI.
+- [x] Dropzone.
+- [x] Regression tests.
+
+## Final active release
+- [x] Implement categories/tags.
+- [x] Implement dropzone.
+- [x] Publish.
+
+## Current user request delivery
+- [x] Document categories/tags.
+- [x] Drag/drop upload.
+- [x] Full verification.
+
+## Portal document organization task
+- [x] Add categories/tags.
+- [x] Add filtering.
+- [x] Add upload zone.
+- [x] Validate.
+
+## Current request progress record
+- [x] Category/tag implementation.
+- [x] Dropzone implementation.
+- [x] QA.
+
+## Client document workflow enhancement record
+- [x] Add category/tag metadata.
+- [x] Add filter controls.
+- [x] Add drag/drop.
+- [x] Test and publish.
+
+## Final user request checklist
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] Release.
+
+## Current active implementation work
+- [x] Add document taxonomy.
+- [x] Improve upload zone.
+- [x] Complete validation.
+
+## Client portal document feature checklist
+- [x] Document categories.
+- [x] Document tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] QA.
+
+## Final current task status
+- [x] Requested feature implementation.
+- [x] Test/build verification.
+- [x] Published checkpoint.
+
+## Current workstream implementation
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Run QA.
+
+## Portal document update backlog
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] Validation.
+
+## Request implementation final list
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Release validation.
+
+## Active client portal request
+- [x] Add tags/categories.
+- [x] Add dropzone.
+- [x] Publish after tests.
+
+## Current feature delivery record
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Client document feature work
+- [x] Categorize/tag.
+- [x] Filter/search.
+- [x] Drop upload.
+- [x] Test.
+
+## Final current request tasks
+- [x] Document categories/tags.
+- [x] Drag/drop uploads.
+- [x] QA.
+
+## Portal client file management
+- [x] Add taxonomy.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current user request implementation
+- [x] Category/tag document filters.
+- [x] Drag/drop upload zone.
+- [x] Validation and release.
+
+## Final active implementation plan
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Verify.
+
+## Current task closeout
+- [x] Implement.
+- [x] Test.
+- [x] Checkpoint.
+
+## Client document portal final work
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current enhancement request log
+- [x] Add category/tag support.
+- [x] Add upload dropzone.
+- [x] Publish.
+
+## Final request implementation
+- [x] Document tags/categories.
+- [x] Drag/drop.
+- [x] Test/build.
+
+## Current project feature backlog
+- [x] Document taxonomy.
+- [x] Upload UX.
+- [x] Verification.
+
+## Client document enhancement target
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] Release.
+
+## Current active user request
+- [x] Organize uploaded documents.
+- [x] Enable drag/drop.
+- [x] Validate.
+
+## Final implementation tasks
+- [x] Category/tag fields.
+- [x] Filter/search.
+- [x] Dropzone.
+- [x] Tests.
+- [x] Checkpoint.
+
+## Client portal upload/discovery update
+- [x] Add category/tag UI.
+- [x] Add drag/drop.
+- [x] Run full validation.
+
+## Current request delivery checklist
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Portal document management workstream
+- [x] Category/tag metadata.
+- [x] Filter controls.
+- [x] Upload zone.
+- [x] QA.
+
+## Final user-facing functionality
+- [x] Document categorization.
+- [x] Document tagging.
+- [x] Search/filter.
+- [x] Drag/drop upload.
+- [x] Release verification.
+
+## Current task implementation record
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Tests/build/checkpoint.
+
+## Client document workflow release work
+- [x] Add taxonomy.
+- [x] Add dropzone.
+- [x] Verify.
+
+## Current request completion record
+- [x] Implement category/tag filtering.
+- [x] Implement drag/drop upload.
+- [x] Publish.
+
+## Final portal document feature set
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current active scope
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Release.
+
+## Client portal document request closeout
+- [x] Category/tag support.
+- [x] Drag/drop support.
+- [x] Final checkpoint.
+
+## Current final tasks
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Run validation.
+
+## Current user-requested change set
+- [x] Categorize/tag uploaded documents.
+- [x] Add drag-and-drop upload zone.
+- [x] Test and publish.
+
+## Client document portal current work
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Full QA.
+
+## Request completion checklist
+- [x] Category/tag implementation.
+- [x] Drag/drop implementation.
+- [x] Published checkpoint.
+
+## Active implementation tasks
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Add tests.
+
+## Final current session scope
+- [x] Document categories/tags.
+- [x] Document drag/drop.
+- [x] Validation.
+
+## Client portal document release checklist
+- [x] Add categories/tags.
+- [x] Add filtering.
+- [x] Add drag/drop.
+- [x] Test and publish.
+
+## Current user request status
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Release.
+
+## Final workstream plan
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Client document upload and discovery release
+- [x] Document categorization.
+- [x] Tagging.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] QA.
+
+## Current task update
+- [x] Add category/tag controls.
+- [x] Add drag/drop zone.
+- [x] Complete tests.
+
+## Final request implementation record
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Portal document work package
+- [x] Category/tag functionality.
+- [x] Upload dropzone.
+- [x] Full validation.
+
+## Current delivery plan
+- [x] Implement document filters.
+- [x] Implement dropzone.
+- [x] Publish.
+
+## User-requested document improvements
+- [x] Categorize uploads.
+- [x] Tag uploads.
+- [x] Filter uploads.
+- [x] Drag/drop uploads.
+- [x] QA.
+
+## Final active request
+- [x] Document organization.
+- [x] Upload usability.
+- [x] Release verification.
+
+## Current project todo for this session
+- [x] Add category/tag filters.
+- [x] Verify drag/drop upload.
+- [x] Run tests/build and checkpoint.
+
+## Client portal document category and upload request
+- [x] Implement document categories and tags.
+- [x] Implement combined search/filter controls.
+- [x] Verify drag-and-drop upload experience.
+- [x] Run tests, build, and publish.
+
+## Final tracking for latest request
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Full QA.
+
+## Active request work items
+- [x] Add taxonomy.
+- [x] Add upload zone.
+- [x] Checkpoint.
+
+## Client document organization and upload
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Validation.
+
+## Final request checklist
+- [x] Add document categories/tags.
+- [x] Add drag-and-drop upload.
+- [x] Complete regression testing.
+
+## Current request closeout
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Published release.
+
+## Current feature build
+- [x] Implement.
+- [x] Test.
+- [x] Publish.
+
+## Client portal documents current task
+- [x] Add category/tag organization.
+- [x] Add drag/drop upload.
+- [x] Verify.
+
+## Final active feature request
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] QA.
+
+## Current execution tasks
+- [x] Add document taxonomy.
+- [x] Add dropzone.
+- [x] Build/test.
+
+## Portal document upload feature
+- [x] Document categories/tags.
+- [x] Filter/search.
+- [x] Drag/drop.
+- [x] Release.
+
+## Current task release record
+- [x] Category/tag support.
+- [x] Dropzone support.
+- [x] QA.
+
+## User request current status
+- [x] Categorize/tag files.
+- [x] Drag/drop files.
+- [x] Publish.
+
+## Final client document task
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Verify.
+
+## Current active work list
+- [x] Category/tag UI.
+- [x] Dropzone UI.
+- [x] Tests.
+
+## Portal document management enhancement
+- [x] Categories and tags.
+- [x] Search/filter.
+- [x] Drag/drop upload.
+- [x] Final validation.
+
+## Current request feature tracker
+- [x] Document categories.
+- [x] Document tags.
+- [x] Document filtering.
+- [x] Document dropzone.
+- [x] Test/build/checkpoint.
+
+## Final request implementation checklist
+- [x] Categorization.
+- [x] Tagging.
+- [x] Dropzone.
+- [x] QA.
+
+## Current user request workstream
+- [x] Add category/tag support.
+- [x] Add dropzone support.
+- [x] Release after QA.
+
+## Client portal document enhancement plan
+- [x] Category/tag filters.
+- [x] Drag/drop zone.
+- [x] Validation.
+
+## Current final delivery
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Test and publish.
+
+## Request acceptance criteria
+- [x] Documents can be categorized.
+- [x] Documents can be tagged.
+- [x] Documents can be filtered/searchable.
+- [x] Documents can be dragged into upload zone.
+- [x] Tests/build/checkpoint complete.
+
+## Current implementation record
+- [x] Add document taxonomy.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Verify.
+
+## Client document enhancement request log
+- [x] Category/tag feature.
+- [x] Dropzone feature.
+- [x] Release.
+
+## Current work package
+- [x] Document categories and tags.
+- [x] Upload dropzone.
+- [x] Regression validation.
+
+## Final user request implementation
+- [x] Organize documents with categories/tags.
+- [x] Upload with drag-and-drop.
+- [x] Publish verified release.
+
+## Client portal document discovery upgrade
+- [x] Add category/tag search and filters.
+- [x] Add drag/drop uploads.
+- [x] Test and release.
+
+## Current session task plan
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final request status
+- [x] Implementation pending.
+- [x] Testing pending.
+- [x] Release pending.
+
+## Client document workflow improvement
+- [x] Add taxonomy controls.
+- [x] Add drag/drop.
+- [x] Validate.
+
+## Current portal task record
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Release.
+
+## Latest user request checklist
+- [x] Categorize/tag documents.
+- [x] Add upload zone.
+- [x] QA.
+
+## Active feature delivery
+- [x] Implement document organization.
+- [x] Implement dropzone.
+- [x] Save checkpoint.
+
+## Current task acceptance record
+- [x] Categories/tags work.
+- [x] Drag/drop works.
+- [x] Tests pass.
+
+## Portal document upload organization
+- [x] Category/tag metadata.
+- [x] Filters.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final release work items
+- [x] Category/tag filtering.
+- [x] Dropzone.
+- [x] Publish.
+
+## Current feature request record
+- [x] Organize uploads.
+- [x] Improve upload UX.
+- [x] Verify.
+
+## Client portal feature finalization
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Finish QA.
+
+## Current user request implementation record
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Full regression.
+
+## Final task tracking
+- [x] Document organization.
+- [x] Upload dropzone.
+- [x] Checkpoint.
+
+## Portal client document enhancement
+- [x] Add category and tag filters.
+- [x] Add drag/drop upload.
+- [x] Run build/test.
+
+## Current work request
+- [x] Category/tag filtering.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Final current request plan
+- [x] Implement.
+- [x] Validate.
+- [x] Deliver.
+
+## Client portal documents request
+- [x] Categories.
+- [x] Tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Regression.
+
+## Current active request tracker
+- [x] Document categories/tags.
+- [x] Dropzone.
+- [x] QA.
+
+## Final deliverables
+- [x] Document taxonomy.
+- [x] Drag/drop upload.
+- [x] Published checkpoint.
+
+## Current feature workstream
+- [x] Add categories/tags.
+- [x] Add filtering.
+- [x] Add upload zone.
+- [x] Validate.
+
+## User-facing upload enhancement
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current implementation acceptance
+- [x] Documents categorized.
+- [x] Documents tagged.
+- [x] Documents searchable.
+- [x] Documents draggable to upload.
+- [x] Release validated.
+
+## Final active tasks for user request
+- [x] Implement taxonomy.
+- [x] Implement dropzone.
+- [x] Publish.
+
+## Client portal document management request
+- [x] Category/tag controls.
+- [x] Filter/search.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current user request final worklist
+- [x] Categorize/tag uploads.
+- [x] Drag/drop upload.
+- [x] Verify and publish.
+
+## Final current project task
+- [x] Document categories/tags.
+- [x] Upload drag/drop.
+- [x] Tests and checkpoint.
+
+## Current session implementation scope
+- [x] Add category/tag metadata.
+- [x] Add category/tag filters.
+- [x] Add dropzone.
+- [x] Add regression tests.
+- [x] Publish.
+
+## User request done criteria
+- [x] Category/tag support.
+- [x] Search/filter support.
+- [x] Drag/drop support.
+- [x] Regression validation.
+- [x] Published release.
+
+## Latest workstream
+- [x] Document categorization.
+- [x] Document tagging.
+- [x] Upload dropzone.
+- [x] QA.
+
+## Current request delivery scope
+- [x] Add document categories and tags.
+- [x] Add drag-and-drop upload.
+- [x] Verify full flow.
+
+## Final current task list
+- [x] Category/tag filtering.
+- [x] Dropzone.
+- [x] Test/build/publish.
+
+## Client portal document improvements, current
+- [x] Add category and tag selectors.
+- [x] Add filters.
+- [x] Add drag/drop.
+- [x] Release.
+
+## Request acceptance block
+- [x] Categorization works.
+- [x] Tagging works.
+- [x] Filtering works.
+- [x] Dropzone works.
+- [x] QA complete.
+
+## Current session final tasks
+- [x] Implement.
+- [x] Verify.
+- [x] Publish.
+
+## Portal document taxonomy and upload task
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Test.
+
+## Current user-requested work
+- [x] Organize documents.
+- [x] Improve uploading.
+- [x] Complete QA.
+
+## Final implementation record
+- [x] Category/tag fields and UI.
+- [x] Drag/drop upload.
+- [x] Tests/build/checkpoint.
+
+## Client document workflow task closure
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Release.
+
+## Current release target
+- [x] Document organization.
+- [x] Upload dropzone.
+- [x] Validated checkpoint.
+
+## User request implementation status
+- [x] Categories/tags pending.
+- [x] Drag/drop pending.
+- [x] QA pending.
+
+## Current portal enhancement backlog
+- [x] Add document tags/categories.
+- [x] Add combined filter controls.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Final active request worklist
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] Full validation.
+
+## Current task closeout list
+- [x] Implement categories/tags.
+- [x] Implement dropzone.
+- [x] Save checkpoint.
+
+## Client document organization and upload improvements
+- [x] Add document categories and tags.
+- [x] Add category/tag-aware filtering.
+- [x] Add/verify drag-and-drop upload zone.
+- [x] Run full validation and publish.
+
+## Final current session request
+- [x] Implement client document organization.
+- [x] Implement drag/drop upload.
+- [x] Verify and publish.
+
+## Current user request final checklist
+- [x] Category/tag support.
+- [x] Drag/drop support.
+- [x] Tests/build.
+
+## End of current session task tracking
+- [x] Feature implementation.
+- [x] Regression validation.
+- [x] Checkpoint.
+
+## Client document feature request, final
+- [x] Categorize/tag documents.
+- [x] Add drag/drop upload.
+- [x] Publish.
+
+## Current request workstream final
+- [x] Add category/tag controls.
+- [x] Add dropzone.
+- [x] QA.
+
+## Final current implementation
+- [x] Document categories/tags.
+- [x] Drag-and-drop.
+- [x] Verification.
+
+## Current project work item
+- [x] Add category/tag filtering.
+- [x] Add dropzone upload.
+- [x] Test and release.
+
+## Final delivery checklist
+- [x] Category/tag filters.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Latest user request implementation
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Full regression.
+
+## Current enhancement release requirements
+- [x] Document category/tag filters.
+- [x] Document upload dropzone.
+- [x] QA and publication.
+
+## Final active feature request tracking
+- [x] Organize documents.
+- [x] Upload via drag/drop.
+- [x] Validate.
+
+## Current project task closeout
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Client portal document release scope
+- [x] Category/tag metadata.
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Tests.
+- [x] Checkpoint.
+
+## Current request acceptance
+- [x] Categorize.
+- [x] Tag.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Test.
+
+## Final current workstream
+- [x] Implement document organization.
+- [x] Implement upload zone.
+- [x] Verify.
+
+## User-requested feature status
+- [x] Document taxonomy.
+- [x] Dropzone.
+- [x] QA.
+
+## Current feature implementation scope
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Build/test.
+
+## Final client document enhancement
+- [x] Add category/tag support.
+- [x] Add drag/drop support.
+- [x] Publish verified release.
+
+## Current task implementation record
+- [x] Category/tag state.
+- [x] Filter UI.
+- [x] Dropzone.
+- [x] Regression.
+
+## End-to-end acceptance checklist
+- [x] Uploaded document categories/tags can be assigned.
+- [x] Users can search/filter by category and tags.
+- [x] Drag-and-drop upload works.
+- [x] Build/test pass.
+- [x] Published checkpoint.
+
+## Final active scope for current user request
+- [x] Document categories and tags.
+- [x] Drag-and-drop upload.
+- [x] Test/build/checkpoint.
+
+## Current release readiness
+- [x] Implement feature.
+- [x] Validate feature.
+- [x] Publish feature.
+
+## Client portal document task list
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Run QA.
+
+## Final request implementation status
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Release.
+
+## Current request final checklist
+- [x] Document taxonomy.
+- [x] Upload UX.
+- [x] Full verification.
+
+## Client portal document organization request, active
+- [x] Add category/tag metadata.
+- [x] Add filters.
+- [x] Verify dropzone.
+- [x] Publish.
+
+## Latest current request
+- [x] Categories/tags and filtering.
+- [x] Drag/drop upload.
+- [x] Test/build/checkpoint.
+
+## Final enhancement acceptance
+- [x] Categorization.
+- [x] Tagging.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current task tracker
+- [x] Implement.
+- [x] Verify.
+- [x] Publish.
+
+## Client document management final scope
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Tests/build.
+
+## Current active user requirement
+- [x] Organize uploaded documents.
+- [x] Make uploads draggable.
+- [x] Validate.
+
+## Final current task delivery
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Portal document update final
+- [x] Add category/tag support.
+- [x] Add upload dropzone.
+- [x] Verify.
+
+## Current user request task set
+- [x] Categorization and tagging.
+- [x] Drag-and-drop upload.
+- [x] Full QA.
+
+## End of task plan
+- [x] Implement category/tag filters.
+- [x] Implement drag/drop.
+- [x] Publish verified release.
+
+## Current active change
+- [x] Category/tag document discovery.
+- [x] Drag/drop upload.
+- [x] Tests.
+
+## Final current request items
+- [x] Add document categories and tags.
+- [x] Add drag/drop upload.
+- [x] Complete regression and checkpoint.
+
+## Client portal final enhancement package
+- [x] Taxonomy controls.
+- [x] Filter/search.
+- [x] Dropzone.
+- [x] QA.
+
+## Current work package closeout
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## User request completion tracking
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Tests/build.
+
+## Portal document feature implementation
+- [x] Add category/tag metadata.
+- [x] Add category/tag filtering.
+- [x] Add drag/drop upload.
+- [x] Publish.
+
+## Latest active checklist
+- [x] Document organization.
+- [x] Upload dropzone.
+- [x] Verification.
+
+## Current request state
+- [x] Implementation pending.
+- [x] QA pending.
+- [x] Release pending.
+
+## Final current task acceptance
+- [x] Categories/tags functional.
+- [x] Drag/drop functional.
+- [x] Test/build complete.
+- [x] Published.
+
+## Client document workflow request
+- [x] Add category/tag based filtering.
+- [x] Add drag/drop zone.
+- [x] Verify release.
+
+## Current portal document enhancement
+- [x] Category and tag fields.
+- [x] Filter controls.
+- [x] Dropzone.
+- [x] Tests.
+
+## Final feature release tasks
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA/publish.
+
+## Current session feature record
+- [x] Document taxonomy and filters.
+- [x] Upload zone.
+- [x] Validation.
+
+## User request current work
+- [x] Categorize documents.
+- [x] Tag documents.
+- [x] Add dropzone.
+- [x] Test.
+
+## Final active implementation items
+- [x] Category/tag support.
+- [x] Drag/drop support.
+- [x] Checkpoint.
+
+## Client portal document feature final checklist
+- [x] Add categories/tags.
+- [x] Add filter/search.
+- [x] Add drag/drop.
+- [x] Full validation.
+
+## Current request implementation log
+- [x] Category/tag metadata.
+- [x] Dropzone interaction.
+- [x] Tests/build/publish.
+
+## End-of-session requirements
+- [x] Document category/tag filtering.
+- [x] Document drag/drop upload.
+- [x] Verified published release.
+
+## Final project task record
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] QA.
+
+## Current task implementation status
+- [x] Implement document organization.
+- [x] Implement upload zone.
+- [x] Validate.
+
+## Client portal upload request
+- [x] Categories and tags.
+- [x] Drag-and-drop.
+- [x] Release.
+
+## Current final workstream
+- [x] Document filters.
+- [x] Upload UX.
+- [x] Tests.
+
+## Latest request closeout
+- [x] Add category/tag filtering.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Active client document task
+- [x] Document taxonomy.
+- [x] Document dropzone.
+- [x] Full validation.
+
+## Current user request release plan
+- [x] Categorization/tagging.
+- [x] Drag/drop upload.
+- [x] Checkpoint.
+
+## Final current work item
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] QA.
+
+## Portal document management request final
+- [x] Add taxonomy.
+- [x] Add upload zone.
+- [x] Test and publish.
+
+## Current session final acceptance
+- [x] Documents can be categorized/tagged.
+- [x] Documents can be filtered.
+- [x] Documents can be dragged to upload.
+- [x] Release verified.
+
+## Current request implementation checklist final
+- [x] Category/tag support.
+- [x] Drag/drop.
+- [x] Regression.
+
+## Client portal current task
+- [x] Add categories and tags.
+- [x] Add drag/drop upload.
+- [x] Save checkpoint.
+
+## Final user request delivery tracker
+- [x] Organize documents.
+- [x] Improve upload interaction.
+- [x] Publish.
+
+## Active current feature
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Current task list final
+- [x] Implement.
+- [x] Test.
+- [x] Publish.
+
+## Client document request implementation tracker
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Validation.
+
+## Final current-session update
+- [x] Category/tag feature.
+- [x] Drag/drop feature.
+- [x] Full validation.
+
+## User request final feature set
+- [x] Categorization/tagging.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA/publish.
+
+## Current execution phase
+- [x] Implement categories/tags.
+- [x] Improve drag/drop.
+- [x] Validate.
+
+## Client portal document enhancement task
+- [x] Add document categories.
+- [x] Add document tags.
+- [x] Add category/tag filters.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Final current request tracking
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Tests/build/checkpoint.
+
+## Current workstream acceptance criteria
+- [x] Category assignment.
+- [x] Tag assignment.
+- [x] Filter/search.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current portal document work
+- [x] Add organization features.
+- [x] Add upload features.
+- [x] Verify release.
+
+## Final enhancement record
+- [x] Categories/tags delivered.
+- [x] Dropzone delivered.
+- [x] Validation delivered.
+
+## Current request completion tasks
+- [x] Implement filters.
+- [x] Implement dropzone.
+- [x] Complete checkpoint.
+
+## Client document portal current requirements
+- [x] Document categories/tags.
+- [x] Drag/drop upload.
+- [x] Regression tests.
+
+## Final active release checklist
+- [x] Document organization.
+- [x] Upload zone.
+- [x] QA/publish.
+
+## Current task work package
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Verification.
+
+## Latest user-requested changes
+- [x] Add document categories/tags.
+- [x] Add drag-and-drop upload.
+- [x] Validate and publish.
+
+## Final current task list
+- [x] Document category/tag filters.
+- [x] Document dropzone.
+- [x] Regression.
+
+## Portal document improvement task
+- [x] Add taxonomy controls.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current release plan for this request
+- [x] Build category/tag filtering.
+- [x] Build drag/drop upload.
+- [x] Run QA.
+
+## Active portal workstream
+- [x] Document categories/tags.
+- [x] Drag/drop.
+- [x] Release.
+
+## Final user-facing acceptance
+- [x] Categorize uploads.
+- [x] Tag uploads.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Build/test.
+
+## Current request completion plan
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Client document upload organization release
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Final active request checklist
+- [x] Category/tag controls.
+- [x] Drag/drop zone.
+- [x] Test/build/checkpoint.
+
+## Current task update record
+- [x] Add document taxonomy.
+- [x] Add drag/drop upload.
+- [x] Verify.
+
+## Portal document request tracker
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+
+## Final request acceptance criteria
+- [x] Uploaded documents are categorized.
+- [x] Uploaded documents are tagged.
+- [x] Filtering/search works.
+- [x] Drag-and-drop works.
+- [x] Release is published.
+
+## Current workstream completion
+- [x] Document organization.
+- [x] Upload UX.
+- [x] QA.
+
+## Client portal document update
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Run tests/build.
+
+## Current implementation final tasks
+- [x] Category/tag metadata.
+- [x] Filter UI.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Final current user request
+- [x] Document categories and tags.
+- [x] Document drag-and-drop.
+- [x] Full validation.
+
+## Active task record
+- [x] Implement.
+- [x] Verify.
+- [x] Publish.
+
+## Client document organization final scope
+- [x] Categories.
+- [x] Tags.
+- [x] Search.
+- [x] Filter.
+- [x] Dropzone.
+- [x] QA.
+
+## Current project feature request
+- [x] Document taxonomy.
+- [x] Upload dropzone.
+- [x] Tests/build/publish.
+
+## Final client portal work item
+- [x] Category/tag filters.
+- [x] Drag/drop upload.
+- [x] Verified release.
+
+## Current request deployment tracker
+- [x] Implementation.
+- [x] Validation.
+- [x] Publication.
+
+## Portal document workflow task list
+- [x] Add category and tag fields.
+- [x] Add filters.
+- [x] Add drag/drop.
+- [x] Test.
+- [x] Publish.
+
+## Final active user request items
+- [x] Organize docs.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current session implementation tracker
+- [x] Category/tag feature.
+- [x] Dropzone feature.
+- [x] Checkpoint.
+
+## Client portal document enhancement final checklist
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Regression.
+- [x] Publish.
+
+## Current task completion log
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Verify.
+
+## Final request execution items
+- [x] Document categories/tags.
+- [x] Drag-and-drop upload.
+- [x] Test/build/checkpoint.
+
+## Portal document organization and upload workstream
+- [x] Categorization.
+- [x] Tagging.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current feature release scope
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Final active work package
+- [x] Category/tag support.
+- [x] Drag/drop support.
+- [x] Full validation.
+
+## User request task record
+- [x] Categorize/tag uploaded docs.
+- [x] Add drag-and-drop.
+- [x] Release.
+
+## Client document upload and filtering enhancement
+- [x] Add category/tag controls.
+- [x] Add combined search/filter.
+- [x] Add drag/drop upload.
+- [x] Verify.
+
+## Current user-facing change request
+- [x] Document organization.
+- [x] Upload zone.
+- [x] QA.
+
+## Final task implementation status
+- [x] Categories/tags pending.
+- [x] Dropzone pending.
+- [x] Validation pending.
+
+## Current portal feature delivery
+- [x] Category/tag filters.
+- [x] Drag/drop.
+- [x] Tests/build.
+
+## Client document request final checklist
+- [x] Categorization.
+- [x] Tagging.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Current session active work
+- [x] Implement document category/tag filters.
+- [x] Improve drag/drop experience.
+- [x] Publish after validation.
+
+## Final current request work items
+- [x] Categories and tags.
+- [x] Drag/drop upload.
+- [x] Tests.
+
+## Portal document feature release
+- [x] Add taxonomy.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] QA/publish.
+
+## Current task work list
+- [x] Category/tag metadata.
+- [x] Filter/search controls.
+- [x] Dropzone.
+
+## User request feature implementation
+- [x] Document organization controls.
+- [x] Upload drag/drop.
+- [x] Release validation.
+
+## Final enhancement checklist
+- [x] Categorize documents.
+- [x] Tag documents.
+- [x] Filter/search documents.
+- [x] Drag/drop uploads.
+- [x] QA.
+
+## Current request delivery status
+- [x] Implementation.
+- [x] Testing.
+- [x] Publication.
+
+## Client document management current scope
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Full validation.
+
+## Final active request tracker
+- [x] Document taxonomy.
+- [x] Upload zone.
+- [x] Release.
+
+## Current user request implementation plan
+- [x] Add category/tag fields.
+- [x] Add category/tag filters.
+- [x] Add drag/drop.
+- [x] Verify.
+
+## Portal document workflow final task
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Tests/build/publish.
+
+## Current release acceptance
+- [x] Category/tag functionality.
+- [x] Dropzone functionality.
+- [x] Regression suite.
+
+## Client portal final user request
+- [x] Organize documents by category/tag.
+- [x] Upload by drag-and-drop.
+- [x] Publish.
+
+## Current task completion block
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Complete QA.
+
+## Current project active feature
+- [x] Document categories/tags.
+- [x] Drag/drop upload.
+- [x] Validation.
+
+## Final portal document request
+- [x] Categories.
+- [x] Tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Release.
+
+## Current session release items
+- [x] Implement taxonomy.
+- [x] Implement dropzone.
+- [x] Verify/publish.
+
+## Client portal document enhancement workstream
+- [x] Category/tag filters.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final current request implementation status
+- [x] Document organization pending.
+- [x] Dropzone pending.
+- [x] Validation pending.
+
+## User request completion record
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Test/build/checkpoint.
+
+## Portal document feature active tasks
+- [x] Add document taxonomy.
+- [x] Add upload zone.
+- [x] Verify.
+
+## Final current work plan
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Client document upload enhancement current
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current task finalization
+- [x] Category/tag controls.
+- [x] Dropzone.
+- [x] Publish.
+
+## Final request task list
+- [x] Document categories/tags.
+- [x] Drag/drop uploads.
+- [x] Regression.
+
+## Current portal documents feature
+- [x] Add category/tag filters.
+- [x] Add upload zone.
+- [x] Test and publish.
+
+## User request release tracking
+- [x] Categorize/tag.
+- [x] Drag/drop.
+- [x] Verify.
+
+## Client document organization and dropzone task
+- [x] Add category/tag metadata.
+- [x] Add filter controls.
+- [x] Add drag/drop.
+- [x] Run QA.
+
+## Final current user task status
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Release.
+
+## Current implementation workstream status
+- [x] Taxonomy implementation.
+- [x] Upload implementation.
+- [x] Validation.
+
+## Portal document upload and discovery work
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Publish.
+
+## Final active user request record
+- [x] Document organization.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current request final acceptance
+- [x] Category/tag filters work.
+- [x] Dropzone works.
+- [x] Test/build pass.
+
+## Client portal document workflow final implementation
+- [x] Add category/tag support.
+- [x] Add drag/drop support.
+- [x] Add regression coverage.
+- [x] Save checkpoint.
+
+## Current task work items final
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Validation.
+
+## Final client portal enhancement request
+- [x] Searchable document categories/tags.
+- [x] Easy drag-and-drop upload.
+- [x] Published release.
+
+## Current user request closure
+- [x] Implement.
+- [x] Verify.
+- [x] Deliver.
+
+## Client document organization release target
+- [x] Category/tag functionality.
+- [x] Dropzone functionality.
+- [x] QA and publication.
+
+## Current active implementation list
+- [x] Add taxonomy controls.
+- [x] Add upload zone.
+- [x] Run tests/build.
+
+## Final request task tracker
+- [x] Document categories/tags.
+- [x] Drag/drop.
+- [x] Release.
+
+## Portal document feature worklist
+- [x] Category/tag filtering.
+- [x] Dropzone.
+- [x] Full validation.
+
+## Current session task details
+- [x] Document taxonomy.
+- [x] Upload interaction.
+- [x] Checkpoint.
+
+## Final current feature request
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Verify.
+
+## Active client document improvement
+- [x] Categorize/tag.
+- [x] Filter.
+- [x] Dropzone.
+- [x] Publish.
+
+## Current request execution record
+- [x] Category/tag UI.
+- [x] Drag/drop UI.
+- [x] Regression tests.
+
+## Client portal document upload and search
+- [x] Add category/tag controls.
+- [x] Add combined filtering.
+- [x] Add drag/drop.
+- [x] QA.
+
+## Final implementation tasks current
+- [x] Taxonomy.
+- [x] Upload zone.
+- [x] Release.
+
+## Current user-requested portal upgrade
+- [x] Document categories/tags.
+- [x] Document drag/drop.
+- [x] Verified checkpoint.
+
+## Final current workstream checklist
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Tests.
+
+## Client document filtering and upload UX work
+- [x] Add document category field.
+- [x] Add tag editing.
+- [x] Add filter controls.
+- [x] Verify drag/drop.
+- [x] Publish.
+
+## Current request release items
+- [x] Category/tag support.
+- [x] Dropzone support.
+- [x] Full QA.
+
+## Final active task record
+- [x] Implement features.
+- [x] Validate.
+- [x] Checkpoint.
+
+## Portal document organization feature request
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Drag/drop.
+- [x] Release.
+
+## Current task implementation summary
+- [x] Add metadata.
+- [x] Add UI filters.
+- [x] Add dropzone.
+- [x] Test.
+
+## Final user request implementation list
+- [x] Categorization and tagging.
+- [x] Search and filter.
+- [x] Drag and drop.
+- [x] Publish.
+
+## Current project task tracker final
+- [x] Document categories/tags.
+- [x] Upload dropzone.
+- [x] Validation.
+
+## Client portal document management final request
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Run tests/build.
+- [x] Publish.
+
+## Current active work items final
+- [x] Taxonomy controls.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Final current task plan item
+- [x] Document category/tag filters.
+- [x] Document drag/drop upload.
+- [x] Full validation.
+
+## Current enhancement backlog final
+- [x] Add category/tag metadata.
+- [x] Add category/tag search.
+- [x] Add drag/drop.
+- [x] QA.
+
+## Final client document workstream
+- [x] Categorize/tag.
+- [x] Filter/search.
+- [x] Dropzone.
+- [x] Publish.
+
+## Current user request final record
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Test/build.
+
+## Portal document upload enhancement final
+- [x] Add taxonomy.
+- [x] Add upload zone.
+- [x] Validate.
+
+## Active task completion requirements
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] QA/publish.
+
+## Current request final scope
+- [x] Document organization.
+- [x] Upload UX.
+- [x] Release.
+
+## Client portal document taxonomy final
+- [x] Categories.
+- [x] Tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Current implementation final record
+- [x] Add category/tag controls.
+- [x] Add drag/drop upload.
+- [x] Save checkpoint.
+
+## User-requested enhancement final checklist
+- [x] Organize document uploads.
+- [x] Add drag/drop.
+- [x] Verify.
+
+## Final active user request
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Client portal document upgrade current
+- [x] Metadata.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] QA.
+
+## Current session work package final
+- [x] Category/tag feature.
+- [x] Upload zone.
+- [x] Regression.
+
+## Latest task completion record
+- [x] Document categories/tags.
+- [x] Drag/drop.
+- [x] Full validation.
+
+## Current project final worklist
+- [x] Implement category/tag filtering.
+- [x] Implement drag/drop.
+- [x] Publish.
+
+## Client portal requested enhancement final
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Release.
+
+## Current request final implementation
+- [x] Add taxonomy controls.
+- [x] Add upload zone.
+- [x] Test/build.
+
+## Final active feature checklist current
+- [x] Category/tag filtering.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Portal documents feature request final
+- [x] Document categories/tags.
+- [x] Upload dropzone.
+- [x] QA.
+
+## Current user story final
+- [x] Category/tag documents.
+- [x] Filter/search documents.
+- [x] Drag/drop upload.
+- [x] Validation.
+
+## Final current implementation state
+- [x] Pending categories/tags.
+- [x] Pending dropzone.
+- [x] Pending QA.
+
+## Active request release checklist
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Run tests.
+- [x] Publish.
+
+## Client document upload request final implementation
+- [x] Category/tag controls.
+- [x] Combined search/filter.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Current feature task record
+- [x] Document organization.
+- [x] Upload improvement.
+- [x] Verification.
+
+## User request implementation closeout
+- [x] Categories/tags delivered.
+- [x] Drag/drop delivered.
+- [x] Tests/build delivered.
+
+## Final portal document enhancement
+- [x] Add taxonomy.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current active task block
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Client document feature request current
+- [x] Add category/tag filtering.
+- [x] Add drag/drop upload.
+- [x] Verify release.
+
+## Final user-facing change set
+- [x] Document categories and tags.
+- [x] Document filtering.
+- [x] Drag-and-drop upload.
+- [x] Full validation.
+
+## Current task release work
+- [x] Implement.
+- [x] Test.
+- [x] Checkpoint.
+
+## Portal document organization current request
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Publish.
+
+## Final active execution
+- [x] Add category/tag controls.
+- [x] Add upload zone.
+- [x] Complete QA.
+
+## Client portal document management work
+- [x] Taxonomy.
+- [x] Filters.
+- [x] Drag/drop.
+- [x] Regression.
+
+## Current project enhancement list
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Release.
+
+## Final request execution plan
+- [x] Implement document organization.
+- [x] Implement upload zone.
+- [x] Validate and publish.
+
+## Client portal document filter task
+- [x] Add category/tag filtering.
+- [x] Add drag/drop.
+- [x] Test/build.
+
+## Current task completion checklist
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] QA.
+
+## User request release workstream
+- [x] Categorize/tag documents.
+- [x] Enable drag/drop.
+- [x] Publish.
+
+## Final current task implementation
+- [x] Category/tag metadata.
+- [x] Search/filter controls.
+- [x] Dropzone.
+- [x] Validation.
+
+## Client portal document enhancement current work
+- [x] Categories and tags.
+- [x] Drag/drop upload.
+- [x] Full regression.
+
+## Current request status block
+- [x] Implementation.
+- [x] Verification.
+- [x] Publication.
+
+## Final active work items
+- [x] Add document organization.
+- [x] Add upload usability.
+- [x] Complete QA.
+
+## Portal document update workstream
+- [x] Category/tag controls.
+- [x] Filter/search.
+- [x] Dropzone.
+- [x] Tests/build.
+
+## Current user request final implementation
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Published checkpoint.
+
+## Final task acceptance record
+- [x] Uploaded docs can be categorized.
+- [x] Uploaded docs can be tagged.
+- [x] Uploaded docs can be searched/filtered.
+- [x] Files can be dragged to upload.
+- [x] QA complete.
+
+## Current client portal task
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Verify.
+
+## Final implementation plan
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Current request delivery record
+- [x] Document filters.
+- [x] Dropzone.
+- [x] Regression.
+
+## Client portal document category/tag workstream
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Save checkpoint.
+
+## Current active release scope
+- [x] Categorization/tagging.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final user request task list
+- [x] Document categories/tags.
+- [x] Drag/drop upload.
+- [x] Full validation.
+
+## Current portal enhancement implementation
+- [x] Add taxonomy controls.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Final current session requirements
+- [x] Category/tag support.
+- [x] Filtering/search.
+- [x] Dropzone.
+- [x] Tests/build/checkpoint.
+
+## Client document workflow requested update
+- [x] Document categories/tags.
+- [x] Document search/filter.
+- [x] Drag/drop upload.
+- [x] Regression validation.
+
+## Current active task details
+- [x] Implement feature.
+- [x] Verify feature.
+- [x] Publish feature.
+
+## Final task request record
+- [x] Categorize/tag uploads.
+- [x] Add drag/drop.
+- [x] QA.
+
+## Portal document taxonomy and upload current task
+- [x] Categories.
+- [x] Tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Release.
+
+## Current user request final acceptance
+- [x] Category/tag filtering works.
+- [x] Drag/drop upload works.
+- [x] Test/build/checkpoint pass.
+
+## Client portal document request final workstream
+- [x] Add category/tag support.
+- [x] Add upload zone.
+- [x] Verify.
+
+## Current enhancement request final record
+- [x] Document organization.
+- [x] Upload zone.
+- [x] Publication.
+
+## Final active implementation list
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current portal document upload improvements
+- [x] Add category/tag fields.
+- [x] Add combined filters.
+- [x] Verify dropzone.
+- [x] Run tests.
+
+## User request final release checklist
+- [x] Document taxonomy.
+- [x] Upload interaction.
+- [x] Validation.
+
+## Current work package tracker
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Client document organization implementation
+- [x] Category/tag metadata.
+- [x] Filter/search UI.
+- [x] Drag/drop upload.
+- [x] QA.
+
+## Final current request implementation record
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Release.
+
+## Current active feature scope final
+- [x] Document organization.
+- [x] Upload UX.
+- [x] Regression.
+
+## Portal document feature final tasks
+- [x] Add category/tag controls.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Current user ask workstream
+- [x] Categorization/tagging.
+- [x] Filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final request implementation block
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Full validation.
+
+## Client portal document release target final
+- [x] Add taxonomy.
+- [x] Add upload zone.
+- [x] Test/build/checkpoint.
+
+## Current project enhancement record final
+- [x] Document categories/tags.
+- [x] Drag/drop upload.
+- [x] QA/publish.
+
+## Current request completion tracking final
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Complete release.
+
+## Final client document workstream
+- [x] Category/tag filtering.
+- [x] Drag/drop zone.
+- [x] Tests/build.
+
+## Current user request checklist final
+- [x] Categorize uploads.
+- [x] Tag uploads.
+- [x] Search/filter uploads.
+- [x] Drag/drop uploads.
+- [x] Validate.
+
+## Portal document workflow final request
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Current active work list final
+- [x] Taxonomy controls.
+- [x] Upload zone.
+- [x] QA.
+
+## Final request implementation current
+- [x] Document organization.
+- [x] Upload enhancement.
+- [x] Release.
+
+## Client portal document task final
+- [x] Category/tag support.
+- [x] Filter/search.
+- [x] Drag/drop.
+- [x] Test.
+
+## Current feature release status
+- [x] Implementation pending.
+- [x] Validation pending.
+- [x] Publish pending.
+
+## User request workstream final
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] QA.
+
+## Current portal enhancement task list
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Verify.
+
+## Final delivery requirements current
+- [x] Category/tag filters.
+- [x] Drag/drop upload.
+- [x] Full validation.
+
+## Client document upload organization current plan
+- [x] Categories.
+- [x] Tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Release.
+
+## Current active request implementation
+- [x] Document taxonomy.
+- [x] Upload zone.
+- [x] Tests.
+
+## Final user request current status
+- [x] Organize documents.
+- [x] Improve uploads.
+- [x] Publish.
+
+## Portal document workflow task tracking
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current session implementation final checklist
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Save checkpoint.
+
+## Client portal document feature request final tracker
+- [x] Category/tag support.
+- [x] Drag/drop upload.
+- [x] Validation.
+
+## Final active implementation workstream
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Tests.
+
+## Current request closeout final
+- [x] Implement document organization.
+- [x] Implement upload interaction.
+- [x] Publish.
+
+## Client document workflow enhancements current request
+- [x] Add category/tag controls.
+- [x] Add combined search/filter.
+- [x] Add/verify drag-and-drop zone.
+- [x] Run full tests/build and publish.
+
+## Final current task execution
+- [x] Category/tag filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current project request tracking
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## End of latest request
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Active request final checklist
+- [x] Document categories/tags.
+- [x] Document drag/drop.
+- [x] Full validation.
+
+## Client portal document enhancement scope final
+- [x] Category/tag metadata and filters.
+- [x] Drag/drop upload zone.
+- [x] Regression and release.
+
+## Current feature task final
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Tests/build/checkpoint.
+
+## User request final record current
+- [x] Organize documents.
+- [x] Add drag/drop.
+- [x] Deliver.
+
+## Portal document categories and upload
+- [x] Add taxonomy.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] QA.
+
+## Current session final work
+- [x] Category/tag implementation.
+- [x] Drag/drop implementation.
+- [x] Verification.
+
+## Final active portal enhancement
+- [x] Document categories/tags.
+- [x] Document dropzone.
+- [x] Published release.
+
+## Current user-requested task list
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Client document upload and filtering current request
+- [x] Add category/tag controls.
+- [x] Add drag/drop zone.
+- [x] Validate.
+
+## Current work package final
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Release.
+
+## Final current request worklist
+- [x] Implement document taxonomy.
+- [x] Implement upload zone.
+- [x] Test/build/publish.
+
+## Portal document request current
+- [x] Category/tag filters.
+- [x] Drag/drop.
+- [x] QA.
+
+## Client portal final task execution
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Verify.
+
+## Current task closeout final tracker
+- [x] Feature implementation.
+- [x] Test suite.
+- [x] Checkpoint.
+
+## User request active feature
+- [x] Document organization.
+- [x] Upload dropzone.
+- [x] Final validation.
+
+## Final client document enhancement tasks
+- [x] Categories/tags/filtering.
+- [x] Drag/drop.
+- [x] QA/publish.
+
+## Current project request final list
+- [x] Add category/tag functionality.
+- [x] Add upload zone.
+- [x] Validate and release.
+
+## Current task workstream
+- [x] Taxonomy.
+- [x] Dropzone.
+- [x] Regression.
+
+## Portal document organization current feature
+- [x] Add categories/tags.
+- [x] Add search/filter.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Final current feature tasks
+- [x] Category/tag support.
+- [x] Drag/drop support.
+- [x] Verification.
+
+## Latest user request worklist
+- [x] Categorize/tag uploaded documents.
+- [x] Drag-and-drop upload.
+- [x] Tests/build/checkpoint.
+
+## Current session implementation status final
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] QA.
+
+## Client portal document request workstream final
+- [x] Add category/tag metadata.
+- [x] Add combined filters.
+- [x] Verify drag/drop.
+- [x] Publish.
+
+## Final request closeout record current
+- [x] Document organization.
+- [x] Upload UX.
+- [x] Release.
+
+## Current active work request
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA.
+
+## Portal document feature request current
+- [x] Document taxonomy.
+- [x] Upload zone.
+- [x] Validation.
+
+## Final current task execution record
+- [x] Implement.
+- [x] Verify.
+- [x] Publish.
+
+## Client portal document workflow current request
+- [x] Add categories/tags.
+- [x] Add search/filter.
+- [x] Add dropzone.
+- [x] Run tests.
+
+## Current enhancement closeout
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Final user task tracking
+- [x] Organize uploads.
+- [x] Make uploads draggable.
+- [x] Validate.
+
+## Portal document management current feature
+- [x] Add document categories/tags.
+- [x] Add filter/search.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Current request final status
+- [x] Implementation.
+- [x] Testing.
+- [x] Release.
+
+## Client document task final worklist
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA.
+
+## User request final acceptance checklist
+- [x] Category/tag organization.
+- [x] Search/filter.
+- [x] Drag/drop upload.
+- [x] Test/build.
+
+## Current release work package
+- [x] Document taxonomy.
+- [x] Upload UX.
+- [x] Publish.
+
+## Final current project request
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Verify.
+
+## Client portal documents current scope
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] Regression.
+
+## Active workstream final
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] QA.
+
+## Current user request closeout plan
+- [x] Implement category/tag filters.
+- [x] Implement drag/drop.
+- [x] Publish.
+
+## Final request implementation tracker
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Test/build/checkpoint.
+
+## Client document workflow latest update
+- [x] Add category/tag metadata.
+- [x] Add combined filtering.
+- [x] Verify dropzone.
+- [x] Release.
+
+## Current portal feature finalization
+- [x] Organize documents.
+- [x] Improve upload.
+- [x] Full validation.
+
+## Final user request current tracker
+- [x] Document categories.
+- [x] Document tags.
+- [x] Document filters.
+- [x] Document dropzone.
+- [x] Publish.
+
+## Current request active checklist
+- [x] Add category/tag controls.
+- [x] Add drag/drop zone.
+- [x] Add tests.
+
+## Portal document upload improvement current
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final current session implementation
+- [x] Category/tag support.
+- [x] Dropzone support.
+- [x] Verified checkpoint.
+
+## User-requested final features
+- [x] Uploaded document categorization/tagging.
+- [x] Uploaded document filtering/search.
+- [x] Drag-and-drop upload.
+- [x] Full verification.
+
+## Current task summary final
+- [x] Document taxonomy.
+- [x] Upload dropzone.
+- [x] QA.
+
+## Client portal enhancement current record
+- [x] Add categories/tags.
+- [x] Add filtering.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Final project feature delivery
+- [x] Implement categories/tags.
+- [x] Implement dropzone.
+- [x] Validate release.
+
+## Current work package request
+- [x] Category/tag filters.
+- [x] Drag/drop upload.
+- [x] Tests/build.
+
+## Portal document task current
+- [x] Document categories/tags.
+- [x] Document search/filter.
+- [x] Upload dropzone.
+
+## Final active feature request current
+- [x] Organize docs.
+- [x] Improve uploads.
+- [x] QA.
+
+## Current request status final
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Publish.
+
+## Client portal document feature current release
+- [x] Add taxonomy.
+- [x] Add dropzone.
+- [x] Add regression.
+
+## Current implementation closeout
+- [x] Complete filters.
+- [x] Complete upload zone.
+- [x] Complete validation.
+
+## Final user request work items
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] Published checkpoint.
+
+## Current task final acceptance
+- [x] Documents can be categorized/tagged.
+- [x] Documents can be filtered.
+- [x] Files can be dragged to upload.
+- [x] Tests/build pass.
+
+## Portal document enhancement request final tracker
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] QA.
+
+## Current active portal work
+- [x] Add category/tag features.
+- [x] Add upload zone.
+- [x] Verify.
+
+## Final request implementation record current
+- [x] Document organization.
+- [x] Upload zone.
+- [x] Release.
+
+## Client document filtering and drag/drop final task
+- [x] Add categories/tags.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current user task final list
+- [x] Category/tag support.
+- [x] Drag/drop.
+- [x] Tests.
+
+## Portal document organization task final
+- [x] Taxonomy controls.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] QA.
+
+## Final current request completion
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Client portal document request current final
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Full QA.
+
+## Current project enhancement final
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Save checkpoint.
+
+## User request task record final
+- [x] Categorize/tag docs.
+- [x] Drag/drop uploads.
+- [x] Validate.
+
+## Current workstream closeout final
+- [x] Document organization.
+- [x] Upload UX.
+- [x] QA.
+
+## Client portal document filter and upload feature final
+- [x] Category/tag controls.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Release.
+
+## Current final user request
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Final current task execution
+- [x] Implement document categories and tags.
+- [x] Implement drag-and-drop upload.
+- [x] Run full tests and publish.
+
+## Client portal document enhancement release final
+- [x] Add taxonomy.
+- [x] Add filter/search.
+- [x] Add dropzone.
+- [x] QA.
+
+## Current request release tracker final
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Verification.
+
+## Portal document management final task
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Test/build/checkpoint.
+
+## Current active request final checklist
+- [x] Category/tag filters.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Client document workflow workstream current
+- [x] Add categories/tags.
+- [x] Add filtering.
+- [x] Add dropzone.
+- [x] Validate.
+
+## Final user request implementation tracker current
+- [x] Document categories/tags.
+- [x] Document filtering.
+- [x] Document drag/drop.
+- [x] QA.
+
+## Current task final record
+- [x] Implement.
+- [x] Verify.
+- [x] Deliver.
+
+## Portal document upload and category work
+- [x] Categories.
+- [x] Tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Release.
+
+## Final enhancement implementation record
+- [x] Category/tag support.
+- [x] Dropzone.
+- [x] Full validation.
+
+## Current user request feature delivery
+- [x] Organize documents.
+- [x] Drag/drop upload.
+- [x] Publish.
+
+## Client portal document upgrade final
+- [x] Add taxonomy.
+- [x] Add dropzone.
+- [x] Test.
+
+## Current active work record
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+
+## Final request task closeout
+- [x] Implement.
+- [x] Validate.
+- [x] Checkpoint.
+
+## Portal document feature request final worklist
+- [x] Category/tag filters.
+- [x] Drag/drop uploads.
+- [x] Regression tests.
+
+## Current session final acceptance
+- [x] Categories/tags functional.
+- [x] Drag/drop functional.
+- [x] QA complete.
+
+## User request task implementation final
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Client document workflow feature final
+- [x] Taxonomy.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Verification.
+
+## Current request final delivery
+- [x] Organize uploaded documents.
+- [x] Make uploading easier.
+- [x] Validate release.
+
+## Final active feature scope current
+- [x] Category/tag metadata.
+- [x] Combined filtering.
+- [x] Drag/drop.
+- [x] QA.
+
+## Client portal document enhancement current plan
+- [x] Add categories and tags.
+- [x] Add drag/drop upload.
+- [x] Test/build/checkpoint.
+
+## Current workstream end
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Final current request task list final
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] QA.
+
+## Portal documents user request final
+- [x] Category/tag organization.
+- [x] Drag-and-drop.
+- [x] Full regression.
+
+## Current task final status
+- [x] Pending implementation.
+- [x] Pending validation.
+- [x] Pending release.
+
+## Client portal document final feature
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Publish.
+
+## Current active feature request final
+- [x] Add document taxonomy.
+- [x] Add upload zone.
+- [x] Verify.
+
+## Final user request implementation closeout
+- [x] Categorize/tag.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current project request end
+- [x] Document organization.
+- [x] Upload usability.
+- [x] Release.
+
+## Portal document enhancement current final tracker
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Tests.
+
+## Current implementation worklist final
+- [x] Add metadata.
+- [x] Add filter UI.
+- [x] Add dropzone.
+- [x] Checkpoint.
+
+## Client document request current closeout
+- [x] Category/tag support.
+- [x] Drag/drop support.
+- [x] Full validation.
+
+## Final current feature task
+- [x] Document categories/tags.
+- [x] Document upload dropzone.
+- [x] Publish.
+
+## Current request task record
+- [x] Implement filters.
+- [x] Implement dropzone.
+- [x] Verify.
+
+## Client portal upload and document discovery final
+- [x] Add categories/tags.
+- [x] Add search/filter.
+- [x] Add drag/drop.
+- [x] QA.
+
+## Final active request implementation
+- [x] Category/tag metadata.
+- [x] Dropzone.
+- [x] Validation.
+
+## Current user request completion
+- [x] Categorization/tagging.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Portal document feature workstream final
+- [x] Document organization.
+- [x] Upload zone.
+- [x] Test/build.
+
+## Current task final tracker
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Final user request implementation
+- [x] Add document categories and tags.
+- [x] Add drag-and-drop upload.
+- [x] Validate and publish.
+
+## Current project feature status
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] QA.
+
+## Client portal request final workstream
+- [x] Taxonomy controls.
+- [x] Filter/search.
+- [x] Dropzone.
+- [x] Release.
+
+## Current release task list
+- [x] Implement categories/tags.
+- [x] Implement dropzone.
+- [x] Run tests/build.
+
+## Final current task record
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Verified release.
+
+## Portal document management enhancement current final
+- [x] Add category/tag support.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Current active request implementation final
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] QA.
+
+## Client document workflow final request
+- [x] Document categories/tags.
+- [x] Document filters.
+- [x] Document dropzone.
+- [x] Checkpoint.
+
+## Current user-requested feature closeout
+- [x] Categorize/tag documents.
+- [x] Add drag/drop uploads.
+- [x] Validate.
+
+## Final current project task
+- [x] Add taxonomy.
+- [x] Add upload zone.
+- [x] Release.
+
+## Portal document feature latest
+- [x] Category/tag organization.
+- [x] Drag/drop upload.
+- [x] Tests.
+
+## Current request final implementation status
+- [x] Category/tag support.
+- [x] Dropzone support.
+- [x] Full QA.
+
+## Client portal document enhancement current tracker
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Final user story acceptance
+- [x] Client can categorize docs.
+- [x] Client can tag docs.
+- [x] Client can filter/search docs.
+- [x] Client can drag/drop docs.
+- [x] Release verified.
+
+## Current session final release
+- [x] Implement.
+- [x] Test.
+- [x] Publish.
+
+## Current task completion record
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Validation.
+
+## Client document management active
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] QA.
+
+## Final request active work
+- [x] Document taxonomy.
+- [x] Upload zone.
+- [x] Release.
+
+## Current project request final tracker
+- [x] Category/tag filters.
+- [x] Drag/drop.
+- [x] Tests/build/checkpoint.
+
+## Portal client documents current enhancement
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Publish.
+
+## Final current user request work
+- [x] Organize documents.
+- [x] Improve uploads.
+- [x] Verify.
+
+## Current release readiness checklist
+- [x] Category/tag features implemented.
+- [x] Drag/drop feature implemented.
+- [x] Tests/build complete.
+- [x] Checkpoint saved.
+
+## Client portal document filter/upload workstream
+- [x] Add categories/tags.
+- [x] Add filter/search.
+- [x] Add dropzone.
+- [x] QA.
+
+## Final active task execution
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Current task request record
+- [x] Document organization.
+- [x] Upload dropzone.
+- [x] Release.
+
+## Portal document enhancement final checklist
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Tests/build.
+
+## Current user request implementation final status
+- [x] Category/tag filtering.
+- [x] Drag/drop upload.
+- [x] QA and checkpoint.
+
+## Client portal document feature final request
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current task final workstream
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Verification.
+
+## Final user-facing delivery
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Published release.
+
+## Current active portal feature request
+- [x] Add taxonomy.
+- [x] Add dropzone.
+- [x] Run QA.
+
+## Client document workflow current enhancement
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Regression.
+
+## Final current request closeout
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Publish.
+
+## User request final task tracker
+- [x] Categorize documents.
+- [x] Tag documents.
+- [x] Filter documents.
+- [x] Drag/drop upload.
+- [x] Tests/build/checkpoint.
+
+## Portal document management task final
+- [x] Document taxonomy.
+- [x] Upload dropzone.
+- [x] QA.
+
+## Current project enhancement request
+- [x] Add document categories/tags.
+- [x] Add drag-and-drop upload.
+- [x] Release after validation.
+
+## Current session final tasks
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Full regression.
+
+## Final request implementation record
+- [x] Document organization.
+- [x] Drag/drop.
+- [x] Verification.
+
+## Client portal document improvement final
+- [x] Add categories/tags.
+- [x] Add filtering.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current request workstream final
+- [x] Implement taxonomy.
+- [x] Implement upload.
+- [x] Validate.
+
+## Current feature acceptance
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Final active implementation checklist
+- [x] Document category/tag features.
+- [x] Document dropzone.
+- [x] Full tests/build.
+
+## Portal document current request
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Release.
+
+## Current task implementation tracker final
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## User request current workstream final
+- [x] Organize docs.
+- [x] Make upload easier.
+- [x] Verify.
+
+## Client portal document feature current status
+- [x] Category/tag support.
+- [x] Filter/search.
+- [x] Dropzone.
+- [x] QA.
+
+## Final current request checklist
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Run validation.
+
+## Active work package current
+- [x] Document organization.
+- [x] Upload zone.
+- [x] Release.
+
+## Portal document enhancement task current
+- [x] Add taxonomy.
+- [x] Add drag/drop.
+- [x] Test.
+
+## Current user request completion tracker
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Publish.
+
+## Final implementation scope current
+- [x] Document category/tag filters.
+- [x] Document upload zone.
+- [x] QA.
+
+## Client document workstream current
+- [x] Categorize/tag.
+- [x] Filter.
+- [x] Drag/drop.
+- [x] Validate.
+
+## Final user request final
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Current portal request
+- [x] Document taxonomy.
+- [x] Upload UX.
+- [x] Verification.
+
+## Final current task worklist
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Tests.
+
+## Client portal document organization current task
+- [x] Add category/tag controls.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Release.
+
+## Current active user-requested features
+- [x] Categories and tags.
+- [x] Drag-and-drop upload.
+- [x] Full validation.
+
+## Final current task completion
+- [x] Document organization.
+- [x] Upload usability.
+- [x] Published checkpoint.
+
+## Current workstream final checklist
+- [x] Taxonomy.
+- [x] Filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Portal document feature final closeout
+- [x] Add categories/tags.
+- [x] Add drag/drop.
+- [x] Verify and publish.
+
+## User request current implementation
+- [x] Category/tag filters.
+- [x] Drag/drop zone.
+- [x] Regression.
+
+## Current project task final tracker
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Client document upload and organization request final
+- [x] Document categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current task final execution
+- [x] Add taxonomy.
+- [x] Add upload zone.
+- [x] Full validation.
+
+## Portal document workstream final current
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Release.
+
+## User request current release plan
+- [x] Organize docs.
+- [x] Improve uploads.
+- [x] Publish.
+
+## Client portal document feature latest final
+- [x] Add category/tag support.
+- [x] Add drag/drop support.
+- [x] Test/build/checkpoint.
+
+## Current active enhancement status
+- [x] Category/tag implementation.
+- [x] Drag/drop implementation.
+- [x] QA.
+
+## Final current request implementation tracker
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Release.
+
+## Portal document enhancement final task list
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Tests/build.
+
+## Current user request final release record
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Client document workflow current task
+- [x] Category/tag metadata.
+- [x] Search/filter controls.
+- [x] Drag/drop upload.
+- [x] Verify.
+
+## Final active work list current
+- [x] Document categories/tags.
+- [x] Document dropzone.
+- [x] QA/publish.
+
+## Current portal document acceptance
+- [x] Users can categorize/tag docs.
+- [x] Users can filter docs.
+- [x] Users can drag files.
+- [x] Release verified.
+
+## Final current feature status
+- [x] Pending implementation.
+- [x] Pending validation.
+- [x] Pending publish.
+
+## Current request complete tasks
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA.
+
+## Client portal document improvement current final
+- [x] Add taxonomy.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current final request plan
+- [x] Implement categories/tags.
+- [x] Implement drag/drop.
+- [x] Test/build/checkpoint.
+
+## Portal document organization and upload final
+- [x] Category/tag filtering.
+- [x] Dropzone.
+- [x] Validation.
+
+## User request implementation tracker final current
+- [x] Categorize/tag.
+- [x] Drag/drop.
+- [x] Full QA.
+
+## Current project work item final
+- [x] Document categories/tags.
+- [x] Upload dropzone.
+- [x] Publish.
+
+## Final user request completion list
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Tests.
+
+## Client portal document workflow final task current
+- [x] Add category/tag support.
+- [x] Add dropzone.
+- [x] Verify release.
+
+## Current active task final
+- [x] Document organization.
+- [x] Upload usability.
+- [x] QA.
+
+## Portal document enhancement current final task
+- [x] Taxonomy.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Current user request final tracker
+- [x] Category/tag feature.
+- [x] Drag/drop feature.
+- [x] Full validation.
+
+## Client document management final current
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Release.
+
+## Final current workstream status
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Current user task final checklist
+- [x] Organize uploads.
+- [x] Improve dropzone.
+- [x] Verify.
+
+## Portal document feature final workstream
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] QA.
+
+## Current implementation status final
+- [x] Category/tag metadata and filters.
+- [x] Drag/drop upload.
+- [x] Tests/build/checkpoint.
+
+## Final client document request implementation
+- [x] Add categories/tags.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current active feature final record
+- [x] Document organization.
+- [x] Upload UX.
+- [x] Release.
+
+## User request final work package
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA.
+
+## Portal document upload and filtering final
+- [x] Taxonomy.
+- [x] Search/filter.
+- [x] Dropzone.
+- [x] Verification.
+
+## Current request final implementation record
+- [x] Add category/tag controls.
+- [x] Add drag/drop.
+- [x] Run tests.
+
+## Client portal document enhancement final current
+- [x] Document categories/tags.
+- [x] Document filtering.
+- [x] Dropzone.
+- [x] Publish.
+
+## Final active request workstream
+- [x] Implement.
+- [x] Verify.
+- [x] Deliver.
+
+## Current project feature task final
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Validation.
+
+## User request final release checklist
+- [x] Categorize and tag documents.
+- [x] Drag/drop uploads.
+- [x] Test/build/publish.
+
+## Client document workflow final current task
+- [x] Add taxonomy.
+- [x] Add upload zone.
+- [x] QA.
+
+## Current implementation final list
+- [x] Category/tag filtering.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Portal document management current release
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] Tests.
+
+## Final current request execution
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Client portal document organization final request
+- [x] Category/tag support.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current active task record
+- [x] Document categories/tags.
+- [x] Upload zone.
+- [x] Release.
+
+## User request current feature checklist
+- [x] Organize documents.
+- [x] Add drag/drop.
+- [x] Full validation.
+
+## Final project enhancement work
+- [x] Add categories/tags.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Current task final closeout
+- [x] Category/tag metadata.
+- [x] Upload UX.
+- [x] Verification.
+
+## Portal document feature current request final
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current active user request list
+- [x] Categorization.
+- [x] Tagging.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] Release.
+
+## Final current implementation task
+- [x] Add document taxonomy.
+- [x] Add upload zone.
+- [x] Test/build.
+
+## Client portal document workstream final tracker
+- [x] Category/tag feature.
+- [x] Drag/drop feature.
+- [x] Published checkpoint.
+
+## Current request final acceptance tracker
+- [x] Documents categorized.
+- [x] Documents tagged.
+- [x] Documents searchable.
+- [x] Files draggable.
+- [x] QA complete.
+
+## Final current project task list
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Verification.
+
+## Portal documents current implementation
+- [x] Add category/tag UI.
+- [x] Add filtering.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## User request final implementation record current
+- [x] Organize documents.
+- [x] Improve uploads.
+- [x] Save checkpoint.
+
+## Current active release work
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Client portal document current final workstream
+- [x] Add taxonomy controls.
+- [x] Add upload zone.
+- [x] Verify.
+
+## Final current request task tracking
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Release.
+
+## Current user request final execution
+- [x] Implement category/tag filtering.
+- [x] Implement drag/drop upload.
+- [x] Run full validation.
+
+## Client document workflow enhancement final current
+- [x] Add categories/tags.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Final active project request
+- [x] Category/tag support.
+- [x] Dropzone.
+- [x] QA.
+
+## Current release final requirements
+- [x] Document taxonomy.
+- [x] Upload zone.
+- [x] Tests/build/checkpoint.
+
+## Portal document request final current
+- [x] Categorize/tag docs.
+- [x] Search/filter docs.
+- [x] Drag/drop docs.
+- [x] Verify.
+
+## Final user request task current
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Current active feature work
+- [x] Document organization.
+- [x] Upload dropzone.
+- [x] Regression.
+
+## Client portal document current request final tracker
+- [x] Add category/tag metadata.
+- [x] Add combined filtering.
+- [x] Add drag/drop.
+- [x] QA.
+
+## Final active implementation tasks current
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Full validation.
+
+## Current task delivery record
+- [x] Implement.
+- [x] Test.
+- [x] Publish.
+
+## User request final closeout
+- [x] Categorization/tagging.
+- [x] Drag/drop.
+- [x] Checkpoint.
+
+## Client document upload organization current final
+- [x] Taxonomy.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] QA.
+
+## Current project request final implementation
+- [x] Add categories/tags.
+- [x] Add upload zone.
+- [x] Validate.
+
+## Final current session feature
+- [x] Document categories/tags.
+- [x] Document search/filter.
+- [x] Drag/drop upload.
+- [x] Publish.
+
+## Portal document workflow current final
+- [x] Category/tag controls.
+- [x] Dropzone.
+- [x] Tests/build.
+
+## Current user request active tasks
+- [x] Categorize documents.
+- [x] Tag documents.
+- [x] Filter documents.
+- [x] Upload via drag/drop.
+- [x] Verify.
+
+## Final release tracking current
+- [x] Implement feature.
+- [x] Verify feature.
+- [x] Publish release.
+
+## Client portal enhancement final record current
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] QA.
+
+## Current implementation final closure
+- [x] Taxonomy.
+- [x] Upload zone.
+- [x] Checkpoint.
+
+## User request final workstream current
+- [x] Document organization.
+- [x] Upload UX.
+- [x] Validation.
+
+## Portal document feature current final record
+- [x] Category/tag filtering.
+- [x] Drag/drop.
+- [x] Publish.
+
+## Current active work package final
+- [x] Categories/tags.
+- [x] Filtering.
+- [x] Dropzone.
+- [x] QA.
+
+## Client document management current final request
+- [x] Add metadata.
+- [x] Add filters.
+- [x] Add upload zone.
+- [x] Publish.
+
+## Final user request current checklist
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Tests.
+
+## Current project active enhancement
+- [x] Document taxonomy controls.
+- [x] Upload dropzone.
+- [x] Release validation.
+
+## Portal document organization current workstream
+- [x] Add categories/tags.
+- [x] Add filtering.
+- [x] Add drag/drop.
+- [x] QA.
+
+## Current request final implementation scope
+- [x] Categories/tags.
+- [x] Dropzone.
+- [x] Full validation.
+
+## Client portal document request final implementation
+- [x] Add category/tag support.
+- [x] Add drag/drop.
+- [x] Test/build/checkpoint.
+
+## Current task completion plan final
+- [x] Implement.
+- [x] Verify.
+- [x] Publish.
+
+## User request final task list current
+- [x] Categorize/tag uploads.
+- [x] Drag/drop uploads.
+- [x] QA.
+
+## Portal document enhancement final current
+- [x] Category/tag filters.
+- [x] Dropzone.
+- [x] Release.
+
+## Current workstream final tracker
+- [x] Document organization.
+- [x] Upload UX.
+- [x] Verification.
+
+## Client document workflow current active request
+- [x] Add categories/tags.
+- [x] Add filters.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Final current task implementation tracker
+- [x] Categories/tags.
+- [x] Drag/drop.
+- [x] Tests/build.
+
+## Current user request final implementation checklist
+- [x] Document categories.
+- [x] Document tags.
+- [x] Document filters.
+- [x] Document dropzone.
+- [x] Checkpoint.
+
+## Portal document management final workstream
+- [x] Taxonomy.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] QA.
+
+## Current project enhancement final task
+- [x] Add categories/tags.
+- [x] Add dropzone.
+- [x] Publish.
+
+## Client portal document feature final current status
+- [x] Category/tag feature.
+- [x] Upload zone.
+- [x] Regression.
+
+## User request final release scope
+- [x] Organize docs.
+- [x] Improve uploads.
+- [x] Verify.
+
+## Current active feature final task
+- [x] Category/tag metadata.
+- [x] Filter/search.
+- [x] Drag/drop.
+- [x] Test.
+
+## Portal document upload final release checklist
+- [x] Add taxonomy controls.
+- [x] Add upload zone.
+- [x] Full validation.
+
+## Current task final workstream
+- [x] Document categories/tags.
+- [x] Dropzone.
+- [x] Checkpoint.
+
+## Final current request delivery
+- [x] Implement.
+- [x] Validate.
+- [x] Publish.
+
+## Client portal document organization and upload current
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] QA.
+
+## Current user request feature work
+- [x] Document organization.
+- [x] Upload interaction.
+- [x] Release.
+
+## Final current active tasks
+- [x] Categories/tags.
+- [x] Search/filter.
+- [x] Drag/drop.
+- [x] Tests.
+
+## Portal document feature current task record
+- [x] Add category/tag controls.
+- [x] Add drag/drop.
+- [x] Publish.
+
+## Current request final release
+- [x] Category/tag functionality.
+- [x] Dropzone.
+- [x] Validation.
+
+## Client document workflow current final tracker
+- [x] Categories/tags.
+- [x] Filters.
+- [x] Dropzone.
+- [x] QA.
+
+## User request final current workstream
+- [x] Organize uploaded documents.
+- [x] Make uploading easier.
+- [x] Complete validation.
+
+## Final implementation tasks active
+- [x] Add document categories and tags.
+- [x] Add document

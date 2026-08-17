@@ -20,7 +20,19 @@ export type CraneAsset = { id: string; assetCode: string; name: string; capacity
 export type CrewMember = { id: string; name: string; designation: string; availability: Availability; certificateExpiry: string; trainingRequired: boolean };
 export type LiftingGear = { id: string; name: string; gearType: "Shackle" | "Sling" | "Spreader beam" | "Hook"; swlTons: number; inspectionExpiry: string };
 export type TrailerAsset = { id: string; plateNumber: string; trailerType: "Flatbed" | "Lowboy" | "Extendable"; status: "Available" | "Assigned" | "Off-Site" };
-export type DocumentItem = { id: string; departmentCode: DepartmentCode; name: string; state: DocumentState; expiryDate?: string; required: boolean };
+export type DocumentItem = {
+  id: string;
+  departmentCode: DepartmentCode;
+  name: string;
+  state: DocumentState;
+  expiryDate?: string;
+  required: boolean;
+  category?: string;
+  tags?: string[];
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+};
 export type ChatMessage = { id: string; team: "Documentation" | "HSE" | "Sales" | "Accounts" | "Operations Management"; sender: string; body: string; createdAt: string };
 export type Notification = { id: string; departmentCode: DepartmentCode; title: string; body: string; read: boolean; createdAt: string };
 export type BookingDossier = { id: string; clientName: string; projectName: string; projectManager: string; lpoReference: string; mobilizationDate: string; offHireDate: string; clientContactName: string; clientEmail: string; clientPhone: string; priority: PriorityTier; stage: BookingStage; craneId?: string; crewIds: string[]; gearIds: string[]; trailerIds: string[]; documents: DocumentItem[]; chat: ChatMessage[]; notifications: Notification[] };

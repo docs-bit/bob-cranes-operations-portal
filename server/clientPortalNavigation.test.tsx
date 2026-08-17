@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import "@testing-library/jest-dom/vitest";
 import React from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -70,6 +70,34 @@ describe("Client Response Portal navigation", () => {
     await user.click(previewButton);
     expect(screen.getByText(/document preview: site access pass/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /download file/i })).toBeInTheDocument();
+  });
+
+  it("filters documents by category and tag and accepts a dropped file", async () => {
+    const user = userEvent.setup();
+    const onUploadAll = vi.fn();
+    render(<ClientPortal
+      booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
+      documents={[
+        { id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Uploaded", required: true, category: "Access & Permits", tags: ["permit"] },
+        { id: "doc-2", departmentCode: "ACC", name: "Signed LPO", state: "Uploaded", required: true, category: "Commercial", tags: ["lpo"] },
+      ] as any}
+      onUpdate={vi.fn()}
+      onUploadAll={onUploadAll}
+      onBackToInternal={vi.fn()}
+    />);
+    await user.click(screen.getByRole("button", { name: /required documents/i }));
+    expect(screen.getByText("Site access pass")).toBeInTheDocument();
+    await user.selectOptions(screen.getByRole("combobox", { name: /filter documents by category/i }), "Access & Permits");
+    expect(screen.getByText("Site access pass")).toBeInTheDocument();
+    expect(screen.queryByText("Signed LPO")).not.toBeInTheDocument();
+    await user.selectOptions(screen.getByRole("combobox", { name: /filter documents by category/i }), "All categories");
+    await user.selectOptions(screen.getByRole("combobox", { name: /filter documents by tag/i }), "lpo");
+    expect(screen.getByText("Signed LPO")).toBeInTheDocument();
+    expect(screen.queryByText("Site access pass")).not.toBeInTheDocument();
+
+    const droppedFile = new File(["delivery note"], "delivery-note.pdf", { type: "application/pdf" });
+    fireEvent.drop(screen.getByRole("button", { name: /drag and drop client documents/i }), { dataTransfer: { files: [droppedFile] } });
+    expect(onUploadAll).toHaveBeenCalledWith([droppedFile]);
   });
 
   it("always exposes a header return control and invokes the internal navigation callback", async () => {

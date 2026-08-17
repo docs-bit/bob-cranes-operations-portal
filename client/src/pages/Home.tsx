@@ -516,6 +516,15 @@ export const gears: GearRecord[] = [
   },
 ];
 
+const CLIENT_DOCUMENT_CATEGORIES = [
+  "Safety & HSE",
+  "Commercial",
+  "Crew & Competency",
+  "Access & Permits",
+  "Transport & Delivery",
+  "Other",
+] as const;
+
 const initialUploadDocuments: DocumentItem[] = [
   {
     id: "doc-1",
@@ -523,6 +532,8 @@ const initialUploadDocuments: DocumentItem[] = [
     name: "Method statement",
     state: "Approved",
     required: true,
+    category: "Safety & HSE",
+    tags: ["method statement", "lift plan"],
   },
   {
     id: "doc-2",
@@ -530,6 +541,8 @@ const initialUploadDocuments: DocumentItem[] = [
     name: "Lift plan approval",
     state: "Approved",
     required: true,
+    category: "Safety & HSE",
+    tags: ["approval", "lift plan"],
   },
   {
     id: "doc-3",
@@ -537,6 +550,8 @@ const initialUploadDocuments: DocumentItem[] = [
     name: "Crew certificates",
     state: "Uploaded",
     required: true,
+    category: "Crew & Competency",
+    tags: ["crew", "certificates"],
   },
   {
     id: "doc-4",
@@ -544,6 +559,8 @@ const initialUploadDocuments: DocumentItem[] = [
     name: "Signed LPO · Rev. 2",
     state: "Uploaded",
     required: true,
+    category: "Commercial",
+    tags: ["lpo", "commercial"],
   },
   {
     id: "doc-5",
@@ -551,6 +568,8 @@ const initialUploadDocuments: DocumentItem[] = [
     name: "Site access pass",
     state: "Required",
     required: true,
+    category: "Access & Permits",
+    tags: ["site access", "permit"],
   },
   {
     id: "doc-6",
@@ -558,6 +577,8 @@ const initialUploadDocuments: DocumentItem[] = [
     name: "Trade license",
     state: "Uploaded",
     required: true,
+    category: "Commercial",
+    tags: ["trade license", "company"],
   },
   {
     id: "doc-7",
@@ -565,6 +586,8 @@ const initialUploadDocuments: DocumentItem[] = [
     name: "Delivery note",
     state: "Required",
     required: true,
+    category: "Transport & Delivery",
+    tags: ["delivery note", "transport"],
   },
 ];
 
@@ -5745,7 +5768,8 @@ type ClientPortalProps = {
   booking: Booking;
   documents: DocumentItem[];
   onUpdate: (booking: Booking) => void;
-  onUploadAll: (files?: File[]) => void;
+  onUploadAll: (files?: File[], documentId?: string) => void;
+  onUpdateDocuments?: (documents: DocumentItem[]) => void;
   onBackToInternal: () => void;
 };
 
@@ -5754,6 +5778,7 @@ export function ClientPortal({
   documents,
   onUpdate,
   onUploadAll,
+  onUpdateDocuments,
   onBackToInternal,
 }: ClientPortalProps) {
   const crews = legacyCrews;
@@ -5768,9 +5793,12 @@ export function ClientPortal({
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [feedbackEmail, setFeedbackEmail] = useState("");
   const [documentSearch, setDocumentSearch] = useState("");
+  const [documentCategory, setDocumentCategory] = useState("All categories");
+  const [documentTag, setDocumentTag] = useState("All tags");
   const [documentSort, setDocumentSort] = useState<
     "required" | "name" | "department"
   >("required");
+  const [documentOverrides, setDocumentOverrides] = useState<Record<string, Partial<DocumentItem>>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -5800,18 +5828,31 @@ export function ClientPortal({
           booking.progress,
           Math.round((uploadedDocs / documents.length) * 100)
         );
+  const documentRecords = useMemo(
+    () => documents.map(document => ({
+      ...document,
+      ...documentOverrides[document.id],
+      tags: documentOverrides[document.id]?.tags ?? document.tags ?? [],
+    })),
+    [documentOverrides, documents]
+  );
+  const availableDocumentTags = useMemo(
+    () => Array.from(new Set(documentRecords.flatMap(document => document.tags ?? []))).toSorted((left, right) => left.localeCompare(right)),
+    [documentRecords]
+  );
   const visibleClientDocuments = useMemo(() => {
     const query = documentSearch.trim().toLocaleLowerCase();
     const stateRank = (state: DocumentItem["state"]) =>
       state === "Required" ? 0 : state === "Revision Required" ? 1 : 2;
-    return documents
-      .filter(
-        document =>
-          !query ||
-          `${document.name} ${document.departmentCode} ${document.state}`
-            .toLocaleLowerCase()
-            .includes(query)
-      )
+    return documentRecords
+      .filter(document => {
+        const haystack = `${document.name} ${document.departmentCode} ${document.state} ${document.category ?? ""} ${(document.tags ?? []).join(" ")}`.toLocaleLowerCase();
+        return (
+          (!query || haystack.includes(query)) &&
+          (documentCategory === "All categories" || document.category === documentCategory) &&
+          (documentTag === "All tags" || (document.tags ?? []).includes(documentTag))
+        );
+      })
       .toSorted((left, right) => {
         if (documentSort === "name") return left.name.localeCompare(right.name);
         if (documentSort === "department")
@@ -5824,7 +5865,22 @@ export function ClientPortal({
           left.name.localeCompare(right.name)
         );
       });
-  }, [documentSearch, documentSort, documents]);
+  }, [documentCategory, documentRecords, documentSearch, documentSort, documentTag]);
+  const updateDocumentMetadata = (documentId: string, patch: Partial<DocumentItem>) => {
+    setDocumentOverrides(current => ({
+      ...current,
+      [documentId]: {
+        ...current[documentId],
+        ...patch,
+        ...(patch.tags ? { tags: Array.from(new Set(patch.tags.map(tag => tag.trim()).filter(Boolean))) } : {}),
+      },
+    }));
+    onUpdateDocuments?.(documents.map(document =>
+      document.id === documentId
+        ? { ...document, ...patch, tags: patch.tags ?? document.tags ?? [] }
+        : document
+    ));
+  };
   const sendMessage = () => {
     if (!message.trim()) return;
     setMessages(current => [
@@ -5892,7 +5948,8 @@ export function ClientPortal({
   };
 
   const resetDocument = (docName: string) => {
-    onUploadAll([]);
+    const documentId = documents.find(document => document.name === docName)?.id;
+    onUploadAll([], documentId);
     notify(`Reset ${docName}. You can upload a replacement file.`);
   };
   const submitDocuments = () => {
@@ -6188,6 +6245,17 @@ export function ClientPortal({
                 )}
                 <div
                   className={`client-drop-zone ${isDraggingOver ? "drag-over" : ""}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Drag and drop client documents or browse files"
+                  onClick={uploadBatch}
+                  onKeyDown={event => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      uploadBatch();
+                    }
+                  }}
+                  onDragEnter={handleDragOver}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
@@ -6199,14 +6267,16 @@ export function ClientPortal({
                     background: isDraggingOver ? "rgba(33, 124, 100, 0.08)" : "rgba(248, 250, 252, 0.6)",
                     marginBottom: "14px",
                     transition: "all 0.2s ease",
+                    cursor: pendingDocs.length === 0 || isUploading ? "default" : "pointer",
+                    outline: "none",
                   }}
                 >
                   <CloudUpload size={24} color="#217c64" style={{ marginBottom: "6px" }} />
                   <div style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937" }}>
-                    Drag and drop your files here
+                    {isDraggingOver ? "Release to upload your files" : "Drag and drop your files here"}
                   </div>
                   <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>
-                    Supports PDF, JPG, PNG (up to 25MB)
+                    or click to browse · Supports PDF, JPG, PNG (up to 25MB)
                   </div>
                 </div>
                 {isUploading && (
@@ -6230,7 +6300,7 @@ export function ClientPortal({
                     mirrors the Drive archive.
                   </div>
                 </div>
-                <div className="account-toolbar" style={{ marginBottom: 14 }}>
+                <div className="account-toolbar" style={{ marginBottom: 14, alignItems: "end" }}>
                   <label className="form-field" style={{ flex: 1 }}>
                     <span>Find a document</span>
                     <div className="input-icon-wrap">
@@ -6238,27 +6308,42 @@ export function ClientPortal({
                       <input
                         className="form-input"
                         value={documentSearch}
-                        onChange={event =>
-                          setDocumentSearch(event.target.value)
-                        }
-                        placeholder="Search name, department, or status"
+                        onChange={event => setDocumentSearch(event.target.value)}
+                        placeholder="Search name, department, category, or tag"
                         aria-label="Search required documents"
                       />
                     </div>
+                  </label>
+                  <label className="form-field">
+                    <span>Category</span>
+                    <select
+                      className="form-select"
+                      value={documentCategory}
+                      onChange={event => setDocumentCategory(event.target.value)}
+                      aria-label="Filter documents by category"
+                    >
+                      <option>All categories</option>
+                      {CLIENT_DOCUMENT_CATEGORIES.map(category => <option key={category}>{category}</option>)}
+                    </select>
+                  </label>
+                  <label className="form-field">
+                    <span>Tag</span>
+                    <select
+                      className="form-select"
+                      value={documentTag}
+                      onChange={event => setDocumentTag(event.target.value)}
+                      aria-label="Filter documents by tag"
+                    >
+                      <option>All tags</option>
+                      {availableDocumentTags.map(tag => <option key={tag}>{tag}</option>)}
+                    </select>
                   </label>
                   <label className="form-field">
                     <span>Sort by</span>
                     <select
                       className="form-select"
                       value={documentSort}
-                      onChange={event =>
-                        setDocumentSort(
-                          event.target.value as
-                            | "required"
-                            | "name"
-                            | "department"
-                        )
-                      }
+                      onChange={event => setDocumentSort(event.target.value as "required" | "name" | "department")}
                       aria-label="Sort required documents"
                     >
                       <option value="required">Action needed first</option>
@@ -6266,6 +6351,26 @@ export function ClientPortal({
                       <option value="department">Department</option>
                     </select>
                   </label>
+                  {(documentSearch || documentCategory !== "All categories" || documentTag !== "All tags") && (
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => {
+                        setDocumentSearch("");
+                        setDocumentCategory("All categories");
+                        setDocumentTag("All tags");
+                      }}
+                      aria-label="Clear document filters"
+                      style={{ height: 38, padding: "0 10px" }}
+                    >
+                      <X size={14} /> Clear
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }} aria-label="Active document filters">
+                  {documentCategory !== "All categories" && <span className="status-badge blue">Category: {documentCategory}</span>}
+                  {documentTag !== "All tags" && <span className="status-badge green">Tag: {documentTag}</span>}
+                  <span className="status-badge gray">{visibleClientDocuments.length} of {documentRecords.length} documents</span>
                 </div>
                 <div className="compliance-list">
                   {visibleClientDocuments.map(doc => {
@@ -6303,8 +6408,36 @@ export function ClientPortal({
                           <div style={{ minWidth: 0 }}>
                             <div className="compliance-name" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.name}</div>
                             <div className="compliance-sub">
-                              {doc.departmentCode} · client upload · synced to
-                              Drive
+                              {doc.departmentCode} · client upload · synced to Drive
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+                              <select
+                                className="form-select"
+                                value={doc.category ?? "Other"}
+                                onChange={event => updateDocumentMetadata(doc.id, { category: event.target.value })}
+                                aria-label={`Category for ${doc.name}`}
+                                style={{ height: 28, minWidth: 132, padding: "0 7px", fontSize: 11 }}
+                              >
+                                {CLIENT_DOCUMENT_CATEGORIES.map(category => <option key={category}>{category}</option>)}
+                              </select>
+                              {(doc.tags ?? []).map(tag => <span className="status-badge gray" key={`${doc.id}-${tag}`}>{tag}</span>)}
+                              <input
+                                className="form-input"
+                                defaultValue=""
+                                placeholder="Add tag"
+                                aria-label={`Add tag to ${doc.name}`}
+                                onKeyDown={event => {
+                                  if (event.key === "Enter") {
+                                    event.preventDefault();
+                                    const nextTag = event.currentTarget.value.trim();
+                                    if (nextTag) {
+                                      updateDocumentMetadata(doc.id, { tags: [...(doc.tags ?? []), nextTag] });
+                                      event.currentTarget.value = "";
+                                    }
+                                  }
+                                }}
+                                style={{ height: 28, width: 92, padding: "0 7px", fontSize: 11 }}
+                              />
                             </div>
                           </div>
                         </div>
@@ -8184,14 +8317,24 @@ export default function Home() {
         booking={clientBooking}
         documents={uploadDocuments}
         onUpdate={updateBooking}
-        onUploadAll={files =>
+        onUpdateDocuments={setUploadDocuments}
+        onUploadAll={(files, documentId) =>
           setUploadDocuments(current => {
-            const uploadCount = files?.length ?? current.filter(doc => doc.state === "Required").length;
+            if (documentId && (!files || files.length === 0)) {
+              return current.map(doc =>
+                doc.id === documentId
+                  ? { ...doc, state: "Required", fileName: undefined, fileType: undefined, fileSize: undefined }
+                  : doc
+              );
+            }
+            const filesToUpload = files ?? [];
+            if (filesToUpload.length === 0) return current;
             let uploaded = 0;
             return current.map(doc => {
-              if (doc.state !== "Required" || uploaded >= uploadCount) return doc;
+              if (doc.state !== "Required" || uploaded >= filesToUpload.length) return doc;
+              const file = filesToUpload[uploaded];
               uploaded += 1;
-              return { ...doc, state: "Uploaded" };
+              return { ...doc, state: "Uploaded", fileName: file.name, fileType: file.type, fileSize: file.size };
             });
           })
         }
