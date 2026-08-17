@@ -407,3 +407,9 @@
 - [x] Implement fine-grained route-level code splitting for departmental portals.
 - [x] Add an automated Lighthouse performance check script for CI.
 - [x] Run test suite, production build, and publish final optimized release.
+
+## Public-page fetch mutation failure bugfix
+- [x] Reproduce and isolate the cause of `TRPCClientError: Failed to fetch` on signed-out pages.
+- [x] Ensure PerformanceTelemetry and RuntimeErrorReporter gracefully handle server connection states or route calls only when appropriate.
+- [x] Add unit test coverage and verify the public rental landing page mutation flow.
+- [x] Build, checkpoint, and deliver the fixed release.

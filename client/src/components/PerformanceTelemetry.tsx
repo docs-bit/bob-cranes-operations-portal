@@ -1,42 +1,45 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 
 export default function PerformanceTelemetry() {
   const capture = trpc.runtimeMonitoring.capture.useMutation();
+  const reportedRef = useRef(new Set<string>());
 
   useEffect(() => {
     if (typeof window === "undefined" || !("PerformanceObserver" in window)) return;
 
+    const sendMetric = (metricName: string, value: string) => {
+      const key = `${metricName}:${window.location.pathname}`;
+      if (reportedRef.current.has(key)) return;
+      reportedRef.current.add(key);
+      try {
+        capture.mutate({
+          source: "window.error",
+          message: `[Performance Metric] ${metricName}: ${value}`,
+          path: window.location.pathname.slice(0, 512),
+        });
+      } catch {
+        // Silently ignore network failures during background telemetry.
+      }
+    };
+
     try {
-      // Largest Contentful Paint (LCP)
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
         if (lastEntry) {
-          const lcpValue = Math.round(lastEntry.startTime);
-          capture.mutate({
-            source: "window.error",
-            message: `[Performance Metric] LCP: ${lcpValue}ms`,
-            path: window.location.pathname.slice(0, 512),
-          });
+          sendMetric("LCP", `${Math.round(lastEntry.startTime)}ms`);
         }
       });
       lcpObserver.observe({ type: "largest-contentful-paint", buffered: true });
 
-      // First Input Delay (FID)
       const fidObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          const fidValue = Math.round((entry as PerformanceEventTiming).processingStart - entry.startTime);
-          capture.mutate({
-            source: "window.error",
-            message: `[Performance Metric] FID: ${fidValue}ms`,
-            path: window.location.pathname.slice(0, 512),
-          });
+          sendMetric("FID", `${Math.round((entry as PerformanceEventTiming).processingStart - entry.startTime)}ms`);
         }
       });
       fidObserver.observe({ type: "first-input", buffered: true });
 
-      // Cumulative Layout Shift (CLS)
       let clsValue = 0;
       const clsObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries() as any[]) {
@@ -44,11 +47,7 @@ export default function PerformanceTelemetry() {
             clsValue += entry.value;
           }
         }
-        capture.mutate({
-          source: "window.error",
-          message: `[Performance Metric] CLS: ${clsValue.toFixed(3)}`,
-          path: window.location.pathname.slice(0, 512),
-        });
+        sendMetric("CLS", clsValue.toFixed(3));
       });
       clsObserver.observe({ type: "layout-shift", buffered: true });
 
@@ -58,7 +57,7 @@ export default function PerformanceTelemetry() {
         clsObserver.disconnect();
       };
     } catch {
-      // Fallback for browsers with restricted PerformanceObserver types.
+      // Fallback for restricted observer environments.
     }
   }, [capture]);
 
