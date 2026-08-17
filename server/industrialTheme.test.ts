@@ -17,5 +17,8 @@ describe("light equipment-operations portal theme", () => {
     expect(css).toContain(".analytics-progress-board, .reference-progress-board, .client-reference-progress");
     expect(css).toContain(".auth-visual {");
     expect(css).toContain("@media (prefers-reduced-motion: no-preference)");
+    expect(css).toContain("transition: background-color 220ms ease");
+    expect(css).toContain(".dashboard-summary-card::after");
+    expect(css).toContain("@media (prefers-reduced-motion: reduce)");
   });
 });

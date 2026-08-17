@@ -1779,3 +1779,66 @@ body,
 .dark .dashboard-summary-card small { color: #a9bdb6; }
 .dark .dashboard-summary-card-icon { background: #27483d; color: #8ad6ba; }
 .dark .header-theme-toggle { color: #d9eee6; }
+
+/* Accessible motion and contextual guidance for interactive operations surfaces. */
+html,
+body,
+#root,
+button,
+input,
+select,
+textarea,
+.panel,
+.card,
+.dashboard-summary-widget,
+.dashboard-summary-card,
+.sidebar,
+.topbar,
+.content {
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.dashboard-summary-card {
+  position: relative;
+  isolation: isolate;
+}
+.dashboard-summary-card::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  z-index: 10;
+  left: 14px;
+  bottom: calc(100% + 9px);
+  max-width: 260px;
+  padding: 7px 9px;
+  border: 1px solid rgba(31, 54, 47, .16);
+  border-radius: 8px;
+  background: #1b2b26;
+  color: #f8fffc;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: .01em;
+  box-shadow: 0 8px 20px rgba(12, 30, 24, .18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.dashboard-summary-card:hover::after,
+.dashboard-summary-card:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+.dashboard-summary-card:focus-visible {
+  outline: 3px solid rgba(43, 135, 106, .32);
+  outline-offset: 3px;
+}
+.dark .dashboard-summary-card::after {
+  background: #e4f3ed;
+  color: #1a3028;
+  border-color: rgba(223, 242, 234, .18);
+}
+@media (prefers-reduced-motion: reduce) {
+  html, body, #root, button, input, select, textarea, .panel, .card, .dashboard-summary-widget, .dashboard-summary-card, .sidebar, .topbar, .content { transition: none; }
+  .dashboard-summary-card::after { transition: none; }
+}

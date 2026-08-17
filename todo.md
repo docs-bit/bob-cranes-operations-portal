@@ -544,3 +544,9 @@
 - [x] Implement filtered booking PDF export alongside existing CSV export.
 - [x] Create and validate the updated reusable workflow skill package.
 - [x] Add regression test assertions, run test suite, verify build, and publish release.
+
+## Branded PDF header, card tooltips, and smooth theme transitions
+- [x] Add logo and generated timestamp to the exported PDF document header.
+- [x] Add hover animations and descriptive tooltips to dashboard summary cards.
+- [x] Implement smooth CSS transition animations across light, dark, and system themes.
+- [x] Add regression assertions, run test suite, verify build, and publish release.

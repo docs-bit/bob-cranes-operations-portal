@@ -86,6 +86,7 @@ import DataUploadCenter, {
 } from "@/components/DataUploadCenter";
 import SupervisorPermissionsAudit from "@/components/SupervisorPermissionsAudit";
 import { generateDispatchBundlePdf } from "@/lib/dispatchBundlePdf";
+import { embedBobFullLogo, drawBobDocumentLogo } from "@/lib/pdfBrand";
 import * as XLSX from "xlsx";
 import DepartmentUsersView from "@/components/DepartmentUsersView";
 import SalesEnquiryInbox from "@/components/SalesEnquiryInbox";
@@ -2080,12 +2081,12 @@ function Overview({
       <section className="dashboard-summary-widget" aria-label="Operations quick summary" data-testid="operations-quick-summary">
         <div className="dashboard-summary-widget-heading"><div><span className="eyebrow">Quick pulse</span><h2>Today’s capacity at a glance</h2></div><span className="status-badge green">Live</span></div>
         <div className="dashboard-summary-widget-grid">
-          <button type="button" className="dashboard-summary-card" onClick={() => setView("bookings")}>
+          <button type="button" className="dashboard-summary-card" onClick={() => setView("bookings")} aria-label="Open Booking Dossiers filtered to active bookings" data-tooltip="Open Booking Dossiers · active bookings">
             <span className="dashboard-summary-card-icon"><ClipboardCheck size={17} /></span>
             <span><strong>{activeDossiers.length}</strong><small>active bookings</small></span>
             <ArrowRight size={15} aria-hidden="true" />
           </button>
-          <button type="button" className="dashboard-summary-card" onClick={() => setView("crew")}>
+          <button type="button" className="dashboard-summary-card" onClick={() => setView("crew")} aria-label="Open Crew Assignment filtered to crew available today" data-tooltip="Open Crew Assignment · available today">
             <span className="dashboard-summary-card-icon"><Users size={17} /></span>
             <span><strong>{availableCrew.length}<small> / {ATTENDANCE_CREW_ROSTER.length}</small></strong><small>crew available today</small></span>
             <ArrowRight size={15} aria-hidden="true" />
@@ -2533,15 +2534,20 @@ function BookingsView({
 
   const exportBookingsPdf = async () => {
     try {
-      const { PDFDocument, rgb } = await import("pdf-lib");
+      const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
       const pdfDoc = await PDFDocument.create();
+      const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const logo = await embedBobFullLogo(pdfDoc);
       let page = pdfDoc.addPage([842, 595]); // A4 landscape
       const { height } = page.getSize();
+      const logoWidth = drawBobDocumentLogo({ page, logo, bold, x: 40, y: height - 88, maxWidth: 150, maxHeight: 54 });
+      const headerX = 40 + logoWidth + 18;
+      const generatedAt = new Date().toLocaleString();
       
-      page.drawText("BOB Cranes — Filtered Booking Dossiers Report", { x: 40, y: height - 40, size: 18, color: rgb(0.12, 0.35, 0.28) });
-      page.drawText(`Generated: ${new Date().toLocaleString()} · Filter: ${filter} · Sorted: ${sortBy} · Total: ${visibleBookings.length} dossiers`, { x: 40, y: height - 62, size: 10, color: rgb(0.4, 0.4, 0.4) });
+      page.drawText("Filtered Booking Dossiers Report", { x: headerX, y: height - 45, size: 18, color: rgb(0.12, 0.35, 0.28) });
+      page.drawText(`Generated: ${generatedAt} · Filter: ${filter} · Sorted: ${sortBy} · Total: ${visibleBookings.length} dossiers`, { x: headerX, y: height - 66, size: 10, color: rgb(0.4, 0.4, 0.4) });
       
-      let y = height - 95;
+      let y = height - 118;
       page.drawText("ID", { x: 40, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
       page.drawText("Client / Project", { x: 120, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
       page.drawText("Crane & Site", { x: 320, y, size: 10, color: rgb(0.2, 0.2, 0.2) });

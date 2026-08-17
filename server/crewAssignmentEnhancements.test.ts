@@ -56,6 +56,10 @@ describe("Crew Assignment enhancements", () => {
     expect(home).toContain("active bookings");
     expect(home).toContain("crew available today");
     expect(home).toContain('aria-label={`Switch application to ${theme === "dark" ? "light" : "dark"} mode`}');
+    expect(home).toContain("embedBobFullLogo");
+    expect(home).toContain("Generated: ${generatedAt}");
+    expect(home).toContain('data-tooltip="Open Booking Dossiers · active bookings"');
+    expect(home).toContain('data-tooltip="Open Crew Assignment · available today"');
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {
