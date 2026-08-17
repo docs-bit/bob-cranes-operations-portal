@@ -432,3 +432,10 @@
 - [x] Implement departmental workspace skeleton loading screens for smooth perceived chunk loading.
 - [x] Add date range filter and CSV export button to WebVitalsAnalyticsView.
 - [x] Run full test suite, production build, and publish final repaired release.
+
+## Visual analytics and workspace experience
+- [x] Create and validate a reusable skill for Web Vitals telemetry, operational workspace controls, and release verification.
+- [x] Add visual Web Vitals trend charts that respect the selected analytics date range.
+- [x] Add an accessible persistent dark-mode toggle for departmental workspace views.
+- [x] Add workspace search and advanced filtering controls for operational data.
+- [x] Add focused regression coverage, validate the reusable skill, build, and publish the release.

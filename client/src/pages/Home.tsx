@@ -3,6 +3,7 @@ import { toast, toast as globalToast } from "sonner";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   canDispatch as canDispatchByRule,
   departmentCompletion,
@@ -88,6 +89,8 @@ import { generateDispatchBundlePdf } from "@/lib/dispatchBundlePdf";
 import * as XLSX from "xlsx";
 import DepartmentUsersView from "@/components/DepartmentUsersView";
 import SalesEnquiryInbox from "@/components/SalesEnquiryInbox";
+import WorkspaceLoadingSkeleton from "@/components/WorkspaceLoadingSkeleton";
+import WebVitalsAnalyticsView from "@/components/WebVitalsAnalyticsView";
 import "./DepartmentWorkspace.css";
 import {
   AlertTriangle,
@@ -118,11 +121,14 @@ import {
   MapPin,
   MessageCircle,
   MoreHorizontal,
+  Moon,
   Plus,
   Search,
   Send,
   Settings,
   ShieldCheck,
+  Sun,
+  TrendingUp,
   Truck,
   Users,
   UserCog,
@@ -156,7 +162,8 @@ type View =
   | "provisioned-dashboard"
   | "sales-enquiries"
   | "users"
-  | "supervisor-audit";
+  | "supervisor-audit"
+  | "web-vitals";
 
 type Booking = {
   id: string;
@@ -659,6 +666,7 @@ export function Shell({
   };
   onSignOut: () => Promise<void>;
 }) {
+  const { theme, toggleTheme } = useTheme();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [moreActionsOpen, setMoreActionsOpen] = useState(false);
@@ -922,6 +930,13 @@ export function Shell({
                 <span>Supervisor Audit</span>
               </button>
               <button
+                className={`nav-item ${view === "web-vitals" ? "active" : ""}`}
+                onClick={() => setView("web-vitals")}
+              >
+                <TrendingUp />
+                <span>Web Vitals Analytics</span>
+              </button>
+              <button
                 className="nav-item"
                 onClick={() => {
                   setProfileOpen(false);
@@ -972,6 +987,16 @@ export function Shell({
           )}
         </nav>
         <div className="sidebar-footer">
+          <button
+            type="button"
+            className="workspace-theme-toggle"
+            onClick={toggleTheme}
+            aria-pressed={theme === "dark"}
+            aria-label={`Switch departmental workspace to ${theme === "dark" ? "light" : "dark"} mode`}
+          >
+            {theme === "dark" ? <Sun size={15} aria-hidden="true" /> : <Moon size={15} aria-hidden="true" />}
+            <span>{theme === "dark" ? "Light workspace" : "Dark workspace"}</span>
+          </button>
           <div className="profile-menu-wrap">
             <button
               className="user-mini"
@@ -6821,6 +6846,9 @@ function DepartmentView({
   ) => void;
   completedWorkstreams: Record<string, string[]>;
 }) {
+  const [workspaceQuery, setWorkspaceQuery] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<"all" | Booking["priority"]>("all");
+  const [readinessFilter, setReadinessFilter] = useState<"all" | "ready" | "action">("all");
   const departmentCode =
     DEPARTMENT_LABEL_TO_CODE[department] ?? "administrator";
   const config =
@@ -6850,6 +6878,16 @@ function DepartmentView({
     booking.stage === config.secondaryStage
       ? config.secondaryNextStage
       : config.nextStage;
+  const visibleQueue = queue.filter(booking => {
+    const searchText = `${booking.id} ${booking.client} ${booking.project} ${booking.site} ${booking.crane}`.toLowerCase();
+    const matchesQuery = searchText.includes(workspaceQuery.trim().toLowerCase());
+    const matchesPriority = priorityFilter === "all" || booking.priority === priorityFilter;
+    const isReady = config.parallelCode
+      ? Boolean(completedWorkstreams[booking.id]?.includes(config.parallelCode))
+      : Boolean(nextStageFor(booking));
+    const matchesReadiness = readinessFilter === "all" || (readinessFilter === "ready" ? isReady : !isReady);
+    return matchesQuery && matchesPriority && matchesReadiness;
+  });
   return (
     <div className="content">
       <PageHeading
@@ -6947,9 +6985,31 @@ function DepartmentView({
             />
           </div>
           <div className="panel-body">
+            <div className="department-workspace-toolbar" role="search" aria-label={`${config.label} operations search and filters`}>
+              <label className="department-workspace-search">
+                <Search size={15} aria-hidden="true" />
+                <input
+                  value={workspaceQuery}
+                  onChange={event => setWorkspaceQuery(event.target.value)}
+                  placeholder="Search dossier, client, site or crane"
+                  aria-label="Search operational queue"
+                />
+              </label>
+              <select value={priorityFilter} onChange={event => setPriorityFilter(event.target.value as "all" | Booking["priority"])} aria-label="Filter by priority">
+                <option value="all">All priorities</option>
+                <option value="High">High priority</option>
+                <option value="Standard">Standard priority</option>
+              </select>
+              <select value={readinessFilter} onChange={event => setReadinessFilter(event.target.value as "all" | "ready" | "action")} aria-label="Filter by readiness">
+                <option value="all">All readiness</option>
+                <option value="ready">Ready to act</option>
+                <option value="action">Needs action</option>
+              </select>
+              <span className="department-filter-result" aria-live="polite">{visibleQueue.length} of {queue.length} dossiers</span>
+            </div>
             <div className="compliance-list">
-              {queue.length ? (
-                queue.map(booking => {
+              {visibleQueue.length ? (
+                visibleQueue.map(booking => {
                   const parallelDone = config.parallelCode
                     ? completedWorkstreams[booking.id]?.includes(
                         config.parallelCode
@@ -7040,7 +7100,7 @@ function DepartmentView({
                 })
               ) : (
                 <div className="empty-state">
-                  No dossiers are waiting at this stage gate.
+                  {queue.length ? "No dossiers match the selected search and filters." : "No dossiers are waiting at this stage gate."}
                 </div>
               )}
             </div>
@@ -7265,6 +7325,7 @@ export default function Home() {
               ? "gear"
               : "overview"
   );
+  const [workspaceLoading, setWorkspaceLoading] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [uploadDocuments, setUploadDocuments] = useState<DocumentItem[]>(
     initialUploadDocuments
@@ -7324,6 +7385,15 @@ export default function Home() {
   const [completedWorkstreams, setCompletedWorkstreams] = useState<
     Record<string, string[]>
   >({});
+  useEffect(() => {
+    if (view !== "department" && view !== "provisioned-dashboard") {
+      setWorkspaceLoading(false);
+      return;
+    }
+    setWorkspaceLoading(true);
+    const timer = window.setTimeout(() => setWorkspaceLoading(false), 160);
+    return () => window.clearTimeout(timer);
+  }, [activeDepartment, activeProvisionedDepartmentCode, view]);
   const updateBooking = (nextBooking: Booking) => {
     setBookings(current =>
       current.map(item => (item.id === nextBooking.id ? nextBooking : item))
@@ -7456,6 +7526,7 @@ export default function Home() {
     if (nextView === "sales-enquiries") {
       return Boolean(user && (user.role === "admin" || user.departmentCode === "sales"));
     }
+    if (nextView === "web-vitals") return Boolean(user?.role === "admin");
     if (nextView === "provisioned-dashboard") {
       return Boolean(user && activeProvisionedDepartmentCode && canAccessProvisionedDepartmentDashboard(user, activeProvisionedDepartmentCode));
     }
@@ -7615,8 +7686,11 @@ export default function Home() {
       {view === "supervisor-audit" && user.role === "admin" && (
         <SupervisorPermissionsAudit />
       )}
+      {view === "web-vitals" && user.role === "admin" && (
+        <WebVitalsAnalyticsView />
+      )}
       {view === "department" && activeDepartment && (
-        <>
+        workspaceLoading ? <WorkspaceLoadingSkeleton title={`Loading ${activeDepartment} workspace…`} /> : <>
           {activeDepartment === "Transportation" && (
             <TransportationFleetPanel />
           )}
@@ -7631,7 +7705,7 @@ export default function Home() {
         </>
       )}
       {view === "provisioned-dashboard" && activeProvisionedDashboard && (
-        <ProvisionedDepartmentDashboard
+        workspaceLoading ? <WorkspaceLoadingSkeleton title={`Loading ${activeProvisionedDashboard.name} workspace…`} /> : <ProvisionedDepartmentDashboard
           dashboard={activeProvisionedDashboard}
           bookings={bookings}
           canManageTeam={user.role === "admin" || user.role === "supervisor"}
