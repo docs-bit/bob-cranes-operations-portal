@@ -426,3 +426,9 @@
 - [x] Create dedicated `telemetry_events` table migration and database helpers.
 - [x] Update WebVitalsAnalyticsView and routers to persist and query dedicated telemetry rows.
 - [x] Run full test suite, migration verification, production build, and publish final release.
+
+## Telemetry Fix, Workspace Skeletons, & Analytics Enhancements
+- [x] Create and apply database migration for `telemetry_events` table so inserts succeed in production.
+- [x] Implement departmental workspace skeleton loading screens for smooth perceived chunk loading.
+- [x] Add date range filter and CSV export button to WebVitalsAnalyticsView.
+- [x] Run full test suite, production build, and publish final repaired release.
