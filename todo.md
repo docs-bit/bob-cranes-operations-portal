@@ -459,3 +459,9 @@
 - [x] Add a Web Vitals threshold summary table below trend charts displaying good, needs-improvement, and poor sample counts.
 - [x] Update and re-validate the reusable performance-workspace-operations skill package.
 - [x] Run test suite, production build, skill validation, and publish final verified release.
+
+## Slash Shortcut, Recent Searches, and Period Comparisons
+- [x] Add global `/` keyboard shortcut to focus the departmental search input.
+- [x] Add a clear-search button and persistent recent search history dropdown in departmental search.
+- [x] Add previous-period percentage change comparisons to the Web Vitals threshold summary table.
+- [x] Run test suite, production build, and publish final verified release.

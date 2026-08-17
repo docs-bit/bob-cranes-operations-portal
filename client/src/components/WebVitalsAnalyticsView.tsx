@@ -82,10 +82,31 @@ export default function WebVitalsAnalyticsView() {
     }));
   }, [filteredMetrics]);
 
-  const valuesFor = (name: "LCP" | "FID" | "CLS") => filteredMetrics.filter(metric => metric.metricName === name).map(metric => metricNumber(metric.metricValue)).filter(value => !Number.isNaN(value));
-  const lcpValues = valuesFor("LCP");
-  const fidValues = valuesFor("FID");
-  const clsValues = valuesFor("CLS");
+  const valuesFor = (source: typeof filteredMetrics, name: "LCP" | "FID" | "CLS") => source.filter(metric => metric.metricName === name).map(metric => metricNumber(metric.metricValue)).filter(value => !Number.isNaN(value));
+  const lcpValues = valuesFor(filteredMetrics, "LCP");
+  const fidValues = valuesFor(filteredMetrics, "FID");
+  const clsValues = valuesFor(filteredMetrics, "CLS");
+  const previousPeriodBounds = useMemo(() => {
+    const now = Date.now();
+    if (dateRange === "all") return null;
+    if (dateRange === "today") return { start: now - 2 * 86_400_000, end: now - 86_400_000 };
+    if (dateRange === "7days") return { start: now - 14 * 86_400_000, end: now - 7 * 86_400_000 };
+    const start = customStartDate ? new Date(`${customStartDate}T00:00:00`).getTime() : NaN;
+    const end = customEndDate ? new Date(`${customEndDate}T23:59:59.999`).getTime() : NaN;
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start > end) return null;
+    const span = end - start + 1;
+    return { start: start - span, end: start - 1 };
+  }, [customEndDate, customStartDate, dateRange]);
+  const previousPeriodMetrics = useMemo(() => {
+    if (!previousPeriodBounds) return [];
+    return metrics.filter(metric => {
+      const capturedAt = new Date(metric.createdAt).getTime();
+      return capturedAt >= previousPeriodBounds.start && capturedAt <= previousPeriodBounds.end;
+    });
+  }, [metrics, previousPeriodBounds]);
+  const previousLcpValues = valuesFor(previousPeriodMetrics, "LCP");
+  const previousFidValues = valuesFor(previousPeriodMetrics, "FID");
+  const previousClsValues = valuesFor(previousPeriodMetrics, "CLS");
   const thresholdCounts = (dataKey: TrendKey, values: number[]) => {
     const threshold = VITAL_THRESHOLDS[dataKey];
     return {
@@ -94,10 +115,16 @@ export default function WebVitalsAnalyticsView() {
       poor: values.filter(value => value > threshold.needsImprovement).length,
     };
   };
+  const percentageChange = (current: number, previous: number) => {
+    if (previousPeriodBounds === null) return "N/A";
+    if (previous === 0) return current === 0 ? "0%" : "New";
+    const change = ((current - previous) / previous) * 100;
+    return `${change > 0 ? "+" : ""}${change.toFixed(1)}%`;
+  };
   const thresholdRows = [
-    { name: "LCP", dataKey: "lcp" as TrendKey, suffix: "ms", counts: thresholdCounts("lcp", lcpValues) },
-    { name: "FID", dataKey: "fid" as TrendKey, suffix: "ms", counts: thresholdCounts("fid", fidValues) },
-    { name: "CLS", dataKey: "cls" as TrendKey, suffix: "", counts: thresholdCounts("cls", clsValues) },
+    { name: "LCP", dataKey: "lcp" as TrendKey, suffix: "ms", counts: thresholdCounts("lcp", lcpValues), samples: lcpValues.length, previousSamples: previousLcpValues.length },
+    { name: "FID", dataKey: "fid" as TrendKey, suffix: "ms", counts: thresholdCounts("fid", fidValues), samples: fidValues.length, previousSamples: previousFidValues.length },
+    { name: "CLS", dataKey: "cls" as TrendKey, suffix: "", counts: thresholdCounts("cls", clsValues), samples: clsValues.length, previousSamples: previousClsValues.length },
   ];
 
   const formatTrendValue = (value: unknown, dataKey: TrendKey, suffix: string) => {
@@ -291,7 +318,7 @@ export default function WebVitalsAnalyticsView() {
         <div className="web-vitals-chart-grid"><TrendChart dataKey="lcp" label="Largest Contentful Paint" suffix="ms" /><TrendChart dataKey="fid" label="First Input Delay" suffix="ms" /><TrendChart dataKey="cls" label="Cumulative Layout Shift" /></div>
         <div className="web-vitals-threshold-summary" aria-labelledby="web-vitals-threshold-summary-title">
           <div className="web-vitals-summary-heading"><div><h2 id="web-vitals-threshold-summary-title">Threshold summary</h2><p>Sample counts for the selected reporting period.</p></div><span>{filteredMetrics.length} total samples</span></div>
-          <div className="table-scroll"><table><thead><tr><th scope="col">Metric</th><th scope="col">Good</th><th scope="col">Needs improvement</th><th scope="col">Poor</th><th scope="col">Thresholds</th></tr></thead><tbody>{thresholdRows.map(row => <tr key={row.name}><th scope="row">{row.name}</th><td><span className="threshold-count good">{row.counts.good}</span></td><td><span className="threshold-count warning">{row.counts.needsImprovement}</span></td><td><span className="threshold-count poor">{row.counts.poor}</span></td><td>Good ≤ {formatTrendValue(VITAL_THRESHOLDS[row.dataKey].good, row.dataKey, row.suffix)} · Needs improvement ≤ {formatTrendValue(VITAL_THRESHOLDS[row.dataKey].needsImprovement, row.dataKey, row.suffix)}</td></tr>)}</tbody></table></div>
+          <div className="table-scroll"><table><thead><tr><th scope="col">Metric</th><th scope="col">Good</th><th scope="col">Needs improvement</th><th scope="col">Poor</th><th scope="col">Samples vs previous</th><th scope="col">Thresholds</th></tr></thead><tbody>{thresholdRows.map(row => <tr key={row.name}><th scope="row">{row.name}</th><td><span className="threshold-count good">{row.counts.good}</span></td><td><span className="threshold-count warning">{row.counts.needsImprovement}</span></td><td><span className="threshold-count poor">{row.counts.poor}</span></td><td><span className={`threshold-change${row.previousSamples === 0 && row.samples > 0 ? " new" : ""}`}>{percentageChange(row.samples, row.previousSamples)}</span><small className="threshold-previous-count">{row.samples} now · {row.previousSamples} previous</small></td><td>Good ≤ {formatTrendValue(VITAL_THRESHOLDS[row.dataKey].good, row.dataKey, row.suffix)} · Needs improvement ≤ {formatTrendValue(VITAL_THRESHOLDS[row.dataKey].needsImprovement, row.dataKey, row.suffix)}</td></tr>)}</tbody></table></div>
         </div>
       </> : <div className="empty-state"><TrendingUp size={28} /><strong>No Web Vitals telemetry matches the selected filter</strong><p>Choose another date range or wait for active sessions to emit performance metrics.</p></div>}</div>
     </section>

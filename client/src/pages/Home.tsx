@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast, toast as globalToast } from "sonner";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -6849,6 +6849,16 @@ function DepartmentView({
   const [workspaceQuery, setWorkspaceQuery] = useState("");
   const [searchSuggestionsOpen, setSearchSuggestionsOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = JSON.parse(window.localStorage.getItem("bob-department-recent-searches") ?? "[]");
+      return Array.isArray(stored) ? stored.filter((value): value is string => typeof value === "string").slice(0, 6) : [];
+    } catch {
+      return [];
+    }
+  });
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [priorityFilter, setPriorityFilter] = useState<"all" | Booking["priority"]>("all");
   const [readinessFilter, setReadinessFilter] = useState<"all" | "ready" | "action">("all");
   const departmentCode =
@@ -6905,8 +6915,30 @@ function DepartmentView({
       window.clearTimeout(timer);
     };
   }, [queue, workspaceQuery]);
+  const rememberSearch = (term: string) => {
+    const normalized = term.trim();
+    if (!normalized) return;
+    setRecentSearches(previous => {
+      const next = [normalized, ...previous.filter(item => item.toLowerCase() !== normalized.toLowerCase())].slice(0, 6);
+      window.localStorage.setItem("bob-department-recent-searches", JSON.stringify(next));
+      return next;
+    });
+  };
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || ["INPUT", "TEXTAREA", "SELECT"].includes(target?.tagName ?? "")) return;
+      event.preventDefault();
+      searchInputRef.current?.focus();
+      setSearchSuggestionsOpen(true);
+      setActiveSuggestionIndex(searchSuggestions.length ? 0 : -1);
+    };
+    document.addEventListener("keydown", focusSearch);
+    return () => document.removeEventListener("keydown", focusSearch);
+  }, [searchSuggestions.length]);
   const selectSuggestion = (booking: Booking) => {
     setWorkspaceQuery(booking.id);
+    rememberSearch(booking.id);
     setSearchSuggestionsOpen(false);
     setActiveSuggestionIndex(-1);
   };
@@ -7029,6 +7061,7 @@ function DepartmentView({
                 <label className="department-workspace-search">
                   <Search size={15} aria-hidden="true" />
                   <input
+                    ref={searchInputRef}
                     value={workspaceQuery}
                     onChange={event => {
                       setWorkspaceQuery(event.target.value);
@@ -7043,6 +7076,16 @@ function DepartmentView({
                     }}
                     onBlur={() => window.setTimeout(() => setSearchSuggestionsOpen(false), 120)}
                     onKeyDown={event => {
+                      if (event.key === "Escape") {
+                        setSearchSuggestionsOpen(false);
+                        setActiveSuggestionIndex(-1);
+                        return;
+                      }
+                      if (event.key === "Enter" && activeSuggestionIndex < 0 && workspaceQuery.trim()) {
+                        rememberSearch(workspaceQuery);
+                        setSearchSuggestionsOpen(false);
+                        return;
+                      }
                       if (!searchSuggestionsOpen || !searchSuggestions.length) return;
                       if (event.key === "ArrowDown") {
                         event.preventDefault();
@@ -7053,9 +7096,6 @@ function DepartmentView({
                       } else if (event.key === "Enter" && activeSuggestionIndex >= 0) {
                         event.preventDefault();
                         selectSuggestion(searchSuggestions[activeSuggestionIndex]);
-                      } else if (event.key === "Escape") {
-                        setSearchSuggestionsOpen(false);
-                        setActiveSuggestionIndex(-1);
                       }
                     }}
                     placeholder="Search dossier, client, site or crane"
@@ -7065,8 +7105,13 @@ function DepartmentView({
                     aria-activedescendant={activeSuggestionIndex >= 0 ? `department-search-suggestion-${activeSuggestionIndex}` : undefined}
                   />
                 </label>
-                {searchSuggestionsOpen && (searchSuggestionsLoading || searchSuggestions.length > 0) && (
-                  <div id="department-search-suggestions" className="department-search-suggestions" role="listbox" aria-label="Matching operations" aria-busy={searchSuggestionsLoading}>
+                {workspaceQuery && <button type="button" className="department-search-clear" aria-label="Clear operational queue search" onMouseDown={event => event.preventDefault()} onClick={() => { setWorkspaceQuery(""); setSearchSuggestions([]); setSearchSuggestionsOpen(false); setActiveSuggestionIndex(-1); searchInputRef.current?.focus(); }}><X size={13} aria-hidden="true" /></button>}
+                {searchSuggestionsOpen && (searchSuggestionsLoading || searchSuggestions.length > 0 || (!workspaceQuery.trim() && recentSearches.length > 0)) && (
+                  <div id="department-search-suggestions" className="department-search-suggestions" role="listbox" aria-label={workspaceQuery.trim() ? "Matching operations" : "Recent searches"} aria-busy={searchSuggestionsLoading}>
+                    {!searchSuggestionsLoading && !workspaceQuery.trim() && recentSearches.length > 0 && <>
+                      <div className="department-search-recent-title">Recent searches</div>
+                      {recentSearches.map(term => <button type="button" role="option" className="department-search-suggestion" key={`recent-${term}`} onMouseDown={event => event.preventDefault()} onClick={() => { setWorkspaceQuery(term); setSearchSuggestionsOpen(false); rememberSearch(term); }}><strong>{term}</strong><span>Recent search</span></button>)}
+                    </>}
                     {searchSuggestionsLoading ? <div className="department-search-loading" role="status"><LoaderCircle size={14} aria-hidden="true" /> Finding matching operations…</div> : searchSuggestions.map((booking, index) => (
                       <button
                         key={booking.id}

@@ -21,6 +21,9 @@ describe("performance workspace experience", () => {
     expect(analytics).toContain("Save preset");
     expect(analytics).toContain("Threshold summary");
     expect(analytics).toContain("thresholdCounts");
+    expect(analytics).toContain("previousPeriodBounds");
+    expect(analytics).toContain("percentageChange");
+    expect(analytics).toContain("Samples vs previous");
     expect(analytics).toContain("pdf-lib");
   });
 
@@ -40,6 +43,9 @@ describe("performance workspace experience", () => {
     expect(workspace).toContain("searchSuggestionsLoading");
     expect(workspace).toContain("Finding matching operations");
     expect(workspace).toContain("aria-busy={searchSuggestionsLoading}");
+    expect(workspace).toContain("bob-department-recent-searches");
+    expect(workspace).toContain("Clear operational queue search");
+    expect(workspace).toContain("event.key !== \"/\"");
     expect(styles).toContain(".dark .app-shell");
   });
 

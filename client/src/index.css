@@ -1693,3 +1693,15 @@ body,
 @keyframes department-search-spin { to { transform: rotate(360deg); } }
 .dark .department-search-loading { color: #a8bac5; }
 @media (prefers-reduced-motion: reduce) { .department-search-loading svg { animation: none; } }
+
+.department-search-clear { position: absolute; right: 9px; top: 50%; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; transform: translateY(-50%); border: 0; border-radius: 50%; background: transparent; color: #6e6e73; cursor: pointer; }
+.department-search-clear:hover, .department-search-clear:focus-visible { background: #edf1f3; color: #1d1d1f; outline: none; }
+.department-search-recent-title { padding: 8px 10px 5px; color: #6e6e73; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.threshold-change { display: block; color: #46545d; font-weight: 700; }
+.threshold-change.new { color: #0a66c2; }
+.threshold-previous-count { display: block; margin-top: 2px; color: #6e6e73; font-size: 9px; white-space: nowrap; }
+.dark .department-search-clear { color: #a8bac5; }
+.dark .department-search-clear:hover, .dark .department-search-clear:focus-visible { background: #1a3445; color: #edf4f7; }
+.dark .department-search-recent-title, .dark .threshold-previous-count { color: #a8bac5; }
+.dark .threshold-change { color: #edf4f7; }
+.dark .threshold-change.new { color: #7cb8ff; }
