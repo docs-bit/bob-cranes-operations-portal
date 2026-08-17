@@ -482,3 +482,9 @@
 - [x] Fix the unstable effect dependency or state feedback loop without changing workflow behavior.
 - [x] Add regression coverage and verify `/portal` with type checks, tests, build, and runtime QA.
 - [x] Save and publish the verified portal repair checkpoint.
+
+## Shareable bookings views and filtered export
+- [x] Add a clear illustrated empty state when booking search or filters return no results.
+- [x] Sync booking search, status filter, and sorting state with URL parameters for shareable views.
+- [x] Add an Export to CSV action next to the booking search bar for the current filtered results.
+- [x] Add regression coverage and verify the updated bookings workspace with tests, build, visual QA, and a published checkpoint.

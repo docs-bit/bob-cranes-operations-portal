@@ -181,6 +181,7 @@ type Booking = {
 };
 
 type BookingSort = "date-asc" | "date-desc" | "status" | "id-asc" | "id-desc";
+type BookingFilter = "all" | "critical" | "mobilizing";
 
 const stages: Stage[] = [
   "Created by Salesperson",
@@ -2266,6 +2267,29 @@ function Overview({
   );
 }
 
+function parseBookingListParams(search: string): {
+  query: string;
+  filter: BookingFilter;
+  sortBy: BookingSort;
+} {
+  const params = new URLSearchParams(search);
+  const query = params.get("q") ?? "";
+  const filterValue = params.get("filter");
+  const sortValue = params.get("sort");
+  const filter: BookingFilter =
+    filterValue === "critical" || filterValue === "mobilizing"
+      ? filterValue
+      : "all";
+  const sortBy: BookingSort =
+    sortValue === "date-desc" ||
+    sortValue === "status" ||
+    sortValue === "id-asc" ||
+    sortValue === "id-desc"
+      ? sortValue
+      : "date-asc";
+  return { query, filter, sortBy };
+}
+
 function BookingsListSkeleton() {
   return (
     <div className="table-wrap bookings-list-skeleton" role="status" aria-live="polite" aria-label="Loading booking dossiers">
@@ -2309,6 +2333,40 @@ function BookingsListSkeleton() {
   );
 }
 
+function BookingsEmptyState({
+  query,
+  filter,
+  onReset,
+}: {
+  query: string;
+  filter: BookingFilter;
+  onReset: () => void;
+}) {
+  const hasCriteria = Boolean(query.trim()) || filter !== "all";
+  return (
+    <div className="booking-empty-state" role="status" aria-live="polite">
+      <div className="booking-empty-illustration" aria-hidden="true">
+        <div className="booking-empty-orbit orbit-one" />
+        <div className="booking-empty-orbit orbit-two" />
+        <div className="booking-empty-icon"><FolderOpen size={30} /></div>
+      </div>
+      <strong>{hasCriteria ? "No booking dossiers found" : "No booking dossiers yet"}</strong>
+      <p>
+        {query.trim()
+          ? `We couldn’t find a dossier matching “${query.trim()}”.`
+          : filter !== "all"
+            ? "No dossiers match the selected booking filter right now."
+            : "New booking dossiers will appear here as the sales team creates them."}
+      </p>
+      {hasCriteria && (
+        <button type="button" className="secondary-button compact-button" onClick={onReset}>
+          Clear search and filters
+        </button>
+      )}
+    </div>
+  );
+}
+
 function BookingsView({
   bookings,
   setView,
@@ -2320,11 +2378,37 @@ function BookingsView({
   setDetail: (booking: Booking) => void;
   isLoading?: boolean;
 }) {
-  const [filter, setFilter] = useState<"all" | "critical" | "mobilizing">(
-    "all"
+  const [location] = useLocation();
+  const locationSearch = location.includes("?")
+    ? location.slice(location.indexOf("?") + 1)
+    : "";
+  const initialParams = useMemo(
+    () => parseBookingListParams(locationSearch),
+    [locationSearch]
   );
-  const [query, setQuery] = useState("");
-  const [sortBy, setSortBy] = useState<BookingSort>("date-asc");
+  const [filter, setFilter] = useState<BookingFilter>(initialParams.filter);
+  const [query, setQuery] = useState(initialParams.query);
+  const [sortBy, setSortBy] = useState<BookingSort>(initialParams.sortBy);
+
+  useEffect(() => {
+    const nextParams = parseBookingListParams(locationSearch);
+    setQuery(current => current === nextParams.query ? current : nextParams.query);
+    setFilter(current => current === nextParams.filter ? current : nextParams.filter);
+    setSortBy(current => current === nextParams.sortBy ? current : nextParams.sortBy);
+  }, [locationSearch]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(locationSearch);
+    if (query.trim()) params.set("q", query.trim()); else params.delete("q");
+    if (filter !== "all") params.set("filter", filter); else params.delete("filter");
+    if (sortBy !== "date-asc") params.set("sort", sortBy); else params.delete("sort");
+    const pathname = location.split("?")[0] || "/portal";
+    const nextLocation = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    if (nextLocation !== location) {
+      window.history.replaceState(window.history.state, "", nextLocation);
+    }
+  }, [filter, location, locationSearch, query, sortBy]);
+
   const visibleBookings = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const filtered = bookings.filter(booking => {
@@ -2363,6 +2447,34 @@ function BookingsView({
       return sortBy === "date-desc" ? -result : result;
     });
   }, [bookings, filter, query, sortBy]);
+
+  const exportBookings = () => {
+    const quote = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
+    const rows = visibleBookings.map(booking => [
+      booking.id,
+      booking.client,
+      booking.project,
+      booking.crane,
+      booking.site,
+      booking.stage,
+      booking.priority,
+      booking.progress,
+      booking.mob,
+      booking.offHire,
+    ]);
+    const csv = [
+      ["Booking ID", "Client", "Project", "Crane", "Site", "Status", "Priority", "Documents %", "Mobilization", "Off-hire"],
+      ...rows,
+    ].map(row => row.map(quote).join(",")).join("\\r\\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `bob-bookings-${filter}-${sortBy}-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${visibleBookings.length} booking${visibleBookings.length === 1 ? "" : "s"} exported to CSV`);
+  };
 
   return (
     <div className="content">
@@ -2403,6 +2515,7 @@ function BookingsView({
           </div>
           <div className="booking-list-tools">
             <label className="search-pill booking-search">
+
               <Search size={14} aria-hidden="true" />
               <input
                 value={query}
@@ -2421,6 +2534,15 @@ function BookingsView({
                 </button>
               )}
             </label>
+            <button
+              type="button"
+              className="secondary-button booking-export-button"
+              onClick={exportBookings}
+              disabled={!visibleBookings.length || isLoading}
+              aria-label="Export filtered booking dossiers to CSV"
+            >
+              <Download size={14} /> Export to CSV
+            </button>
             <label className="booking-sort-control">
               <span>Sort by</span>
               <select
@@ -2500,11 +2622,15 @@ function BookingsView({
               </tbody>
             </table>
             {visibleBookings.length === 0 && (
-              <div className="empty-state">
-                {query.trim()
-                  ? `No dossiers match “${query.trim()}”.`
-                  : "No dossiers match this filter."}
-              </div>
+              <BookingsEmptyState
+                query={query}
+                filter={filter}
+                onReset={() => {
+                  setQuery("");
+                  setFilter("all");
+                  setSortBy("date-asc");
+                }}
+              />
             )}
           </div>
         )}

@@ -544,6 +544,15 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .more-actions-menu button:hover, .more-actions-menu button:focus-visible { background: #edf7f3; color: #1d725f; outline: none; }
 .booking-search { cursor: text; }
 .booking-list-tools { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }
+.booking-export-button { min-height: 36px; white-space: nowrap; }
+.booking-empty-state { display: flex; min-height: 260px; flex-direction: column; align-items: center; justify-content: center; gap: 9px; padding: 36px 22px; border-top: 1px solid #edf0f2; color: #172b4d; text-align: center; }
+.booking-empty-state strong { font-size: 16px; letter-spacing: -.01em; }
+.booking-empty-state p { max-width: 390px; margin: 0; color: #6e6e73; font-size: 12px; line-height: 1.55; }
+.booking-empty-illustration { position: relative; display: grid; width: 86px; height: 72px; place-items: center; margin-bottom: 4px; }
+.booking-empty-icon { position: relative; z-index: 1; display: grid; width: 54px; height: 54px; place-items: center; border: 1px solid #9acfc1; border-radius: 18px; background: #edf7f3; color: #1d725f; box-shadow: 0 10px 24px rgba(29,114,95,.12); }
+.booking-empty-orbit { position: absolute; border: 1px solid #d7e4df; border-radius: 50%; }
+.booking-empty-orbit.orbit-one { width: 82px; height: 38px; transform: rotate(-18deg); }
+.booking-empty-orbit.orbit-two { width: 50px; height: 76px; transform: rotate(28deg); border-color: #e6c99f; }
 .booking-search-clear { display: grid; place-items: center; width: 22px; height: 22px; border: 0; border-radius: 50%; background: transparent; color: #6e6e73; cursor: pointer; }
 .booking-search-clear:hover, .booking-search-clear:focus-visible { background: #e3eee9; color: #1d725f; outline: none; }
 .booking-sort-control { display: flex; align-items: center; gap: 7px; color: #6e6e73; font-size: 11px; white-space: nowrap; }
@@ -558,7 +567,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .booking-list-skeleton-pill { width: 96px; height: 24px; border-radius: 999px; }
 .booking-list-skeleton-dot { width: 18px; height: 18px; border-radius: 50%; }
 @keyframes booking-list-skeleton-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-@media (max-width: 760px) { .booking-list-header { align-items: stretch; flex-direction: column; gap: 12px; } .booking-list-tools { justify-content: stretch; } .booking-list-tools .booking-search { flex: 1 1 240px; } .booking-sort-control { flex: 1 1 220px; justify-content: space-between; } .booking-sort-control select { flex: 1; } }
+@media (max-width: 760px) { .booking-list-header { align-items: stretch; flex-direction: column; gap: 12px; } .booking-list-tools { justify-content: stretch; } .booking-list-tools .booking-search { flex: 1 1 240px; } .booking-export-button { flex: 1 1 160px; justify-content: center; } .booking-sort-control { flex: 1 1 220px; justify-content: space-between; } .booking-sort-control select { flex: 1; } }
 @media (max-width: 620px) { .booking-search { width: 100% !important; } .booking-list-tools { align-items: stretch; flex-direction: column; } .booking-sort-control { width: 100%; } }
 
 

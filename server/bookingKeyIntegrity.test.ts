@@ -36,4 +36,12 @@ describe("bookings list discovery controls", () => {
     expect(homeSource).toContain("bookings-list-skeleton");
     expect(homeSource).toContain("setBookingsLoading(false)");
   });
+
+  it("provides an illustrated empty state, shareable URL controls, and filtered CSV export", () => {
+    expect(homeSource).toContain("function BookingsEmptyState(");
+    expect(homeSource).toContain("parseBookingListParams(locationSearch)");
+    expect(homeSource).toContain("window.history.replaceState(window.history.state, \"\", nextLocation)");
+    expect(homeSource).toContain("aria-label=\"Export filtered booking dossiers to CSV\"");
+    expect(homeSource).toContain("bob-bookings-${filter}-${sortBy}-");
+  });
 });
