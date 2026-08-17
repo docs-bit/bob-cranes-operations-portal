@@ -37,8 +37,13 @@ describe("Crew Assignment enhancements", () => {
     expect(workspace).toContain("Edit Booking");
     expect(workspace).toContain('aria-label="Search available crew members by name or role"');
     expect(workspace).toContain('label: "Undo"');
+    expect(workspace).toContain('aria-label="Filter available crew by current availability"');
+    expect(workspace).toContain("Confirm undo assignment");
+    expect(workspace).toContain("Confirm undo");
     expect(home).toContain("booking-pagination");
     expect(home).toContain("paginatedBookings");
+    expect(home).toContain("Bookings per page");
+    expect(home).toContain('<option value={50}>50</option>');
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {

@@ -2390,7 +2390,7 @@ function BookingsView({
   const [query, setQuery] = useState(initialParams.query);
   const [sortBy, setSortBy] = useState<BookingSort>(initialParams.sortBy);
   const [bookingPage, setBookingPage] = useState(1);
-  const bookingsPerPage = 10;
+  const [bookingsPerPage, setBookingsPerPage] = useState<10 | 20 | 50>(10);
 
   useEffect(() => {
     const nextParams = parseBookingListParams(locationSearch);
@@ -2462,7 +2462,7 @@ function BookingsView({
 
   useEffect(() => {
     setBookingPage(1);
-  }, [filter, query, sortBy]);
+  }, [bookingsPerPage, filter, query, sortBy]);
 
   const exportBookings = () => {
     const quote = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
@@ -2654,6 +2654,18 @@ function BookingsView({
                   Showing {(bookingPage - 1) * bookingsPerPage + 1}–{Math.min(bookingPage * bookingsPerPage, visibleBookings.length)} of {visibleBookings.length} bookings
                 </span>
                 <div className="booking-pagination-controls">
+                  <label className="booking-page-size-control">
+                    <span className="muted">Rows</span>
+                    <select
+                      value={bookingsPerPage}
+                      onChange={event => setBookingsPerPage(Number(event.target.value) as 10 | 20 | 50)}
+                      aria-label="Bookings per page"
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </label>
                   <button
                     type="button"
                     className="secondary-button compact-button"

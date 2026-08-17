@@ -519,3 +519,9 @@
 - [x] Implement pagination controls at the bottom of the filtered bookings list.
 - [x] Add a search input above the available crew members list for filtering personnel by name or role.
 - [x] Add regression test assertions, run full test suite, verify build, and publish checkpoint.
+
+## Availability filter, page-size selector, and undo confirmation modal
+- [x] Add an availability status dropdown next to the personnel search bar.
+- [x] Add a page-size selector (10, 20, 50) to the bookings list pagination controls.
+- [x] Implement a confirmation modal for undoing drag-and-drop assignment toast actions.
+- [x] Add regression assertions, run test suite, verify build, and publish checkpoint.

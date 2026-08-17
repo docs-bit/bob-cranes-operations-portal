@@ -255,6 +255,7 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
   const [query, setQuery] = useState(""); const [availableCrewQuery, setAvailableCrewQuery] = useState(""); const [department, setDepartment] = useState("All"); const [availability, setAvailability] = useState<Availability>("All"); const [availabilityDate, setAvailabilityDate] = useState(todayKey);
   const [selectedCrewId, setSelectedCrewId] = useState(focusedCrewId ?? CREW_ASSIGNMENT_ROSTER[0]?.id ?? ""); const [bulkIds, setBulkIds] = useState<string[]>([]); const [presetName, setPresetName] = useState(""); const [savedPresets, setSavedPresets] = useState<CrewSearchPreset[]>([]);
   const [csvDialogOpen, setCsvDialogOpen] = useState(false); const [csvColumns, setCsvColumns] = useState<CsvColumnKey[]>(DEFAULT_EXPORT_COLUMNS); const [exporting, setExporting] = useState(false);
+  const [undoRequest, setUndoRequest] = useState<{ crew: RosterCrew; previousIds: string[]; bookingId: string } | null>(null);
   const focusedBooking = bookings.find(booking => booking.id === focusedBookingId) ?? null;
   const departments = useMemo(() => Array.from(new Set(CREW_ASSIGNMENT_ROSTER.map(crew => crew.department))).sort(), []);
   const bookingIdsByCrew = useMemo(() => new Map(CREW_ASSIGNMENT_ROSTER.map(crew => [crew.id, allocations.filter(allocation => allocationMatches(crew, allocation)).map(allocation => allocation.bookingId)])), [allocations]);
@@ -314,9 +315,36 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
   const toggleBulk = (id: string) => setBulkIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
   const persistCrew = async (crew: RosterCrew, ids: string[]) => saveAllocation.mutateAsync({ crewId: crew.id, crewName: crew.name, bookingIds: ids.map(toPersistedBookingId).filter((id): id is string => id !== null) });
   const mergeCrewResult = (crewId: string, result: { allocations: { crewName: string; crewId: string; bookingId: string }[] }) => setAllocations(current => [...current.filter(allocation => allocation.crewId !== crewId), ...result.allocations.map(allocation => ({ employeeName: allocation.crewName, crewId: allocation.crewId, bookingId: toUiBookingId(allocation.bookingId) }))]);
+  const confirmUndo = async () => {
+    if (!undoRequest) return;
+    try {
+      const result = await persistCrew(undoRequest.crew, undoRequest.previousIds);
+      mergeCrewResult(undoRequest.crew.id, result);
+      onAllocationSaved({ bookingId: undoRequest.bookingId, employeeName: undoRequest.crew.name, action: "removed" });
+      setUndoRequest(null);
+      toast.success(`Undid ${undoRequest.crew.name}'s assignment to ${undoRequest.bookingId}.`);
+    } catch {
+      toast.error("Undo could not be saved. Please review the assignment manually.");
+    }
+  };
   const toggleSingle = async (booking: Booking) => { if (!selectedCrew) return; const next = selectedCrew.bookingIds.includes(booking.id) ? selectedCrew.bookingIds.filter(id => id !== booking.id) : [...selectedCrew.bookingIds, booking.id]; try { const result = await persistCrew(selectedCrew, next); mergeCrewResult(selectedCrew.id, result); onAllocationSaved({ bookingId: booking.id, employeeName: selectedCrew.name, action: selectedCrew.bookingIds.includes(booking.id) ? "removed" : "saved" }); } catch { toast.error("Allocation could not be saved."); } };
   const bulkAssign = async () => { if (!targetBooking || !selectedBulkCrew.length) return toast.info("Select one or more crew members first."); if (!toPersistedBookingId(targetBooking.id)) return toast.info("This preview dossier cannot receive durable assignments."); try { const results = await Promise.all(selectedBulkCrew.map(async crew => ({ crew, result: await persistCrew(crew, crew.bookingIds.includes(targetBooking.id) ? crew.bookingIds : [...crew.bookingIds, targetBooking.id]) }))); results.forEach(({ crew, result }) => mergeCrewResult(crew.id, result)); results.forEach(({ crew }) => onAllocationSaved({ bookingId: targetBooking.id, employeeName: crew.name, action: "saved" })); toast.success(`${results.length} crew member${results.length === 1 ? "" : "s"} assigned to ${targetBooking.id}.`); } catch { toast.error("Bulk assignment could not be saved. Existing assignments were left unchanged."); } };
-  return <div className="content"><CsvColumnDialog open={csvDialogOpen} onOpenChange={setCsvDialogOpen} selected={csvColumns} onSelectedChange={setCsvColumns} onExport={() => void exportCurrentScheduleCsv()} exporting={exporting}/><div className="page-heading"><div><div className="eyebrow">Resource readiness</div><h1>{focusedBooking ? `Edit assignment · ${focusedBooking.id}` : "Crew assignment"}</h1><p>{focusedBooking ? "Select multiple available or assigned employees, review conflicts, then assign the group in one action." : "Search, review, and allocate the attendance-backed crew roster."}</p></div><div style={{ display: "flex", gap: 8 }}><button className="secondary-button" onClick={() => setCsvDialogOpen(true)} disabled={exporting}>{exporting ? <><LoaderCircle size={14} className="animate-spin"/> Generating CSV…</> : <><Download size={14}/> Export CSV</>}</button><button className="primary-button" onClick={onAddWorkman}><Plus size={14}/> Add workman</button></div></div>{focusedBooking && <div className="notification"><div className="title">Bulk Edit Assignment</div><div className="body">Available and already-assigned crew remain selectable. Conflicts are shown before the bulk save.</div></div>}<div className="panel" style={{ marginTop: 16 }}><div className="panel-header"><div className="filter-row">{(["All", "Present", "On Leave", "Assigned", "Upcoming booking", "Completed booking", "Off-Site"] as Availability[]).map(value => <button key={value} className={`filter-chip ${availability === value ? "selected" : ""}`} onClick={() => setAvailability(value)}>{value}</button>)}</div><span className="panel-meta">{visibleCrew.length} matching crew</span></div><div className="panel-body crew-search-controls">
+  return       <div className="content">
+        <Dialog open={Boolean(undoRequest)} onOpenChange={open => { if (!open) setUndoRequest(null); }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Confirm undo assignment</DialogTitle>
+              <DialogDescription>
+                Remove {undoRequest?.crew.name ?? "this crew member"} from {undoRequest?.bookingId ?? "the booking"}? This will save the previous allocation state.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <button type="button" className="secondary-button" onClick={() => setUndoRequest(null)}>Keep assignment</button>
+              <button type="button" className="primary-button" onClick={() => void confirmUndo()}>Confirm undo</button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <CsvColumnDialog open={csvDialogOpen} onOpenChange={setCsvDialogOpen} selected={csvColumns} onSelectedChange={setCsvColumns} onExport={() => void exportCurrentScheduleCsv()} exporting={exporting}/><div className="page-heading"><div><div className="eyebrow">Resource readiness</div><h1>{focusedBooking ? `Edit assignment · ${focusedBooking.id}` : "Crew assignment"}</h1><p>{focusedBooking ? "Select multiple available or assigned employees, review conflicts, then assign the group in one action." : "Search, review, and allocate the attendance-backed crew roster."}</p></div><div style={{ display: "flex", gap: 8 }}><button className="secondary-button" onClick={() => setCsvDialogOpen(true)} disabled={exporting}>{exporting ? <><LoaderCircle size={14} className="animate-spin"/> Generating CSV…</> : <><Download size={14}/> Export CSV</>}</button><button className="primary-button" onClick={onAddWorkman}><Plus size={14}/> Add workman</button></div></div>{focusedBooking && <div className="notification"><div className="title">Bulk Edit Assignment</div><div className="body">Available and already-assigned crew remain selectable. Conflicts are shown before the bulk save.</div></div>}<div className="panel" style={{ marginTop: 16 }}><div className="panel-header"><div className="filter-row">{(["All", "Present", "On Leave", "Assigned", "Upcoming booking", "Completed booking", "Off-Site"] as Availability[]).map(value => <button key={value} className={`filter-chip ${availability === value ? "selected" : ""}`} onClick={() => setAvailability(value)}>{value}</button>)}</div><span className="panel-meta">{visibleCrew.length} matching crew</span></div><div className="panel-body crew-search-controls">
   <label className="search-pill booking-search">
     <Search size={14} />
     <input
@@ -335,6 +363,20 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
       placeholder="Search available crew by name or role"
     />
   </label>
+  <select
+    className="attendance-select compact"
+    value={availability}
+    onChange={event => setAvailability(event.target.value as Availability)}
+    aria-label="Filter available crew by current availability"
+  >
+    <option value="All">All availability</option>
+    <option value="Present">Present</option>
+    <option value="Assigned">Assigned</option>
+    <option value="Upcoming booking">Upcoming booking</option>
+    <option value="Completed booking">Completed booking</option>
+    <option value="On Leave">On Leave</option>
+    <option value="Off-Site">Off-Site</option>
+  </select>
   <select
     className="attendance-select compact"
     value={department}
@@ -512,20 +554,11 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
         const result = await persistCrew(crew, next);
         mergeCrewResult(crew.id, result);
         onAllocationSaved({ bookingId: targetBooking.id, employeeName: crew.name, action: "saved" });
-        toast.success(`Dropped ${crew.name} onto ${targetBooking.id}.`, {
+          toast.success(`Dropped ${crew.name} onto ${targetBooking.id}.`, {
           description: "The assignment was saved successfully.",
           action: {
             label: "Undo",
-            onClick: async () => {
-              try {
-                const undoResult = await persistCrew(crew, previousIds);
-                mergeCrewResult(crew.id, undoResult);
-                onAllocationSaved({ bookingId: targetBooking.id, employeeName: crew.name, action: "removed" });
-                toast.success(`Undid ${crew.name}'s assignment to ${targetBooking.id}.`);
-              } catch {
-                toast.error("Undo could not be saved. Please review the assignment manually.");
-              }
-            },
+            onClick: () => setUndoRequest({ crew, previousIds, bookingId: targetBooking.id }),
           },
         });
       } catch {
