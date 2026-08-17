@@ -11,6 +11,9 @@ describe("performance workspace experience", () => {
     expect(analytics).toContain("LineChart");
     expect(analytics).toContain("dateRange");
     expect(analytics).toContain("Export CSV");
+    expect(analytics).toContain("Export PDF");
+    expect(analytics).toContain("formatTrendValue");
+    expect(analytics).toContain("pdf-lib");
   });
 
   it("provides persistent workspace dark mode and accessible operational filtering", () => {
@@ -19,6 +22,9 @@ describe("performance workspace experience", () => {
     expect(workspace).toContain("department-workspace-toolbar");
     expect(workspace).toContain("Search operational queue");
     expect(workspace).toContain("Filter by priority");
+    expect(workspace).toContain("searchSuggestions");
+    expect(workspace).toContain("department-search-suggestions");
+    expect(workspace).toContain("aria-autocomplete=\"list\"");
     expect(styles).toContain(".dark .app-shell");
   });
 

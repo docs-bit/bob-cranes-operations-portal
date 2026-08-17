@@ -6847,6 +6847,7 @@ function DepartmentView({
   completedWorkstreams: Record<string, string[]>;
 }) {
   const [workspaceQuery, setWorkspaceQuery] = useState("");
+  const [searchSuggestionsOpen, setSearchSuggestionsOpen] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<"all" | Booking["priority"]>("all");
   const [readinessFilter, setReadinessFilter] = useState<"all" | "ready" | "action">("all");
   const departmentCode =
@@ -6878,6 +6879,13 @@ function DepartmentView({
     booking.stage === config.secondaryStage
       ? config.secondaryNextStage
       : config.nextStage;
+  const searchSuggestions = useMemo(() => {
+    const query = workspaceQuery.trim().toLowerCase();
+    if (!query) return [];
+    return queue
+      .filter(booking => `${booking.id} ${booking.client} ${booking.project} ${booking.site} ${booking.crane}`.toLowerCase().includes(query))
+      .slice(0, 5);
+  }, [queue, workspaceQuery]);
   const visibleQueue = queue.filter(booking => {
     const searchText = `${booking.id} ${booking.client} ${booking.project} ${booking.site} ${booking.crane}`.toLowerCase();
     const matchesQuery = searchText.includes(workspaceQuery.trim().toLowerCase());
@@ -6986,15 +6994,44 @@ function DepartmentView({
           </div>
           <div className="panel-body">
             <div className="department-workspace-toolbar" role="search" aria-label={`${config.label} operations search and filters`}>
-              <label className="department-workspace-search">
-                <Search size={15} aria-hidden="true" />
-                <input
-                  value={workspaceQuery}
-                  onChange={event => setWorkspaceQuery(event.target.value)}
-                  placeholder="Search dossier, client, site or crane"
-                  aria-label="Search operational queue"
-                />
-              </label>
+              <div className="department-search-field">
+                <label className="department-workspace-search">
+                  <Search size={15} aria-hidden="true" />
+                  <input
+                    value={workspaceQuery}
+                    onChange={event => {
+                      setWorkspaceQuery(event.target.value);
+                      setSearchSuggestionsOpen(true);
+                    }}
+                    onFocus={() => setSearchSuggestionsOpen(true)}
+                    onBlur={() => window.setTimeout(() => setSearchSuggestionsOpen(false), 120)}
+                    placeholder="Search dossier, client, site or crane"
+                    aria-label="Search operational queue"
+                    aria-autocomplete="list"
+                    aria-controls="department-search-suggestions"
+                  />
+                </label>
+                {searchSuggestionsOpen && searchSuggestions.length > 0 && (
+                  <div id="department-search-suggestions" className="department-search-suggestions" role="listbox" aria-label="Matching operations">
+                    {searchSuggestions.map(booking => (
+                      <button
+                        key={booking.id}
+                        type="button"
+                        role="option"
+                        className="department-search-suggestion"
+                        onMouseDown={event => event.preventDefault()}
+                        onClick={() => {
+                          setWorkspaceQuery(booking.id);
+                          setSearchSuggestionsOpen(false);
+                        }}
+                      >
+                        <strong>{booking.id}</strong>
+                        <span>{booking.client} · {booking.project}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <select value={priorityFilter} onChange={event => setPriorityFilter(event.target.value as "all" | Booking["priority"])} aria-label="Filter by priority">
                 <option value="all">All priorities</option>
                 <option value="High">High priority</option>

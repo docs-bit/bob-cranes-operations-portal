@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { Activity, Calendar, Download, Gauge, RefreshCw, TrendingUp } from "lucide-react";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
@@ -22,6 +23,7 @@ export default function WebVitalsAnalyticsView() {
   const telemetryQuery = trpc.telemetry.list.useQuery({ limit: 250 });
   const metrics = telemetryQuery.data ?? [];
   const [dateRange, setDateRange] = useState<DateRange>("all");
+  const [pdfReportLoading, setPdfReportLoading] = useState(false);
 
   const filteredMetrics = useMemo(() => {
     const now = Date.now();
@@ -57,6 +59,13 @@ export default function WebVitalsAnalyticsView() {
   const fidValues = valuesFor("FID");
   const clsValues = valuesFor("CLS");
 
+  const formatTrendValue = (value: unknown, dataKey: TrendKey, suffix: string) => {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return "—";
+    const digits = dataKey === "cls" ? 3 : 0;
+    return `${numericValue.toFixed(digits)}${suffix}`;
+  };
+
   const exportCsv = () => {
     const quote = (value: string) => `"${String(value).replace(/"/g, '""')}"`;
     const rows = filteredMetrics.map(metric => [metric.id, metric.metricName, metric.metricValue, metric.path, new Date(metric.createdAt).toISOString()]);
@@ -71,6 +80,80 @@ export default function WebVitalsAnalyticsView() {
     toast.success("Web Vitals telemetry exported to CSV");
   };
 
+  const exportPdf = async () => {
+    if (!filteredMetrics.length || pdfReportLoading) return;
+    setPdfReportLoading(true);
+    try {
+      const pdfDocument = await PDFDocument.create();
+      const regular = await pdfDocument.embedFont(StandardFonts.Helvetica);
+      const bold = await pdfDocument.embedFont(StandardFonts.HelveticaBold);
+      const pageSize: [number, number] = [595, 842];
+      const margin = 42;
+      const accent = rgb(0.84, 0.36, 0.14);
+      const navy = rgb(0.05, 0.13, 0.19);
+      const muted = rgb(0.36, 0.41, 0.44);
+      const rangeLabel = dateRange === "all" ? "All time" : dateRange === "today" ? "Past 24 hours" : "Past 7 days";
+      const drawHeader = (page: ReturnType<typeof pdfDocument.addPage>, continuation = false) => {
+        page.drawRectangle({ x: 0, y: 790, width: pageSize[0], height: 52, color: navy });
+        page.drawText("BOB CRANES", { x: margin, y: 812, size: 18, font: bold, color: rgb(1, 1, 1) });
+        page.drawText(continuation ? "Web Vitals Analytics - continued" : "Web Vitals Analytics Report", { x: margin, y: 797, size: 9, font: regular, color: rgb(0.82, 0.9, 0.94) });
+      };
+      let page = pdfDocument.addPage(pageSize);
+      drawHeader(page);
+      page.drawText("Performance Intelligence", { x: margin, y: 752, size: 10, font: bold, color: accent });
+      page.drawText("Real-user Web Vitals report", { x: margin, y: 721, size: 24, font: bold, color: navy });
+      page.drawText(`Reporting period: ${rangeLabel}`, { x: margin, y: 700, size: 10, font: regular, color: muted });
+      page.drawText(`Generated: ${new Date().toLocaleString()}`, { x: margin, y: 685, size: 9, font: regular, color: muted });
+      const cards: Array<[string, string]> = [["AVG LCP", average(lcpValues) === null ? "-" : `${average(lcpValues)}ms`], ["AVG FID", average(fidValues) === null ? "-" : `${average(fidValues)}ms`], ["AVG CLS", String(average(clsValues, 3) ?? "-")], ["EVENTS", String(filteredMetrics.length)]];
+      cards.forEach(([label, value], index) => {
+        const x = margin + index * 128;
+        page.drawRectangle({ x, y: 625, width: 116, height: 48, color: rgb(0.95, 0.97, 0.98), borderColor: rgb(0.86, 0.89, 0.9), borderWidth: 1 });
+        page.drawText(label, { x: x + 9, y: 655, size: 8, font: bold, color: muted });
+        page.drawText(value, { x: x + 9, y: 636, size: 14, font: bold, color: navy });
+      });
+      page.drawText("Captured telemetry", { x: margin, y: 588, size: 13, font: bold, color: navy });
+      page.drawText("Exact metric values captured from browser sessions; no synthetic samples are included.", { x: margin, y: 570, size: 9, font: regular, color: muted });
+      const columns = ["Metric", "Value", "Path", "Captured at"];
+      const xPositions = [margin, margin + 78, margin + 148, margin + 282];
+      const drawTableHeader = (currentPage: ReturnType<typeof pdfDocument.addPage>) => {
+        currentPage.drawRectangle({ x: margin, y: 535, width: 511, height: 22, color: rgb(0.9, 0.94, 0.95) });
+        columns.forEach((column, index) => currentPage.drawText(column, { x: xPositions[index], y: 542, size: 8, font: bold, color: navy }));
+      };
+      drawTableHeader(page);
+      let y = 518;
+      filteredMetrics.forEach((metric, index) => {
+        if (y < 56) {
+          page = pdfDocument.addPage(pageSize);
+          drawHeader(page, true);
+          drawTableHeader(page);
+          y = 518;
+        }
+        if (index % 2 === 0) page.drawRectangle({ x: margin, y: y - 4, width: 511, height: 20, color: rgb(0.98, 0.99, 0.99) });
+        const values = [metric.metricName, metric.metricValue, metric.path, new Date(metric.createdAt).toLocaleString()];
+        values.forEach((value, valueIndex) => {
+          const clipped = String(value).length > 34 ? `${String(value).slice(0, 31)}…` : String(value);
+          page.drawText(clipped, { x: xPositions[valueIndex], y, size: 8, font: regular, color: navy });
+        });
+        y -= 20;
+      });
+      const bytes = await pdfDocument.save();
+      const pdfBuffer = bytes.slice().buffer as ArrayBuffer;
+      const blob = new Blob([pdfBuffer], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = window.document.createElement("a");
+      link.href = url;
+      link.download = `bob-web-vitals-${dateRange}-${new Date().toISOString().slice(0, 10)}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success("Web Vitals PDF report downloaded");
+    } catch (error) {
+      console.error("Web Vitals PDF export failed", error);
+      toast.error("Unable to generate the Web Vitals PDF report");
+    } finally {
+      setPdfReportLoading(false);
+    }
+  };
+
   const TrendChart = ({ dataKey, label, suffix = "" }: { dataKey: TrendKey; label: string; suffix?: string }) => (
     <div className="web-vitals-chart-card">
       <div className="web-vitals-chart-heading"><span>{label}</span><small>{chartData.length ? "Daily average" : "Awaiting samples"}</small></div>
@@ -79,7 +162,7 @@ export default function WebVitalsAnalyticsView() {
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
           <YAxis tickLine={false} axisLine={false} tickMargin={8} width={42} />
-          <ChartTooltip content={<ChartTooltipContent labelFormatter={value => `Day: ${value}`} formatter={value => `${value}${suffix}`} />} />
+          <ChartTooltip content={<ChartTooltipContent labelFormatter={value => `Day: ${value}`} formatter={value => formatTrendValue(value, dataKey, suffix)} />} />
           <Line dataKey={dataKey} type="monotone" stroke={`var(--color-${dataKey})`} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} connectNulls />
         </LineChart>
       </ChartContainer>
@@ -92,12 +175,13 @@ export default function WebVitalsAnalyticsView() {
       <div className="web-vitals-actions">
         <label className="web-vitals-range"><Calendar size={14} aria-hidden="true" /><span className="sr-only">Select reporting date range</span><select value={dateRange} onChange={event => setDateRange(event.target.value as DateRange)}><option value="all">All time</option><option value="today">Past 24 hours</option><option value="7days">Past 7 days</option></select></label>
         <button type="button" className="secondary-button compact-button" onClick={exportCsv} disabled={!filteredMetrics.length}><Download size={13} /> Export CSV</button>
+        <button type="button" className="secondary-button compact-button" onClick={() => void exportPdf()} disabled={!filteredMetrics.length || pdfReportLoading}><Download size={13} /> {pdfReportLoading ? "Preparing PDF…" : "Export PDF"}</button>
         <button type="button" className="secondary-button compact-button" onClick={() => void telemetryQuery.refetch()} disabled={telemetryQuery.isFetching}><RefreshCw size={13} /> {telemetryQuery.isFetching ? "Refreshing…" : "Refresh"}</button>
       </div>
     </div>
     <div className="metric-grid">
-      <div className="metric-card"><div className="metric-label">Avg LCP</div><div className="metric-value">{average(lcpValues) === null ? "—" : `${average(lcpValues)}ms`}</div><div className="metric-foot">{lcpValues.length} samples in range</div></div>
-      <div className="metric-card"><div className="metric-label">Avg FID</div><div className="metric-value">{average(fidValues) === null ? "—" : `${average(fidValues)}ms`}</div><div className="metric-foot">{fidValues.length} samples in range</div></div>
+      <div className="metric-card"><div className="metric-label">Avg LCP</div><div className="metric-value">{average(lcpValues) === null ? "-" : `${average(lcpValues)}ms`}</div><div className="metric-foot">{lcpValues.length} samples in range</div></div>
+      <div className="metric-card"><div className="metric-label">Avg FID</div><div className="metric-value">{average(fidValues) === null ? "-" : `${average(fidValues)}ms`}</div><div className="metric-foot">{fidValues.length} samples in range</div></div>
       <div className="metric-card"><div className="metric-label">Avg CLS</div><div className="metric-value">{average(clsValues, 3) ?? "—"}</div><div className="metric-foot">{clsValues.length} samples in range</div></div>
       <div className="metric-card"><div className="metric-label">Telemetry events</div><div className="metric-value">{filteredMetrics.length}</div><div className="metric-foot">Dedicated persistence active</div></div>
     </div>

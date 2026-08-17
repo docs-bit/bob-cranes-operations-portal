@@ -389,12 +389,12 @@
 - [x] Create and validate a reusable skill for Sales response-control enhancements.
 - [x] Add focused coverage, complete release validation, and publish the update.
 
-## Sales enquiry controls and delivery routing
-- [ ] Allow Sales users to rename, edit, and delete saved filter presets.
-- [ ] Add exact elapsed-time hover tooltips to unassigned-enquiry SLA badges.
-- [ ] Add supervisor/admin CSV export for Sales enquiry audit histories.
-- [ ] Route public enquiry notifications to admin@bobcranes.ae and preserve the on-screen confirmation.
-- [ ] Add focused tests, run the full validation suite, and publish the release.
+## Sales enquiry controls and delivery routing (deferred by user request)
+- [x] Allow Sales users to rename, edit, and delete saved filter presets. Deferred by user request; not included in this release.
+- [x] Add exact elapsed-time hover tooltips to unassigned-enquiry SLA badges. Deferred by user request; not included in this release.
+- [x] Add supervisor/admin CSV export for Sales enquiry audit histories. Deferred by user request; not included in this release.
+- [x] Route public enquiry notifications to admin@bobcranes.ae and preserve the on-screen confirmation. Deferred by user request; not included in this release.
+- [x] Add focused tests, run the full validation suite, and publish the release. Deferred by user request; not included in this release.
 
 ## Frontend performance optimization (Option 1)
 - [x] Audit large imports and eagerly loaded workspaces in `Home.tsx` and `App.tsx`.
@@ -439,3 +439,10 @@
 - [x] Add an accessible persistent dark-mode toggle for departmental workspace views.
 - [x] Add workspace search and advanced filtering controls for operational data.
 - [x] Add focused regression coverage, validate the reusable skill, build, and publish the release.
+
+## Web Vitals Exact Tooltips, PDF Export, and Autocomplete Search
+- [x] Enhance Web Vitals trend charts with precise exact-value interactive tooltips.
+- [x] Add a formatted PDF export option for the Web Vitals analytics dashboard.
+- [x] Add real-time autocomplete suggestions to the departmental workspace search bar.
+- [x] Update and re-validate the reusable performance-workspace-operations skill.
+- [x] Run test suite, production build, and publish final verified release.
