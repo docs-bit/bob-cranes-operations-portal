@@ -14,6 +14,9 @@ const vitalsChartConfig = {
 
 type DateRange = "all" | "today" | "7days" | "custom";
 type TrendKey = "lcp" | "fid" | "cls";
+type DatePreset = { id: string; name: string; startDate: string; endDate: string };
+
+const DATE_PRESETS_STORAGE_KEY = "bob-web-vitals-date-presets";
 
 const VITAL_THRESHOLDS: Record<TrendKey, { good: number; needsImprovement: number; unit: string }> = {
   lcp: { good: 2500, needsImprovement: 4000, unit: "ms" },
@@ -32,6 +35,16 @@ export default function WebVitalsAnalyticsView() {
   const [pdfReportLoading, setPdfReportLoading] = useState(false);
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
+  const [presetName, setPresetName] = useState("");
+  const [savedDatePresets, setSavedDatePresets] = useState<DatePreset[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(DATE_PRESETS_STORAGE_KEY) ?? "[]");
+      return Array.isArray(stored) ? stored.slice(0, 8) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const filteredMetrics = useMemo(() => {
     const now = Date.now();
@@ -73,12 +86,56 @@ export default function WebVitalsAnalyticsView() {
   const lcpValues = valuesFor("LCP");
   const fidValues = valuesFor("FID");
   const clsValues = valuesFor("CLS");
+  const thresholdCounts = (dataKey: TrendKey, values: number[]) => {
+    const threshold = VITAL_THRESHOLDS[dataKey];
+    return {
+      good: values.filter(value => value <= threshold.good).length,
+      needsImprovement: values.filter(value => value > threshold.good && value <= threshold.needsImprovement).length,
+      poor: values.filter(value => value > threshold.needsImprovement).length,
+    };
+  };
+  const thresholdRows = [
+    { name: "LCP", dataKey: "lcp" as TrendKey, suffix: "ms", counts: thresholdCounts("lcp", lcpValues) },
+    { name: "FID", dataKey: "fid" as TrendKey, suffix: "ms", counts: thresholdCounts("fid", fidValues) },
+    { name: "CLS", dataKey: "cls" as TrendKey, suffix: "", counts: thresholdCounts("cls", clsValues) },
+  ];
 
   const formatTrendValue = (value: unknown, dataKey: TrendKey, suffix: string) => {
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) return "—";
     const digits = dataKey === "cls" ? 3 : 0;
     return `${numericValue.toFixed(digits)}${suffix}`;
+  };
+
+  const saveDatePreset = () => {
+    const name = presetName.trim();
+    if (!name || !customStartDate || !customEndDate || customStartDate > customEndDate) {
+      toast.error("Enter a name and a valid custom date range first");
+      return;
+    }
+    const preset: DatePreset = { id: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`, name, startDate: customStartDate, endDate: customEndDate };
+    setSavedDatePresets(previous => {
+      const next = [preset, ...previous.filter(item => item.name.toLowerCase() !== name.toLowerCase())].slice(0, 8);
+      window.localStorage.setItem(DATE_PRESETS_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+    setPresetName("");
+    toast.success(`Saved date preset: ${name}`);
+  };
+
+  const applyDatePreset = (preset: DatePreset) => {
+    setCustomStartDate(preset.startDate);
+    setCustomEndDate(preset.endDate);
+    setDateRange("custom");
+    toast.success(`Applied date preset: ${preset.name}`);
+  };
+
+  const deleteDatePreset = (id: string) => {
+    setSavedDatePresets(previous => {
+      const next = previous.filter(item => item.id !== id);
+      window.localStorage.setItem(DATE_PRESETS_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
   };
 
   const exportCsv = () => {
@@ -207,6 +264,15 @@ export default function WebVitalsAnalyticsView() {
         {dateRange === "custom" && <div className="web-vitals-custom-range" aria-label="Custom Web Vitals date range">
           <label><span>From</span><input type="date" value={customStartDate} onChange={event => setCustomStartDate(event.target.value)} aria-label="Custom range start date" /></label>
           <label><span>To</span><input type="date" value={customEndDate} onChange={event => setCustomEndDate(event.target.value)} aria-label="Custom range end date" /></label>
+          <input className="web-vitals-preset-name" value={presetName} onChange={event => setPresetName(event.target.value)} placeholder="Preset name" aria-label="Saved date preset name" />
+          <button type="button" className="secondary-button compact-button" onClick={saveDatePreset} disabled={!customStartDate || !customEndDate}>Save preset</button>
+        </div>}
+        {savedDatePresets.length > 0 && <div className="web-vitals-saved-presets" aria-label="Saved Web Vitals date presets">
+          <span>Saved reports</span>
+          {savedDatePresets.map(preset => <span className="web-vitals-preset-chip" key={preset.id}>
+            <button type="button" onClick={() => applyDatePreset(preset)}>{preset.name}</button>
+            <button type="button" aria-label={`Delete ${preset.name} preset`} onClick={() => deleteDatePreset(preset.id)}>×</button>
+          </span>)}
         </div>}
         <button type="button" className="secondary-button compact-button" onClick={exportCsv} disabled={!filteredMetrics.length}><Download size={13} /> Export CSV</button>
         <button type="button" className="secondary-button compact-button" onClick={() => void exportPdf()} disabled={!filteredMetrics.length || pdfReportLoading}><Download size={13} /> {pdfReportLoading ? "Preparing PDF…" : "Export PDF"}</button>
@@ -221,7 +287,13 @@ export default function WebVitalsAnalyticsView() {
     </div>
     <section className="panel web-vitals-trends-panel">
       <div className="panel-header"><div><div className="panel-title"><TrendingUp size={16} /> Web Vitals trends over time</div><div className="panel-meta">Daily averages for the selected reporting period.</div></div><span className="status-badge blue">{chartData.length} reporting day{chartData.length === 1 ? "" : "s"}</span></div>
-      <div className="panel-body">{telemetryQuery.isLoading ? <div className="empty-state">Loading Web Vitals trends…</div> : telemetryQuery.error ? <div className="account-error">Unable to load telemetry analytics.</div> : filteredMetrics.length ? <div className="web-vitals-chart-grid"><TrendChart dataKey="lcp" label="Largest Contentful Paint" suffix="ms" /><TrendChart dataKey="fid" label="First Input Delay" suffix="ms" /><TrendChart dataKey="cls" label="Cumulative Layout Shift" /></div> : <div className="empty-state"><TrendingUp size={28} /><strong>No Web Vitals telemetry matches the selected filter</strong><p>Choose another date range or wait for active sessions to emit performance metrics.</p></div>}</div>
+      <div className="panel-body">{telemetryQuery.isLoading ? <div className="empty-state">Loading Web Vitals trends…</div> : telemetryQuery.error ? <div className="account-error">Unable to load telemetry analytics.</div> : filteredMetrics.length ? <>
+        <div className="web-vitals-chart-grid"><TrendChart dataKey="lcp" label="Largest Contentful Paint" suffix="ms" /><TrendChart dataKey="fid" label="First Input Delay" suffix="ms" /><TrendChart dataKey="cls" label="Cumulative Layout Shift" /></div>
+        <div className="web-vitals-threshold-summary" aria-labelledby="web-vitals-threshold-summary-title">
+          <div className="web-vitals-summary-heading"><div><h2 id="web-vitals-threshold-summary-title">Threshold summary</h2><p>Sample counts for the selected reporting period.</p></div><span>{filteredMetrics.length} total samples</span></div>
+          <div className="table-scroll"><table><thead><tr><th scope="col">Metric</th><th scope="col">Good</th><th scope="col">Needs improvement</th><th scope="col">Poor</th><th scope="col">Thresholds</th></tr></thead><tbody>{thresholdRows.map(row => <tr key={row.name}><th scope="row">{row.name}</th><td><span className="threshold-count good">{row.counts.good}</span></td><td><span className="threshold-count warning">{row.counts.needsImprovement}</span></td><td><span className="threshold-count poor">{row.counts.poor}</span></td><td>Good ≤ {formatTrendValue(VITAL_THRESHOLDS[row.dataKey].good, row.dataKey, row.suffix)} · Needs improvement ≤ {formatTrendValue(VITAL_THRESHOLDS[row.dataKey].needsImprovement, row.dataKey, row.suffix)}</td></tr>)}</tbody></table></div>
+        </div>
+      </> : <div className="empty-state"><TrendingUp size={28} /><strong>No Web Vitals telemetry matches the selected filter</strong><p>Choose another date range or wait for active sessions to emit performance metrics.</p></div>}</div>
     </section>
     <section className="panel" style={{ marginTop: 20 }}>
       <div className="panel-header"><div><div className="panel-title"><Activity size={16} /> Web Vitals telemetry stream</div><div className="panel-meta">Dedicated metric entries captured from real browser sessions.</div></div><span className="status-badge blue">{filteredMetrics.length} entries</span></div>

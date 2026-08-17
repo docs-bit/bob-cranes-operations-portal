@@ -452,3 +452,10 @@
 - [x] Implement selectable custom date range filters with start/end date inputs in WebVitalsAnalyticsView.
 - [x] Add keyboard arrow navigation, enter-to-select, and highlighted query substring matching to departmental autocomplete suggestions.
 - [x] Run test suite, production build, and publish final verified release.
+
+## Async Autocomplete, Saved Date Presets, and Threshold Summary Table
+- [x] Implement asynchronous suggestion filtering with a loading spinner for large departmental queues.
+- [x] Add saved custom date-range presets (e.g., "Last 30 Days", "Current Month") in WebVitalsAnalyticsView.
+- [x] Add a Web Vitals threshold summary table below trend charts displaying good, needs-improvement, and poor sample counts.
+- [x] Update and re-validate the reusable performance-workspace-operations skill package.
+- [x] Run test suite, production build, skill validation, and publish final verified release.

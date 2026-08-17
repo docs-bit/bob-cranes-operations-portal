@@ -6880,12 +6880,30 @@ function DepartmentView({
     booking.stage === config.secondaryStage
       ? config.secondaryNextStage
       : config.nextStage;
-  const searchSuggestions = useMemo(() => {
+  const [searchSuggestions, setSearchSuggestions] = useState<Booking[]>([]);
+  const [searchSuggestionsLoading, setSearchSuggestionsLoading] = useState(false);
+  useEffect(() => {
     const query = workspaceQuery.trim().toLowerCase();
-    if (!query) return [];
-    return queue
-      .filter(booking => `${booking.id} ${booking.client} ${booking.project} ${booking.site} ${booking.crane}`.toLowerCase().includes(query))
-      .slice(0, 5);
+    if (!query) {
+      setSearchSuggestions([]);
+      setSearchSuggestionsLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setSearchSuggestionsLoading(true);
+    const timer = window.setTimeout(() => {
+      const matches = queue
+        .filter(booking => `${booking.id} ${booking.client} ${booking.project} ${booking.site} ${booking.crane}`.toLowerCase().includes(query))
+        .slice(0, 5);
+      if (!cancelled) {
+        setSearchSuggestions(matches);
+        setSearchSuggestionsLoading(false);
+      }
+    }, 180);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [queue, workspaceQuery]);
   const selectSuggestion = (booking: Booking) => {
     setWorkspaceQuery(booking.id);
@@ -7014,6 +7032,8 @@ function DepartmentView({
                     value={workspaceQuery}
                     onChange={event => {
                       setWorkspaceQuery(event.target.value);
+                      setSearchSuggestions([]);
+                      setSearchSuggestionsLoading(Boolean(event.target.value.trim()));
                       setActiveSuggestionIndex(0);
                       setSearchSuggestionsOpen(true);
                     }}
@@ -7045,9 +7065,9 @@ function DepartmentView({
                     aria-activedescendant={activeSuggestionIndex >= 0 ? `department-search-suggestion-${activeSuggestionIndex}` : undefined}
                   />
                 </label>
-                {searchSuggestionsOpen && searchSuggestions.length > 0 && (
-                  <div id="department-search-suggestions" className="department-search-suggestions" role="listbox" aria-label="Matching operations">
-                    {searchSuggestions.map((booking, index) => (
+                {searchSuggestionsOpen && (searchSuggestionsLoading || searchSuggestions.length > 0) && (
+                  <div id="department-search-suggestions" className="department-search-suggestions" role="listbox" aria-label="Matching operations" aria-busy={searchSuggestionsLoading}>
+                    {searchSuggestionsLoading ? <div className="department-search-loading" role="status"><LoaderCircle size={14} aria-hidden="true" /> Finding matching operations…</div> : searchSuggestions.map((booking, index) => (
                       <button
                         key={booking.id}
                         id={`department-search-suggestion-${index}`}

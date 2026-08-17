@@ -17,6 +17,10 @@ describe("performance workspace experience", () => {
     expect(analytics).toContain("VITAL_THRESHOLDS");
     expect(analytics).toContain("Custom range");
     expect(analytics).toContain("customStartDate");
+    expect(analytics).toContain("savedDatePresets");
+    expect(analytics).toContain("Save preset");
+    expect(analytics).toContain("Threshold summary");
+    expect(analytics).toContain("thresholdCounts");
     expect(analytics).toContain("pdf-lib");
   });
 
@@ -33,6 +37,9 @@ describe("performance workspace experience", () => {
     expect(workspace).toContain("ArrowUp");
     expect(workspace).toContain("highlightQuery");
     expect(workspace).toContain("aria-activedescendant");
+    expect(workspace).toContain("searchSuggestionsLoading");
+    expect(workspace).toContain("Finding matching operations");
+    expect(workspace).toContain("aria-busy={searchSuggestionsLoading}");
     expect(styles).toContain(".dark .app-shell");
   });
 
