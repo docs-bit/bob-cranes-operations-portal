@@ -388,3 +388,16 @@
 - [x] Add saved Sales filter presets for rental duration and owner status combinations.
 - [x] Create and validate a reusable skill for Sales response-control enhancements.
 - [x] Add focused coverage, complete release validation, and publish the update.
+
+## Sales enquiry controls and delivery routing
+- [ ] Allow Sales users to rename, edit, and delete saved filter presets.
+- [ ] Add exact elapsed-time hover tooltips to unassigned-enquiry SLA badges.
+- [ ] Add supervisor/admin CSV export for Sales enquiry audit histories.
+- [ ] Route public enquiry notifications to admin@bobcranes.ae and preserve the on-screen confirmation.
+- [ ] Add focused tests, run the full validation suite, and publish the release.
+
+## Frontend performance optimization (Option 1)
+- [ ] Audit large imports and eagerly loaded workspaces in `Home.tsx` and `App.tsx`.
+- [ ] Introduce React lazy loading and Suspense boundaries with skeleton placeholders for secondary views.
+- [ ] Defer loading of heavy static datasets until needed or split them cleanly.
+- [ ] Run test suite, production build size check, and publish updated checkpoint.
