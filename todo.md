@@ -401,3 +401,9 @@
 - [x] Introduce React lazy loading and Suspense boundaries with skeleton placeholders for secondary views.
 - [x] Defer loading of heavy static datasets until needed or split them cleanly.
 - [x] Run test suite, production build size check, and publish updated checkpoint.
+
+## Performance telemetry, code-splitting, and Lighthouse CI
+- [x] Add LCP/FID/CLS performance metric collection to the runtime monitor.
+- [x] Implement fine-grained route-level code splitting for departmental portals.
+- [x] Add an automated Lighthouse performance check script for CI.
+- [x] Run test suite, production build, and publish final optimized release.

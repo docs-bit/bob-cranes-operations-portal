@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import RentalLanding from "./pages/RentalLanding";
 import RuntimeErrorReporter from "./components/RuntimeErrorReporter";
+import PerformanceTelemetry from "./components/PerformanceTelemetry";
 
 function ProtectedPortal() {
   const { user, loading, refresh } = useAuth();
@@ -52,6 +53,7 @@ export default function App() {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <RuntimeErrorReporter />
+          <PerformanceTelemetry />
           <Toaster />
           <Router />
         </TooltipProvider>
