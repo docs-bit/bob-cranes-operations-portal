@@ -49,7 +49,13 @@ describe("Crew Assignment enhancements", () => {
     expect(home).toContain("bob-bookings-page-size-v1");
     expect(workspace).toContain("UndoAssignmentToast");
     expect(workspace).toContain("Undo available for");
+    expect(workspace).toContain("exportFilteredBookingsCsv");
+    expect(workspace).toContain("Export bookings CSV");
     expect(workspace).toContain("undo-toast-progress");
+    expect(home).toContain('data-testid="operations-quick-summary"');
+    expect(home).toContain("active bookings");
+    expect(home).toContain("crew available today");
+    expect(home).toContain('aria-label={`Switch application to ${theme === "dark" ? "light" : "dark"} mode`}');
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {

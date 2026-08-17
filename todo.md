@@ -531,3 +531,9 @@
 - [x] Persist bookings list page-size preference in local storage.
 - [x] Add a visual countdown timer to assignment success toast notifications.
 - [x] Add regression test assertions, run full test suite, verify build, and publish release.
+
+## Crew assignment booking export, dashboard summary widget, and header dark-mode toggle
+- [x] Add a filtered booking export button to the Crew Assignment workspace.
+- [x] Implement a home dashboard summary widget for active bookings and available crew.
+- [x] Add a dark-mode toggle to the application header.
+- [x] Add regression test assertions, run test suite, verify build, and publish release.

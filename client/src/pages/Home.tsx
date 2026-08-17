@@ -1119,6 +1119,16 @@ export function Shell({
             </div>
           </div>
           <div className="topbar-actions">
+            <button
+              type="button"
+              className="icon-button header-theme-toggle"
+              onClick={toggleTheme}
+              aria-pressed={theme === "dark"}
+              aria-label={`Switch application to ${theme === "dark" ? "light" : "dark"} mode`}
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
+            </button>
             {canSearchDossiers && <><button
               type="button"
               className="search-pill search-launcher"
@@ -2030,6 +2040,8 @@ function Overview({
           ([name]) => DEPARTMENT_LABEL_TO_CODE[name] === user.departmentCode
         );
   const activeDossiers = bookings.filter(booking => booking.stage !== "Dispatched");
+  const todayAttendance = attendanceRecords[dateKey(new Date())] ?? defaultAttendanceRecord(ATTENDANCE_CREW_ROSTER);
+  const availableCrew = ATTENDANCE_CREW_ROSTER.filter(employee => (todayAttendance[employee.name] ?? employee.availability) === "Present");
   const dispatchReviewDossiers = bookings.filter(booking => booking.stage === "Reviewed");
   const complianceBlockers = documents.filter(
     document => document.required && !["Uploaded", "Approved"].includes(document.state)
@@ -2063,6 +2075,21 @@ function Overview({
           <article><strong>{activeDossiers.length}</strong><span>active dossiers</span></article>
           <article><strong>{dispatchReviewDossiers.length}</strong><span>in Sales dispatch review</span></article>
           <article className={complianceBlockers ? "attention" : "ready"}><strong>{complianceBlockers}</strong><span>{complianceBlockers === 1 ? "compliance item needs action" : "compliance items need action"}</span></article>
+        </div>
+      </section>
+      <section className="dashboard-summary-widget" aria-label="Operations quick summary" data-testid="operations-quick-summary">
+        <div className="dashboard-summary-widget-heading"><div><span className="eyebrow">Quick pulse</span><h2>Today’s capacity at a glance</h2></div><span className="status-badge green">Live</span></div>
+        <div className="dashboard-summary-widget-grid">
+          <button type="button" className="dashboard-summary-card" onClick={() => setView("bookings")}>
+            <span className="dashboard-summary-card-icon"><ClipboardCheck size={17} /></span>
+            <span><strong>{activeDossiers.length}</strong><small>active bookings</small></span>
+            <ArrowRight size={15} aria-hidden="true" />
+          </button>
+          <button type="button" className="dashboard-summary-card" onClick={() => setView("crew")}>
+            <span className="dashboard-summary-card-icon"><Users size={17} /></span>
+            <span><strong>{availableCrew.length}<small> / {ATTENDANCE_CREW_ROSTER.length}</small></strong><small>crew available today</small></span>
+            <ArrowRight size={15} aria-hidden="true" />
+          </button>
         </div>
       </section>
       {canViewSalesEnquiries && (

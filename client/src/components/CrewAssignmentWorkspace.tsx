@@ -285,6 +285,13 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
     });
     return { all: bookings.length, dispatched, reviewed, assigned };
   }, [bookings]);
+  const filteredBookingsForExport = useMemo(() => bookings.filter(booking => {
+    const stage = booking.stage;
+    if (quickStatusFilter === "dispatched") return stage === "Dispatched";
+    if (quickStatusFilter === "reviewed") return stage === "Reviewed" || stage === "All Docs Submitted";
+    if (quickStatusFilter === "assigned") return stage === "Crew Assigned" || stage === "Gear Confirmed";
+    return true;
+  }), [bookings, quickStatusFilter]);
 
   const visibleCrew = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -325,6 +332,18 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
   const persistPresets = (items: CrewSearchPreset[]) => { setSavedPresets(items); try { localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(items)); } catch {} };
   const savePreset = () => { const name = presetName.trim(); if (!name) return toast.info("Name this search before saving it."); persistPresets([{ id: `${Date.now()}`, name, query, department, role, availability, date: availabilityDate }, ...savedPresets.filter(item => item.name !== name)].slice(0, 8)); setPresetName(""); };
   const exportCurrentScheduleCsv = async () => { if (!csvColumns.length) return toast.info("Select at least one CSV column."); setExporting(true); await new Promise(resolve => window.setTimeout(resolve, 80)); const values: Record<CsvColumnKey, (crew: RosterCrew) => string> = { employee: crew => crew.name, attendanceId: crew => crew.sourceId, role: crew => crew.role, department: crew => crew.department, availability: crew => crew.availability, date: () => availabilityDate, bookingIds: crew => crew.bookingIds.join(" | ") || "Available", bookingSummaries: crew => crew.bookingIds.map(id => { const booking = bookings.find(item => item.id === id); return booking ? `${booking.client} / ${booking.project ?? "Project"} / ${booking.mob}–${booking.offHire}` : id; }).join(" | ") }; const header = csvColumns.map(key => EXPORT_COLUMNS.find(column => column.key === key)?.label ?? key); const rows = visibleCrew.map(crew => csvColumns.map(key => values[key](crew))); const csv = [header, ...rows].map(row => row.map(csvCell).join(",")).join("\n"); const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); const link = document.createElement("a"); link.href = url; link.download = `BOB-Crew-Assignment-${availabilityDate}.csv`; link.click(); URL.revokeObjectURL(url); setExporting(false); setCsvDialogOpen(false); toast.success(`Exported ${rows.length} current crew rows as CSV.`); };
+  const exportFilteredBookingsCsv = () => {
+    const header = ["Booking ID", "Client", "Project", "Crane", "Site", "Status", "Priority", "Mobilization", "Off-hire"];
+    const rows = filteredBookingsForExport.map(booking => [booking.id, booking.client, booking.project ?? "Project", booking.crane ?? "", booking.site ?? "", booking.stage ?? "", booking.priority ?? "", booking.mob, booking.offHire]);
+    const csv = [header, ...rows].map(row => row.map(csvCell).join(",")).join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `BOB-Crew-Filtered-Bookings-${quickStatusFilter}-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${rows.length} filtered booking${rows.length === 1 ? "" : "s"} exported to CSV.`);
+  };
   const toggleBulk = (id: string) => setBulkIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
   const persistCrew = async (crew: RosterCrew, ids: string[]) => saveAllocation.mutateAsync({ crewId: crew.id, crewName: crew.name, bookingIds: ids.map(toPersistedBookingId).filter((id): id is string => id !== null) });
   const mergeCrewResult = (crewId: string, result: { allocations: { crewName: string; crewId: string; bookingId: string }[] }) => setAllocations(current => [...current.filter(allocation => allocation.crewId !== crewId), ...result.allocations.map(allocation => ({ employeeName: allocation.crewName, crewId: allocation.crewId, bookingId: toUiBookingId(allocation.bookingId) }))]);
@@ -357,7 +376,7 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <CsvColumnDialog open={csvDialogOpen} onOpenChange={setCsvDialogOpen} selected={csvColumns} onSelectedChange={setCsvColumns} onExport={() => void exportCurrentScheduleCsv()} exporting={exporting}/><div className="page-heading"><div><div className="eyebrow">Resource readiness</div><h1>{focusedBooking ? `Edit assignment · ${focusedBooking.id}` : "Crew assignment"}</h1><p>{focusedBooking ? "Select multiple available or assigned employees, review conflicts, then assign the group in one action." : "Search, review, and allocate the attendance-backed crew roster."}</p></div><div style={{ display: "flex", gap: 8 }}><button className="secondary-button" onClick={() => setCsvDialogOpen(true)} disabled={exporting}>{exporting ? <><LoaderCircle size={14} className="animate-spin"/> Generating CSV…</> : <><Download size={14}/> Export CSV</>}</button><button className="primary-button" onClick={onAddWorkman}><Plus size={14}/> Add workman</button></div></div>{focusedBooking && <div className="notification"><div className="title">Bulk Edit Assignment</div><div className="body">Available and already-assigned crew remain selectable. Conflicts are shown before the bulk save.</div></div>}<div className="panel" style={{ marginTop: 16 }}><div className="panel-header"><div className="filter-row">{(["All", "Present", "On Leave", "Assigned", "Upcoming booking", "Completed booking", "Off-Site"] as Availability[]).map(value => <button key={value} className={`filter-chip ${availability === value ? "selected" : ""}`} onClick={() => setAvailability(value)}>{value}</button>)}</div><span className="panel-meta">{visibleCrew.length} matching crew</span></div><div className="panel-body crew-search-controls">
+        <CsvColumnDialog open={csvDialogOpen} onOpenChange={setCsvDialogOpen} selected={csvColumns} onSelectedChange={setCsvColumns} onExport={() => void exportCurrentScheduleCsv()} exporting={exporting}/><div className="page-heading"><div><div className="eyebrow">Resource readiness</div><h1>{focusedBooking ? `Edit assignment · ${focusedBooking.id}` : "Crew assignment"}</h1><p>{focusedBooking ? "Select multiple available or assigned employees, review conflicts, then assign the group in one action." : "Search, review, and allocate the attendance-backed crew roster."}</p></div><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button className="secondary-button" onClick={exportFilteredBookingsCsv} disabled={!filteredBookingsForExport.length}><Download size={14}/> Export bookings CSV</button><button className="secondary-button" onClick={() => setCsvDialogOpen(true)} disabled={exporting}>{exporting ? <><LoaderCircle size={14} className="animate-spin"/> Generating CSV…</> : <><Download size={14}/> Export CSV</>}</button><button className="primary-button" onClick={onAddWorkman}><Plus size={14}/> Add workman</button></div></div>{focusedBooking && <div className="notification"><div className="title">Bulk Edit Assignment</div><div className="body">Available and already-assigned crew remain selectable. Conflicts are shown before the bulk save.</div></div>}<div className="panel" style={{ marginTop: 16 }}><div className="panel-header"><div className="filter-row">{(["All", "Present", "On Leave", "Assigned", "Upcoming booking", "Completed booking", "Off-Site"] as Availability[]).map(value => <button key={value} className={`filter-chip ${availability === value ? "selected" : ""}`} onClick={() => setAvailability(value)}>{value}</button>)}</div><span className="panel-meta">{visibleCrew.length} matching crew</span></div><div className="panel-body crew-search-controls">
   <label className="search-pill booking-search">
     <Search size={14} />
     <input

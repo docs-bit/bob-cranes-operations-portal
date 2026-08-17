@@ -1761,3 +1761,21 @@ body,
 .undo-toast-progress > span { display: block; height: 100%; border-radius: inherit; background: #1d8d74; transition: width 1s linear; }
 .booking-page-size-control { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
 .booking-page-size-control select { min-height: 30px; padding: 5px 24px 5px 8px; border: 1px solid #d6e2de; border-radius: 7px; background: #fff; color: inherit; }
+
+.dashboard-summary-widget { margin: 16px 0; padding: 18px; border: 1px solid var(--border, #dce6e2); border-radius: 16px; background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(239,247,244,.9)); box-shadow: 0 10px 28px rgba(31, 54, 47, .07); }
+.dashboard-summary-widget-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.dashboard-summary-widget-heading h2 { margin: 4px 0 0; font-size: 18px; letter-spacing: -.02em; }
+.dashboard-summary-widget-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.dashboard-summary-card { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 14px; border: 1px solid #d9e7e2; border-radius: 12px; background: rgba(255,255,255,.78); color: inherit; text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.dashboard-summary-card:hover { transform: translateY(-2px); border-color: #97c9b8; box-shadow: 0 8px 20px rgba(31, 92, 76, .1); }
+.dashboard-summary-card > span:nth-child(2) { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.dashboard-summary-card strong { font-size: 24px; line-height: 1; }
+.dashboard-summary-card small { color: #63736d; font-size: 12px; }
+.dashboard-summary-card-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #e2f2ec; color: #217c64; }
+.header-theme-toggle { color: #3b5049; }
+@media (max-width: 720px) { .dashboard-summary-widget-grid { grid-template-columns: 1fr; } }
+.dark .dashboard-summary-widget { background: linear-gradient(135deg, rgba(24, 36, 33, .98), rgba(19, 30, 28, .98)); border-color: #31443e; }
+.dark .dashboard-summary-card { background: rgba(28, 43, 39, .86); border-color: #365149; }
+.dark .dashboard-summary-card small { color: #a9bdb6; }
+.dark .dashboard-summary-card-icon { background: #27483d; color: #8ad6ba; }
+.dark .header-theme-toggle { color: #d9eee6; }
