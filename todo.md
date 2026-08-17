@@ -555,3 +555,10 @@
 - [x] Inspect client portal upload button implementation in Home.tsx.
 - [x] Implement file picker trigger and upload mutation handler for 'Upload remaining'.
 - [x] Add regression test assertions and verify with build and test checks.
+
+## Thumbnail previews, drag-and-drop, delete/replace, and upload skill packaging
+- [x] Add thumbnail preview support for JPG and PNG files in client documents.
+- [x] Implement drag-and-drop upload zone in the client portal document section.
+- [x] Implement delete and replace actions for uploaded documents.
+- [x] Create and validate the updated reusable client upload workflow skill package.
+- [x] Add regression test assertions, run test suite, verify build, and publish release.

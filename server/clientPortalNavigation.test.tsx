@@ -37,6 +37,24 @@ describe("Client Response Portal navigation", () => {
     expect(onUploadAll.mock.calls[0][0][0]).toMatchObject({ name: "signed-site-access-pass.pdf", type: "application/pdf" });
   });
 
+  it("exposes a drag-and-drop upload zone and document replace/delete action", async () => {
+    const user = userEvent.setup();
+    const onUploadAll = vi.fn();
+    render(<ClientPortal
+      booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
+      documents={[{ id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Uploaded", required: true }] as any}
+      onUpdate={vi.fn()}
+      onUploadAll={onUploadAll}
+      onBackToInternal={vi.fn()}
+    />);
+    await user.click(screen.getByRole("button", { name: /required documents/i }));
+    expect(screen.getByText(/drag and drop your files here/i)).toBeInTheDocument();
+    const replaceButton = screen.getByRole("button", { name: /replace or delete document site access pass/i });
+    expect(replaceButton).toBeInTheDocument();
+    await user.click(replaceButton);
+    expect(onUploadAll).toHaveBeenCalled();
+  });
+
   it("always exposes a header return control and invokes the internal navigation callback", async () => {
     const user = userEvent.setup();
     const onBackToInternal = vi.fn();

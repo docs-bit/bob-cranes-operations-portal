@@ -5772,6 +5772,8 @@ export function ClientPortal({
     "required" | "name" | "department"
   >("required");
   const [isUploading, setIsUploading] = useState(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState([
     {
@@ -5836,9 +5838,9 @@ export function ClientPortal({
     if (pendingDocs.length === 0 || isUploading) return;
     fileInputRef.current?.click();
   };
-  const handleClientFiles = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(event.target.files ?? []);
-    event.target.value = "";
+  const handleClientFiles = (event: React.ChangeEvent<HTMLInputElement> | File[]) => {
+    const selectedFiles = Array.isArray(event) ? event : Array.from(event.target.files ?? []);
+    if (!Array.isArray(event) && event.target) event.target.value = "";
     if (!selectedFiles.length) return;
 
     const allowedTypes = new Set(["application/pdf", "image/jpeg", "image/png"]);
@@ -5850,13 +5852,40 @@ export function ClientPortal({
       return;
     }
 
-    const filesToUpload = selectedFiles.slice(0, pendingDocs.length);
+    const filesToUpload = selectedFiles.slice(0, Math.max(1, pendingDocs.length));
     setIsUploading(true);
     onUploadAll(filesToUpload);
     notify(
       `${filesToUpload.length} document${filesToUpload.length === 1 ? "" : "s"} uploaded and synced to the BOB Cranes team.`
     );
     setIsUploading(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    const droppedFiles = Array.from(e.dataTransfer.files ?? []);
+    if (droppedFiles.length) {
+      handleClientFiles(droppedFiles);
+    }
+  };
+
+  const resetDocument = (docName: string) => {
+    onUploadAll([]);
+    notify(`Reset ${docName}. You can upload a replacement file.`);
   };
   const submitDocuments = () => {
     if (pendingDocs.length > 0) return;
@@ -6124,6 +6153,29 @@ export function ClientPortal({
                 </button>
               </div>
               <div className="panel-body">
+                <div
+                  className={`client-drop-zone ${isDraggingOver ? "drag-over" : ""}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  style={{
+                    border: "2px dashed var(--border, #cbd5e1)",
+                    borderRadius: "12px",
+                    padding: "16px",
+                    textAlign: "center",
+                    background: isDraggingOver ? "rgba(33, 124, 100, 0.08)" : "rgba(248, 250, 252, 0.6)",
+                    marginBottom: "14px",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <CloudUpload size={24} color="#217c64" style={{ marginBottom: "6px" }} />
+                  <div style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937" }}>
+                    Drag and drop your files here
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>
+                    Supports PDF, JPG, PNG (up to 25MB)
+                  </div>
+                </div>
                 <div className="notification" style={{ marginBottom: 14 }}>
                   <div className="title">
                     {uploadedDocs}/{documents.length} requirements uploaded ·{" "}
@@ -6172,27 +6224,63 @@ export function ClientPortal({
                   </label>
                 </div>
                 <div className="compliance-list">
-                  {visibleClientDocuments.map(doc => (
-                    <div className="compliance-row" key={doc.name}>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 10,
-                          alignItems: "center",
-                        }}
-                      >
-                        <FileText size={16} color="#888" />
-                        <div>
-                          <div className="compliance-name">{doc.name}</div>
-                          <div className="compliance-sub">
-                            {doc.departmentCode} · client upload · synced to
-                            Drive
+                  {visibleClientDocuments.map(doc => {
+                    const isImage = doc.state === "Uploaded";
+                    return (
+                      <div className="compliance-row" key={doc.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 10,
+                            alignItems: "center",
+                            minWidth: 0,
+                          }}
+                        >
+                          {isImage ? (
+                            <div
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 6,
+                                background: "#e2f2ec",
+                                color: "#217c64",
+                                display: "grid",
+                                placeItems: "center",
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                flexShrink: 0,
+                              }}
+                            >
+                              IMG
+                            </div>
+                          ) : (
+                            <FileText size={16} color="#888" style={{ flexShrink: 0 }} />
+                          )}
+                          <div style={{ minWidth: 0 }}>
+                            <div className="compliance-name" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.name}</div>
+                            <div className="compliance-sub">
+                              {doc.departmentCode} · client upload · synced to
+                              Drive
+                            </div>
                           </div>
                         </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                          <StatusBadge value={doc.state} />
+                          {doc.state === "Uploaded" && (
+                            <button
+                              type="button"
+                              className="secondary-button"
+                              style={{ padding: "4px 8px", fontSize: "11px", height: "auto" }}
+                              onClick={() => resetDocument(doc.name)}
+                              aria-label={`Replace or delete document ${doc.name}`}
+                            >
+                              Replace / Delete
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <StatusBadge value={doc.state} />
-                    </div>
-                  ))}
+                    );
+                  })}
                   {visibleClientDocuments.length === 0 && (
                     <div className="empty-state">
                       No documents match your current search.
