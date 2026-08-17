@@ -32,6 +32,9 @@ describe("Crew Assignment enhancements", () => {
     expect(workspace).toContain("View Details");
     expect(workspace).toContain("Clear filters (");
     expect(workspace).toContain("quickStatusFilter");
+    expect(workspace).toContain("draggable");
+    expect(workspace).toContain("statusCounts");
+    expect(workspace).toContain("Edit Booking");
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {

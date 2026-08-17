@@ -506,3 +506,10 @@
 - [x] Add an active-filter badge count and conditionally hide the Clear Filters button when zero filters are active.
 - [x] Implement quick-filter status pills for dispatched, reviewed, and assigned bookings above the crew roster.
 - [x] Update duplicate-key skill documentation, add regression tests, run build checks, and publish.
+
+## Drag-and-drop crew assignment, pill counts, and editable booking details
+- [x] Implement HTML5 drag-and-drop so users can drag crew members directly onto filtered booking cards.
+- [x] Display task volume counts inside each quick-filter status pill above the crew roster.
+- [x] Add an 'Edit Booking' form inside BookingDetailsDialog to update priority and mobilization dates.
+- [x] Create and validate the updated reusable crew-assignment workflow skill package.
+- [x] Add regression tests, run full test suite, verify build, and publish the release.
