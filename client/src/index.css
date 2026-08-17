@@ -543,7 +543,23 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .more-actions-menu button { width: 100%; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 8px; padding: 9px 10px; background: transparent; color: var(--analytics-ink); font-size: 12px; text-align: left; cursor: pointer; }
 .more-actions-menu button:hover, .more-actions-menu button:focus-visible { background: #edf7f3; color: #1d725f; outline: none; }
 .booking-search { cursor: text; }
-@media (max-width: 620px) { .booking-search { width: 100% !important; } }
+.booking-list-tools { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }
+.booking-search-clear { display: grid; place-items: center; width: 22px; height: 22px; border: 0; border-radius: 50%; background: transparent; color: #6e6e73; cursor: pointer; }
+.booking-search-clear:hover, .booking-search-clear:focus-visible { background: #e3eee9; color: #1d725f; outline: none; }
+.booking-sort-control { display: flex; align-items: center; gap: 7px; color: #6e6e73; font-size: 11px; white-space: nowrap; }
+.booking-sort-control select { min-height: 36px; border: 1px solid #d0d0cc; border-radius: 6px; background: #fff; color: #191919; padding: 0 28px 0 10px; font-size: 11px; cursor: pointer; }
+.booking-sort-control select:focus-visible { border-color: #70b5f9; box-shadow: 0 0 0 3px rgba(112,181,249,.18); outline: none; }
+.booking-list-skeleton { overflow: hidden; }
+.booking-list-skeleton-bar, .booking-list-skeleton-pill, .booking-list-skeleton-dot { display: block; background: linear-gradient(90deg, #edf1ef 25%, #f8faf9 50%, #edf1ef 75%); background-size: 200% 100%; animation: booking-list-skeleton-shimmer 1.35s ease-in-out infinite; }
+.booking-list-skeleton-bar { height: 10px; margin: 4px 0; border-radius: 999px; }
+.booking-list-skeleton-bar.wide { width: 120px; }
+.booking-list-skeleton-bar.medium { width: 92px; }
+.booking-list-skeleton-bar.short { width: 58px; }
+.booking-list-skeleton-pill { width: 96px; height: 24px; border-radius: 999px; }
+.booking-list-skeleton-dot { width: 18px; height: 18px; border-radius: 50%; }
+@keyframes booking-list-skeleton-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@media (max-width: 760px) { .booking-list-header { align-items: stretch; flex-direction: column; gap: 12px; } .booking-list-tools { justify-content: stretch; } .booking-list-tools .booking-search { flex: 1 1 240px; } .booking-sort-control { flex: 1 1 220px; justify-content: space-between; } .booking-sort-control select { flex: 1; } }
+@media (max-width: 620px) { .booking-search { width: 100% !important; } .booking-list-tools { align-items: stretch; flex-direction: column; } .booking-sort-control { width: 100%; } }
 
 
 /* Attendance, training register, and multi-booking allocation */

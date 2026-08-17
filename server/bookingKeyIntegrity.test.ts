@@ -18,3 +18,22 @@ describe("booking render identity", () => {
     expect(homeSource).toContain("new Map(initialBookings.map(booking => [booking.id, booking]))");
   });
 });
+
+describe("bookings list discovery controls", () => {
+  const homeSource = readFileSync(resolve(process.cwd(), "client/src/pages/Home.tsx"), "utf8");
+
+  it("supports dossier search and all requested sort dimensions", () => {
+    expect(homeSource).toContain("aria-label=\"Search booking dossiers by client, project, or booking ID\"");
+    expect(homeSource).toContain("value=\"date-asc\">Mobilization date · earliest");
+    expect(homeSource).toContain("value=\"status\">Workflow status");
+    expect(homeSource).toContain("value=\"id-asc\">Booking ID · A–Z");
+    expect(homeSource).toContain("stages.indexOf(left.stage) - stages.indexOf(right.stage)");
+  });
+
+  it("renders a table-shaped loading skeleton while bookings hydrate", () => {
+    expect(homeSource).toContain("function BookingsListSkeleton()");
+    expect(homeSource).toContain("isLoading ? (");
+    expect(homeSource).toContain("bookings-list-skeleton");
+    expect(homeSource).toContain("setBookingsLoading(false)");
+  });
+});

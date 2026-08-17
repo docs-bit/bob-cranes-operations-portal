@@ -470,3 +470,9 @@
 - [ ] Locate every occurrence of booking mapping/rendering keys in `Home.tsx` and ensure composite or unique keys (`${booking.id}-${index}` or unique IDs).
 - [ ] Add regression test coverage checking for unique keys across rendered booking lists.
 - [ ] Run test suite, production build, and publish final repaired release.
+
+## Bookings list discovery and loading polish
+- [x] Add an accessible search bar above the Home bookings list to filter by client/project name and booking ID.
+- [x] Add an accessible sorting dropdown to order bookings by mobilization date, workflow status, or booking ID.
+- [x] Add a bookings-list skeleton loading state in Home.tsx while booking data is being fetched.
+- [x] Add regression coverage and verify the updated bookings list with type checks, tests, build, and visual QA.

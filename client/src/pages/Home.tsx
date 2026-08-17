@@ -180,6 +180,8 @@ type Booking = {
   crew: string;
 };
 
+type BookingSort = "date-asc" | "date-desc" | "status" | "id-asc" | "id-desc";
+
 const stages: Stage[] = [
   "Created by Salesperson",
   "Documentation Supervisor",
@@ -2264,43 +2266,104 @@ function Overview({
   );
 }
 
+function BookingsListSkeleton() {
+  return (
+    <div className="table-wrap bookings-list-skeleton" role="status" aria-live="polite" aria-label="Loading booking dossiers">
+      <table className="data-table" aria-hidden="true">
+        <thead>
+          <tr>
+            <th>Dossier</th>
+            <th>Client / Project</th>
+            <th>Crane & Site</th>
+            <th>Lifecycle stage</th>
+            <th>Docs</th>
+            <th>Mobilization</th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: 5 }, (_, index) => (
+            <tr key={`booking-skeleton-${index}`}>
+              <td><span className="booking-list-skeleton-bar wide" /></td>
+              <td>
+                <span className="booking-list-skeleton-bar medium" />
+                <span className="booking-list-skeleton-bar short" />
+              </td>
+              <td>
+                <span className="booking-list-skeleton-bar medium" />
+                <span className="booking-list-skeleton-bar short" />
+              </td>
+              <td><span className="booking-list-skeleton-pill" /></td>
+              <td>
+                <span className="booking-list-skeleton-bar medium" />
+                <span className="booking-list-skeleton-bar short" />
+              </td>
+              <td><span className="booking-list-skeleton-bar short" /></td>
+              <td><span className="booking-list-skeleton-dot" /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <span className="sr-only">Loading booking dossiers…</span>
+    </div>
+  );
+}
+
 function BookingsView({
   bookings,
   setView,
   setDetail,
+  isLoading,
 }: {
   bookings: Booking[];
   setView: (view: View) => void;
   setDetail: (booking: Booking) => void;
+  isLoading?: boolean;
 }) {
   const [filter, setFilter] = useState<"all" | "critical" | "mobilizing">(
     "all"
   );
   const [query, setQuery] = useState("");
-  const visibleBookings = useMemo(
-    () =>
-      bookings.filter(booking => {
-        const matchesFilter =
-          filter === "all" ||
-          (filter === "critical"
-            ? booking.priority === "Critical"
-            : booking.progress < 100);
-        const normalized = query.trim().toLowerCase();
-        const matchesQuery =
-          !normalized ||
-          [
-            booking.id,
-            booking.client,
-            booking.project,
-            booking.crane,
-            booking.site,
-            booking.stage,
-            booking.priority,
-          ].some(value => value.toLowerCase().includes(normalized));
-        return matchesFilter && matchesQuery;
-      }),
-    [bookings, filter, query]
-  );
+  const [sortBy, setSortBy] = useState<BookingSort>("date-asc");
+  const visibleBookings = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const filtered = bookings.filter(booking => {
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "critical"
+          ? booking.priority === "Critical"
+          : booking.progress < 100);
+      const matchesQuery =
+        !normalized ||
+        [
+          booking.id,
+          booking.client,
+          booking.project,
+          booking.crane,
+          booking.site,
+          booking.stage,
+          booking.priority,
+        ].some(value => value.toLowerCase().includes(normalized));
+      return matchesFilter && matchesQuery;
+    });
+
+    return filtered.sort((left, right) => {
+      if (sortBy === "status") {
+        return stages.indexOf(left.stage) - stages.indexOf(right.stage);
+      }
+      if (sortBy === "id-asc" || sortBy === "id-desc") {
+        const result = left.id.localeCompare(right.id, undefined, { numeric: true });
+        return sortBy === "id-desc" ? -result : result;
+      }
+      const leftDate = Date.parse(left.mob);
+      const rightDate = Date.parse(right.mob);
+      const result =
+        (Number.isNaN(leftDate) ? Number.MAX_SAFE_INTEGER : leftDate) -
+        (Number.isNaN(rightDate) ? Number.MAX_SAFE_INTEGER : rightDate);
+      return sortBy === "date-desc" ? -result : result;
+    });
+  }, [bookings, filter, query, sortBy]);
+
   return (
     <div className="content">
       <PageHeading
@@ -2314,7 +2377,7 @@ function BookingsView({
         }
       />
       <div className="panel">
-        <div className="panel-header">
+        <div className="panel-header booking-list-header">
           <div className="filter-row">
             <button
               className={`filter-chip ${filter === "all" ? "selected" : ""}`}
@@ -2338,79 +2401,113 @@ function BookingsView({
               Mobilizing this week
             </button>
           </div>
-          <label className="search-pill booking-search" style={{ width: 230 }}>
-            <Search size={14} />
-            <input
-              value={query}
-              onChange={event => setQuery(event.target.value)}
-              placeholder="Search client or ID"
-              aria-label="Search booking dossiers"
-            />
-          </label>
-        </div>
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Dossier</th>
-                <th>Client / Project</th>
-                <th>Crane & Site</th>
-                <th>Lifecycle stage</th>
-                <th>Docs</th>
-                <th>Mobilization</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {visibleBookings.map((booking, index) => (
-                <tr
-                  key={`booking-table-${booking.id}-${index}`}
-                  onClick={() => setDetail(booking)}
-                  style={{ cursor: "pointer" }}
-                  tabIndex={0}
-                  onKeyDown={event => {
-                    if (event.key === "Enter" || event.key === " ")
-                      setDetail(booking);
-                  }}
+          <div className="booking-list-tools">
+            <label className="search-pill booking-search">
+              <Search size={14} aria-hidden="true" />
+              <input
+                value={query}
+                onChange={event => setQuery(event.target.value)}
+                placeholder="Search client, project, or ID"
+                aria-label="Search booking dossiers by client, project, or booking ID"
+              />
+              {query && (
+                <button
+                  type="button"
+                  className="booking-search-clear"
+                  onClick={() => setQuery("")}
+                  aria-label="Clear booking search"
                 >
-                  <td>
-                    <strong style={{ color: "#ef7377" }}>{booking.id}</strong>
-                    <div className="muted">Created by Sales</div>
-                  </td>
-                  <td>
-                    <strong>{booking.client}</strong>
-                    <div className="muted">{booking.project}</div>
-                  </td>
-                  <td>
-                    <strong>{booking.crane}</strong>
-                    <div className="muted">{booking.site}</div>
-                  </td>
-                  <td>
-                    <StatusBadge value={booking.stage} />
-                  </td>
-                  <td style={{ minWidth: 100 }}>
-                    <div className="progress-track">
-                      <div
-                        className={`progress-fill ${booking.progress === 100 ? "green" : ""}`}
-                        style={{ width: `${booking.progress}%` }}
-                      />
-                    </div>
-                    <div className="muted" style={{ marginTop: 4 }}>
-                      {booking.progress}% complete
-                    </div>
-                  </td>
-                  <td>{booking.mob}</td>
-                  <td>
-                    <ArrowRight size={15} color="#777" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {visibleBookings.length === 0 && (
-            <div className="empty-state">No dossiers match this filter.</div>
-          )}
+                  <X size={13} />
+                </button>
+              )}
+            </label>
+            <label className="booking-sort-control">
+              <span>Sort by</span>
+              <select
+                value={sortBy}
+                onChange={event => setSortBy(event.target.value as BookingSort)}
+                aria-label="Sort booking dossiers"
+              >
+                <option value="date-asc">Mobilization date · earliest</option>
+                <option value="date-desc">Mobilization date · latest</option>
+                <option value="status">Workflow status</option>
+                <option value="id-asc">Booking ID · A–Z</option>
+                <option value="id-desc">Booking ID · Z–A</option>
+              </select>
+            </label>
+          </div>
         </div>
+        {isLoading ? (
+          <BookingsListSkeleton />
+        ) : (
+          <div className="table-wrap" aria-live="polite">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Dossier</th>
+                  <th>Client / Project</th>
+                  <th>Crane & Site</th>
+                  <th>Lifecycle stage</th>
+                  <th>Docs</th>
+                  <th>Mobilization</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {visibleBookings.map((booking, index) => (
+                  <tr
+                    key={`booking-table-${booking.id}-${index}`}
+                    onClick={() => setDetail(booking)}
+                    style={{ cursor: "pointer" }}
+                    tabIndex={0}
+                    onKeyDown={event => {
+                      if (event.key === "Enter" || event.key === " ")
+                        setDetail(booking);
+                    }}
+                  >
+                    <td>
+                      <strong style={{ color: "#ef7377" }}>{booking.id}</strong>
+                      <div className="muted">Created by Sales</div>
+                    </td>
+                    <td>
+                      <strong>{booking.client}</strong>
+                      <div className="muted">{booking.project}</div>
+                    </td>
+                    <td>
+                      <strong>{booking.crane}</strong>
+                      <div className="muted">{booking.site}</div>
+                    </td>
+                    <td>
+                      <StatusBadge value={booking.stage} />
+                    </td>
+                    <td style={{ minWidth: 100 }}>
+                      <div className="progress-track">
+                        <div
+                          className={`progress-fill ${booking.progress === 100 ? "green" : ""}`}
+                          style={{ width: `${booking.progress}%` }}
+                        />
+                      </div>
+                      <div className="muted" style={{ marginTop: 4 }}>
+                        {booking.progress}% complete
+                      </div>
+                    </td>
+                    <td>{booking.mob}</td>
+                    <td>
+                      <ArrowRight size={15} color="#777" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {visibleBookings.length === 0 && (
+              <div className="empty-state">
+                {query.trim()
+                  ? `No dossiers match “${query.trim()}”.`
+                  : "No dossiers match this filter."}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -7462,6 +7559,7 @@ export default function Home() {
               : "overview"
   );
   const [workspaceLoading, setWorkspaceLoading] = useState(false);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
   const [bookings, setBookings] = useState<Booking[]>(() => Array.from(new Map(initialBookings.map(booking => [booking.id, booking])).values()));
   const [uploadDocuments, setUploadDocuments] = useState<DocumentItem[]>(
     initialUploadDocuments
@@ -7521,6 +7619,11 @@ export default function Home() {
   const [completedWorkstreams, setCompletedWorkstreams] = useState<
     Record<string, string[]>
   >({});
+  useEffect(() => {
+    if (!user) return;
+    const timer = window.setTimeout(() => setBookingsLoading(false), 220);
+    return () => window.clearTimeout(timer);
+  }, [user]);
   useEffect(() => {
     if (view !== "department" && view !== "provisioned-dashboard") {
       setWorkspaceLoading(false);
@@ -7743,6 +7846,7 @@ export default function Home() {
           bookings={bookings}
           setView={guardedSetView}
           setDetail={openDetail}
+          isLoading={bookingsLoading}
         />
       )}
       {view === "wizard" &&
