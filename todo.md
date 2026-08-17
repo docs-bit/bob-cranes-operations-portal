@@ -500,3 +500,9 @@
 - [x] Add a Clear Filters action next to the crew search bar to reset search, department, and availability filters.
 - [x] Initialize and write the reusable duplicate-key repair skill using the skill-creator guidelines and quick-validate.
 - [x] Add regression assertions, run full tests, verify build, and publish the completed release.
+
+## Crew assignment modal and quick status pills enhancements
+- [x] Add a 'View Details' button inside booking chip hover tooltips to open a complete booking information modal.
+- [x] Add an active-filter badge count and conditionally hide the Clear Filters button when zero filters are active.
+- [x] Implement quick-filter status pills for dispatched, reviewed, and assigned bookings above the crew roster.
+- [x] Update duplicate-key skill documentation, add regression tests, run build checks, and publish.

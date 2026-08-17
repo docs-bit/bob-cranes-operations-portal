@@ -29,7 +29,82 @@ const csvCell = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""'
 
 function Badge({ value }: { value: string }) { const tone = value === "Present" || value === "Active booking" || value === "Clear" ? "green" : value === "Assigned" || value === "Upcoming booking" ? "blue" : value === "On Leave" || value === "Off-Site" || value.includes("conflict") ? "red" : "gray"; return <span className={`status-badge ${tone}`}>{value}</span>; }
 function dateAvailability(crew: (typeof CREW_ASSIGNMENT_ROSTER)[number], ids: string[], bookings: Booking[], date: string) { if (!ids.length) return allocationAwareAvailability(crew.availability, false); const timing = summarizeAllocationTiming(ids, bookings, new Date(`${date}T12:00:00`)); return timing === "Active booking" ? "Assigned" : timing; }
-function BookingIdChip({ bookingId, booking, onOpen }: { bookingId: string; booking?: Booking; onOpen: (id: string) => void }) {
+function BookingDetailsDialog({
+  booking,
+  open,
+  onOpenChange,
+  onOpenDossier,
+}: {
+  booking?: Booking & { site?: string; crane?: string; priority?: string; progress?: number; offHire?: string };
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onOpenDossier: (id: string) => void;
+}) {
+  if (!booking) return null;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{booking.id} · Dossier overview</DialogTitle>
+          <DialogDescription>
+            {booking.client} {booking.project ? `· ${booking.project}` : ""}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="booking-details-modal-grid">
+          <div>
+            <span className="muted">Lifecycle stage</span>
+            <strong>{booking.stage ?? "Active"}</strong>
+          </div>
+          <div>
+            <span className="muted">Priority</span>
+            <strong>{booking.priority ?? "Standard"}</strong>
+          </div>
+          <div>
+            <span className="muted">Crane / Equipment</span>
+            <strong>{booking.crane ?? "Allocated crane"}</strong>
+          </div>
+          <div>
+            <span className="muted">Site location</span>
+            <strong>{booking.site ?? "Job site"}</strong>
+          </div>
+          <div>
+            <span className="muted">Mobilization</span>
+            <strong>{booking.mob}</strong>
+          </div>
+          <div>
+            <span className="muted">Off-hire</span>
+            <strong>{booking.offHire}</strong>
+          </div>
+        </div>
+        <DialogFooter>
+          <button className="secondary-button" onClick={() => onOpenChange(false)}>
+            Close
+          </button>
+          <button
+            className="primary-button"
+            onClick={() => {
+              onOpenChange(false);
+              onOpenDossier(booking.id);
+            }}
+          >
+            Open full dossier <ExternalLink size={14} />
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function BookingIdChip({
+  bookingId,
+  booking,
+  onOpen,
+}: {
+  bookingId: string;
+  booking?: Booking & { site?: string; crane?: string; priority?: string; progress?: number; offHire?: string };
+  onOpen: (id: string) => void;
+}) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const stage = booking?.stage;
   const tone =
     stage === "Dispatched"
@@ -43,25 +118,46 @@ function BookingIdChip({ bookingId, booking, onOpen }: { bookingId: string; book
     ? `${booking.client} · ${booking.project ?? "Project"} · ${booking.stage ?? "Active"} · Mob: ${booking.mob}`
     : "Booking details unavailable in this schedule view.";
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          className={`booking-id-chip status-${tone}`}
-          onClick={event => {
-            event.stopPropagation();
-            onOpen(bookingId);
-          }}
-          aria-label={`Open ${bookingId} dossier (${booking?.stage ?? "Active"})`}
-        >
-          <span>{bookingId}</span>
-          <ExternalLink size={11} />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent side="top" sideOffset={8} className="booking-chip-tooltip">
-        <strong>{bookingId}</strong>
-        <span>{summary}</span>
-      </TooltipContent>
-    </Tooltip>
+    <>
+      <BookingDetailsDialog
+        booking={booking}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        onOpenDossier={onOpen}
+      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            className={`booking-id-chip status-${tone}`}
+            onClick={event => {
+              event.stopPropagation();
+              onOpen(bookingId);
+            }}
+            aria-label={`Open ${bookingId} dossier (${booking?.stage ?? "Active"})`}
+          >
+            <span>{bookingId}</span>
+            <ExternalLink size={11} />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top" sideOffset={8} className="booking-chip-tooltip">
+          <strong>{bookingId}</strong>
+          <span>{summary}</span>
+          <div style={{ marginTop: 6, display: "flex", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="secondary-button compact-button"
+              onClick={event => {
+                event.stopPropagation();
+                setDetailsOpen(true);
+              }}
+              style={{ fontSize: 10, padding: "2px 8px" }}
+            >
+              View Details
+            </button>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </>
   );
 }
 
@@ -80,7 +176,36 @@ export function CrewView({ bookings, allocations, setAllocations, focusedBooking
   const departments = useMemo(() => Array.from(new Set(CREW_ASSIGNMENT_ROSTER.map(crew => crew.department))).sort(), []);
   const bookingIdsByCrew = useMemo(() => new Map(CREW_ASSIGNMENT_ROSTER.map(crew => [crew.id, allocations.filter(allocation => allocationMatches(crew, allocation)).map(allocation => allocation.bookingId)])), [allocations]);
   const roster = useMemo((): RosterCrew[] => CREW_ASSIGNMENT_ROSTER.map(crew => { const bookingIds = bookingIdsByCrew.get(crew.id) ?? []; return { ...crew, bookingIds, availability: dateAvailability(crew, bookingIds, bookings, availabilityDate) }; }), [availabilityDate, bookingIdsByCrew, bookings]);
-  const visibleCrew = useMemo(() => { const needle = query.trim().toLowerCase(); return roster.filter(crew => (availability === "All" || crew.availability === availability) && (department === "All" || crew.department === department) && (!needle || `${crew.name} ${crew.sourceId} ${crew.role} ${crew.department} ${crew.bookingIds.join(" ")}`.toLowerCase().includes(needle))); }, [availability, department, query, roster]);
+  const [quickStatusFilter, setQuickStatusFilter] = useState<"all" | "dispatched" | "reviewed" | "assigned">("all");
+
+  const visibleCrew = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return roster.filter(crew => {
+      const matchesAvailability = availability === "All" || crew.availability === availability;
+      const matchesDepartment = department === "All" || crew.department === department;
+      const matchesQuery = !needle || `${crew.name} ${crew.sourceId} ${crew.role} ${crew.department} ${crew.bookingIds.join(" ")}`.toLowerCase().includes(needle);
+      if (!matchesAvailability || !matchesDepartment || !matchesQuery) return false;
+      if (quickStatusFilter === "all") return true;
+      const crewBookings = crew.bookingIds.map(id => bookings.find(item => item.id === id)).filter((item): item is Booking & { stage?: string } => Boolean(item));
+      if (quickStatusFilter === "dispatched") {
+        return crewBookings.some(b => b.stage === "Dispatched");
+      }
+      if (quickStatusFilter === "reviewed") {
+        return crewBookings.some(b => b.stage === "Reviewed" || b.stage === "All Docs Submitted");
+      }
+      if (quickStatusFilter === "assigned") {
+        return crewBookings.some(b => b.stage === "Crew Assigned" || b.stage === "Gear Confirmed");
+      }
+      return true;
+    });
+  }, [availability, bookings, department, quickStatusFilter, query, roster]);
+
+  const activeFilterCount =
+    (query.trim() ? 1 : 0) +
+    (department !== "All" ? 1 : 0) +
+    (availability !== "All" ? 1 : 0) +
+    (availabilityDate !== todayKey() ? 1 : 0) +
+    (quickStatusFilter !== "all" ? 1 : 0);
   const selectedCrew = roster.find(crew => crew.id === selectedCrewId) ?? roster[0]; const selectedBulkCrew = roster.filter(crew => bulkIds.includes(crew.id)); const targetBooking = focusedBooking ?? focusAssignmentBooking(bookings, focusedBookingId)[0] ?? null;
   const conflictSummary = useMemo(() => targetBooking ? buildBulkConflictSummary(selectedBulkCrew, targetBooking, bookings, allocations) : [], [allocations, bookings, selectedBulkCrew, targetBooking]); const activeConflicts = conflictSummary.filter(item => item.conflicts.length);
   useEffect(() => { if (focusedCrewId) setSelectedCrewId(focusedCrewId); }, [focusedCrewId]); useEffect(() => { if (focusedBookingId) setBulkIds(allocations.filter(allocation => allocation.bookingId === focusedBookingId).map(allocation => allocation.crewId).filter((id): id is string => Boolean(id))); }, [allocations, focusedBookingId]); useEffect(() => { try { const saved = localStorage.getItem(PRESET_STORAGE_KEY); if (saved) setSavedPresets(JSON.parse(saved)); } catch {} }, []);
@@ -123,7 +248,7 @@ export function CrewView({ bookings, allocations, setAllocations, focusedBooking
       aria-label="Filter crew availability by date"
     />
   </label>
-  {(query.trim() || department !== "All" || availability !== "All" || availabilityDate !== todayKey()) && (
+  {activeFilterCount > 0 && (
     <button
       type="button"
       className="secondary-button compact-button"
@@ -132,12 +257,44 @@ export function CrewView({ bookings, allocations, setAllocations, focusedBooking
         setDepartment("All");
         setAvailability("All");
         setAvailabilityDate(todayKey());
+        setQuickStatusFilter("all");
         toast.success("Crew assignment filters reset");
       }}
       aria-label="Clear all active crew filters"
     >
-      Clear filters
+      Clear filters ({activeFilterCount})
     </button>
   )}
+</div>
+<div className="panel-body crew-status-pills-row" style={{ display: "flex", gap: 8, paddingBottom: 12 }}>
+  <span className="muted" style={{ fontSize: 11, alignSelf: "center", marginRight: 4 }}>Status filter:</span>
+  <button
+    type="button"
+    className={`filter-chip ${quickStatusFilter === "all" ? "selected" : ""}`}
+    onClick={() => setQuickStatusFilter("all")}
+  >
+    All
+  </button>
+  <button
+    type="button"
+    className={`filter-chip ${quickStatusFilter === "dispatched" ? "selected" : ""}`}
+    onClick={() => setQuickStatusFilter("dispatched")}
+  >
+    Dispatched
+  </button>
+  <button
+    type="button"
+    className={`filter-chip ${quickStatusFilter === "reviewed" ? "selected" : ""}`}
+    onClick={() => setQuickStatusFilter("reviewed")}
+  >
+    Reviewed / Submitted
+  </button>
+  <button
+    type="button"
+    className={`filter-chip ${quickStatusFilter === "assigned" ? "selected" : ""}`}
+    onClick={() => setQuickStatusFilter("assigned")}
+  >
+    Crew / Gear Assigned
+  </button>
 </div><div className="panel-body saved-search-controls"><input className="form-input" value={presetName} onChange={event => setPresetName(event.target.value)} placeholder="Name this workspace search" aria-label="Saved search name"/><button className="secondary-button" onClick={savePreset}><Save size={14}/> Save search</button>{savedPresets.map(preset => <button className="filter-chip" key={preset.id} onClick={() => { setQuery(preset.query); setDepartment(preset.department); setAvailability(preset.availability); setAvailabilityDate(preset.date); }}>{preset.name}</button>)}</div><div className="table-wrap"><table className="data-table" data-testid="crew-roster-table"><thead><tr>{focusedBooking && <th><button className="table-select-all" onClick={() => setBulkIds(visibleCrew.map(crew => crew.id))} aria-label="Select all filtered crew"><CheckSquare size={14}/></button></th>}<th>Workman</th><th>Attendance ID</th><th>Role</th><th>Department</th><th>Availability</th><th>Booking allocation</th></tr></thead><tbody>{visibleCrew.map(crew => { const timing = crew.bookingIds.length ? summarizeAllocationTiming(crew.bookingIds, bookings, new Date(`${availabilityDate}T12:00:00`)) : null; return <tr key={crew.id} className={selectedCrew?.id === crew.id ? "selected-row" : ""} onClick={() => setSelectedCrewId(crew.id)}>{focusedBooking && <td><input type="checkbox" checked={bulkIds.includes(crew.id)} onChange={() => toggleBulk(crew.id)} onClick={event => event.stopPropagation()} aria-label={`Select ${crew.name} for bulk assignment`}/></td>}<td><strong>{crew.name}</strong><span className="allocation-count-badge">{crew.bookingIds.length} allocation{crew.bookingIds.length === 1 ? "" : "s"}</span></td><td>{crew.sourceId}</td><td>{crew.role}</td><td>{crew.department}</td><td><Badge value={crew.availability}/>{timing && <Badge value={timing}/>}</td><td>{crew.bookingIds.length ? <div className="crew-booking-ids">{crew.bookingIds.map((id, index) => <BookingIdChip key={`booking-chip-${id}-${index}`} bookingId={id} booking={bookings.find(item => item.id === id)} onOpen={onOpenDossier}/>)}</div> : "Available"}</td></tr>; })}</tbody></table>{!visibleCrew.length && <div className="empty-state">No crew match this page search and date filter.</div>}</div></div>{focusedBooking && <div className="bulk-assignment-layout"><section className="panel"><div className="panel-header"><div><div className="panel-title"><Users size={15}/> Bulk assignment · {targetBooking?.id}</div><div className="panel-meta">{selectedBulkCrew.length} selected crew member{selectedBulkCrew.length === 1 ? "" : "s"}</div></div><button className="primary-button" disabled={!selectedBulkCrew.length || saveAllocation.isPending} onClick={bulkAssign}>{saveAllocation.isPending ? "Saving…" : `Assign ${selectedBulkCrew.length || "selected"} crew`}</button></div><div className="panel-body">{selectedBulkCrew.length ? <div className="bulk-selected-list">{selectedBulkCrew.map(crew => <span className="booking-id-chip" key={crew.id}>{crew.name} · {crew.role}</span>)}</div> : <div className="empty-state">Select employees from the roster above to prepare a bulk assignment.</div>}</div></section><section className="panel"><div className="panel-header"><div><div className="panel-title"><AlertTriangle size={15}/> Conflict timeline before save</div><div className="panel-meta">Target booking dates are compared with every selected crew member’s saved allocations.</div></div><Badge value={activeConflicts.length ? `${activeConflicts.length} conflicts` : "Clear"}/></div><div className="panel-body conflict-timeline">{selectedBulkCrew.length ? conflictSummary.map(item => <div className="conflict-timeline-row" key={item.crew.id}><strong>{item.crew.name}</strong><div className="conflict-track"><span className="conflict-target-segment">Target · {targetBooking?.mob} → {targetBooking?.offHire}</span>{item.conflicts.map(conflict => <span className="conflict-overlap-segment" key={conflict.id}>Conflict · {conflict.id}</span>)}</div><small>{item.conflicts.length ? `${item.conflicts.length} overlapping booking${item.conflicts.length === 1 ? "" : "s"}` : "No date overlap"}</small></div>) : <div className="empty-state">Select crew to see their booking conflict timeline before saving.</div>}</div></section></div>}<div className="panel" style={{ marginTop: 16 }}><div className="panel-header"><div className="panel-title">Individual assignment</div><div className="panel-meta">Use this control for the selected roster row.</div></div></div><div className="panel-body booking-allocation-list">{focusAssignmentBooking(bookings, focusedBookingId).map((booking, index) => <div className="booking-allocation-row" key={`booking-allocation-${booking.id}-${index}`}><div><strong>{booking.id}</strong><span>{booking.client} · {booking.mob} → {booking.offHire}</span></div><button className="secondary-button" onClick={() => toggleSingle(booking)}>{selectedCrew?.bookingIds.includes(booking.id) ? "Remove selected crew" : "Assign selected crew"}</button></div>)}</div></div>;
 }

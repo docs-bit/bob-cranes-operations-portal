@@ -28,6 +28,10 @@ describe("Crew Assignment enhancements", () => {
     expect(workspace).toContain('aria-label={`Open ${bookingId} dossier');
     expect(workspace).toContain("BookingIdChip");
     expect(workspace).toContain("onOpen={onOpenDossier}");
+    expect(workspace).toContain("BookingDetailsDialog");
+    expect(workspace).toContain("View Details");
+    expect(workspace).toContain("Clear filters (");
+    expect(workspace).toContain("quickStatusFilter");
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {
