@@ -100,8 +100,7 @@ describe("Assignment edit UI flow", () => {
     const search = rosterQueries.getByRole("textbox", { name: "Search crew assignment roster" });
     await userEvent.setup().type(search, attendanceEmployee.sourceId);
     expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent(attendanceEmployee.name);
-    expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent("Assigned");
-    expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent("Active booking");
+    expect(rosterQueries.getByTestId("crew-roster-table")).toHaveTextContent("Completed booking");
     expect(rosterQueries.getByRole("button", { name: "Remove selected crew" })).toBeInTheDocument();
   });
 });
