@@ -5833,16 +5833,29 @@ export function ClientPortal({
   const [documentSort, setDocumentSort] = useState<
     "required" | "name" | "department"
   >("required");
+  const { data: serverFilterPresets, refetch: refetchServerPresets } = trpc.filterPresets.list.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const savePresetMutation = trpc.filterPresets.save.useMutation({
+    onSuccess: () => { void refetchServerPresets(); },
+  });
+  const deletePresetMutation = trpc.filterPresets.delete.useMutation({
+    onSuccess: () => { void refetchServerPresets(); },
+  });
+
   const [filterPresets, setFilterPresets] = useState<Array<{ name: string; category: string; tags: string[]; search: string }>>(() => {
-    try {
-      const raw = localStorage.getItem("bob-client-filter-presets");
-      if (raw) return JSON.parse(raw);
-    } catch {}
     return [
-      { name: "Safety & Passes", category: "All categories", tags: ["Safety", "Site Pass"], search: "" },
-      { name: "Required LPO", category: "All categories", tags: ["LPO"], search: "" },
+      { name: "Commercial & LPO", category: "Commercial", tags: ["lpo"], search: "" },
+      { name: "Safety & HSE", category: "Safety & HSE", tags: ["approval"], search: "" },
     ];
   });
+
+  React.useEffect(() => {
+    if (serverFilterPresets && serverFilterPresets.length > 0) {
+      setFilterPresets(serverFilterPresets.map(p => ({ name: p.name, category: p.category, tags: p.tags, search: p.search })));
+    }
+  }, [serverFilterPresets]);
   const [newPresetName, setNewPresetName] = useState("");
   const [documentOverrides, setDocumentOverrides] = useState<Record<string, Partial<DocumentItem>>>({});
   const [isUploading, setIsUploading] = useState(false);
@@ -5962,13 +5975,15 @@ export function ClientPortal({
   };
   const saveFilterPreset = () => {
     if (!newPresetName.trim()) return;
-    const next = [...filterPresets, { name: newPresetName.trim(), category: documentCategory, tags: documentTags, search: documentSearch }];
+    const name = newPresetName.trim();
+    const category = documentCategory;
+    const tags = documentTags;
+    const search = documentSearch;
+    const next = [...filterPresets.filter(p => p.name !== name), { name, category, tags, search }];
     setFilterPresets(next);
     setNewPresetName("");
-    try {
-      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
-    } catch {}
-    notify(`Filter preset “${newPresetName.trim()}” saved.`);
+    savePresetMutation.mutate({ name, category, tags, search });
+    notify(`Filter preset “${name}” saved and persisted.`);
   };
   const applyFilterPreset = (preset: { name: string; category: string; tags: string[]; search: string }) => {
     setDocumentCategory(preset.category);
@@ -5979,9 +5994,7 @@ export function ClientPortal({
   const removeFilterPreset = (presetName: string) => {
     const next = filterPresets.filter(preset => preset.name !== presetName);
     setFilterPresets(next);
-    try {
-      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
-    } catch {}
+    deletePresetMutation.mutate({ name: presetName });
     notify(`Removed preset “${presetName}”.`);
   };
   const renameFilterPreset = (oldName: string) => {
@@ -5992,9 +6005,8 @@ export function ClientPortal({
     const trimmed = updatedName.trim();
     const next = filterPresets.map(preset => preset.name === oldName ? { ...preset, name: trimmed } : preset);
     setFilterPresets(next);
-    try {
-      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
-    } catch {}
+    deletePresetMutation.mutate({ name: oldName });
+    savePresetMutation.mutate({ name: trimmed, category: target.category, tags: target.tags, search: target.search });
     notify(`Renamed preset to “${trimmed}”.`);
   };
   const updateFilterPresetCriteria = (presetName: string) => {
@@ -6002,9 +6014,7 @@ export function ClientPortal({
     if (!target) return;
     const next = filterPresets.map(preset => preset.name === presetName ? { ...preset, category: documentCategory, tags: documentTags, search: documentSearch } : preset);
     setFilterPresets(next);
-    try {
-      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
-    } catch {}
+    savePresetMutation.mutate({ name: presetName, category: documentCategory, tags: documentTags, search: documentSearch });
     notify(`Updated preset “${presetName}” with current active filters.`);
   };
   const retryUpload = (documentId: string, fileName: string) => {

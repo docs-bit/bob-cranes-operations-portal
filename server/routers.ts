@@ -1035,6 +1035,46 @@ export const appRouter = router({
     list: adminProcedure.input(z.object({ limit: z.number().int().min(1).max(500).optional() }).optional()).query(async ({ input }) => await db.listTelemetryEvents(input?.limit ?? 250)),
   }),
 
+  filterPresets: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const presets = await db.listClientFilterPresets(ctx.user.id);
+      return presets.map(p => ({
+        ...p,
+        tags: JSON.parse(p.tagsJson || "[]") as string[],
+      }));
+    }),
+    save: protectedProcedure
+      .input(
+        z.object({
+          id: z.string().trim().max(64).optional(),
+          name: z.string().trim().min(1).max(128),
+          category: z.string().trim().max(128),
+          tags: z.array(z.string().trim().max(128)),
+          search: z.string().trim().max(255),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const saved = await db.saveClientFilterPreset({
+          userId: ctx.user.id,
+          id: input.id,
+          name: input.name,
+          category: input.category,
+          tags: input.tags,
+          search: input.search,
+        });
+        return {
+          ...saved,
+          tags: JSON.parse(saved?.tagsJson || "[]") as string[],
+        };
+      }),
+    delete: protectedProcedure
+      .input(z.object({ name: z.string().trim().min(1).max(128) }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deleteClientFilterPreset(ctx.user.id, input.name);
+        return { success: true };
+      }),
+  }),
+
   clientFeedback: router({
     submit: publicProcedure
       .input(

@@ -1683,3 +1683,82 @@ export async function deletePersistedDocumentMetadata(id: string) {
   await db.delete(persistedDocumentMetadata).where(eq(persistedDocumentMetadata.id, id));
   return { success: true };
 }
+
+export async function listClientFilterPresets(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(clientFilterPresets)
+    .where(eq(clientFilterPresets.userId, userId))
+    .orderBy(desc(clientFilterPresets.updatedAt));
+}
+
+export async function saveClientFilterPreset(input: {
+  userId: number;
+  id?: string;
+  name: string;
+  category: string;
+  tags: string[];
+  search: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const id = input.id ?? `preset-${nanoid(12)}`;
+  const tagsJson = JSON.stringify(input.tags);
+  const [existing] = await db
+    .select()
+    .from(clientFilterPresets)
+    .where(and(eq(clientFilterPresets.userId, input.userId), eq(clientFilterPresets.name, input.name)))
+    .limit(1);
+
+  if (existing && !input.id) {
+    await db
+      .update(clientFilterPresets)
+      .set({
+        category: input.category,
+        tagsJson,
+        search: input.search,
+        updatedAt: new Date(),
+      })
+      .where(eq(clientFilterPresets.id, existing.id));
+    const [updated] = await db
+      .select()
+      .from(clientFilterPresets)
+      .where(eq(clientFilterPresets.id, existing.id))
+      .limit(1);
+    return updated;
+  }
+
+  await db
+    .insert(clientFilterPresets)
+    .values({
+      id,
+      userId: input.userId,
+      name: input.name,
+      category: input.category,
+      tagsJson,
+      search: input.search,
+    })
+    .onDuplicateKeyUpdate({
+      category: input.category,
+      tagsJson,
+      search: input.search,
+      updatedAt: new Date(),
+    });
+
+  const [saved] = await db
+    .select()
+    .from(clientFilterPresets)
+    .where(eq(clientFilterPresets.id, id))
+    .limit(1);
+  return saved;
+}
+
+export async function deleteClientFilterPreset(userId: number, name: string) {
+  const db = await getDb();
+  if (!db) return;
+  await db
+    .delete(clientFilterPresets)
+    .where(and(eq(clientFilterPresets.userId, userId), eq(clientFilterPresets.name, name)));
+}

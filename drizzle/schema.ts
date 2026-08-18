@@ -291,3 +291,16 @@ export const persistedDocumentMetadata = mysqlTable("persisted_document_metadata
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
+
+export const clientFilterPresets = mysqlTable("client_filter_presets", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 128 }).notNull(),
+  category: varchar("category", { length: 128 }).notNull(),
+  tagsJson: text("tagsJson").notNull(),
+  search: varchar("search", { length: 255 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ClientFilterPresetRecord = typeof clientFilterPresets.$inferSelect;

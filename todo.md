@@ -12485,9 +12485,9 @@
 - [x] Add row-level validation to the Excel preview table before import.
 - [x] Run regression tests, build, and publish checkpoint.
 
-## Editable filter presets, inline Excel row corrections, CSV error reports, and workflow skill
-- [x] Implement edit, rename, and delete controls for saved multi-tag search presets.
-- [x] Add inline cell editing to the Excel preview table for correcting flagged data errors before import.
-- [x] Add an export button to download a CSV error report of all flagged validation rows.
-- [x] Create or update a reusable skill package documenting these interactive patterns and validate via skill-creator.
-- [x] Run regression suite, production build, visual checks, deliver skill, and publish checkpoint.
+## Enterprise mapping validation, batch fixes, backend preset persistence, and workflow skill
+- [x] Implement automated schema rule checks for custom Excel column mappings during preview.
+- [x] Add batch-correction feature in the Excel preview to apply replacement rules across all flagged rows simultaneously.
+- [x] Implement backend database persistence for user-created filter presets across sessions.
+- [x] Update the reusable `portal-workflow-enhancements` skill package and validate success.
+- [x] Run full migration, 145 unit tests, production build, and publish checkpoint.
