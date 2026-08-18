@@ -12478,3 +12478,9 @@
 - [x] Upgrade document management search and filter to support multiple simultaneous tags.
 - [x] Add precision upload speed and remaining time tooltips to concurrent upload progress bars.
 - [x] Run regression suite, TypeScript checks, and publish verified checkpoint.
+
+## Custom filter presets, upload retry, and row-level Excel validation
+- [x] Implement saving multi-tag search combinations as custom filter presets.
+- [x] Add a retry button next to upload progress bars for failed file uploads.
+- [x] Add row-level validation to the Excel preview table before import.
+- [x] Run regression tests, build, and publish checkpoint.

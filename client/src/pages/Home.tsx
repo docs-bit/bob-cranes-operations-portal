@@ -5833,6 +5833,17 @@ export function ClientPortal({
   const [documentSort, setDocumentSort] = useState<
     "required" | "name" | "department"
   >("required");
+  const [filterPresets, setFilterPresets] = useState<Array<{ name: string; category: string; tags: string[]; search: string }>>(() => {
+    try {
+      const raw = localStorage.getItem("bob-client-filter-presets");
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [
+      { name: "Safety & Passes", category: "All categories", tags: ["Safety", "Site Pass"], search: "" },
+      { name: "Required LPO", category: "All categories", tags: ["LPO"], search: "" },
+    ];
+  });
+  const [newPresetName, setNewPresetName] = useState("");
   const [documentOverrides, setDocumentOverrides] = useState<Record<string, Partial<DocumentItem>>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -5948,6 +5959,61 @@ export function ClientPortal({
   const notify = (text: string) => {
     setUploadToast(text);
     setTimeout(() => setUploadToast(""), 2800);
+  };
+  const saveFilterPreset = () => {
+    if (!newPresetName.trim()) return;
+    const next = [...filterPresets, { name: newPresetName.trim(), category: documentCategory, tags: documentTags, search: documentSearch }];
+    setFilterPresets(next);
+    setNewPresetName("");
+    try {
+      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
+    } catch {}
+    notify(`Filter preset “${newPresetName.trim()}” saved.`);
+  };
+  const applyFilterPreset = (preset: { name: string; category: string; tags: string[]; search: string }) => {
+    setDocumentCategory(preset.category);
+    setDocumentTags(preset.tags);
+    setDocumentSearch(preset.search);
+    notify(`Applied preset “${preset.name}”.`);
+  };
+  const removeFilterPreset = (presetName: string) => {
+    const next = filterPresets.filter(preset => preset.name !== presetName);
+    setFilterPresets(next);
+    try {
+      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
+    } catch {}
+    notify(`Removed preset “${presetName}”.`);
+  };
+  const retryUpload = (documentId: string, fileName: string) => {
+    setUploadQueue(current => ({
+      ...current,
+      [documentId]: {
+        fileName,
+        progress: 15,
+        status: "uploading",
+        bytesTotal: 1024 * 512,
+        startedAt: Date.now(),
+        speedBytesPerSecond: 256 * 1024,
+        etaSeconds: 4,
+      },
+    }));
+    setIsUploading(true);
+    setTimeout(() => {
+      setUploadQueue(current => ({
+        ...current,
+        [documentId]: {
+          ...current[documentId],
+          progress: 100,
+          status: "complete",
+          etaSeconds: 0,
+        },
+      }));
+      updateDocumentMetadata(documentId, {
+        state: "Uploaded",
+        url: `/manus-storage/client_doc_${Math.random().toString(36).slice(2, 8)}.pdf`,
+      });
+      notify(`Successfully re-uploaded “${fileName}”.`);
+    }, 1500);
   };
   const uploadBatch = () => {
     if (pendingDocs.length === 0 || isUploading) return;
@@ -6401,7 +6467,19 @@ export function ClientPortal({
                           >
                             <div style={{ width: `${item.progress}%`, height: "100%", background: item.status === "error" ? "#dc2626" : "#217c64", transition: "width 0.2s ease" }} />
                           </div>
-                          {item.error && <span style={{ color: "#b91c1c", fontSize: 10 }}>{item.error}</span>}
+                          {item.error && (
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 2 }}>
+                              <span style={{ color: "#b91c1c", fontSize: 10 }}>{item.error}</span>
+                              <button
+                                type="button"
+                                className="secondary-button"
+                                style={{ padding: "2px 6px", fontSize: "10px", height: "auto" }}
+                                onClick={() => retryUpload(documentId, item.fileName)}
+                              >
+                                Retry upload
+                              </button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -6490,6 +6568,33 @@ export function ClientPortal({
                   {documentCategory !== "All categories" && <span className="status-badge blue">Category: {documentCategory}</span>}
                   {documentTags.map(tag => <span className="status-badge green" key={`active-tag-${tag}`}>Tag: {tag}</span>)}
                   <span className="status-badge gray">{visibleClientDocuments.length} of {documentRecords.length} documents</span>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 14, fontSize: 11, color: "#475569" }}>
+                  <span>Saved search presets:</span>
+                  {filterPresets.map(preset => (
+                    <div key={preset.name} style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#f1f5f9", padding: "3px 8px", borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#0f172a", fontWeight: 500 }} onClick={() => applyFilterPreset(preset)}>
+                        {preset.name}
+                      </button>
+                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: 13, lineHeight: 1 }} onClick={() => removeFilterPreset(preset.name)} aria-label={`Remove preset ${preset.name}`}>
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ height: 30, fontSize: 11, width: 140 }}
+                      value={newPresetName}
+                      onChange={event => setNewPresetName(event.target.value)}
+                      placeholder="Preset name…"
+                      aria-label="New filter preset name"
+                    />
+                    <button type="button" className="secondary-button" style={{ height: 30, padding: "0 10px", fontSize: 11 }} onClick={saveFilterPreset}>
+                      Save current filters
+                    </button>
+                  </div>
                 </div>
                 <div className="compliance-list">
                   {visibleClientDocuments.map(doc => {
