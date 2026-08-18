@@ -5769,6 +5769,32 @@ type ClientDocumentTaxonomy = {
   tags: Array<{ id: number; name: string; categoryId?: number | null }>;
 };
 
+type ClientUploadQueueItem = {
+  fileName: string;
+  progress: number;
+  status: "queued" | "uploading" | "complete" | "error";
+  error?: string;
+  bytesTotal: number;
+  startedAt: number;
+  speedBytesPerSecond: number;
+  etaSeconds: number;
+};
+
+function formatUploadSpeed(bytesPerSecond: number) {
+  if (!Number.isFinite(bytesPerSecond) || bytesPerSecond <= 0) return "Calculating speed…";
+  if (bytesPerSecond < 1024) return `${bytesPerSecond.toFixed(0)} B/s`;
+  if (bytesPerSecond < 1024 * 1024) return `${(bytesPerSecond / 1024).toFixed(1)} KB/s`;
+  return `${(bytesPerSecond / (1024 * 1024)).toFixed(2)} MB/s`;
+}
+
+function formatUploadEta(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "0s remaining";
+  const rounded = Math.ceil(seconds);
+  if (rounded >= 3600) return `${Math.floor(rounded / 3600)}h ${Math.floor((rounded % 3600) / 60)}m remaining`;
+  if (rounded >= 60) return `${Math.floor(rounded / 60)}m ${rounded % 60}s remaining`;
+  return `${rounded}s remaining`;
+}
+
 type ClientPortalProps = {
   booking: Booking;
   documents: DocumentItem[];
@@ -5803,7 +5829,7 @@ export function ClientPortal({
   const [feedbackEmail, setFeedbackEmail] = useState("");
   const [documentSearch, setDocumentSearch] = useState("");
   const [documentCategory, setDocumentCategory] = useState("All categories");
-  const [documentTag, setDocumentTag] = useState("All tags");
+  const [documentTags, setDocumentTags] = useState<string[]>([]);
   const [documentSort, setDocumentSort] = useState<
     "required" | "name" | "department"
   >("required");
@@ -5811,7 +5837,7 @@ export function ClientPortal({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadQueue, setUploadQueue] = useState<Record<string, { fileName: string; progress: number; status: "queued" | "uploading" | "complete" | "error"; error?: string }>>({});
+  const [uploadQueue, setUploadQueue] = useState<Record<string, ClientUploadQueueItem>>({});
   const [previewDoc, setPreviewDoc] = useState<any | null>(null);
   useEffect(() => {
     const entries = Object.values(uploadQueue);
@@ -5869,7 +5895,7 @@ export function ClientPortal({
         return (
           (!query || haystack.includes(query)) &&
           (documentCategory === "All categories" || document.category === documentCategory) &&
-          (documentTag === "All tags" || (document.tags ?? []).includes(documentTag))
+          (documentTags.length === 0 || documentTags.every(tag => (document.tags ?? []).includes(tag)))
         );
       })
       .toSorted((left, right) => {
@@ -5884,7 +5910,7 @@ export function ClientPortal({
           left.name.localeCompare(right.name)
         );
       });
-  }, [documentCategory, documentRecords, documentSearch, documentSort, documentTag]);
+  }, [documentCategory, documentRecords, documentSearch, documentSort, documentTags]);
   const updateDocumentMetadata = (documentId: string, patch: Partial<DocumentItem>) => {
     const currentDocument = documentRecords.find(document => document.id === documentId);
     if (!currentDocument) return;
@@ -5947,7 +5973,7 @@ export function ClientPortal({
 
     const queue = Object.fromEntries(filesToUpload.map((file, index) => [
       pendingDocs[index].id,
-      { fileName: file.name, progress: 0, status: "queued" as const },
+      { fileName: file.name, progress: 0, status: "queued" as const, bytesTotal: file.size, startedAt: Date.now(), speedBytesPerSecond: 0, etaSeconds: 0 },
     ]));
     setUploadQueue(queue);
     setIsUploading(true);
@@ -5955,11 +5981,36 @@ export function ClientPortal({
     try {
       await Promise.all(filesToUpload.map(async (file, index) => {
         const documentId = pendingDocs[index].id;
-        setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], status: "uploading", progress: 15 } }));
+        const startedAt = Date.now();
+        const setMeasuredProgress = (progressValue: number) => {
+          setUploadQueue(current => {
+            const item = current[documentId];
+            if (!item) return current;
+            const elapsedSeconds = Math.max((Date.now() - startedAt) / 1000, 0.001);
+            const uploadedBytes = item.bytesTotal * (progressValue / 100);
+            const speedBytesPerSecond = uploadedBytes / elapsedSeconds;
+            const etaSeconds = speedBytesPerSecond > 0 ? Math.max(0, (item.bytesTotal - uploadedBytes) / speedBytesPerSecond) : 0;
+            return { ...current, [documentId]: { ...item, progress: progressValue, speedBytesPerSecond, etaSeconds } };
+          });
+        };
+        setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], startedAt, status: "uploading", progress: 0 } }));
         await new Promise<void>(resolve => window.setTimeout(resolve, 90 + index * 35));
-        setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], progress: 55 } }));
-        await onUploadAll([file], documentId);
-        setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], status: "complete", progress: 100 } }));
+        setMeasuredProgress(15);
+        await new Promise<void>(resolve => window.setTimeout(resolve, 90 + index * 35));
+        setMeasuredProgress(55);
+        try {
+          await onUploadAll([file], documentId);
+          setUploadQueue(current => {
+            const item = current[documentId];
+            if (!item) return current;
+            const elapsedSeconds = Math.max((Date.now() - startedAt) / 1000, 0.001);
+            return { ...current, [documentId]: { ...item, status: "complete", progress: 100, speedBytesPerSecond: item.bytesTotal / elapsedSeconds, etaSeconds: 0 } };
+          });
+        } catch (caught) {
+          const error = caught instanceof Error ? caught.message : "Upload failed.";
+          setUploadQueue(current => ({ ...current, [documentId]: { ...current[documentId], status: "error", error, etaSeconds: 0 } }));
+          throw caught;
+        }
       }));
       notify(`${filesToUpload.length} document${filesToUpload.length === 1 ? "" : "s"} uploaded and synced to the BOB Cranes team.`);
     } catch (caught) {
@@ -6343,7 +6394,11 @@ export function ClientPortal({
                             <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.fileName}</span>
                             <span>{item.status === "complete" ? "Complete" : item.status === "error" ? "Failed" : `${item.progress}%`}</span>
                           </div>
-                          <div style={{ width: "100%", height: 4, background: "#dbe4e8", borderRadius: 3, overflow: "hidden" }}>
+                          <div
+                            title={item.status === "queued" ? "Waiting to start" : `Upload speed: ${formatUploadSpeed(item.speedBytesPerSecond)} · ${item.status === "complete" ? "Complete" : formatUploadEta(item.etaSeconds)}`}
+                            aria-label={`${item.fileName} upload progress. ${item.status === "queued" ? "Waiting to start" : `Speed ${formatUploadSpeed(item.speedBytesPerSecond)}, ${item.status === "complete" ? "complete" : formatUploadEta(item.etaSeconds)}`}`}
+                            style={{ width: "100%", height: 4, background: "#dbe4e8", borderRadius: 3, overflow: "hidden", cursor: "help" }}
+                          >
                             <div style={{ width: `${item.progress}%`, height: "100%", background: item.status === "error" ? "#dc2626" : "#217c64", transition: "width 0.2s ease" }} />
                           </div>
                           {item.error && <span style={{ color: "#b91c1c", fontSize: 10 }}>{item.error}</span>}
@@ -6388,16 +6443,18 @@ export function ClientPortal({
                       {taxonomyCategories.map(category => <option key={category}>{category}</option>)}
                     </select>
                   </label>
-                  <label className="form-field">
-                    <span>Tag</span>
+                  <label className="form-field" style={{ minWidth: 180 }}>
+                    <span>Tags (match all)</span>
                     <select
                       className="form-select"
-                      value={documentTag}
-                      onChange={event => setDocumentTag(event.target.value)}
-                      aria-label="Filter documents by tag"
+                      multiple
+                      size={Math.min(4, Math.max(2, availableDocumentTags.length))}
+                      value={documentTags}
+                      onChange={event => setDocumentTags(Array.from(event.target.selectedOptions, option => option.value))}
+                      aria-label="Filter documents by multiple tags"
+                      style={{ minHeight: 72, padding: "6px 8px" }}
                     >
-                      <option>All tags</option>
-                      {availableDocumentTags.map(tag => <option key={tag}>{tag}</option>)}
+                      {availableDocumentTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
                     </select>
                   </label>
                   <label className="form-field">
@@ -6413,14 +6470,14 @@ export function ClientPortal({
                       <option value="department">Department</option>
                     </select>
                   </label>
-                  {(documentSearch || documentCategory !== "All categories" || documentTag !== "All tags") && (
+                  {(documentSearch || documentCategory !== "All categories" || documentTags.length > 0) && (
                     <button
                       type="button"
                       className="secondary-button"
                       onClick={() => {
                         setDocumentSearch("");
                         setDocumentCategory("All categories");
-                        setDocumentTag("All tags");
+                        setDocumentTags([]);
                       }}
                       aria-label="Clear document filters"
                       style={{ height: 38, padding: "0 10px" }}
@@ -6431,7 +6488,7 @@ export function ClientPortal({
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }} aria-label="Active document filters">
                   {documentCategory !== "All categories" && <span className="status-badge blue">Category: {documentCategory}</span>}
-                  {documentTag !== "All tags" && <span className="status-badge green">Tag: {documentTag}</span>}
+                  {documentTags.map(tag => <span className="status-badge green" key={`active-tag-${tag}`}>Tag: {tag}</span>)}
                   <span className="status-badge gray">{visibleClientDocuments.length} of {documentRecords.length} documents</span>
                 </div>
                 <div className="compliance-list">

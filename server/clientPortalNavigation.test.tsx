@@ -77,8 +77,8 @@ describe("Client Response Portal navigation", () => {
     render(<ClientPortal
       booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
       documents={[
-        { id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Required", required: true, category: "Access & Permits", tags: ["permit"] },
-        { id: "doc-2", departmentCode: "ACC", name: "Signed LPO", state: "Required", required: true, category: "Commercial", tags: ["lpo"] },
+        { id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Required", required: true, category: "Access & Permits", tags: ["permit", "site"] },
+        { id: "doc-2", departmentCode: "ACC", name: "Signed LPO", state: "Required", required: true, category: "Commercial", tags: ["lpo", "commercial"] },
       ] as any}
       onUpdate={vi.fn()}
       onUploadAll={onUploadAll}
@@ -90,7 +90,8 @@ describe("Client Response Portal navigation", () => {
     expect(screen.getByText("Site access pass")).toBeInTheDocument();
     expect(screen.queryByText("Signed LPO")).not.toBeInTheDocument();
     await user.selectOptions(screen.getByRole("combobox", { name: /filter documents by category/i }), "All categories");
-    await user.selectOptions(screen.getByRole("combobox", { name: /filter documents by tag/i }), "lpo");
+    const tagFilter = screen.getByRole("listbox", { name: /filter documents by multiple tags/i });
+    await user.selectOptions(tagFilter, ["lpo", "commercial"]);
     expect(screen.getByText("Signed LPO")).toBeInTheDocument();
     expect(screen.queryByText("Site access pass")).not.toBeInTheDocument();
 
@@ -121,6 +122,8 @@ describe("Client Response Portal navigation", () => {
     await waitFor(() => {
       expect(onUploadAll).toHaveBeenCalledTimes(2);
       expect(screen.getByText(/uploading 2 documents concurrently/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/site-access\.pdf upload progress/i)).toHaveAttribute("title", expect.stringContaining("Upload speed:"));
+      expect(screen.getByLabelText(/site-access\.pdf upload progress/i)).toHaveAttribute("aria-label", expect.stringMatching(/Speed .*remaining|complete/i));
     }, { timeout: 1000 });
     expect(onUploadAll).toHaveBeenCalledWith([expect.objectContaining({ name: "site-access.pdf" })], "doc-1");
     expect(onUploadAll).toHaveBeenCalledWith([expect.objectContaining({ name: "signed-lpo.pdf" })], "doc-2");

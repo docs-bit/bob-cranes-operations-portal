@@ -12472,3 +12472,9 @@
 - [x] Ready.
 
 ##
+
+## Excel preview, multi-tag search, and upload tooltips
+- [x] Implement in-portal Excel workbook preview before processing.
+- [x] Upgrade document management search and filter to support multiple simultaneous tags.
+- [x] Add precision upload speed and remaining time tooltips to concurrent upload progress bars.
+- [x] Run regression suite, TypeScript checks, and publish verified checkpoint.
