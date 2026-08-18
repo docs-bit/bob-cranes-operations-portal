@@ -5984,6 +5984,29 @@ export function ClientPortal({
     } catch {}
     notify(`Removed preset “${presetName}”.`);
   };
+  const renameFilterPreset = (oldName: string) => {
+    const target = filterPresets.find(preset => preset.name === oldName);
+    if (!target) return;
+    const updatedName = window.prompt("Enter a new name for this saved filter preset:", target.name);
+    if (!updatedName || !updatedName.trim()) return;
+    const trimmed = updatedName.trim();
+    const next = filterPresets.map(preset => preset.name === oldName ? { ...preset, name: trimmed } : preset);
+    setFilterPresets(next);
+    try {
+      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
+    } catch {}
+    notify(`Renamed preset to “${trimmed}”.`);
+  };
+  const updateFilterPresetCriteria = (presetName: string) => {
+    const target = filterPresets.find(preset => preset.name === presetName);
+    if (!target) return;
+    const next = filterPresets.map(preset => preset.name === presetName ? { ...preset, category: documentCategory, tags: documentTags, search: documentSearch } : preset);
+    setFilterPresets(next);
+    try {
+      localStorage.setItem("bob-client-filter-presets", JSON.stringify(next));
+    } catch {}
+    notify(`Updated preset “${presetName}” with current active filters.`);
+  };
   const retryUpload = (documentId: string, fileName: string) => {
     setUploadQueue(current => ({
       ...current,
@@ -6572,11 +6595,17 @@ export function ClientPortal({
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 14, fontSize: 11, color: "#475569" }}>
                   <span>Saved search presets:</span>
                   {filterPresets.map(preset => (
-                    <div key={preset.name} style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#f1f5f9", padding: "3px 8px", borderRadius: 12, border: "1px solid #e2e8f0" }}>
-                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#0f172a", fontWeight: 500 }} onClick={() => applyFilterPreset(preset)}>
+                    <div key={preset.name} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#f1f5f9", padding: "3px 8px", borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#0f172a", fontWeight: 500 }} onClick={() => applyFilterPreset(preset)} title="Apply this saved filter preset">
                         {preset.name}
                       </button>
-                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: 13, lineHeight: 1 }} onClick={() => removeFilterPreset(preset.name)} aria-label={`Remove preset ${preset.name}`}>
+                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#2563eb", fontSize: 11, padding: 0 }} onClick={() => renameFilterPreset(preset.name)} title="Rename saved preset">
+                        Rename
+                      </button>
+                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#059669", fontSize: 11, padding: 0 }} onClick={() => updateFilterPresetCriteria(preset.name)} title="Update preset with current active filters">
+                        Save current
+                      </button>
+                      <button type="button" style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: 13, lineHeight: 1 }} onClick={() => removeFilterPreset(preset.name)} aria-label={`Remove preset ${preset.name}`} title="Delete preset">
                         ×
                       </button>
                     </div>

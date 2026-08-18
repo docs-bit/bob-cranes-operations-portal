@@ -46,8 +46,8 @@ describe("DataUploadCenter workbook preview", () => {
     const dialog = screen.getByRole("dialog", { name: /sales-register\.xlsx/i });
     expect(dialog).toHaveTextContent("Sales Register");
     expect(dialog).toHaveTextContent("Client Name");
-    expect(dialog).toHaveTextContent("Gulf Contracting LLC");
-    expect(dialog).toHaveTextContent("Downtown Tower Lift");
+    expect(screen.getByDisplayValue("Gulf Contracting LLC")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Downtown Tower Lift")).toBeInTheDocument();
   });
 });
 

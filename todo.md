@@ -12484,3 +12484,10 @@
 - [x] Add a retry button next to upload progress bars for failed file uploads.
 - [x] Add row-level validation to the Excel preview table before import.
 - [x] Run regression tests, build, and publish checkpoint.
+
+## Editable filter presets, inline Excel row corrections, CSV error reports, and workflow skill
+- [x] Implement edit, rename, and delete controls for saved multi-tag search presets.
+- [x] Add inline cell editing to the Excel preview table for correcting flagged data errors before import.
+- [x] Add an export button to download a CSV error report of all flagged validation rows.
+- [x] Create or update a reusable skill package documenting these interactive patterns and validate via skill-creator.
+- [x] Run regression suite, production build, visual checks, deliver skill, and publish checkpoint.
