@@ -6043,7 +6043,7 @@ export function ClientPortal({
       }));
       updateDocumentMetadata(documentId, {
         state: "Uploaded",
-        url: `/manus-storage/client_doc_${Math.random().toString(36).slice(2, 8)}.pdf`,
+        fileName: `${fileName}`,
       });
       notify(`Successfully re-uploaded “${fileName}”.`);
     }, 1500);

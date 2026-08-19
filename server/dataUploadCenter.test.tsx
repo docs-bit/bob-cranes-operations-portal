@@ -24,13 +24,13 @@ describe("DataUploadCenter workbook preview", () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sales Register");
     const workbookBytes = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const workbookArrayBuffer = workbookBytes instanceof ArrayBuffer ? workbookBytes : (workbookBytes as Uint8Array).buffer;
-    const file = new File([workbookArrayBuffer], "sales-register.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const file = new File([workbookArrayBuffer as ArrayBuffer], "sales-register.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
     class MockFileReader {
       onload: ((event: { target: { result: ArrayBuffer } }) => void) | null = null;
       onerror: (() => void) | null = null;
       readAsArrayBuffer() {
-        this.onload?.({ target: { result: workbookArrayBuffer } });
+        this.onload?.({ target: { result: workbookArrayBuffer as ArrayBuffer } });
       }
     }
     vi.stubGlobal("FileReader", MockFileReader);

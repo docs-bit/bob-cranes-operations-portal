@@ -269,7 +269,7 @@ export default function DataUploadCenter({ uploads, setUploads }: { uploads: Upl
   }} style={{ height: 28, fontSize: 11 }}>Batch fix flagged rows</button>}{rowValidationErrors.length > 0 && <button type="button" className="secondary-button" onClick={() => {
     const csvContent = [
       pendingWorkbook.headers.join(","),
-      ...rowValidationErrors.map(({ rowIndex, issues }) => {
+      ...rowValidationErrors.map(({ rowIndex, messages: issues }) => {
         const row = pendingWorkbook.rows[rowIndex] ?? {};
         return pendingWorkbook.headers.map(h => `"${String(row[h] ?? "").replace(/"/g, '""')}"`).join(",");
       })

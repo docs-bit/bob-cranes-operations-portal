@@ -37,6 +37,7 @@ import {
   documentTaxonomyCategories,
   documentTaxonomyTags,
   persistedDocumentMetadata,
+  clientFilterPresets,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1741,10 +1742,11 @@ export async function saveClientFilterPreset(input: {
       search: input.search,
     })
     .onDuplicateKeyUpdate({
-      category: input.category,
-      tagsJson,
-      search: input.search,
-      updatedAt: new Date(),
+      set: {
+        category: input.category,
+        tagsJson,
+        search: input.search,
+      },
     });
 
   const [saved] = await db
