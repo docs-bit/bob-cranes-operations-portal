@@ -1,0 +1,217 @@
+import { trpc } from "@/lib/trpc";
+import { RENTAL_DURATION_OPTIONS } from "@shared/rentalEnquiryOptions";
+import { ArrowRight, BriefcaseBusiness, CheckCircle2, ClipboardCheck, Download, LoaderCircle, Mail, MapPin, RefreshCw, UserRound, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { generateRentalQuotePdf } from "@/lib/rentalQuotePdf";
+import "./SalesEnquiryInbox.css";
+
+const enquiryStatuses = ["all", "New", "In review", "Quoted", "Converted", "Closed"] as const;
+type EnquiryStatusFilter = (typeof enquiryStatuses)[number];
+type AssignmentFilter = "all" | "assigned" | "unassigned";
+type SalesFilterPreset = { name: string; status: EnquiryStatusFilter; duration: string; assignment: AssignmentFilter };
+
+type BookingPreview = {
+  id: string;
+  clientName?: string;
+  projectName?: string;
+  stage?: string;
+  priority?: string;
+  mobilizationDate?: string;
+  offHireDate?: string;
+  projectManager?: string;
+  clientContactName?: string;
+};
+
+export default function SalesEnquiryInbox({
+  actor,
+  onOpenBooking,
+}: {
+  actor: { id: number; role: "admin" | "supervisor" | "user"; departmentCode?: string | null };
+  onOpenBooking: (booking: BookingPreview) => void;
+}) {
+  const utils = trpc.useUtils();
+  const [status, setStatus] = useState<EnquiryStatusFilter>("all");
+  const [durationFilter, setDurationFilter] = useState<string>("all");
+  const [assignmentFilter, setAssignmentFilter] = useState<AssignmentFilter>("all");
+  const [presetName, setPresetName] = useState("");
+  const [savedPresets, setSavedPresets] = useState<SalesFilterPreset[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isGeneratingQuote, setIsGeneratingQuote] = useState(false);
+  const listInput = useMemo(() => ({ status }), [status]);
+  const enquiriesQuery = trpc.salesEnquiries.list.useQuery(listInput);
+  const usersQuery = trpc.auth.listUsers.useQuery(undefined, { enabled: actor.role === "admin" || actor.role === "supervisor" });
+  const updateStatus = trpc.salesEnquiries.updateStatus.useMutation();
+  const assignOwner = trpc.salesEnquiries.assignOwner.useMutation();
+  const convertToBooking = trpc.salesEnquiries.convertToBooking.useMutation();
+  const recordQuickReply = trpc.salesEnquiries.recordQuickReply.useMutation();
+  const updateSlaConfig = trpc.salesEnquiries.updateSlaConfig.useMutation();
+  const slaQuery = trpc.salesEnquiries.getSlaConfig.useQuery();
+  const enquiries = enquiriesQuery.data ?? [];
+  const visibleEnquiries = useMemo(() => enquiries.filter(enquiry => {
+    const matchesDuration = durationFilter === "all" || enquiry.rentalDuration === durationFilter;
+    const matchesAssignment = assignmentFilter === "all" || (assignmentFilter === "assigned" ? Boolean(enquiry.assignedToUserId) : !enquiry.assignedToUserId);
+    return matchesDuration && matchesAssignment;
+  }), [assignmentFilter, durationFilter, enquiries]);
+  const selected = enquiries.find(enquiry => enquiry.id === selectedId) ?? null;
+  const salesOwners = useMemo(() => (usersQuery.data ?? []).filter(user => user.departmentCode === "sales" && user.isActive === 1), [usersQuery.data]);
+  const canAssign = actor.role === "admin" || actor.role === "supervisor";
+  const ownerById = useMemo(() => new Map(salesOwners.map(owner => [owner.id, owner])), [salesOwners]);
+  const auditEventsQuery = trpc.salesEnquiries.getAuditEvents.useQuery({ id: selectedId ?? "" }, { enabled: Boolean(selectedId) });
+  const [warningHours, setWarningHours] = useState(4);
+  const [criticalHours, setCriticalHours] = useState(24);
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("bob-sales-filter-presets");
+      if (stored) setSavedPresets(JSON.parse(stored) as SalesFilterPreset[]);
+    } catch { /* Ignore malformed local preferences. */ }
+  }, []);
+  useEffect(() => {
+    if (slaQuery.data) {
+      setWarningHours(slaQuery.data.warningHours);
+      setCriticalHours(slaQuery.data.criticalHours);
+    }
+  }, [slaQuery.data]);
+  useEffect(() => {
+    window.localStorage.setItem("bob-sales-filter-presets", JSON.stringify(savedPresets));
+  }, [savedPresets]);
+  const savePreset = () => {
+    const name = presetName.trim();
+    if (!name) return toast.error("Name this filter preset first");
+    setSavedPresets(current => [...current.filter(preset => preset.name !== name), { name, status, duration: durationFilter, assignment: assignmentFilter }]);
+    setPresetName("");
+    toast.success("Sales filter preset saved", { description: name });
+  };
+  const applyPreset = (name: string) => {
+    const preset = savedPresets.find(item => item.name === name);
+    if (!preset) return;
+    setStatus(preset.status);
+    setDurationFilter(preset.duration);
+    setAssignmentFilter(preset.assignment);
+    setSelectedId(null);
+  };
+  const removePreset = () => {
+    if (!presetName) return;
+    setSavedPresets(current => current.filter(preset => preset.name !== presetName));
+    setPresetName("");
+  };
+  const saveSla = async () => {
+    try {
+      await updateSlaConfig.mutateAsync({ warningHours, criticalHours });
+      await slaQuery.refetch();
+      toast.success("Sales SLA thresholds saved");
+    } catch (error) {
+      toast.error("SLA thresholds could not be saved", { description: error instanceof Error ? error.message : "Please try again." });
+    }
+  };
+
+  const refresh = async () => {
+    await Promise.all([utils.salesEnquiries.list.invalidate(), utils.auth.listUsers.invalidate()]);
+  };
+  const changeStatus = async (id: string, nextStatus: Exclude<EnquiryStatusFilter, "all">) => {
+    try {
+      await updateStatus.mutateAsync({ id, status: nextStatus });
+      await refresh();
+      toast.success("Enquiry status updated", { description: `This quote request is now marked ${nextStatus}.` });
+    } catch (error) {
+      toast.error("Status update failed", { description: error instanceof Error ? error.message : "Please try again." });
+    }
+  };
+  const changeOwner = async (id: string, ownerId: string) => {
+    try {
+      await assignOwner.mutateAsync({ id, assignedToUserId: ownerId === "unassigned" ? null : Number(ownerId) });
+      await refresh();
+      toast.success(ownerId === "unassigned" ? "Ownership cleared" : "Sales owner assigned", { description: "The selected owner receives a follow-up notification." });
+    } catch (error) {
+      toast.error("Owner assignment failed", { description: error instanceof Error ? error.message : "Select an active Sales account and try again." });
+    }
+  };
+  const convert = async (id: string) => {
+    try {
+      const result = await convertToBooking.mutateAsync({ id });
+      await refresh();
+      toast.success("Converted to booking", { description: `${result.booking.id} is now ready for Sales to complete.` });
+      setSelectedId(null);
+      onOpenBooking(result.booking as BookingPreview);
+    } catch (error) {
+      toast.error("Booking conversion failed", { description: error instanceof Error ? error.message : "Please try again." });
+    }
+  };
+  const downloadQuoteBrief = async () => {
+    if (!selected) return;
+    try {
+      setIsGeneratingQuote(true);
+      const filename = await generateRentalQuotePdf({ enquiry: selected, generatedBy: actor.role === "admin" ? "Administrator" : "Sales workspace" });
+      toast.success("Branded quote brief downloaded", { description: `${filename} contains the current full BOB logo and no unapproved commercial terms.` });
+    } catch (error) {
+      toast.error("Quote document could not be generated", { description: error instanceof Error ? error.message : "Please try again." });
+    } finally {
+      setIsGeneratingQuote(false);
+    }
+  };
+  const openQuickReply = () => {
+    if (!selected?.email) return;
+    const subject = `BOB Cranes follow-up — ${selected.companyName}`;
+    const body = [
+      `Hello ${selected.contactName},`,
+      "",
+      "Thank you for contacting BOB Heavy Equipment Rental. Our Sales team is following up on your request.",
+      "",
+      `Equipment: ${selected.equipmentInterest}`,
+      `Rental duration: ${selected.rentalDuration ?? "To be confirmed"}`,
+      `Project location: ${selected.projectLocation}`,
+      "",
+      "Please share any additional site or documentation requirements so we can prepare the next step.",
+      "",
+      "Regards,",
+      "BOB Cranes Sales Team",
+    ].join("\n");
+    toast.info("Opening your email client", { description: `A reply to ${selected.contactName} is ready.` });
+    void recordQuickReply.mutateAsync({ id: selected.id }).then(() => auditEventsQuery.refetch()).catch(() => toast.error("Quick reply audit could not be recorded"));
+    window.location.href = `mailto:${selected.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  return <div className="content sales-enquiry-inbox" data-testid="sales-enquiry-inbox">
+    <div className="page-heading">
+      <div><div className="eyebrow">Sales follow-up workspace</div><h1 className="page-title">Rental enquiry inbox</h1><p className="page-copy">Review new rental requests, assign a Sales owner, update progress, and convert qualified enquiries into booking dossiers.</p></div>
+      <div className="status-badge blue"><BriefcaseBusiness size={12} /> Sales workspace</div>
+    </div>
+    <div className="metric-grid">
+      <div className="metric-card"><div className="metric-label">Visible requests</div><div className="metric-value">{visibleEnquiries.length}</div><div className="metric-foot">Filtered by current controls</div></div>
+      <div className="metric-card"><div className="metric-label">Needs review</div><div className="metric-value">{visibleEnquiries.filter(enquiry => enquiry.status === "New").length}</div><div className="metric-foot">New rental follow-ups</div></div>
+      <div className="metric-card"><div className="metric-label">Assigned</div><div className="metric-value">{visibleEnquiries.filter(enquiry => enquiry.assignedToUserId).length}</div><div className="metric-foot">Named Sales ownership</div></div>
+      <div className="metric-card"><div className="metric-label">Converted</div><div className="metric-value">{visibleEnquiries.filter(enquiry => enquiry.status === "Converted").length}</div><div className="metric-foot">Tracked booking dossiers</div></div>
+    </div>
+    <section className="panel">
+      <div className="panel-header"><div><div className="panel-title"><ClipboardCheck size={16} /> Quote follow-up queue</div><div className="panel-meta">Every request entered from the public rental form appears here with its Sales notification context.</div></div><button type="button" className="secondary-button compact-button" onClick={() => void refresh()} disabled={enquiriesQuery.isFetching}><RefreshCw size={13} /> {enquiriesQuery.isFetching ? "Refreshing…" : "Refresh"}</button></div>
+      <div className="panel-body">
+        <div className="sales-enquiry-toolbar sales-enquiry-filter-toolbar">
+          <label><span>Status</span><select className="form-select" value={status} onChange={event => { setStatus(event.target.value as EnquiryStatusFilter); setSelectedId(null); }}><option value="all">All statuses</option><option value="New">New</option><option value="In review">In review</option><option value="Quoted">Quoted</option><option value="Converted">Converted</option><option value="Closed">Closed</option></select></label>
+          <label><span>Rental duration</span><select className="form-select" value={durationFilter} onChange={event => { setDurationFilter(event.target.value); setSelectedId(null); }}><option value="all">All durations</option>{RENTAL_DURATION_OPTIONS.map(option => <option key={option} value={option}>{option}</option>)}</select></label>
+          <label><span>Owner status</span><select className="form-select" value={assignmentFilter} onChange={event => { setAssignmentFilter(event.target.value as AssignmentFilter); setSelectedId(null); }}><option value="all">All owners</option><option value="unassigned">Unassigned only</option><option value="assigned">Assigned only</option></select></label>
+          <span className="status-badge blue">{visibleEnquiries.length} results</span>
+        </div>
+        <div className="sales-enquiry-preset-toolbar">
+          <label><span>Saved preset</span><select className="form-select" value="" onChange={event => applyPreset(event.target.value)}><option value="">Choose a saved queue</option>{savedPresets.map(preset => <option key={preset.name} value={preset.name}>{preset.name}</option>)}</select></label>
+          <input className="form-input" value={presetName} onChange={event => setPresetName(event.target.value)} placeholder="Preset name" aria-label="New Sales filter preset name" />
+          <button type="button" className="secondary-button compact-button" onClick={savePreset}>Save preset</button>
+          <button type="button" className="secondary-button compact-button" onClick={removePreset} disabled={!savedPresets.some(preset => preset.name === presetName)}>Remove</button>
+        </div>
+        {actor.role === "admin" && <div className="sales-enquiry-sla-toolbar">
+          <span className="eyebrow">Admin SLA settings</span><label><span>Warning after (hours)</span><input className="form-input" type="number" min="1" max="168" value={warningHours} onChange={event => setWarningHours(Number(event.target.value))} /></label><label><span>Critical after (hours)</span><input className="form-input" type="number" min="2" max="336" value={criticalHours} onChange={event => setCriticalHours(Number(event.target.value))} /></label><button type="button" className="secondary-button compact-button" disabled={updateSlaConfig.isPending} onClick={() => void saveSla()}>Save SLA</button>
+        </div>}
+        {enquiriesQuery.isLoading ? <div className="empty-state">Loading Sales enquiries…</div> : enquiriesQuery.error ? <div className="account-error">Unable to load quote requests. Please refresh the workspace.</div> : visibleEnquiries.length ? <div className="sales-enquiry-table-wrap"><table className="sales-enquiry-table"><thead><tr><th>Request</th><th>Project requirement</th><th>Status</th><th>Owner</th><th aria-label="Actions" /></tr></thead><tbody>{visibleEnquiries.map(enquiry => {
+          const owner = enquiry.assignedToUserId ? ownerById.get(enquiry.assignedToUserId) : undefined;
+          return <tr key={enquiry.id}><td><strong>{enquiry.companyName}</strong><span>{enquiry.contactName} · {enquiry.email}</span><small>{new Date(enquiry.createdAt).toLocaleDateString()}</small></td><td><strong>{enquiry.equipmentInterest}</strong><span className="sales-enquiry-duration">{enquiry.rentalDuration ?? "To be confirmed"}</span><span><MapPin size={12} /> {enquiry.projectLocation}</span></td><td><span className={`status-badge ${enquiry.status === "Converted" ? "green" : enquiry.status === "New" ? "amber" : "blue"}`}>{enquiry.status}</span></td><td>{owner ? <span className="sales-owner"><UserRound size={13} /> {owner.name ?? owner.email}</span> : <span className="muted">Unassigned</span>}</td><td><button type="button" className="secondary-button compact-button" onClick={() => setSelectedId(enquiry.id)}>Open <ArrowRight size={13} /></button></td></tr>;
+        })}</tbody></table></div> : <div className="empty-state">No rental enquiries match the selected filters. Clear one or more filters to see more requests.</div>}
+      </div>
+    </section>
+    {selected && <div className="modal-backdrop" role="presentation" onClick={() => setSelectedId(null)}><section className="sales-enquiry-detail" role="dialog" aria-modal="true" aria-labelledby="sales-enquiry-title" onClick={event => event.stopPropagation()}>
+      <div className="sales-enquiry-detail-header"><div><div className="eyebrow">Rental enquiry</div><h2 id="sales-enquiry-title">{selected.companyName}</h2><p>{selected.contactName} · {selected.email} · {selected.phone}</p></div><button className="icon-button" type="button" onClick={() => setSelectedId(null)} aria-label="Close enquiry details"><X size={17} /></button></div>
+      <div className="sales-enquiry-detail-grid"><article><span>Requested equipment</span><strong>{selected.equipmentInterest}</strong></article><article><span>Rental duration</span><strong>{selected.rentalDuration ?? "To be confirmed"}</strong></article><article><span>Project location</span><strong>{selected.projectLocation}</strong></article><article><span>Follow-up status</span><select className="form-select" value={selected.status} disabled={selected.status === "Converted" || updateStatus.isPending} onChange={event => void changeStatus(selected.id, event.target.value as Exclude<EnquiryStatusFilter, "all">)}><option value="New">New</option><option value="In review">In review</option><option value="Quoted">Quoted</option><option value="Converted">Converted</option><option value="Closed">Closed</option></select></article><article><span>Sales owner</span>{canAssign ? <select className="form-select" value={selected.assignedToUserId?.toString() ?? "unassigned"} disabled={assignOwner.isPending || selected.status === "Converted"} onChange={event => void changeOwner(selected.id, event.target.value)}><option value="unassigned">Unassigned</option>{salesOwners.map(owner => <option key={owner.id} value={owner.id}>{owner.name ?? owner.email}</option>)}</select> : <strong>{selected.assignedToUserId ? ownerById.get(selected.assignedToUserId)?.name ?? "Assigned Sales user" : "Unassigned"}</strong>}</article></div>
+             <section className="sales-enquiry-notes"><span>Lift or project details</span><p>{selected.liftDetails}</p></section>
+       <section className="sales-enquiry-audit"><div className="panel-title"><ClipboardCheck size={14} /> Quick-reply audit trail</div>{auditEventsQuery.isLoading ? <p className="muted">Loading activity…</p> : auditEventsQuery.data?.length ? <div className="sales-enquiry-audit-list">{auditEventsQuery.data.map(event => <div key={event.id}><strong>{event.eventType === "quick_reply_sent" ? "Quick reply opened" : event.eventType}</strong><span>{event.summary}</span><small>{new Date(event.createdAt).toLocaleString()}</small></div>)}</div> : <p className="muted">No quick-reply emails recorded for this enquiry yet.</p>}</section>
+       <div className="sales-enquiry-detail-actions"><button type="button" className="secondary-button" onClick={openQuickReply} disabled={!selected.email}><Mail size={14} /> Quick reply</button><button type="button" className="secondary-button" disabled={isGeneratingQuote} onClick={() => void downloadQuoteBrief()}><Download size={14} className={isGeneratingQuote ? "spin" : ""} />{isGeneratingQuote ? "Generating quote brief…" : "Download quote brief"}</button>{selected.convertedBookingId ? <button type="button" className="primary-button" onClick={() => onOpenBooking({ id: selected.convertedBookingId!, clientName: selected.companyName, projectName: `Rental enquiry · ${selected.projectLocation}`, stage: "Created by Salesperson", priority: "Standard", mobilizationDate: "To be confirmed", offHireDate: "To be confirmed", projectManager: "Sales follow-up", clientContactName: selected.contactName })}><CheckCircle2 size={14} /> Open {selected.convertedBookingId}</button> : <button type="button" className="primary-button" disabled={convertToBooking.isPending} onClick={() => void convert(selected.id)}><LoaderCircle size={14} className={convertToBooking.isPending ? "spin" : ""} />{convertToBooking.isPending ? "Converting…" : "Convert to booking"}</button>}<button type="button" className="secondary-button" onClick={() => setSelectedId(null)}>Close</button></div>
+    </section></div>}
+  </div>;
+}
