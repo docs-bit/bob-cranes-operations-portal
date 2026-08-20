@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOB Cranes Operations Portal — Architecture Explainer</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #e4e7ef;
+    --text-dim: #8b90a0;
+    --accent: #f59e0b;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #ef4444;
+    --accent5: #8b5cf6;
+    --orange: #f59e0b;
+    --blue: #3b82f6;
+    --green: #10b981;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --cyan: #06b6d4;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  
+  /* Hero */
+  .hero {
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(245,158,11,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .badge-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .badge .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Stats */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 40px 0;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-card .number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-card .label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Sections */
+  section {
+    margin: 60px 0;
+  }
+  section h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section h2 .icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  section .desc {
+    color: var(--text-dim);
+    margin-bottom: 24px;
+    max-width: 800px;
+  }
+
+  /* Workflow Pipeline */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding: 20px 0;
+    position: relative;
+  }
+  .pipeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3), var(--accent5), var(--accent4));
+    transform: translateY(-50%);
+    z-index: 0;
+    border-radius: 2px;
+  }
+  .pipeline-step {
+    flex: 1;
+    min-width: 140px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 8px;
+  }
+  .step-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .step-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .step-desc {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* Architecture Diagram */
+  .arch-diagram {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr 60px 1fr;
+    gap: 0;
+    align-items: start;
+    margin: 30px 0;
+  }
+  .arch-column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .arch-column h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .arch-column .col-desc {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .arch-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--text-dim);
+    padding-top: 60px;
+  }
+  .arch-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background: var(--surface2);
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .arch-item:hover {
+    border-color: var(--accent);
+  }
+  .arch-item .ai-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .arch-item .ai-text {
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .arch-item .ai-sub {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+  }
+
+  /* God Nodes */
+  .god-nodes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .god-node {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .god-node:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .god-rank {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .god-info .god-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .god-info .god-edges {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .god-bar {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 6px;
+    background: var(--border);
+    overflow: hidden;
+  }
+  .god-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+
+  /* Community Grid */
+  .community-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .community-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .community-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+  .community-card .cc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .community-card .cc-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .community-card .cc-cohesion {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .community-card .cc-nodes {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .community-card .cc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .community-card .cc-tag {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--surface2);
+    color: var(--text-dim);
+  }
+
+  /* Surprises */
+  .surprise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .surprise-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--purple);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+  }
+  .surprise-item .si-flow {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .surprise-item .si-arrow {
+    color: var(--purple);
+    margin: 0 6px;
+  }
+  .surprise-item .si-why {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .surprise-item .si-files {
+    font-size: 0.7rem;
+    color: var(--accent2);
+    margin-top: 6px;
+  }
+
+  /* Department Matrix */
+  .dept-matrix {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .dept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    transition: border-color 0.2s;
+  }
+  .dept-card:hover { border-color: var(--accent); }
+  .dept-card .dc-code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .dept-card .dc-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin: 4px 0;
+  }
+  .dept-card .dc-desc {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* RBAC Table */
+  .rbac-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.8rem;
+  }
+  .rbac-table th {
+    background: var(--surface2);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+  .rbac-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .rbac-table tr:last-child td { border-bottom: none; }
+  .rbac-table tr:hover td { background: var(--surface2); }
+  .rbac-check { color: var(--green); font-weight: 700; }
+  .rbac-dash { color: var(--text-dim); }
+
+  /* Callout */
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 0.85rem;
+  }
+  .callout strong { color: var(--accent); }
+  .callout.blue { border-left-color: var(--accent2); }
+  .callout.blue strong { color: var(--accent2); }
+  .callout.green { border-left-color: var(--accent3); }
+  .callout.green strong { color: var(--accent3); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .arch-diagram {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .arch-arrow {
+      padding-top: 0;
+      transform: rotate(90deg);
+    }
+    .pipeline { flex-direction: column; align-items: center; }
+    .pipeline::before { display: none; }
+    .hero h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <h1>🏗️ BOB Cranes Operations Portal</h1>
+    <p class="subtitle">Enterprise-grade heavy equipment rental, crew assignment & compliance document management platform — architecture deep-dive</p>
+    <div class="badge-row">
+      <span class="badge"><span class="dot" style="background:var(--blue)"></span>React 19</span>
+      <span class="badge"><span class="dot" style="background:var(--accent)"></span>TypeScript 5.9</span>
+      <span class="badge"><span class="dot" style="background:var(--cyan)"></span>tRPC 11</span>
+      <span class="badge"><span class="dot" style="background:var(--green)"></span>Drizzle ORM</span>
+      <span class="badge"><span class="dot" style="background:var(--purple)"></span>Vite 7</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- STATS -->
+<div class="stats-grid">
+  <div class="stat-card"><div class="number">266</div><div class="label">Source Files</div></div>
+  <div class="stat-card"><div class="number">1,532</div><div class="label">Code Nodes</div></div>
+  <div class="stat-card"><div class="number">2,981</div><div class="label">Dependency Edges</div></div>
+  <div class="stat-card"><div class="number">167</div><div class="label">Communities</div></div>
+  <div class="stat-card"><div class="number">52</div><div class="label">Test Files</div></div>
+  <div class="stat-card"><div class="number">8</div><div class="label">Departments</div></div>
+</div>
+
+<!-- OPERATIONAL WORKFLOW -->
+<section>
+  <h2><span class="icon" style="background:rgba(245,158,11,0.15);color:var(--accent)">⚡</span> 7-Step Operational Workflow</h2>
+  <p class="desc">Every heavy equipment rental follows this rigorous sequential pipeline. No lift commences without complete compliance and equipment verification.</p>
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="step-circle" style="background:var(--accent)">1</div>
+      <div class="step-title">Sales Initiation</div>
+      <div class="step-desc">6-step wizard · Client onboarding · BOB Booking-XXXXX ID generated</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-circle" style="background:var(--blue)">2</div>
+      <div class="step-title">Doc Supervisor</div>
+      <div class="step-desc">Review requirements · Assign crane assets · Allocate crew</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-circle" style="background:var(--cyan)">3</div>
+      <div class="step-title">Gear Confirmation</div>
+      <div class="step-desc">Select shackles, slings · Hard-block expired inspections</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-circle" style="background:var(--green)">4</div>
+      <div class="step-title">Parallel Uploads</div>
+      <div class="step-desc">8 departments upload concurrently · Progress tracking</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-circle" style="background:var(--purple)">5</div>
+      <div class="step-title">Milestone Review</div>
+      <div class="step-desc">100% completion gate · Ready for Review status</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-circle" style="background:var(--accent5)">6</div>
+      <div class="step-title">Executive Sign-off</div>
+      <div class="step-desc">Sales reviews · Flag revisions · Kick-back authority</div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-circle" style="background:var(--red)">7</div>
+      <div class="step-title">Dispatch</div>
+      <div class="step-desc">PDF bundle generation · Email notifications · Done</div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section>
+  <h2><span class="icon" style="background:rgba(59,130,246,0.15);color:var(--accent2)">🧱</span> Three-Tier Architecture</h2>
+  <p class="desc">The portal follows a clean client–server–database separation with shared business rules.</p>
+  <div class="arch-diagram">
+    <!-- Client -->
+    <div class="arch-column">
+      <h3><span style="color:var(--blue)">⚛</span> Client (React 19)</h3>
+      <p class="col-desc">Vite-bundled SPA with Radix UI, Tailwind CSS 4, wouter routing</p>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(59,130,246,0.15);color:var(--blue)">🏠</div>
+        <div><div class="ai-text">Home.tsx</div><div class="ai-sub">Main workspace hub · 44 nodes</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(16,185,129,0.15);color:var(--green)">📊</div>
+        <div><div class="ai-text">DashboardLayout</div><div class="ai-sub">Sidebar navigation · 59 nodes</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(139,92,246,0.15);color:var(--purple)">👥</div>
+        <div><div class="ai-text">CrewAssignmentWorkspace</div><div class="ai-sub">Drag-drop crew allocation</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(245,158,11,0.15);color:var(--accent)">📄</div>
+        <div><div class="ai-text">DataUploadCenter</div><div class="ai-sub">Excel mapping · 28 nodes</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(239,68,68,0.15);color:var(--red)">🤖</div>
+        <div><div class="ai-text">AIChatBox</div><div class="ai-sub">AI assistant interface</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(6,182,212,0.15);color:var(--cyan)">📑</div>
+        <div><div class="ai-text">SalesEnquiryInbox</div><div class="ai-sub">Quote pipeline · SLA tracking</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(139,92,246,0.15);color:var(--purple)">🎨</div>
+        <div><div class="ai-text">60+ UI Components</div><div class="ai-sub">Radix UI · shadcn/ui pattern</div></div>
+      </div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <!-- Server -->
+    <div class="arch-column">
+      <h3><span style="color:var(--green)">🚀</span> Server (Express + tRPC)</h3>
+      <p class="col-desc">Type-safe API layer with JWT sessions, RBAC middleware</p>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(245,158,11,0.15);color:var(--accent)">🔗</div>
+        <div><div class="ai-text">routers.ts</div><div class="ai-sub">AppRouter · 1600+ lines · 42 edges</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(16,185,129,0.15);color:var(--green)">🗄️</div>
+        <div><div class="ai-text">db.ts</div><div class="ai-sub">Database access layer · 78 edges</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(59,130,246,0.15);color:var(--blue)">🔐</div>
+        <div><div class="ai-text">localAuth.ts</div><div class="ai-sub">Scrypt hashing · JWT sessions</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(239,68,68,0.15);color:var(--red)">📊</div>
+        <div><div class="ai-text">LLM Service</div><div class="ai-sub">AI integration · 33 nodes</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(139,92,246,0.15);color:var(--purple)">🗺️</div>
+        <div><div class="ai-text">Maps Service</div><div class="ai-sub">Google Maps · Geolocation</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(6,182,212,0.15);color:var(--cyan)">🔔</div>
+        <div><div class="ai-text">Notifications</div><div class="ai-sub">Department-scoped alerts</div></div>
+      </div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <!-- Database -->
+    <div class="arch-column">
+      <h3><span style="color:var(--cyan)">💾</span> Database (MySQL + Drizzle)</h3>
+      <p class="col-desc">20+ tables with typed schema, 19 migrations</p>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(245,158,11,0.15);color:var(--accent)">👤</div>
+        <div><div class="ai-text">users</div><div class="ai-sub">RBAC · department codes · sessions</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(59,130,246,0.15);color:var(--blue)">📋</div>
+        <div><div class="ai-text">bookings</div><div class="ai-sub">Core dossier · 8-stage lifecycle</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(16,185,129,0.15);color:var(--green)">🏗️</div>
+        <div><div class="ai-text">equipment / crew / gears</div><div class="ai-sub">Asset management with expiry tracking</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(139,92,246,0.15);color:var(--purple)">📁</div>
+        <div><div class="ai-text">documents</div><div class="ai-sub">Taxonomy · tags · metadata persistence</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(239,68,68,0.15);color:var(--red)">📝</div>
+        <div><div class="ai-text">rental_enquiries</div><div class="ai-sub">Sales pipeline · SLA config</div></div>
+      </div>
+      <div class="arch-item">
+        <div class="ai-icon" style="background:rgba(6,182,212,0.15);color:var(--cyan)">⚙️</div>
+        <div><div class="ai-text">department_dashboards</div><div class="ai-sub">Provisioned workspaces · workflow templates</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>Shared Layer:</strong> Business rules in <code>shared/</code> are imported by both client and server — ensuring a single source of truth for booking stages, RBAC, crew availability, conflict detection, and document compliance rules.
+  </div>
+</section>
+
+<!-- GOD NODES -->
+<section>
+  <h2><span class="icon" style="background:rgba(245,158,11,0.15);color:var(--accent)">👑</span> God Nodes — Core Abstractions</h2>
+  <p class="desc">These are the most-connected nodes in the knowledge graph — the architectural pillars everything depends on.</p>
+  <div class="god-nodes">
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(245,158,11,0.2);color:var(--accent)">1</div>
+      <div class="god-info">
+        <div class="god-name">cn()</div>
+        <div class="god-edges">275 edges · CSS class merger utility</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:100%;background:var(--accent)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(59,130,246,0.2);color:var(--accent2)">2</div>
+      <div class="god-info">
+        <div class="god-name">getDb()</div>
+        <div class="god-edges">78 edges · Database connection gateway</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:28%;background:var(--accent2)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(16,185,129,0.2);color:var(--accent3)">3</div>
+      <div class="god-info">
+        <div class="god-name">AppRouter</div>
+        <div class="god-edges">42 edges · tRPC API root</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:15%;background:var(--accent3)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(139,92,246,0.2);color:var(--accent5)">4</div>
+      <div class="god-info">
+        <div class="god-name">DepartmentUsersView()</div>
+        <div class="god-edges">15 edges · User management hub</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:5.5%;background:var(--accent5)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(239,68,68,0.2);color:var(--accent4)">5</div>
+      <div class="god-info">
+        <div class="god-name">trpc</div>
+        <div class="god-edges">14 edges · Client API client</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:5.1%;background:var(--accent4)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(6,182,212,0.2);color:var(--cyan)">6</div>
+      <div class="god-info">
+        <div class="god-name">DataUploadCenter()</div>
+        <div class="god-edges">13 edges · Excel processing hub</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:4.7%;background:var(--cyan)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(245,158,11,0.2);color:var(--accent)">7</div>
+      <div class="god-info">
+        <div class="god-name">Button()</div>
+        <div class="god-edges">13 edges · Most-used UI primitive</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:4.7%;background:var(--accent)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(59,130,246,0.2);color:var(--accent2)">8</div>
+      <div class="god-info">
+        <div class="god-name">ENV</div>
+        <div class="god-edges">13 edges · Environment config gateway</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:4.7%;background:var(--accent2)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(16,185,129,0.2);color:var(--accent3)">9</div>
+      <div class="god-info">
+        <div class="god-name">useAuth()</div>
+        <div class="god-edges">12 edges · Auth hook</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:4.4%;background:var(--accent3)"></div></div>
+      </div>
+    </div>
+    <div class="god-node">
+      <div class="god-rank" style="background:rgba(139,92,246,0.2);color:var(--accent5)">10</div>
+      <div class="god-info">
+        <div class="god-name">compilerOptions</div>
+        <div class="god-edges">15 edges · TypeScript config</div>
+        <div class="god-bar"><div class="god-bar-fill" style="width:5.5%;background:var(--accent5)"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPARTMENT MATRIX -->
+<section>
+  <h2><span class="icon" style="background:rgba(16,185,129,0.15);color:var(--accent3)">🏢</span> 8-Department RBAC Matrix</h2>
+  <p class="desc">Each department gets scoped access to specific views and capabilities. Administrators see everything.</p>
+  <div class="dept-matrix">
+    <div class="dept-card">
+      <div class="dc-code">SAL</div>
+      <div class="dc-name">Sales & Client Relations</div>
+      <div class="dc-desc">Booking wizard, enquiry inbox, dispatch sign-off, SLA tracking</div>
+    </div>
+    <div class="dept-card">
+      <div class="dc-code">DOC</div>
+      <div class="dc-name">Documentation & Permits</div>
+      <div class="dc-desc">Document taxonomy, parallel tracking, supervisor assignments</div>
+    </div>
+    <div class="dept-card">
+      <div class="dc-code">LG</div>
+      <div class="dc-name">Lifting Gears / Engineering</div>
+      <div class="dc-desc">Gear inspection expiry hard-blocking, certificate validation</div>
+    </div>
+    <div class="dept-card">
+      <div class="dc-code">MNT</div>
+      <div class="dc-name">Maintenance</div>
+      <div class="dc-desc">Equipment maintenance logs, department workspace</div>
+    </div>
+    <div class="dept-card">
+      <div class="dc-code">CRW</div>
+      <div class="dc-name">Crew / Workmen Assignment</div>
+      <div class="dc-desc">Drag-drop crew allocation, availability tracking, conflict alerts</div>
+    </div>
+    <div class="dept-card">
+      <div class="dc-code">HSE</div>
+      <div class="dc-name">HSE / Safety</div>
+      <div class="dc-desc">Compliance audits, training renewals, safety passes, incident logs</div>
+    </div>
+    <div class="dept-card">
+      <div class="dc-code">ACC</div>
+      <div class="dc-name">Accounts</div>
+      <div class="dc-desc">LPO verification, invoicing, financial sign-off, billing tracking</div>
+    </div>
+    <div class="dept-card">
+      <div class="dc-code">TRN</div>
+      <div class="dc-name">Transportation</div>
+      <div class="dc-desc">Trailer allocation, fleet roster, transport document verification</div>
+    </div>
+  </div>
+  
+  <div class="callout green" style="margin-top:20px">
+    <strong>Access Control:</strong> Three roles — <code>admin</code> (full access), <code>supervisor</code> (department-scoped management), <code>user</code> (department-scoped operations). Supervisors can manage users in their department; admins can provision new departments.
+  </div>
+</section>
+
+<!-- COMMUNITIES -->
+<section>
+  <h2><span class="icon" style="background:rgba(139,92,246,0.15);color:var(--accent5)">🏘️</span> Top Architectural Communities</h2>
+  <p class="desc">Community detection reveals how code is naturally clustered. These are the 12 most significant functional modules.</p>
+  <div class="community-grid">
+    <div class="community-card" style="border-top:3px solid var(--blue)">
+      <div class="cc-header">
+        <div class="cc-name">Database Access Layer</div>
+        <div class="cc-cohesion" style="background:rgba(59,130,246,0.15);color:var(--blue)">0.056</div>
+      </div>
+      <div class="cc-nodes">71 nodes · server/db.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">CRUD operations</span>
+        <span class="cc-tag">Seeding</span>
+        <span class="cc-tag">Query builders</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--green)">
+      <div class="cc-header">
+        <div class="cc-name">Database Schema (Drizzle)</div>
+        <div class="cc-cohesion" style="background:rgba(16,185,129,0.15);color:var(--green)">0.042</div>
+      </div>
+      <div class="cc-nodes">46 nodes · drizzle/schema.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">20+ tables</span>
+        <span class="cc-tag">Type inference</span>
+        <span class="cc-tag">19 migrations</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--accent)">
+      <div class="cc-header">
+        <div class="cc-name">Server Router & Dept Rules</div>
+        <div class="cc-cohesion" style="background:rgba(245,158,11,0.15);color:var(--accent)">0.113</div>
+      </div>
+      <div class="cc-nodes">29 nodes · routers.ts + deptDashboardRules</div>
+      <div class="cc-tags">
+        <span class="cc-tag">tRPC procedures</span>
+        <span class="cc-tag">RBAC middleware</span>
+        <span class="cc-tag">Workflow templates</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--purple)">
+      <div class="cc-header">
+        <div class="cc-name">Booking Lifecycle</div>
+        <div class="cc-cohesion" style="background:rgba(139,92,246,0.15);color:var(--purple)">0.101</div>
+      </div>
+      <div class="cc-nodes">27 nodes · bookingRules.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">8-stage pipeline</span>
+        <span class="cc-tag">State transitions</span>
+        <span class="cc-tag">Notifications</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--cyan)">
+      <div class="cc-header">
+        <div class="cc-name">Excel Upload & Mapping</div>
+        <div class="cc-cohesion" style="background:rgba(6,182,212,0.15);color:var(--cyan)">0.121</div>
+      </div>
+      <div class="cc-nodes">28 nodes · DataUploadCenter</div>
+      <div class="cc-tags">
+        <span class="cc-tag">Column mapping</span>
+        <span class="cc-tag">Validation</span>
+        <span class="cc-tag">SheetJS</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--accent4)">
+      <div class="cc-header">
+        <div class="cc-name">Attendance & Roster</div>
+        <div class="cc-cohesion" style="background:rgba(239,68,68,0.15);color:var(--accent4)">0.205</div>
+      </div>
+      <div class="cc-nodes">18 nodes · attendanceRules.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">Daily roster</span>
+        <span class="cc-tag">Monthly summary</span>
+        <span class="cc-tag">Date-aware</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--accent3)">
+      <div class="cc-header">
+        <div class="cc-name">Crew Assignment</div>
+        <div class="cc-cohesion" style="background:rgba(16,185,129,0.15);color:var(--accent3)">0.135</div>
+      </div>
+      <div class="cc-nodes">13 nodes · CrewAssignmentWorkspace</div>
+      <div class="cc-tags">
+        <span class="cc-tag">Drag-drop</span>
+        <span class="cc-tag">CSV export</span>
+        <span class="cc-tag">Search presets</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--accent5)">
+      <div class="cc-header">
+        <div class="cc-name">Sales Inbox & PDF</div>
+        <div class="cc-cohesion" style="background:rgba(139,92,246,0.15);color:var(--accent5)">0.115</div>
+      </div>
+      <div class="cc-nodes">26 nodes · SalesEnquiryInbox + PDF libs</div>
+      <div class="cc-tags">
+        <span class="cc-tag">SLA tracking</span>
+        <span class="cc-tag">Dispatch bundle</span>
+        <span class="cc-tag">pdf-lib</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--accent)">
+      <div class="cc-header">
+        <div class="cc-name">Gear Compliance</div>
+        <div class="cc-cohesion" style="background:rgba(245,158,11,0.15);color:var(--accent)">0.333</div>
+      </div>
+      <div class="cc-nodes">8 nodes · gearDocumentRules.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">Hard-block expired</span>
+        <span class="cc-tag">Certificate validation</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--green)">
+      <div class="cc-header">
+        <div class="cc-name">Vehicle Fleet</div>
+        <div class="cc-cohesion" style="background:rgba(16,185,129,0.15);color:var(--green)">0.378</div>
+      </div>
+      <div class="cc-nodes">7 nodes · vehicleFleetRules.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">Mulkiya expiry</span>
+        <span class="cc-tag">Registration status</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--blue)">
+      <div class="cc-header">
+        <div class="cc-name">Local Authentication</div>
+        <div class="cc-cohesion" style="background:rgba(59,130,246,0.15);color:var(--blue)">0.289</div>
+      </div>
+      <div class="cc-nodes">9 nodes · localAuth.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">Scrypt</span>
+        <span class="cc-tag">JWT sessions</span>
+        <span class="cc-tag">Cookie binding</span>
+      </div>
+    </div>
+    <div class="community-card" style="border-top:3px solid var(--accent4)">
+      <div class="cc-header">
+        <div class="cc-name">Department Access Control</div>
+        <div class="cc-cohesion" style="background:rgba(239,68,68,0.15);color:var(--accent4)">0.231</div>
+      </div>
+      <div class="cc-nodes">9 nodes · departmentAccess.ts</div>
+      <div class="cc-tags">
+        <span class="cc-tag">RBAC guards</span>
+        <span class="cc-tag">Workspace view mapping</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SURPRISING CONNECTIONS -->
+<section>
+  <h2><span class="icon" style="background:rgba(139,92,246,0.15);color:var(--accent5)">🔗</span> Surprising Cross-Community Connections</h2>
+  <p class="desc">These edges bridge seemingly unrelated modules — they're the hidden wiring that makes the system work.</p>
+  <div class="surprise-list">
+    <div class="surprise-item">
+      <div class="si-flow">ProvisionedDepartmentDashboard() <span class="si-arrow">→</span> normalizeDepartmentDashboardConfig()</div>
+      <div class="si-why">Home.tsx directly calls a shared utility to normalize dashboard configs — a client component reaching deep into shared business logic.</div>
+      <div class="si-files">client/src/pages/Home.tsx → shared/departmentDashboardRules.ts</div>
+    </div>
+    <div class="surprise-item">
+      <div class="si-flow">CrewView() <span class="si-arrow">→</span> focusAssignmentBooking()</div>
+      <div class="si-why">The crew assignment UI directly manipulates booking focus state — a visual component driving core booking navigation.</div>
+      <div class="si-files">client/src/components/CrewAssignmentWorkspace.tsx → shared/assignmentRules.ts</div>
+    </div>
+    <div class="surprise-item">
+      <div class="si-flow">CrewView() <span class="si-arrow">→</span> buildBulkConflictSummary()</div>
+      <div class="si-why">The crew UI computes booking conflicts in real-time — complex scheduling logic embedded in a presentation component.</div>
+      <div class="si-files">client/src/components/CrewAssignmentWorkspace.tsx → shared/bulkCrewAssignmentRules.ts</div>
+    </div>
+    <div class="surprise-item">
+      <div class="si-flow">CrewView() <span class="si-arrow">→</span> summarizeAllocationTiming()</div>
+      <div class="si-why">Crew availability timing (Active/Upcoming/Completed) is computed client-side from booking dates.</div>
+      <div class="si-files">client/src/components/CrewAssignmentWorkspace.tsx → shared/crewAssignmentAvailability.ts</div>
+    </div>
+    <div class="surprise-item">
+      <div class="si-flow">DepartmentUsersView() <span class="si-arrow">→</span> nextAccountActiveState()</div>
+      <div class="si-why">User management toggles account status through a shared state machine — not a simple boolean flip.</div>
+      <div class="si-files">client/src/components/DepartmentUsersView.tsx → shared/accountManagementRules.ts</div>
+    </div>
+  </div>
+</section>
+
+<!-- HEALTH CHECK -->
+<section>
+  <h2><span class="icon" style="background:rgba(239,68,68,0.15);color:var(--accent4)">🩺</span> Graph Health & Integrity</h2>
+  <div class="callout">
+    <strong>340 dangling-endpoint edges</strong> — references to external packages or types not in the codebase. Expected for npm imports (React, Radix, tRPC, etc.).
+  </div>
+  <div class="callout blue">
+    <strong>3 self-loop edges</strong> — functions that reference themselves recursively. Minimal and likely intentional.
+  </div>
+  <div class="callout green">
+    <strong>No import cycles detected</strong> — the dependency graph is acyclic, which means the build is reliable and tree-shaking works correctly.
+  </div>
+</section>
+
+<!-- KEY ARCHITECTURAL INSIGHTS -->
+<section>
+  <h2><span class="icon" style="background:rgba(245,158,11,0.15);color:var(--accent)">💡</span> Key Architectural Insights</h2>
+  <div class="callout">
+    <strong>1. Dual Department Code Systems:</strong> Two separate department code conventions exist — <code>bookingRules.ts</code> uses short codes (SAL, DOC, LG...) while <code>departmentAccess.ts</code> uses slug codes (sales, documentation, lifting-gears...). The <code>lifecycleNotificationDepartment</code> map in routers.ts bridges them.
+  </div>
+  <div class="callout blue">
+    <strong>2. Shared Rules as Single Source of Truth:</strong> The <code>shared/</code> directory contains 30+ modules with pure functions (no side effects) that both client and server import. This ensures booking stage transitions, RBAC checks, and conflict detection logic are identical on both sides.
+  </div>
+  <div class="callout green">
+    <strong>3. Monolithic Router Pattern:</strong> <code>server/routers.ts</code> (1600+ lines) contains ALL tRPC procedures in a single file. While this works, it's the second-largest community (cohesion 0.11) and could benefit from domain-based splitting.
+  </div>
+  <div class="callout">
+    <strong>4. Home.tsx as the Mega-Component:</strong> The main workspace view contains 44+ extracted symbols including booking management, crew views, gear selection, attendance, training, and department dashboards. This is the highest-traffic file in the system.
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Generated by graphify + Buffy · BOB Cranes Operations Portal Architecture Analysis<br>
+  266 files · 1,532 nodes · 2,981 edges · 167 communities
+</footer>
+
+</body>
+</html>
