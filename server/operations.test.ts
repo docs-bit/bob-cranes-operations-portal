@@ -74,10 +74,10 @@ describe("operations router", () => {
     const getBooking = vi.spyOn(db, "getBookingById").mockResolvedValue(undefined);
     const addNotification = vi.spyOn(db, "addNotification").mockResolvedValue({} as any);
     const caller = appRouter.createCaller({ ...createSalesContext(), user: { ...createSalesContext().user, departmentCode: "hse" } } as any);
-    const result = await caller.operations.completeBookingWorkstream({ id: "BOB Booking-31511", workstream: "HSE", stage: "Docs In Progress" });
-    expect(result.workstream).toBe("HSE");
+    const result = await caller.operations.completeBookingWorkstream({ id: "BOB Booking-31511", workstream: "hse", stage: "Docs In Progress" });
+    expect(result.workstream).toBe("hse");
     expect(getBooking).toHaveBeenCalledWith("BOB Booking-31511");
-    expect(addNotification).toHaveBeenCalledWith(expect.objectContaining({ departmentCode: "documentation", title: "HSE workstream complete" }));
+    expect(addNotification).toHaveBeenCalledWith(expect.objectContaining({ departmentCode: "documentation", title: "hse workstream complete" }));
     vi.restoreAllMocks();
   });
 

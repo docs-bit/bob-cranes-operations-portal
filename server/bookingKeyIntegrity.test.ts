@@ -4,12 +4,14 @@ import { resolve } from "node:path";
 
 describe("booking render identity", () => {
   const homeSource = readFileSync(resolve(process.cwd(), "client/src/pages/Home.tsx"), "utf8");
+  const bookingsSource = readFileSync(resolve(process.cwd(), "client/src/pages/views/BookingsView.tsx"), "utf8");
+  const deptSource = readFileSync(resolve(process.cwd(), "client/src/pages/views/DepartmentView.tsx"), "utf8");
 
   it("does not use a booking ID alone as a React key", () => {
-    expect(homeSource).not.toMatch(/key=\{booking\.id\}/);
-    expect(homeSource).toContain("key={`booking-table-${booking.id}-${index}`}");
-    expect(homeSource).toContain("key={`department-queue-${booking.id}-${index}`}");
-    expect(homeSource).toContain("key={`handoff-${booking.id}-${index}`}");
+    expect(bookingsSource).not.toMatch(/key=\{booking\.id\}/);
+    expect(bookingsSource).toContain("key={`booking-table-${booking.id}-${index}`}");
+    expect(deptSource).toContain("key={`department-queue-${booking.id}-${index}`}");
+    expect(deptSource).toContain("key={`handoff-${booking.id}-${index}`}");
   });
 
   it("replaces an existing dossier when booking state is updated or created", () => {
@@ -37,28 +39,28 @@ describe("crew assignment booking render identity", () => {
 });
 
 describe("bookings list discovery controls", () => {
-  const homeSource = readFileSync(resolve(process.cwd(), "client/src/pages/Home.tsx"), "utf8");
+  const bookingsSource = readFileSync(resolve(process.cwd(), "client/src/pages/views/BookingsView.tsx"), "utf8");
 
   it("supports dossier search and all requested sort dimensions", () => {
-    expect(homeSource).toContain("aria-label=\"Search booking dossiers by client, project, or booking ID\"");
-    expect(homeSource).toContain("value=\"date-asc\">Mobilization date · earliest");
-    expect(homeSource).toContain("value=\"status\">Workflow status");
-    expect(homeSource).toContain("value=\"id-asc\">Booking ID · A–Z");
-    expect(homeSource).toContain("stages.indexOf(left.stage) - stages.indexOf(right.stage)");
+    expect(bookingsSource).toContain("aria-label=\"Search booking dossiers by client, project, or booking ID\"");
+    expect(bookingsSource).toContain("value=\"date-asc\">Mobilization date · earliest");
+    expect(bookingsSource).toContain("value=\"status\">Workflow status");
+    expect(bookingsSource).toContain("value=\"id-asc\">Booking ID · A–Z");
+    expect(bookingsSource).toContain("stages.indexOf(left.stage) - stages.indexOf(right.stage)");
   });
 
   it("renders a table-shaped loading skeleton while bookings hydrate", () => {
-    expect(homeSource).toContain("function BookingsListSkeleton()");
-    expect(homeSource).toContain("isLoading ? (");
-    expect(homeSource).toContain("bookings-list-skeleton");
-    expect(homeSource).toContain("setBookingsLoading(false)");
+    expect(bookingsSource).toContain("function BookingsListSkeleton()");
+    expect(bookingsSource).toContain("isLoading ? (");
+    expect(bookingsSource).toContain("bookings-list-skeleton");
+    expect(bookingsSource).toContain("setBookingsLoading(false)");
   });
 
   it("provides an illustrated empty state, shareable URL controls, and filtered CSV export", () => {
-    expect(homeSource).toContain("function BookingsEmptyState(");
-    expect(homeSource).toContain("parseBookingListParams(locationSearch)");
-    expect(homeSource).toContain("window.history.replaceState(window.history.state, \"\", nextLocation)");
-    expect(homeSource).toContain("aria-label=\"Export filtered booking dossiers to CSV\"");
-    expect(homeSource).toContain("bob-bookings-${filter}-${sortBy}-");
+    expect(bookingsSource).toContain("function BookingsEmptyState(");
+    expect(bookingsSource).toContain("parseBookingListParams(locationSearch)");
+    expect(bookingsSource).toContain("window.history.replaceState(window.history.state, \"\", nextLocation)");
+    expect(bookingsSource).toContain("aria-label=\"Export filtered booking dossiers to CSV\"");
+    expect(bookingsSource).toContain("bob-bookings-${filter}-${sortBy}-");
   });
 });

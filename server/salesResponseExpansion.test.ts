@@ -7,7 +7,7 @@ describe("Sales response-controls expansion", () => {
   it("persists SLA thresholds and enquiry event records", () => {
     const schema = read("../drizzle/schema.ts");
     const db = read("./db.ts");
-    const router = read("./routers.ts");
+    const router = read("./routers/sales.ts");
 
     expect(schema).toContain("export const rentalEnquiryEvents");
     expect(db).toContain("getSalesEnquirySlaConfig");
@@ -31,12 +31,12 @@ describe("Sales response-controls expansion", () => {
   });
 
   it("maps unassigned wait time to a visible SLA severity and honors reduced motion", () => {
-    const page = read("../client/src/pages/Home.tsx");
+    const overview = read("../client/src/pages/views/Overview.tsx");
     const styles = read("../client/src/index.css");
 
-    expect(page).toContain("unassignedOldestWaitHours");
-    expect(page).toContain('unassignedSeverity === "critical"');
-    expect(page).toContain('unassignedSeverity === "warning"');
+    expect(overview).toContain("unassignedOldestWaitHours");
+    expect(overview).toContain('unassignedSeverity === "critical"');
+    expect(overview).toContain('unassignedSeverity === "warning"');
     expect(styles).toContain(".unassigned-enquiry-status.critical");
     expect(styles).toContain(".unassigned-enquiry-status.warning");
     expect(styles).toContain("prefers-reduced-motion");

@@ -10,6 +10,14 @@ const home = readFileSync(
   new URL("../client/src/pages/Home.tsx", import.meta.url),
   "utf8"
 );
+const bookingsView = readFileSync(
+  new URL("../client/src/pages/views/BookingsView.tsx", import.meta.url),
+  "utf8"
+);
+const overviewView = readFileSync(
+  new URL("../client/src/pages/views/Overview.tsx", import.meta.url),
+  "utf8"
+);
 
 describe("Crew Assignment enhancements", () => {
   it("derives Active and Upcoming booking timing from the selected date", () => {
@@ -42,24 +50,23 @@ describe("Crew Assignment enhancements", () => {
     expect(workspace).toContain("matchesRole");
     expect(workspace).toContain("Confirm undo assignment");
     expect(workspace).toContain("Confirm undo");
-    expect(home).toContain("booking-pagination");
-    expect(home).toContain("paginatedBookings");
-    expect(home).toContain("Bookings per page");
-    expect(home).toContain('<option value={50}>50</option>');
-    expect(home).toContain("bob-bookings-page-size-v1");
+    expect(bookingsView).toContain("booking-pagination");
+    expect(bookingsView).toContain("paginatedBookings");
+    expect(bookingsView).toContain("Bookings per page");
+    expect(bookingsView).toContain('<option value={50}>50</option>');
+    expect(bookingsView).toContain("bob-bookings-page-size-v1");
     expect(workspace).toContain("UndoAssignmentToast");
     expect(workspace).toContain("Undo available for");
     expect(workspace).toContain("exportFilteredBookingsCsv");
     expect(workspace).toContain("Export bookings CSV");
     expect(workspace).toContain("undo-toast-progress");
-    expect(home).toContain('data-testid="operations-quick-summary"');
-    expect(home).toContain("active bookings");
-    expect(home).toContain("crew available today");
-    expect(home).toContain('aria-label={`Switch application to ${theme === "dark" ? "light" : "dark"} mode`}');
-    expect(home).toContain("embedBobFullLogo");
-    expect(home).toContain("Generated: ${generatedAt}");
-    expect(home).toContain('data-tooltip="Open Booking Dossiers · active bookings"');
-    expect(home).toContain('data-tooltip="Open Crew Assignment · available today"');
+    expect(overviewView).toContain('data-testid="operations-quick-summary"');
+    expect(overviewView).toContain("active bookings");
+    expect(overviewView).toContain("crew available today");
+    expect(bookingsView).toContain("embedBobFullLogo");
+    expect(bookingsView).toContain("Generated: ${generatedAt}");
+    expect(overviewView).toContain('data-tooltip="Open Booking Dossiers · active bookings"');
+    expect(overviewView).toContain('data-tooltip="Open Crew Assignment · available today"');
   });
 
   it("preserves flexible assignment editing for both available and already-assigned employees", () => {

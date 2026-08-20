@@ -66,7 +66,7 @@ export default function Login() {
   return (
     <main className="auth-page">
       <section className="auth-visual" aria-label="BOB Cranes Operations Control">
-        <div className="auth-brand auth-brand-full"><div className="auth-brand-mark auth-brand-logo"><img src="/manus-storage/bob-lifting-your-expectations_2beae224.webp" alt="BOB Cranes — Lifting Your Expectations" /></div></div>
+        <div className="auth-brand auth-brand-full"><div className="auth-brand-mark auth-brand-logo"><img src="/assets/bob-logo.webp" alt="BOB Cranes — Lifting Your Expectations" /></div></div>
         <div className="auth-visual-copy">
           <span className="auth-kicker">Operations Control</span>
           <h1>Keep every lift, dossier, and department connected.</h1>

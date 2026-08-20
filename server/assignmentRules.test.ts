@@ -22,15 +22,16 @@ describe("assignment editor focus rules", () => {
 
   it("keeps the Assignment UI handoff and dossier refresh wiring connected", () => {
     const homeSource = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.url), "utf8");
+    const detailSource = readFileSync(new URL("../client/src/pages/views/BookingDetail.tsx", import.meta.url), "utf8");
     expect(homeSource).toContain("onEditAssignment");
     expect(homeSource).toContain("focusedBookingId={focusedAssignmentBookingId}");
     expect(homeSource).toContain("onAllocationSaved");
     expect(homeSource).toContain("assignmentSavedMessage={assignmentSavedMessage}");
-    expect(homeSource).toContain("const dossierCrew = assignedCrew.length");
-    expect(homeSource).toContain("? assignedCrew");
-    expect(homeSource).toContain(": legacyCrews.slice(0, 4)");
-    expect(homeSource).toContain("allocation.crewId === crew.id");
-    expect(homeSource).toContain("allocation.employeeName === crew.name");
+    expect(detailSource).toContain("const dossierCrew = assignedCrew.length");
+    expect(detailSource).toContain("? assignedCrew");
+    expect(detailSource).toContain(": legacyCrews.slice(0, 4)");
+    expect(detailSource).toContain("allocation.crewId === crew.id");
+    expect(detailSource).toContain("allocation.employeeName === crew.name");
   });
 
   it("supports the save handler's assign then remove cycle without mutating prior state", () => {

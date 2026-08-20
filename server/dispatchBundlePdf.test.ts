@@ -45,7 +45,7 @@ describe("dispatch bundle PDF download", () => {
         documents: [
           {
             id: "doc-1",
-            departmentCode: "DOC",
+            departmentCode: "documentation",
             name: "Signed method statement",
             state: "Approved",
             required: true,

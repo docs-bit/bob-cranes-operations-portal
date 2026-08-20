@@ -25,7 +25,7 @@ function ProtectedPortal() {
     return () => window.clearTimeout(timeout);
   }, [loading]);
 
-  if (loading) return <div className="auth-loading" role="status" aria-live="polite"><div className="auth-loading-card"><div className="auth-brand-mark auth-brand-logo"><img src="/manus-storage/bob-lifting-your-expectations_2beae224.webp" alt="BOB Cranes — Lifting Your Expectations" /></div><span className="auth-spinner" aria-hidden="true" /><strong>Loading secure workspace</strong><span>Checking your BOB Cranes access and saved session.</span>{isSlow && <button className="secondary-button" onClick={() => void refresh()}>Retry secure connection</button>}</div></div>;
+  if (loading) return <div className="auth-loading" role="status" aria-live="polite"><div className="auth-loading-card"><div className="auth-brand-mark auth-brand-logo"><img src="/assets/bob-logo.webp" alt="BOB Cranes — Lifting Your Expectations" /></div><span className="auth-spinner" aria-hidden="true" /><strong>Loading secure workspace</strong><span>Checking your BOB Cranes access and saved session.</span>{isSlow && <button className="secondary-button" onClick={() => void refresh()}>Retry secure connection</button>}</div></div>;
   return user ? <Home /> : <Login />;
 }
 

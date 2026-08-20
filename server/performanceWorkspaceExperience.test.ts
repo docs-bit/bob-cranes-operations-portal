@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const analytics = readFileSync(new URL("../client/src/components/WebVitalsAnalyticsView.tsx", import.meta.url), "utf8");
-const workspace = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.url), "utf8");
+const workspace = readFileSync(new URL("../client/src/pages/views/Shell.tsx", import.meta.url), "utf8");
+const deptView = readFileSync(new URL("../client/src/pages/views/DepartmentView.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../client/src/index.css", import.meta.url), "utf8");
 
 describe("performance workspace experience", () => {
@@ -30,27 +31,27 @@ describe("performance workspace experience", () => {
   it("provides persistent workspace dark mode and accessible operational filtering", () => {
     expect(workspace).toContain("workspace-theme-toggle");
     expect(workspace).toContain("aria-pressed={theme === \"dark\"}");
-    expect(workspace).toContain("department-workspace-toolbar");
-    expect(workspace).toContain("Search operational queue");
-    expect(workspace).toContain("Filter by priority");
-    expect(workspace).toContain("searchSuggestions");
-    expect(workspace).toContain("department-search-suggestions");
-    expect(workspace).toContain("aria-autocomplete=\"list\"");
-    expect(workspace).toContain("ArrowDown");
-    expect(workspace).toContain("ArrowUp");
-    expect(workspace).toContain("highlightQuery");
-    expect(workspace).toContain("aria-activedescendant");
-    expect(workspace).toContain("searchSuggestionsLoading");
-    expect(workspace).toContain("Finding matching operations");
-    expect(workspace).toContain("aria-busy={searchSuggestionsLoading}");
-    expect(workspace).toContain("bob-department-recent-searches");
-    expect(workspace).toContain("Clear operational queue search");
+    expect(deptView).toContain("department-workspace-toolbar");
+    expect(deptView).toContain("Search operational queue");
+    expect(deptView).toContain("Filter by priority");
+    expect(deptView).toContain("searchSuggestions");
+    expect(deptView).toContain("department-search-suggestions");
+    expect(deptView).toContain("aria-autocomplete=\"list\"");
+    expect(deptView).toContain("ArrowDown");
+    expect(deptView).toContain("ArrowUp");
+    expect(deptView).toContain("highlightQuery");
+    expect(deptView).toContain("aria-activedescendant");
+    expect(deptView).toContain("searchSuggestionsLoading");
+    expect(deptView).toContain("Finding matching operations");
+    expect(deptView).toContain("aria-busy={searchSuggestionsLoading}");
+    expect(deptView).toContain("bob-department-recent-searches");
+    expect(deptView).toContain("Clear operational queue search");
     expect(workspace).toContain("event.key !== \"/\"");
     expect(styles).toContain(".dark .app-shell");
   });
 
   it("makes the administrator analytics dashboard discoverable in the portal", () => {
-    expect(workspace).toContain("Web Vitals Analytics");
-    expect(workspace).toContain("view === \"web-vitals\"");
+    expect(deptView).toContain("Web Vitals Analytics");
+    expect(deptView).toContain("view === \"web-vitals\"");
   });
 });

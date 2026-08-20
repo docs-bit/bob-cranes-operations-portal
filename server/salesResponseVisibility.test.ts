@@ -11,7 +11,7 @@ describe("Sales response visibility", () => {
   });
 
   it("provides self-service profile contact settings and an unassigned enquiry dashboard status", () => {
-    const source = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.url), "utf8");
+    const source = readFileSync(new URL("../client/src/pages/views/Overview.tsx", import.meta.url), "utf8");
 
     expect(source).toContain("trpc.auth.updateMyContactDetails.useMutation()");
     expect(source).toContain("Rental estimate contact");

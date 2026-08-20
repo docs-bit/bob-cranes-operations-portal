@@ -14,7 +14,7 @@ export type PriorityTier = "Standard" | "High" | "Critical";
 export type Availability = "Present" | "On Leave" | "Assigned" | "Off-Site";
 export type DocumentState = "Required" | "Uploaded" | "Approved" | "Revision Required";
 
-export type DepartmentCode = "SAL" | "DOC" | "LG" | "MNT" | "CRW" | "HSE" | "ACC" | "HR" | "TRN" | "ADM";
+import { type DepartmentCode } from "./departmentAccess";
 export type Department = { code: DepartmentCode; name: string; active: boolean };
 export type CraneAsset = { id: string; assetCode: string; name: string; capacityTons: number; status: "Available" | "Assigned" | "Maintenance"; inspectionExpiry: string };
 export type CrewMember = { id: string; name: string; designation: string; availability: Availability; certificateExpiry: string; trainingRequired: boolean };
@@ -38,16 +38,16 @@ export type Notification = { id: string; departmentCode: DepartmentCode; title: 
 export type BookingDossier = { id: string; clientName: string; projectName: string; projectManager: string; lpoReference: string; mobilizationDate: string; offHireDate: string; clientContactName: string; clientEmail: string; clientPhone: string; priority: PriorityTier; stage: BookingStage; craneId?: string; crewIds: string[]; gearIds: string[]; trailerIds: string[]; documents: DocumentItem[]; chat: ChatMessage[]; notifications: Notification[] };
 
 export const DEPARTMENTS: Department[] = [
-  { code: "SAL", name: "Sales & Client Relations", active: true },
-  { code: "DOC", name: "Documentation & Permits", active: true },
-  { code: "LG", name: "Lifting Gears / Engineering", active: true },
-  { code: "MNT", name: "Maintenance", active: true },
-  { code: "CRW", name: "Crew / Workmen Assignment", active: true },
-  { code: "HSE", name: "HSE / Safety", active: true },
-  { code: "ACC", name: "Accounts", active: true },
-  { code: "HR", name: "HR", active: true },
-  { code: "TRN", name: "Transportation", active: true },
-  { code: "ADM", name: "Administrator / Super Admin", active: true },
+  { code: "sales", name: "Sales & Client Relations", active: true },
+  { code: "documentation", name: "Documentation & Permits", active: true },
+  { code: "lifting-gears", name: "Lifting Gears / Engineering", active: true },
+  { code: "maintenance", name: "Maintenance", active: true },
+  { code: "crew", name: "Crew / Workmen Assignment", active: true },
+  { code: "hse", name: "HSE / Safety", active: true },
+  { code: "accounts", name: "Accounts", active: true },
+  { code: "hr", name: "HR", active: true },
+  { code: "transportation", name: "Transportation", active: true },
+  { code: "administrator", name: "Administrator / Super Admin", active: true },
 ];
 
 export const STAGE_ROLES: Record<BookingStage, string> = {
@@ -78,11 +78,11 @@ export function transitionBooking(current: BookingStage, next: BookingStage, act
     throw new Error(`Role ${actorRole} cannot advance ${current} to ${next}`);
   }
   const notifications: LifecycleNotification[] = [
-    { departmentCode: "SAL", title: `Booking moved to ${next}`, body: `The dossier is now owned by ${STAGE_ROLES[next]}.` },
-    { departmentCode: "DOC", title: `Booking ${next}`, body: "Documentation Supervisor coordination queue updated." },
+    { departmentCode: "sales", title: `Booking moved to ${next}`, body: `The dossier is now owned by ${STAGE_ROLES[next]}.` },
+    { departmentCode: "documentation", title: `Booking ${next}`, body: "Documentation Supervisor coordination queue updated." },
   ];
   if (next === "Docs In Progress") {
-    notifications.push(...DEPARTMENTS.filter((department) => department.code !== "ADM").map((department) => ({ departmentCode: department.code, title: "New booking action", body: "A new dossier requires your department documents." })));
+    notifications.push(...DEPARTMENTS.filter((department) => department.code !== "administrator").map((department) => ({ departmentCode: department.code, title: "New booking action", body: "A new dossier requires your department documents." })));
   }
   return { stage: next, notifications };
 }
@@ -95,7 +95,7 @@ export function revertBooking(current: BookingStage, target: "Docs In Progress" 
     stage: target,
     notifications: [
       { departmentCode, title: "Revision required", body: `A document review moved the dossier back to ${target}.` },
-      { departmentCode: "DOC" as DepartmentCode, title: "Dossier status reverted", body: `Coordinate the next action for ${target}.` },
+      { departmentCode: "documentation" as DepartmentCode, title: "Dossier status reverted", body: `Coordinate the next action for ${target}.` },
     ] satisfies LifecycleNotification[],
   };
 }
