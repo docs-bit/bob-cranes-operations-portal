@@ -1923,9 +1923,3 @@ export async function addAuditLog(input: { actor: string; action: string; detail
   return { id, ...input };
 }
 
-export async function countAuditLogs() {
-  const db = await getDb();
-  if (!db) return 0;
-  const [result] = await db.select({ count: auditLogs.id }).from(auditLogs);
-  return result ? 1 : 0;
-}

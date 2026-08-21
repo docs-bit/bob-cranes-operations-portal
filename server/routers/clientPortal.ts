@@ -1,40 +1,66 @@
 import { TRPCError } from "@trpc/server";
-import { router, publicProcedure } from "../_core/trpc";
+import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import * as db from "../db";
+import { ENV } from "../_core/env";
 import crypto from "crypto";
+import { SignJWT, jwtVerify } from "jose";
 
-function generateToken(): string {
-  return crypto.randomBytes(32).toString("hex");
+async function issueClientSession(bookingId: string, email: string, clientName: string) {
+  return new SignJWT({ type: "client_portal", bookingId, email, clientName })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuer("bob-cranes-client-portal")
+    .setAudience("bob-cranes-client-portal")
+    .setIssuedAt()
+    .setExpirationTime("2h")
+    .sign(new TextEncoder().encode(ENV.cookieSecret));
 }
 
-function generateOtp(): string {
-  return String(Math.floor(100000 + Math.random() * 900000));
+async function validateClientSession(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(ENV.cookieSecret), {
+      issuer: "bob-cranes-client-portal",
+      audience: "bob-cranes-client-portal",
+    });
+    if (payload.type !== "client_portal" || typeof payload.bookingId !== "string") return null;
+    return payload as { bookingId: string; email: string; clientName: string };
+  } catch {
+    return null;
+  }
+}
+
+async function validateAndScope(clientSession: string, bookingId: string) {
+  const payload = await validateClientSession(clientSession);
+  if (!payload || payload.bookingId !== bookingId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Access denied for this booking." });
+  }
+  return payload;
 }
 
 export const clientPortalRouter = router({
-  /** Sales generates a magic-link token for a booking's client contact */
-  generateMagicLink: publicProcedure
+  generateMagicLink: protectedProcedure
     .input(z.object({
       bookingId: z.string(),
       email: z.string().email(),
-      createdBy: z.number().optional(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin" && ctx.user.role !== "supervisor") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Only admins and supervisors can generate client portal links." });
+      }
       const booking = await db.getBookingById(input.bookingId);
       if (!booking) throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found." });
 
-      const token = generateToken();
+      const token = crypto.randomBytes(32).toString("hex");
       const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      const record = await db.createClientPortalToken({
+      await db.createClientPortalToken({
         bookingId: input.bookingId,
         token,
         channel: "magic_link",
         otp: null,
         email: input.email,
         expiresAt,
-        createdBy: input.createdBy ?? null,
+        createdBy: ctx.user.id,
       });
 
       return {
@@ -45,19 +71,20 @@ export const clientPortalRouter = router({
       };
     }),
 
-  /** Sales generates an OTP fallback for the same booking */
-  generateOtp: publicProcedure
+  generateOtp: protectedProcedure
     .input(z.object({
       bookingId: z.string(),
       email: z.string().email(),
-      createdBy: z.number().optional(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin" && ctx.user.role !== "supervisor") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Only admins and supervisors can generate client portal OTPs." });
+      }
       const booking = await db.getBookingById(input.bookingId);
       if (!booking) throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found." });
 
-      const otp = generateOtp();
-      const token = generateToken();
+      const otp = String(crypto.randomInt(100000, 1000000));
+      const token = crypto.randomBytes(32).toString("hex");
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
       await db.createClientPortalToken({
@@ -67,13 +94,12 @@ export const clientPortalRouter = router({
         otp,
         email: input.email,
         expiresAt,
-        createdBy: input.createdBy ?? null,
+        createdBy: ctx.user.id,
       });
 
       return { otp, bookingId: input.bookingId, expiresAt };
     }),
 
-  /** Client verifies a magic-link token — returns a session token */
   verifyMagicLink: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ input }) => {
@@ -81,15 +107,20 @@ export const clientPortalRouter = router({
       if (!record) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid or expired link." });
 
       const booking = await db.getBookingById(record.bookingId);
+      const clientSession = await issueClientSession(
+        record.bookingId,
+        record.email,
+        booking?.clientContactName ?? "Client",
+      );
+
       return {
+        clientSession,
         bookingId: record.bookingId,
         clientEmail: record.email,
         clientName: booking?.clientContactName ?? "Client",
-        booking,
       };
     }),
 
-  /** Client verifies an OTP code — returns a session token */
   verifyOtp: publicProcedure
     .input(z.object({
       bookingId: z.string(),
@@ -100,45 +131,55 @@ export const clientPortalRouter = router({
       if (!record) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid or expired OTP." });
 
       const booking = await db.getBookingById(record.bookingId);
+      const clientSession = await issueClientSession(
+        record.bookingId,
+        record.email,
+        booking?.clientContactName ?? "Client",
+      );
+
       return {
+        clientSession,
         bookingId: record.bookingId,
         clientEmail: record.email,
         clientName: booking?.clientContactName ?? "Client",
-        booking,
       };
     }),
 
-  /** Client portal: get booking summary */
   getBookingSummary: publicProcedure
-    .input(z.object({ bookingId: z.string() }))
+    .input(z.object({ bookingId: z.string(), clientSession: z.string() }))
     .query(async ({ input }) => {
+      await validateAndScope(input.clientSession, input.bookingId);
       const booking = await db.getBookingById(input.bookingId);
       if (!booking) throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found." });
       return booking;
     }),
 
-  /** Client portal: get documents for a booking */
   getDocuments: publicProcedure
-    .input(z.object({ bookingId: z.string() }))
+    .input(z.object({ bookingId: z.string(), clientSession: z.string() }))
     .query(async ({ input }) => {
+      await validateAndScope(input.clientSession, input.bookingId);
       return db.getBookingDocuments(input.bookingId);
     }),
 
-  /** Client portal: get chat messages */
   getChatMessages: publicProcedure
-    .input(z.object({ bookingId: z.string() }))
+    .input(z.object({ bookingId: z.string(), clientSession: z.string() }))
     .query(async ({ input }) => {
+      await validateAndScope(input.clientSession, input.bookingId);
       return db.getBookingChatMessages(input.bookingId);
     }),
 
-  /** Client portal: send a chat message */
   sendChatMessage: publicProcedure
     .input(z.object({
       bookingId: z.string(),
-      sender: z.string(),
+      clientSession: z.string(),
       body: z.string().min(1).max(2000),
     }))
     .mutation(async ({ input }) => {
-      return db.addClientChatMessage(input);
+      const payload = await validateAndScope(input.clientSession, input.bookingId);
+      return db.addClientChatMessage({
+        bookingId: input.bookingId,
+        sender: payload.clientName,
+        body: input.body,
+      });
     }),
 });

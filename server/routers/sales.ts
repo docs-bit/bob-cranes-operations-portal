@@ -8,17 +8,30 @@ import { RENTAL_DURATION_OPTIONS, RENTAL_EQUIPMENT_TYPES } from "../../shared/re
 
 const SALES_ENQUIRY_STATUSES = ["New", "In review", "Quoted", "Converted", "Closed"] as const;
 
-
 const enquiryRateLimit = new Map<string, number[]>();
 const ENQUIRY_RATE_WINDOW = 60_000;
-const ENQUIRY_MAX_PER_WINDOW = 5;
+let lastCleanup = Date.now();
 
 function checkEnquiryRateLimit(ip: string): boolean {
   const now = Date.now();
-  const timestamps = (enquiryRateLimit.get(ip) ?? []).filter(t => now - t < ENQUIRY_RATE_WINDOW);
-  if (timestamps.length >= ENQUIRY_MAX_PER_WINDOW) return false;
-  timestamps.push(now);
-  enquiryRateLimit.set(ip, timestamps);
+  if (now - lastCleanup > ENQUIRY_RATE_WINDOW * 2) {
+    lastCleanup = now;
+    for (const [key, ts] of Array.from(enquiryRateLimit.entries())) {
+      const fresh = ts.filter((t: number) => now - t < ENQUIRY_RATE_WINDOW);
+      if (fresh.length === 0) enquiryRateLimit.delete(key);
+      else enquiryRateLimit.set(key, fresh);
+    }
+  }
+  if (enquiryRateLimit.size >= 10_000) {
+    const keys = Array.from(enquiryRateLimit.keys());
+    for (let i = 0; i < keys.length && enquiryRateLimit.size >= 10_000; i++) {
+      enquiryRateLimit.delete(keys[i]);
+    }
+  }
+  const timestamps = enquiryRateLimit.get(ip);
+  if (timestamps && timestamps.length >= 5) return false;
+  if (!timestamps) enquiryRateLimit.set(ip, [now]);
+  else timestamps.push(now);
   return true;
 }
 

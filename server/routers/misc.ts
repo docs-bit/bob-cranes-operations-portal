@@ -104,4 +104,38 @@ export const miscRouter = router({
         return feedback;
       }),
   }),
+
+  auditLog: router({
+    list: adminProcedure
+      .input(z.object({ limit: z.number().int().min(1).max(200).optional(), offset: z.number().int().min(0).optional() }).optional())
+      .query(async ({ input }) => {
+        return await db.listAuditLogs(input?.limit ?? 50, input?.offset ?? 0);
+      }),
+  }),
+
+  retention: router({
+    getActivityRetentionDays: adminProcedure.query(async () => {
+      return await db.getActivityRetentionDays();
+    }),
+    setActivityRetentionDays: adminProcedure
+      .input(z.object({ days: z.number().int() }))
+      .mutation(async ({ ctx, input }) => {
+        if (![30, 90, 180, 365, 730].includes(input.days)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Retention must be 30, 90, 180, 365, or 730 days." });
+        }
+        return await db.setActivityRetentionDays(input.days, ctx.user.id);
+      }),
+    purgeOldActivity: adminProcedure
+      .mutation(async ({ ctx }) => {
+        const days = await db.getActivityRetentionDays();
+        const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const purged = await db.purgeUserActivityBefore(cutoff);
+        await db.addAuditLog({
+          actor: ctx.user.name ?? ctx.user.email ?? `User ${ctx.user.id}`,
+          action: "activity_retention_purge",
+          details: `Purged ${purged} activity records older than ${days} days (cutoff ${cutoff.toISOString()}).`,
+        });
+        return { purged, days };
+      }),
+  }),
 });

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import {
-  CheckCircle2, Clock3, FileText, LoaderCircle, Lock, Mail,
-  MessageCircle, Send, ShieldCheck, Upload, X,
+  FileText, LoaderCircle, Lock,
+  Send, ShieldCheck, X,
 } from "lucide-react";
 
 const CLIENT_SESSION_KEY = "bob_client_portal_session";
@@ -12,6 +12,7 @@ type ClientSession = {
   bookingId: string;
   clientEmail: string;
   clientName: string;
+  token: string;
 };
 
 function readSession(): ClientSession | null {
@@ -24,8 +25,6 @@ function readSession(): ClientSession | null {
 function writeSession(session: ClientSession) {
   sessionStorage.setItem(CLIENT_SESSION_KEY, JSON.stringify(session));
 }
-
-// ---------- Auth Gate ----------
 
 function MagicLinkVerify() {
   const [, params] = useRoute("/client/verify/:token");
@@ -42,6 +41,7 @@ function MagicLinkVerify() {
             bookingId: data.bookingId,
             clientEmail: data.clientEmail,
             clientName: data.clientName,
+            token: data.clientSession,
           });
           setLocation(`/client/${data.bookingId}`);
         },
@@ -90,6 +90,7 @@ function OtpEntry() {
             bookingId: data.bookingId,
             clientEmail: data.clientEmail,
             clientName: data.clientName,
+            token: data.clientSession,
           });
           setLocation(`/client/${data.bookingId}`);
         },
@@ -141,10 +142,35 @@ function ClientDashboard({ bookingId }: { bookingId: string }) {
   const [tab, setTab] = useState<"summary" | "documents" | "chat">("summary");
   const [message, setMessage] = useState("");
 
-  const bq = trpc.clientPortal.getBookingSummary.useQuery({ bookingId }, { enabled: !!bookingId });
-  const dq = trpc.clientPortal.getDocuments.useQuery({ bookingId }, { enabled: !!bookingId && tab === "documents" });
-  const cq = trpc.clientPortal.getChatMessages.useQuery({ bookingId }, { enabled: !!bookingId && tab === "chat", refetchInterval: tab === "chat" ? 5000 : false });
-  const sm = trpc.clientPortal.sendChatMessage.useMutation({ onSuccess: () => { setMessage(""); cq.refetch(); } });
+  const clientToken = session?.token ?? "";
+
+  const bq = trpc.clientPortal.getBookingSummary.useQuery(
+    { bookingId, clientSession: clientToken },
+    { enabled: !!bookingId && !!clientToken }
+  );
+  const dq = trpc.clientPortal.getDocuments.useQuery(
+    { bookingId, clientSession: clientToken },
+    { enabled: !!bookingId && !!clientToken && tab === "documents" }
+  );
+  const cq = trpc.clientPortal.getChatMessages.useQuery(
+    { bookingId, clientSession: clientToken },
+    { enabled: !!bookingId && !!clientToken && tab === "chat", refetchInterval: tab === "chat" ? 5000 : false }
+  );
+  const sm = trpc.clientPortal.sendChatMessage.useMutation({
+    onSuccess: () => { setMessage(""); cq.refetch(); },
+  });
+
+  if (!clientToken) {
+    return (
+      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "#f5f6f8", fontFamily: "Inter, system-ui, sans-serif" }}>
+        <div style={{ textAlign: "center" }}>
+          <Lock size={32} color="#999" style={{ margin: "0 auto 12px" }} />
+          <div style={{ fontSize: 16, fontWeight: 600 }}>Session expired</div>
+          <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>Please use the link provided by your BOB Cranes contact.</div>
+        </div>
+      </div>
+    );
+  }
 
   if (bq.isLoading) return (<div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "#f5f6f8" }}><LoaderCircle className="animate-spin" size={28} color="#b45309" /></div>);
   const b = bq.data;
@@ -183,8 +209,8 @@ function ClientDashboard({ bookingId }: { bookingId: string }) {
           </div>)) : <div style={{ textAlign: "center", color: "#666", padding: 40, fontSize: 13 }}>No messages yet.</div>}
         </div>
         <div style={{ padding: 12, borderTop: "1px solid #e3e6ea", display: "flex", gap: 8 }}>
-          <input value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && message.trim()) sm.mutate({ bookingId, sender: session?.clientName ?? "Client", body: message.trim() }); }} placeholder="Type a message…" style={{ flex: 1, padding: "10px 14px", border: "1px solid #ddd", borderRadius: 8, fontSize: 13 }} />
-          <button onClick={() => { if (message.trim()) sm.mutate({ bookingId, sender: session?.clientName ?? "Client", body: message.trim() }); }} disabled={!message.trim()} style={{ padding: "10px 16px", background: "#b45309", color: "#fff", border: "none", borderRadius: 8, cursor: message.trim() ? "pointer" : "not-allowed", opacity: message.trim() ? 1 : 0.5 }}><Send size={14} /></button>
+          <input value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && message.trim()) sm.mutate({ bookingId, clientSession: clientToken, body: message.trim() }); }} placeholder="Type a message…" style={{ flex: 1, padding: "10px 14px", border: "1px solid #ddd", borderRadius: 8, fontSize: 13 }} />
+          <button onClick={() => { if (message.trim()) sm.mutate({ bookingId, clientSession: clientToken, body: message.trim() }); }} disabled={!message.trim()} style={{ padding: "10px 16px", background: "#b45309", color: "#fff", border: "none", borderRadius: 8, cursor: message.trim() ? "pointer" : "not-allowed", opacity: message.trim() ? 1 : 0.5 }}><Send size={14} /></button>
         </div>
       </div>)}
     </div>
