@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { toast, toast as globalToast } from "sonner";
+import { toast } from "sonner";
 import { AlertTriangle, ArrowLeft, ArrowRight, Bell, Check, CheckCircle2, ClipboardCheck, Clock3, Download, FileCheck2, FileText, FolderOpen, LayoutDashboard, LoaderCircle, Lock, Mail, MessageCircle, MoreHorizontal, Plus, Send, Truck, Users, Wrench, X } from "lucide-react";
 import { DEPARTMENTS, crews, initials, legacyCrews, persistedBookingIdForUi, stages, stageShort, type Booking, type EmployeeAllocation, type Stage } from "./shared";
 import { PageHeading } from "./OverviewHelpers";
@@ -30,7 +30,7 @@ export function BookingDetail({
   onEditAssignment: () => void;
   onOpenClientPortal: () => void;
 }) {
-  const [toast, setToast] = useState("");
+  const [bannerMessage, setBannerMessage] = useState("");
   const assignedCrew = useMemo(
     () =>
       CREW_ASSIGNMENT_ROSTER.filter(crew =>
@@ -118,8 +118,8 @@ export function BookingDetail({
     revisionFlag
   );
   const notify = (message: string) => {
-    setToast(message);
-    setTimeout(() => setToast(""), 2600);
+    setBannerMessage(message);
+    setTimeout(() => setBannerMessage(""), 2600);
   };
   const flagForRevision = () => {
     const rollback = revertBooking(
@@ -171,7 +171,7 @@ export function BookingDetail({
     } catch (caught) {
       setBundleStatus("error");
       setBundleProgressLabel("PDF generation could not be completed");
-      globalToast.error("PDF bundle could not be generated", {
+      toast.error("PDF bundle could not be generated", {
         description:
           caught instanceof Error ? caught.message : "Please try again.",
       });
@@ -893,13 +893,13 @@ export function BookingDetail({
           </div>
         </div>
       )}
-      {toast && (
+      {bannerMessage && (
         <div className="toast-note">
           <CheckCircle2
             size={14}
             style={{ verticalAlign: "-2px", marginRight: 7 }}
           />
-          {toast}
+          {bannerMessage}
         </div>
       )}
     </div>
