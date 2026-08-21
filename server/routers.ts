@@ -26,8 +26,6 @@ export const appRouter = router({
   telemetry: monitoringRouter.telemetry,
   filterPresets: miscRouter.filterPresets,
   clientFeedback: miscRouter.clientFeedback,
-  auditLog: miscRouter.auditLog,
-  retention: miscRouter.retention,
   clientPortal: clientPortalRouter,
 });
 
