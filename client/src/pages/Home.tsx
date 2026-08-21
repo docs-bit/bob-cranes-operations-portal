@@ -23,31 +23,14 @@ import WebVitalsAnalyticsView from "@/components/WebVitalsAnalyticsView";
 import SupervisorPermissionsAudit from "@/components/SupervisorPermissionsAudit";
 import "./DepartmentWorkspace.css";
 
-// Extracted view components
-import { Shell } from "./views/Shell";
-import { Wizard } from "./views/Wizard";
-import { ClientPortal } from "./views/ClientPortal";
-import { Overview } from "./views/Overview";
-import { BookingsView } from "./views/BookingsView";
-import { DocsView } from "./views/DocsView";
-import { TrainingView } from "./views/TrainingView";
-import { GearView } from "./views/GearView";
-import { BookingDetail } from "./views/BookingDetail";
-import { AttendanceView } from "./views/AttendanceView";
-import { DepartmentView } from "./views/DepartmentView";
-import { ProvisionedDepartmentDashboard } from "./views/DepartmentView";
-
-// Shared types and helpers from views
 import {
-  type View,
-  type Booking,
-  type Stage,
-  type ClientDocumentTaxonomy,
-  initialBookings,
-  initialUploadDocuments,
-  persistedBookingIdForUi,
-  uiBookingIdForPersisted,
-} from "./views/shared";
+  Shell, Wizard, ClientPortal, Overview, BookingsView, DocsView,
+  TrainingView, GearView, BookingDetail, AttendanceView,
+  DepartmentView, ProvisionedDepartmentDashboard,
+  type View, type Booking, type Stage, type ClientDocumentTaxonomy,
+  initialBookings, initialUploadDocuments,
+  persistedBookingIdForUi, uiBookingIdForPersisted,
+} from "./views";
 
 export default function Home() {
   const [location, setLocation] = useLocation();
