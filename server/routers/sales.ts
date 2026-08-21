@@ -8,6 +8,20 @@ import { RENTAL_DURATION_OPTIONS, RENTAL_EQUIPMENT_TYPES } from "../../shared/re
 
 const SALES_ENQUIRY_STATUSES = ["New", "In review", "Quoted", "Converted", "Closed"] as const;
 
+
+const enquiryRateLimit = new Map<string, number[]>();
+const ENQUIRY_RATE_WINDOW = 60_000;
+const ENQUIRY_MAX_PER_WINDOW = 5;
+
+function checkEnquiryRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (enquiryRateLimit.get(ip) ?? []).filter(t => now - t < ENQUIRY_RATE_WINDOW);
+  if (timestamps.length >= ENQUIRY_MAX_PER_WINDOW) return false;
+  timestamps.push(now);
+  enquiryRateLimit.set(ip, timestamps);
+  return true;
+}
+
 export const rentalRouter = router({
   submitEnquiry: publicProcedure
     .input(
@@ -22,7 +36,11 @@ export const rentalRouter = router({
         liftDetails: z.string().trim().min(12).max(2000),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      const clientIp = ctx.req.socket?.remoteAddress ?? ctx.req.headers?.["x-forwarded-for"] ?? "unknown";
+      if (!checkEnquiryRateLimit(clientIp)) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many enquiries. Please try again later." });
+      }
       const enquiry = await db.createRentalEnquiry({ ...input, email: normalizeEmail(input.email) });
       await db.addNotification({
         id: `rental-enquiry-follow-up-${enquiry.id}`,

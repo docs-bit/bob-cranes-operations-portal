@@ -4,6 +4,7 @@ import { parse } from "cookie";
 import { jwtVerify, SignJWT } from "jose";
 import type { User } from "../drizzle/schema";
 import { LOCAL_AUTH_COOKIE_NAME } from "../shared/const";
+import * as db from "./db";
 import { ENV } from "./_core/env";
 
 const scryptAsync = promisify(scrypt);
@@ -38,7 +39,7 @@ export async function verifyPassword(password: string, storedHash: string) {
 }
 
 export async function createLocalSession(user: User) {
-  return new SignJWT({ type: "password" })
+  const token = await new SignJWT({ type: "password" })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(user.id))
     .setIssuer(SESSION_ISSUER)
@@ -46,6 +47,9 @@ export async function createLocalSession(user: User) {
     .setIssuedAt()
     .setExpirationTime(SESSION_LIFETIME)
     .sign(sessionKey());
+  const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000);
+  await db.createAuthSession(user.id, token, expiresAt);
+  return token;
 }
 
 export async function readLocalSession(cookieHeader?: string) {
@@ -58,10 +62,17 @@ export async function readLocalSession(cookieHeader?: string) {
       audience: SESSION_AUDIENCE,
     });
     const userId = Number(payload.sub);
-    return Number.isSafeInteger(userId) && userId > 0 ? userId : undefined;
+    if (!Number.isSafeInteger(userId) || userId <= 0) return undefined;
+    const session = await db.validateAuthSession(token);
+    return session ? userId : undefined;
   } catch {
     return undefined;
   }
+}
+
+export async function revokeLocalSession(cookieHeader?: string) {
+  const token = cookieHeader ? parse(cookieHeader)[LOCAL_AUTH_COOKIE_NAME] : undefined;
+  if (token) await db.revokeAuthSession(token);
 }
 
 export function toSessionUser(user: User) {

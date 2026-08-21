@@ -586,7 +586,7 @@ export function BookingDetail({
                       <div>
                         <div className="compliance-name">{doc.name}</div>
                         <div className="compliance-sub">
-                          {doc.departmentCode} · Required · preview available
+                          {doc.departmentCode} · Required{doc.expiryDate ? ` · Expires ${doc.expiryDate}` : ""} · preview available
                         </div>
                       </div>
                     </div>

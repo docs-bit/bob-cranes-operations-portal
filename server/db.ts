@@ -1854,3 +1854,78 @@ export async function listClientPortalTokensForBooking(bookingId: string) {
     .where(eq(clientPortalTokens.bookingId, bookingId))
     .orderBy(desc(clientPortalTokens.createdAt));
 }
+
+// ---- Auth Sessions ----
+
+import { authSessions } from "../drizzle/schema";
+import crypto from "crypto";
+
+function sha256(input: string): string {
+  return crypto.createHash("sha256").update(input).digest("hex");
+}
+
+export async function createAuthSession(userId: number, rawToken: string, expiresAt: Date) {
+  const db = await getDb();
+  if (!db) return null;
+  const id = nanoid();
+  const tokenHash = sha256(rawToken);
+  await db.insert(authSessions).values({ id, userId, tokenHash, expiresAt });
+  return { id, userId, tokenHash, expiresAt };
+}
+
+export async function validateAuthSession(rawToken: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const tokenHash = sha256(rawToken);
+  const [row] = await db.select().from(authSessions).where(
+    and(
+      eq(authSessions.tokenHash, tokenHash),
+      isNull(authSessions.revokedAt),
+    )
+  ).limit(1);
+  if (!row) return null;
+  if (new Date(row.expiresAt) < new Date()) return null;
+  return row;
+}
+
+export async function revokeAuthSession(rawToken: string) {
+  const db = await getDb();
+  if (!db) return;
+  const tokenHash = sha256(rawToken);
+  await db.update(authSessions).set({ revokedAt: new Date() }).where(
+    eq(authSessions.tokenHash, tokenHash)
+  );
+}
+
+export async function revokeAllUserSessions(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(authSessions).set({ revokedAt: new Date() }).where(
+    eq(authSessions.userId, userId)
+  );
+}
+
+// ---- Audit Logs ----
+
+import { auditLogs } from "../drizzle/schema";
+
+export async function listAuditLogs(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(auditLogs).orderBy(auditLogs.createdAt).limit(limit).offset(offset);
+}
+
+export async function addAuditLog(input: { actor: string; action: string; details?: string }) {
+  const db = await getDb();
+  if (!db) return null;
+  const id = nanoid();
+  await db.insert(auditLogs).values({ id, ...input });
+  return { id, ...input };
+}
+
+export async function countAuditLogs() {
+  const db = await getDb();
+  if (!db) return 0;
+  const [result] = await db.select({ count: auditLogs.id }).from(auditLogs);
+  return result ? 1 : 0;
+}

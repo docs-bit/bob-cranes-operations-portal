@@ -20,6 +20,7 @@ import {
   createLocalSession,
   hashPassword,
   normalizeEmail,
+  revokeLocalSession,
   toSessionUser,
   verifyPassword,
 } from "../localAuth";
@@ -480,7 +481,8 @@ export const authRouter = router({
       return toSessionUser(user);
     }),
 
-  logout: publicProcedure.mutation(({ ctx }) => {
+  logout: publicProcedure.mutation(async ({ ctx }) => {
+    await revokeLocalSession(ctx.req.headers.cookie);
     clearAuthCookies(ctx);
     return { success: true } as const;
   }),

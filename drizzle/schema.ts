@@ -319,3 +319,14 @@ export const clientPortalTokens = mysqlTable("client_portal_tokens", {
 });
 
 export type ClientPortalToken = typeof clientPortalTokens.$inferSelect;
+
+export const authSessions = mysqlTable("auth_sessions", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: int("userId").notNull(),
+  tokenHash: varchar("tokenHash", { length: 128 }).notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  revokedAt: timestamp("revokedAt"),
+});
+
+export type AuthSession = typeof authSessions.$inferSelect;

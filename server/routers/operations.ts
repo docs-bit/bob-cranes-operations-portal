@@ -76,6 +76,11 @@ export const operationsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       requireDepartmentAccess(ctx.user, "sales");
+      const mobilisation = new Date(input.mobilizationDate);
+      const offHire = new Date(input.offHireDate);
+      if (!isNaN(mobilisation.getTime()) && !isNaN(offHire.getTime()) && mobilisation > offHire) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Mobilisation date must be on or before the off-hire date." });
+      }
       return await db.createBooking(input);
     }),
 
