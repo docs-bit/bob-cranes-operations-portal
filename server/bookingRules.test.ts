@@ -21,8 +21,8 @@ describe("BOB Cranes booking rules", () => {
   it("returns notifications when a role-gated transition succeeds", () => {
     const result = transitionBooking("Gear Confirmed", "Docs In Progress", "Department users");
     expect(result.stage).toBe("Docs In Progress");
-    expect(result.notifications.some((notification) => notification.departmentCode === "SAL")).toBe(true);
-    expect(result.notifications.some((notification) => notification.departmentCode === "HSE")).toBe(true);
+    expect(result.notifications.some((notification) => notification.departmentCode === "sales")).toBe(true);
+    expect(result.notifications.some((notification) => notification.departmentCode === "hse")).toBe(true);
     expect(() => transitionBooking("Created by Salesperson", "Crew Assigned", "Salesperson")).toThrow();
   });
 
@@ -46,8 +46,8 @@ describe("BOB Cranes booking rules", () => {
 
   it("reaches All Docs Submitted only after the uploaded document set is complete", () => {
     const documents = [
-      { id: "doc-1", departmentCode: "DOC" as const, name: "Method statement", state: "Uploaded" as const, required: true },
-      { id: "doc-2", departmentCode: "HSE" as const, name: "Lift plan", state: "Required" as const, required: true },
+      { id: "doc-1", departmentCode: "documentation" as const, name: "Method statement", state: "Uploaded" as const, required: true },
+      { id: "doc-2", departmentCode: "hse" as const, name: "Lift plan", state: "Required" as const, required: true },
     ];
     expect(documentCompletion(documents)).toBe(50);
     const uploaded = documents.map((document) => ({ ...document, state: "Uploaded" as const }));

@@ -11,11 +11,12 @@ describe("Sales response visibility", () => {
   });
 
   it("provides self-service profile contact settings and an unassigned enquiry dashboard status", () => {
-    const source = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.url), "utf8");
+    const overviewSource = readFileSync(new URL("../client/src/pages/views/Overview.tsx", import.meta.url), "utf8");
+    const shellSource = readFileSync(new URL("../client/src/pages/views/Shell.tsx", import.meta.url), "utf8");
 
-    expect(source).toContain("trpc.auth.updateMyContactDetails.useMutation()");
-    expect(source).toContain("Rental estimate contact");
-    expect(source).toContain('data-testid="unassigned-enquiry-status"');
-    expect(source).toContain('setView("sales-enquiries")');
+    expect(shellSource).toContain("trpc.auth.updateMyContactDetails.useMutation()");
+    expect(shellSource).toContain("Rental estimate contact");
+    expect(overviewSource).toContain('data-testid="unassigned-enquiry-status"');
+    expect(overviewSource).toContain('setView("sales-enquiries")');
   });
 });

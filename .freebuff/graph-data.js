@@ -1,0 +1,9291 @@
+const GRAPH_DATA = {
+  "communities": [
+    {
+      "id": 0,
+      "name": "Radix UI Components",
+      "count": 81,
+      "files": [
+        "client/src/components/ui/accordion.tsx",
+        "client/src/components/ui/alert.tsx",
+        "client/src/components/ui/aspect-ratio.tsx",
+        "client/src/components/ui/breadcrumb.tsx",
+        "client/src/components/ui/checkbox.tsx",
+        "client/src/components/ui/collapsible.tsx",
+        "client/src/components/ui/drawer.tsx",
+        "client/src/components/ui/hover-card.tsx",
+        "client/src/components/ui/input-otp.tsx",
+        "client/src/components/ui/popover.tsx",
+        "client/src/components/ui/progress.tsx",
+        "client/src/components/ui/radio-group.tsx",
+        "client/src/components/ui/resizable.tsx",
+        "client/src/components/ui/slider.tsx",
+        "client/src/components/ui/switch.tsx",
+        "client/src/components/ui/table.tsx",
+        "client/src/components/ui/tabs.tsx",
+        "client/src/contexts/ThemeContext.tsx",
+        "client/src/pages/ComponentShowcase.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_accordion_accordion",
+          "label": "Accordion()",
+          "source_file": "client/src/components/ui/accordion.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_ui_accordion_accordioncontent",
+          "label": "AccordionContent()",
+          "source_file": "client/src/components/ui/accordion.tsx",
+          "source_location": "L48"
+        },
+        {
+          "id": "client_src_components_ui_accordion_accordionitem",
+          "label": "AccordionItem()",
+          "source_file": "client/src/components/ui/accordion.tsx",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_components_ui_accordion_accordiontrigger",
+          "label": "AccordionTrigger()",
+          "source_file": "client/src/components/ui/accordion.tsx",
+          "source_location": "L26"
+        },
+        {
+          "id": "client_src_components_ui_alert_alert",
+          "label": "Alert()",
+          "source_file": "client/src/components/ui/alert.tsx",
+          "source_location": "L22"
+        },
+        {
+          "id": "client_src_components_ui_alert_alertdescription",
+          "label": "AlertDescription()",
+          "source_file": "client/src/components/ui/alert.tsx",
+          "source_location": "L50"
+        },
+        {
+          "id": "client_src_components_ui_alert_alerttitle",
+          "label": "AlertTitle()",
+          "source_file": "client/src/components/ui/alert.tsx",
+          "source_location": "L37"
+        },
+        {
+          "id": "client_src_components_ui_aspect_ratio_aspectratio",
+          "label": "AspectRatio()",
+          "source_file": "client/src/components/ui/aspect-ratio.tsx",
+          "source_location": "L3"
+        },
+        {
+          "id": "client_src_components_ui_breadcrumb_breadcrumb",
+          "label": "Breadcrumb()",
+          "source_file": "client/src/components/ui/breadcrumb.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_ui_breadcrumb_breadcrumbellipsis",
+          "label": "BreadcrumbEllipsis()",
+          "source_file": "client/src/components/ui/breadcrumb.tsx",
+          "source_location": "L83"
+        },
+        {
+          "id": "client_src_components_ui_breadcrumb_breadcrumbitem",
+          "label": "BreadcrumbItem()",
+          "source_file": "client/src/components/ui/breadcrumb.tsx",
+          "source_location": "L24"
+        },
+        {
+          "id": "client_src_components_ui_breadcrumb_breadcrumblink",
+          "label": "BreadcrumbLink()",
+          "source_file": "client/src/components/ui/breadcrumb.tsx",
+          "source_location": "L34"
+        },
+        {
+          "id": "client_src_components_ui_breadcrumb_breadcrumblist",
+          "label": "BreadcrumbList()",
+          "source_file": "client/src/components/ui/breadcrumb.tsx",
+          "source_location": "L11"
+        },
+        {
+          "id": "client_src_components_ui_breadcrumb_breadcrumbpage",
+          "label": "BreadcrumbPage()",
+          "source_file": "client/src/components/ui/breadcrumb.tsx",
+          "source_location": "L52"
+        },
+        {
+          "id": "client_src_components_ui_breadcrumb_breadcrumbseparator",
+          "label": "BreadcrumbSeparator()",
+          "source_file": "client/src/components/ui/breadcrumb.tsx",
+          "source_location": "L65"
+        },
+        {
+          "id": "client_src_components_ui_checkbox_checkbox",
+          "label": "Checkbox()",
+          "source_file": "client/src/components/ui/checkbox.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_ui_collapsible_collapsible",
+          "label": "Collapsible()",
+          "source_file": "client/src/components/ui/collapsible.tsx",
+          "source_location": "L3"
+        },
+        {
+          "id": "client_src_components_ui_collapsible_collapsiblecontent",
+          "label": "CollapsibleContent()",
+          "source_file": "client/src/components/ui/collapsible.tsx",
+          "source_location": "L20"
+        },
+        {
+          "id": "client_src_components_ui_collapsible_collapsibletrigger",
+          "label": "CollapsibleTrigger()",
+          "source_file": "client/src/components/ui/collapsible.tsx",
+          "source_location": "L9"
+        },
+        {
+          "id": "client_src_components_ui_drawer_drawer",
+          "label": "Drawer()",
+          "source_file": "client/src/components/ui/drawer.tsx",
+          "source_location": "L6"
+        }
+      ],
+      "totalNodes": 81
+    },
+    {
+      "id": 1,
+      "name": "Dashboard Layout & Navigation",
+      "count": 74,
+      "files": [
+        "client/src/components/DashboardLayout.tsx",
+        "client/src/components/DashboardLayoutSkeleton.tsx",
+        "client/src/components/ui/avatar.tsx",
+        "client/src/components/ui/dropdown-menu.tsx",
+        "client/src/components/ui/sheet.tsx",
+        "client/src/components/ui/sidebar.tsx",
+        "client/src/components/ui/skeleton.tsx",
+        "client/src/components/ui/tooltip.tsx",
+        "client/src/hooks/useMobile.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_dashboardlayout_dashboardlayoutcontentprops",
+          "label": "DashboardLayoutContentProps",
+          "source_file": "client/src/components/DashboardLayout.tsx",
+          "source_location": "L98"
+        },
+        {
+          "id": "client_src_components_ui_sidebar_sidebarcontextprops",
+          "label": "SidebarContextProps",
+          "source_file": "client/src/components/ui/sidebar.tsx",
+          "source_location": "L34"
+        },
+        {
+          "id": "client_src_components_dashboardlayout_dashboardlayoutcontent",
+          "label": "DashboardLayoutContent()",
+          "source_file": "client/src/components/DashboardLayout.tsx",
+          "source_location": "L103"
+        },
+        {
+          "id": "client_src_components_dashboardlayoutskeleton_dashboardlayoutskeleton",
+          "label": "DashboardLayoutSkeleton()",
+          "source_file": "client/src/components/DashboardLayoutSkeleton.tsx",
+          "source_location": "L3"
+        },
+        {
+          "id": "client_src_components_ui_avatar_avatar",
+          "label": "Avatar()",
+          "source_file": "client/src/components/ui/avatar.tsx",
+          "source_location": "L6"
+        },
+        {
+          "id": "client_src_components_ui_avatar_avatarfallback",
+          "label": "AvatarFallback()",
+          "source_file": "client/src/components/ui/avatar.tsx",
+          "source_location": "L35"
+        },
+        {
+          "id": "client_src_components_ui_avatar_avatarimage",
+          "label": "AvatarImage()",
+          "source_file": "client/src/components/ui/avatar.tsx",
+          "source_location": "L22"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenu",
+          "label": "DropdownMenu()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenucheckboxitem",
+          "label": "DropdownMenuCheckboxItem()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L83"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenucontent",
+          "label": "DropdownMenuContent()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L32"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenugroup",
+          "label": "DropdownMenuGroup()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L52"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenuitem",
+          "label": "DropdownMenuItem()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L60"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenulabel",
+          "label": "DropdownMenuLabel()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L144"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenuportal",
+          "label": "DropdownMenuPortal()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenuradiogroup",
+          "label": "DropdownMenuRadioGroup()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L109"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenuradioitem",
+          "label": "DropdownMenuRadioItem()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L120"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenuseparator",
+          "label": "DropdownMenuSeparator()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L164"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenushortcut",
+          "label": "DropdownMenuShortcut()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L177"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenusub",
+          "label": "DropdownMenuSub()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L193"
+        },
+        {
+          "id": "client_src_components_ui_dropdown_menu_dropdownmenusubcontent",
+          "label": "DropdownMenuSubContent()",
+          "source_file": "client/src/components/ui/dropdown-menu.tsx",
+          "source_location": "L223"
+        }
+      ],
+      "totalNodes": 74
+    },
+    {
+      "id": 2,
+      "name": "Database Access Layer",
+      "count": 72,
+      "files": [
+        "server/db.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_db_activitylogfilters",
+          "label": "ActivityLogFilters",
+          "source_file": "server/db.ts",
+          "source_location": "L239"
+        },
+        {
+          "id": "server_db_departmentworkflowtemplate",
+          "label": "DepartmentWorkflowTemplate",
+          "source_file": "server/db.ts",
+          "source_location": "L885"
+        },
+        {
+          "id": "server_db_persisteddocumentmetadatainput",
+          "label": "PersistedDocumentMetadataInput",
+          "source_file": "server/db.ts",
+          "source_location": "L1532"
+        },
+        {
+          "id": "server_db_provisioneddepartmentdashboard",
+          "label": "ProvisionedDepartmentDashboard",
+          "source_file": "server/db.ts",
+          "source_location": "L745"
+        },
+        {
+          "id": "server_db_salesenquiryslaconfig",
+          "label": "SalesEnquirySlaConfig",
+          "source_file": "server/db.ts",
+          "source_location": "L1049"
+        },
+        {
+          "id": "server_db_addchatmessage",
+          "label": "addChatMessage()",
+          "source_file": "server/db.ts",
+          "source_location": "L638"
+        },
+        {
+          "id": "server_db_addnotification",
+          "label": "addNotification()",
+          "source_file": "server/db.ts",
+          "source_location": "L693"
+        },
+        {
+          "id": "server_db_adduseractivity",
+          "label": "addUserActivity()",
+          "source_file": "server/db.ts",
+          "source_location": "L229"
+        },
+        {
+          "id": "server_db_countlocalusers",
+          "label": "countLocalUsers()",
+          "source_file": "server/db.ts",
+          "source_location": "L122"
+        },
+        {
+          "id": "server_db_createclientfeedback",
+          "label": "createClientFeedback()",
+          "source_file": "server/db.ts",
+          "source_location": "L352"
+        },
+        {
+          "id": "server_db_createdepartmentworkflowtemplate",
+          "label": "createDepartmentWorkflowTemplate()",
+          "source_file": "server/db.ts",
+          "source_location": "L911"
+        },
+        {
+          "id": "server_db_createdocumentcategory",
+          "label": "createDocumentCategory()",
+          "source_file": "server/db.ts",
+          "source_location": "L1561"
+        },
+        {
+          "id": "server_db_createdocumenttag",
+          "label": "createDocumentTag()",
+          "source_file": "server/db.ts",
+          "source_location": "L1588"
+        },
+        {
+          "id": "server_db_createlocaluser",
+          "label": "createLocalUser()",
+          "source_file": "server/db.ts",
+          "source_location": "L142"
+        },
+        {
+          "id": "server_db_createrentalenquiry",
+          "label": "createRentalEnquiry()",
+          "source_file": "server/db.ts",
+          "source_location": "L983"
+        },
+        {
+          "id": "server_db_createrentalenquiryevent",
+          "label": "createRentalEnquiryEvent()",
+          "source_file": "server/db.ts",
+          "source_location": "L1083"
+        },
+        {
+          "id": "server_db_createruntimeerrorevent",
+          "label": "createRuntimeErrorEvent()",
+          "source_file": "server/db.ts",
+          "source_location": "L400"
+        },
+        {
+          "id": "server_db_createtelemetryevent",
+          "label": "createTelemetryEvent()",
+          "source_file": "server/db.ts",
+          "source_location": "L431"
+        },
+        {
+          "id": "server_db_deleteclientfilterpreset",
+          "label": "deleteClientFilterPreset()",
+          "source_file": "server/db.ts",
+          "source_location": "L1760"
+        },
+        {
+          "id": "server_db_deletedocumentcategory",
+          "label": "deleteDocumentCategory()",
+          "source_file": "server/db.ts",
+          "source_location": "L1581"
+        }
+      ],
+      "totalNodes": 72
+    },
+    {
+      "id": 3,
+      "name": "Form & Input Components",
+      "count": 69,
+      "files": [
+        "client/src/components/ui/button-group.tsx",
+        "client/src/components/ui/empty.tsx",
+        "client/src/components/ui/field.tsx",
+        "client/src/components/ui/item.tsx",
+        "client/src/components/ui/kbd.tsx",
+        "client/src/components/ui/label.tsx",
+        "client/src/components/ui/navigation-menu.tsx",
+        "client/src/components/ui/select.tsx",
+        "client/src/components/ui/separator.tsx",
+        "client/src/components/ui/spinner.tsx",
+        "client/src/lib/utils.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_button_group_buttongroup",
+          "label": "ButtonGroup()",
+          "source_file": "client/src/components/ui/button-group.tsx",
+          "source_location": "L24"
+        },
+        {
+          "id": "client_src_components_ui_button_group_buttongroupseparator",
+          "label": "ButtonGroupSeparator()",
+          "source_file": "client/src/components/ui/button-group.tsx",
+          "source_location": "L60"
+        },
+        {
+          "id": "client_src_components_ui_button_group_buttongrouptext",
+          "label": "ButtonGroupText()",
+          "source_file": "client/src/components/ui/button-group.tsx",
+          "source_location": "L40"
+        },
+        {
+          "id": "client_src_components_ui_empty_empty",
+          "label": "Empty()",
+          "source_file": "client/src/components/ui/empty.tsx",
+          "source_location": "L5"
+        },
+        {
+          "id": "client_src_components_ui_empty_emptycontent",
+          "label": "EmptyContent()",
+          "source_file": "client/src/components/ui/empty.tsx",
+          "source_location": "L84"
+        },
+        {
+          "id": "client_src_components_ui_empty_emptydescription",
+          "label": "EmptyDescription()",
+          "source_file": "client/src/components/ui/empty.tsx",
+          "source_location": "L71"
+        },
+        {
+          "id": "client_src_components_ui_empty_emptyheader",
+          "label": "EmptyHeader()",
+          "source_file": "client/src/components/ui/empty.tsx",
+          "source_location": "L18"
+        },
+        {
+          "id": "client_src_components_ui_empty_emptymedia",
+          "label": "EmptyMedia()",
+          "source_file": "client/src/components/ui/empty.tsx",
+          "source_location": "L46"
+        },
+        {
+          "id": "client_src_components_ui_empty_emptytitle",
+          "label": "EmptyTitle()",
+          "source_file": "client/src/components/ui/empty.tsx",
+          "source_location": "L61"
+        },
+        {
+          "id": "client_src_components_ui_field_field",
+          "label": "Field()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L79"
+        },
+        {
+          "id": "client_src_components_ui_field_fieldcontent",
+          "label": "FieldContent()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L95"
+        },
+        {
+          "id": "client_src_components_ui_field_fielddescription",
+          "label": "FieldDescription()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L139"
+        },
+        {
+          "id": "client_src_components_ui_field_fielderror",
+          "label": "FieldError()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L184"
+        },
+        {
+          "id": "client_src_components_ui_field_fieldgroup",
+          "label": "FieldGroup()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L42"
+        },
+        {
+          "id": "client_src_components_ui_field_fieldlabel",
+          "label": "FieldLabel()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L108"
+        },
+        {
+          "id": "client_src_components_ui_field_fieldlegend",
+          "label": "FieldLegend()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L22"
+        },
+        {
+          "id": "client_src_components_ui_field_fieldseparator",
+          "label": "FieldSeparator()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L154"
+        },
+        {
+          "id": "client_src_components_ui_field_fieldset",
+          "label": "FieldSet()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L8"
+        },
+        {
+          "id": "client_src_components_ui_field_fieldtitle",
+          "label": "FieldTitle()",
+          "source_file": "client/src/components/ui/field.tsx",
+          "source_location": "L126"
+        },
+        {
+          "id": "client_src_components_ui_item_item",
+          "label": "Item()",
+          "source_file": "client/src/components/ui/item.tsx",
+          "source_location": "L54"
+        }
+      ],
+      "totalNodes": 69
+    },
+    {
+      "id": 4,
+      "name": "App Shell & Error Boundary",
+      "count": 64,
+      "files": [
+        "client/src/App.tsx",
+        "client/src/_core/hooks/useAuth.ts",
+        "client/src/components/DashboardLayout.tsx",
+        "client/src/components/ErrorBoundary.tsx",
+        "client/src/components/PerformanceTelemetry.tsx",
+        "client/src/components/RuntimeErrorReporter.tsx",
+        "client/src/components/RuntimeMonitoringPanel.tsx",
+        "client/src/components/SupervisorPermissionsAudit.tsx",
+        "client/src/components/ui/sonner.tsx",
+        "client/src/contexts/ThemeContext.tsx",
+        "client/src/lib/trpc.ts",
+        "client/src/main.tsx",
+        "client/src/pages/Login.tsx",
+        "client/src/pages/RentalLanding.tsx",
+        "server/rentalEnquiryOptions.test.ts",
+        "shared/departmentAccess.ts",
+        "shared/rentalEnquiryOptions.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_errorboundary_errorboundary",
+          "label": "ErrorBoundary",
+          "source_file": "client/src/components/ErrorBoundary.tsx",
+          "source_location": "L14"
+        },
+        {
+          "id": "client_src_components_errorboundary_props",
+          "label": "Props",
+          "source_file": "client/src/components/ErrorBoundary.tsx",
+          "source_location": "L5"
+        },
+        {
+          "id": "client_src_components_errorboundary_state",
+          "label": "State",
+          "source_file": "client/src/components/ErrorBoundary.tsx",
+          "source_location": "L9"
+        },
+        {
+          "id": "client_src_components_runtimeerrorreporter_runtimeerrordetail",
+          "label": "RuntimeErrorDetail",
+          "source_file": "client/src/components/RuntimeErrorReporter.tsx",
+          "source_location": "L4"
+        },
+        {
+          "id": "client_src_contexts_themecontext_theme",
+          "label": "Theme",
+          "source_file": "client/src/contexts/ThemeContext.tsx",
+          "source_location": "L3"
+        },
+        {
+          "id": "client_src_contexts_themecontext_themecontexttype",
+          "label": "ThemeContextType",
+          "source_file": "client/src/contexts/ThemeContext.tsx",
+          "source_location": "L5"
+        },
+        {
+          "id": "client_src_contexts_themecontext_themeproviderprops",
+          "label": "ThemeProviderProps",
+          "source_file": "client/src/contexts/ThemeContext.tsx",
+          "source_location": "L15"
+        },
+        {
+          "id": "client_src_core_hooks_useauth_useauthoptions",
+          "label": "UseAuthOptions",
+          "source_file": "client/src/_core/hooks/useAuth.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "client_src_pages_login_loginform",
+          "label": "LoginForm",
+          "source_file": "client/src/pages/Login.tsx",
+          "source_location": "L8"
+        },
+        {
+          "id": "client_src_pages_rentallanding_enquiryform",
+          "label": "EnquiryForm",
+          "source_file": "client/src/pages/RentalLanding.tsx",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_pages_rentallanding_rentalestimateemailinput",
+          "label": "RentalEstimateEmailInput",
+          "source_file": "client/src/pages/RentalLanding.tsx",
+          "source_location": "L14"
+        },
+        {
+          "id": "shared_rentalenquiryoptions_rentalduration",
+          "label": "RentalDuration",
+          "source_file": "shared/rentalEnquiryOptions.ts",
+          "source_location": "L20"
+        },
+        {
+          "id": "shared_rentalenquiryoptions_rentalequipmenttype",
+          "label": "RentalEquipmentType",
+          "source_file": "shared/rentalEnquiryOptions.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "client_src_app_app",
+          "label": "App()",
+          "source_file": "client/src/App.tsx",
+          "source_location": "L50"
+        },
+        {
+          "id": "client_src_app_protectedportal",
+          "label": "ProtectedPortal()",
+          "source_file": "client/src/App.tsx",
+          "source_location": "L15"
+        },
+        {
+          "id": "client_src_app_router",
+          "label": "Router()",
+          "source_file": "client/src/App.tsx",
+          "source_location": "L32"
+        },
+        {
+          "id": "client_src_components_dashboardlayout_dashboardlayout",
+          "label": "DashboardLayout()",
+          "source_file": "client/src/components/DashboardLayout.tsx",
+          "source_location": "L40"
+        },
+        {
+          "id": "client_src_components_errorboundary_errorboundary_componentdidcatch",
+          "label": ".componentDidCatch()",
+          "source_file": "client/src/components/ErrorBoundary.tsx",
+          "source_location": "L24"
+        },
+        {
+          "id": "client_src_components_errorboundary_errorboundary_constructor",
+          "label": ".constructor()",
+          "source_file": "client/src/components/ErrorBoundary.tsx",
+          "source_location": "L15"
+        },
+        {
+          "id": "client_src_components_errorboundary_errorboundary_getderivedstatefromerror",
+          "label": ".getDerivedStateFromError()",
+          "source_file": "client/src/components/ErrorBoundary.tsx",
+          "source_location": "L20"
+        }
+      ],
+      "totalNodes": 64
+    },
+    {
+      "id": 5,
+      "name": "Home Page & Workspace Views",
+      "count": 58,
+      "files": [
+        "client/src/components/WorkspaceLoadingSkeleton.tsx",
+        "client/src/pages/Home.tsx",
+        "server/clientPortalNavigation.test.tsx",
+        "server/gearSelectionUi.test.tsx",
+        "shared/augustAttendanceData.ts",
+        "shared/departmentDashboardRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_pages_home_booking",
+          "label": "Booking",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L169"
+        },
+        {
+          "id": "client_src_pages_home_bookingfilter",
+          "label": "BookingFilter",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L185"
+        },
+        {
+          "id": "client_src_pages_home_bookingsort",
+          "label": "BookingSort",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L184"
+        },
+        {
+          "id": "client_src_pages_home_clientdocumenttaxonomy",
+          "label": "ClientDocumentTaxonomy",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L5767"
+        },
+        {
+          "id": "client_src_pages_home_clientportalprops",
+          "label": "ClientPortalProps",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L5798"
+        },
+        {
+          "id": "client_src_pages_home_clientuploadqueueitem",
+          "label": "ClientUploadQueueItem",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L5772"
+        },
+        {
+          "id": "client_src_pages_home_crewrecord",
+          "label": "CrewRecord",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L369"
+        },
+        {
+          "id": "client_src_pages_home_departmentportalconfig",
+          "label": "DepartmentPortalConfig",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L7519"
+        },
+        {
+          "id": "client_src_pages_home_gearcreatedialogprops",
+          "label": "GearCreateDialogProps",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L4627"
+        },
+        {
+          "id": "client_src_pages_home_geardocument",
+          "label": "GearDocument",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L465"
+        },
+        {
+          "id": "client_src_pages_home_gearrecord",
+          "label": "GearRecord",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L472"
+        },
+        {
+          "id": "client_src_pages_home_stage",
+          "label": "Stage",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L141"
+        },
+        {
+          "id": "client_src_pages_home_view",
+          "label": "View",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L151"
+        },
+        {
+          "id": "shared_augustattendancedata_augustemployee",
+          "label": "AugustEmployee",
+          "source_file": "shared/augustAttendanceData.ts",
+          "source_location": "L2"
+        },
+        {
+          "id": "client_src_components_workspaceloadingskeleton_workspaceloadingskeleton",
+          "label": "WorkspaceLoadingSkeleton()",
+          "source_file": "client/src/components/WorkspaceLoadingSkeleton.tsx",
+          "source_location": "L3"
+        },
+        {
+          "id": "client_src_pages_home_allocationmatchescrew",
+          "label": "allocationMatchesCrew()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L447"
+        },
+        {
+          "id": "client_src_pages_home_bookingsemptystate",
+          "label": "BookingsEmptyState()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L2387"
+        },
+        {
+          "id": "client_src_pages_home_bookingslistskeleton",
+          "label": "BookingsListSkeleton()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L2344"
+        },
+        {
+          "id": "client_src_pages_home_clientportal",
+          "label": "ClientPortal()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L5809"
+        },
+        {
+          "id": "client_src_pages_home_clientprogressrail",
+          "label": "ClientProgressRail()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L1679"
+        }
+      ],
+      "totalNodes": 58
+    },
+    {
+      "id": 6,
+      "name": "Database Schema (Drizzle)",
+      "count": 48,
+      "files": [
+        "drizzle/relations.ts",
+        "drizzle/schema.ts"
+      ],
+      "nodes": [
+        {
+          "id": "drizzle_schema_auditlogrecord",
+          "label": "AuditLogRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L260"
+        },
+        {
+          "id": "drizzle_schema_booking",
+          "label": "Booking",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L245"
+        },
+        {
+          "id": "drizzle_schema_bookingcrewallocation",
+          "label": "BookingCrewAllocation",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L246"
+        },
+        {
+          "id": "drizzle_schema_chatmessagerecord",
+          "label": "ChatMessageRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L253"
+        },
+        {
+          "id": "drizzle_schema_clientfeedbackrecord",
+          "label": "ClientFeedbackRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L242"
+        },
+        {
+          "id": "drizzle_schema_clientfilterpresetrecord",
+          "label": "ClientFilterPresetRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L306"
+        },
+        {
+          "id": "drizzle_schema_crewmemberitem",
+          "label": "CrewMemberItem",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L249"
+        },
+        {
+          "id": "drizzle_schema_departmentdashboardrecord",
+          "label": "DepartmentDashboardRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L256"
+        },
+        {
+          "id": "drizzle_schema_departmentrecord",
+          "label": "DepartmentRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L255"
+        },
+        {
+          "id": "drizzle_schema_departmentworkflowtemplaterecord",
+          "label": "DepartmentWorkflowTemplateRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L257"
+        },
+        {
+          "id": "drizzle_schema_documentitemrecord",
+          "label": "DocumentItemRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L252"
+        },
+        {
+          "id": "drizzle_schema_equipmentitem",
+          "label": "EquipmentItem",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L248"
+        },
+        {
+          "id": "drizzle_schema_insertbooking",
+          "label": "InsertBooking",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L247"
+        },
+        {
+          "id": "drizzle_schema_insertuser",
+          "label": "InsertUser",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L241"
+        },
+        {
+          "id": "drizzle_schema_liftinggearitem",
+          "label": "LiftingGearItem",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L250"
+        },
+        {
+          "id": "drizzle_schema_notificationrecord",
+          "label": "NotificationRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L254"
+        },
+        {
+          "id": "drizzle_schema_rentalenquiryeventrecord",
+          "label": "RentalEnquiryEventRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L259"
+        },
+        {
+          "id": "drizzle_schema_rentalenquiryrecord",
+          "label": "RentalEnquiryRecord",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L258"
+        },
+        {
+          "id": "drizzle_schema_runtimeerrorevent",
+          "label": "RuntimeErrorEvent",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L244"
+        },
+        {
+          "id": "drizzle_schema_systemsetting",
+          "label": "SystemSetting",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L243"
+        }
+      ],
+      "totalNodes": 48
+    },
+    {
+      "id": 7,
+      "name": "Server Router & Department Rules",
+      "count": 35,
+      "files": [
+        "server/departmentDashboardProvisioning.test.ts",
+        "server/departmentWorkspaceLifecycle.test.ts",
+        "server/routers.ts",
+        "shared/departmentAccess.ts",
+        "shared/departmentDashboardRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_routers_approuter",
+          "label": "AppRouter",
+          "source_file": "server/routers.ts",
+          "source_location": "L1600"
+        },
+        {
+          "id": "shared_departmentaccess_portalrole",
+          "label": "PortalRole",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L24"
+        },
+        {
+          "id": "shared_departmentdashboardrules_departmentdashboardconfig",
+          "label": "DepartmentDashboardConfig",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L15"
+        },
+        {
+          "id": "shared_departmentdashboardrules_departmentdashboardmetric",
+          "label": "DepartmentDashboardMetric",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "shared_departmentdashboardrules_departmentdashboardwidget",
+          "label": "DepartmentDashboardWidget",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "shared_departmentdashboardrules_workflowchecklistitem",
+          "label": "WorkflowChecklistItem",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L121"
+        },
+        {
+          "id": "server_departmentdashboardprovisioning_test_contextfor",
+          "label": "contextFor()",
+          "source_file": "server/departmentDashboardProvisioning.test.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "server_departmentworkspacelifecycle_test_contextfor",
+          "label": "contextFor()",
+          "source_file": "server/departmentWorkspaceLifecycle.test.ts",
+          "source_location": "L23"
+        },
+        {
+          "id": "server_routers_requireaccountmanagementaccess",
+          "label": "requireAccountManagementAccess()",
+          "source_file": "server/routers.ts",
+          "source_location": "L119"
+        },
+        {
+          "id": "server_routers_requireactiveprovisioneddepartment",
+          "label": "requireActiveProvisionedDepartment()",
+          "source_file": "server/routers.ts",
+          "source_location": "L154"
+        },
+        {
+          "id": "server_routers_requiredepartmentaccess",
+          "label": "requireDepartmentAccess()",
+          "source_file": "server/routers.ts",
+          "source_location": "L107"
+        },
+        {
+          "id": "server_routers_requiredocumenttaxonomymanager",
+          "label": "requireDocumentTaxonomyManager()",
+          "source_file": "server/routers.ts",
+          "source_location": "L137"
+        },
+        {
+          "id": "shared_departmentaccess_isdepartmentcode",
+          "label": "isDepartmentCode()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L46"
+        },
+        {
+          "id": "shared_departmentdashboardrules_canaccessprovisioneddepartmentdashboard",
+          "label": "canAccessProvisionedDepartmentDashboard()",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L107"
+        },
+        {
+          "id": "shared_departmentdashboardrules_canmanageprovisioneddepartmentdashboard",
+          "label": "canManageProvisionedDepartmentDashboard()",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L114"
+        },
+        {
+          "id": "shared_departmentdashboardrules_createdepartmentdashboardconfig",
+          "label": "createDepartmentDashboardConfig()",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L54"
+        },
+        {
+          "id": "shared_departmentdashboardrules_isvalidprovisioneddepartmentcode",
+          "label": "isValidProvisionedDepartmentCode()",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L147"
+        },
+        {
+          "id": "shared_departmentdashboardrules_normalizedepartmentcode",
+          "label": "normalizeDepartmentCode()",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L143"
+        },
+        {
+          "id": "shared_departmentdashboardrules_normalizedepartmentdashboardconfig",
+          "label": "normalizeDepartmentDashboardConfig()",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L69"
+        },
+        {
+          "id": "server_departmentdashboardprovisioning_test",
+          "label": "departmentDashboardProvisioning.test.ts",
+          "source_file": "server/departmentDashboardProvisioning.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 35
+    },
+    {
+      "id": 8,
+      "name": "Excel Upload & Data Mapping",
+      "count": 34,
+      "files": [
+        "client/src/components/DataUploadCenter.tsx",
+        "server/dataMapping.test.ts",
+        "server/dataUploadCenter.test.tsx",
+        "shared/dataMapping.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_datauploadcenter_pendingworkbook",
+          "label": "PendingWorkbook",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L21"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_uploadmap",
+          "label": "UploadMap",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L19"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_uploadrecord",
+          "label": "UploadRecord",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_datauploadcenter_test_mockfilereader",
+          "label": "MockFileReader",
+          "source_file": "server/dataUploadCenter.test.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "shared_datamapping_columnmapping",
+          "label": "ColumnMapping",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "shared_datamapping_importfield",
+          "label": "ImportField",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_datamapping_mappingpreference",
+          "label": "MappingPreference",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L10"
+        },
+        {
+          "id": "shared_datamapping_mappingpreferencemap",
+          "label": "MappingPreferenceMap",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L17"
+        },
+        {
+          "id": "shared_datamapping_preferenceapplication",
+          "label": "PreferenceApplication",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "shared_datamapping_spreadsheetrow",
+          "label": "SpreadsheetRow",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_datauploadcenter",
+          "label": "DataUploadCenter()",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L104"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_formatbytes",
+          "label": "formatBytes()",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L66"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_loadmappingpreferences",
+          "label": "loadMappingPreferences()",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L50"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_readworkbook",
+          "label": "readWorkbook()",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L76"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_storemappingpreferences",
+          "label": "storeMappingPreferences()",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L60"
+        },
+        {
+          "id": "client_src_components_datauploadcenter_workbookfilename",
+          "label": "workbookFileName()",
+          "source_file": "client/src/components/DataUploadCenter.tsx",
+          "source_location": "L72"
+        },
+        {
+          "id": "server_datauploadcenter_test_mockfilereader_readasarraybuffer",
+          "label": ".readAsArrayBuffer()",
+          "source_file": "server/dataUploadCenter.test.tsx",
+          "source_location": "L32"
+        },
+        {
+          "id": "shared_datamapping_applymappingpreference",
+          "label": "applyMappingPreference()",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L145"
+        },
+        {
+          "id": "shared_datamapping_automapcolumns",
+          "label": "autoMapColumns()",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L114"
+        },
+        {
+          "id": "shared_datamapping_createmappingpreference",
+          "label": "createMappingPreference()",
+          "source_file": "shared/dataMapping.ts",
+          "source_location": "L136"
+        }
+      ],
+      "totalNodes": 34
+    },
+    {
+      "id": 9,
+      "name": "LLM Service Integration",
+      "count": 34,
+      "files": [
+        "server/_core/llm.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_llm_fetchinit",
+          "label": "FetchInit",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L275"
+        },
+        {
+          "id": "server_core_llm_filecontent",
+          "label": "FileContent",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L18"
+        },
+        {
+          "id": "server_core_llm_imagecontent",
+          "label": "ImageContent",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L10"
+        },
+        {
+          "id": "server_core_llm_invokeparams",
+          "label": "InvokeParams",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L58"
+        },
+        {
+          "id": "server_core_llm_invokeresult",
+          "label": "InvokeResult",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L83"
+        },
+        {
+          "id": "server_core_llm_jsonschema",
+          "label": "JsonSchema",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L103"
+        },
+        {
+          "id": "server_core_llm_message",
+          "label": "Message",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L28"
+        },
+        {
+          "id": "server_core_llm_messagecontent",
+          "label": "MessageContent",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L26"
+        },
+        {
+          "id": "server_core_llm_modelinfo",
+          "label": "ModelInfo",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L423"
+        },
+        {
+          "id": "server_core_llm_modelsresponse",
+          "label": "ModelsResponse",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L430"
+        },
+        {
+          "id": "server_core_llm_outputschema",
+          "label": "OutputSchema",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L109"
+        },
+        {
+          "id": "server_core_llm_responseformat",
+          "label": "ResponseFormat",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L111"
+        },
+        {
+          "id": "server_core_llm_role",
+          "label": "Role",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "server_core_llm_textcontent",
+          "label": "TextContent",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_core_llm_tool",
+          "label": "Tool",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L35"
+        },
+        {
+          "id": "server_core_llm_toolcall",
+          "label": "ToolCall",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L74"
+        },
+        {
+          "id": "server_core_llm_toolchoice",
+          "label": "ToolChoice",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L53"
+        },
+        {
+          "id": "server_core_llm_toolchoicebyname",
+          "label": "ToolChoiceByName",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L45"
+        },
+        {
+          "id": "server_core_llm_toolchoiceexplicit",
+          "label": "ToolChoiceExplicit",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L46"
+        },
+        {
+          "id": "server_core_llm_toolchoiceprimitive",
+          "label": "ToolChoicePrimitive",
+          "source_file": "server/_core/llm.ts",
+          "source_location": "L44"
+        }
+      ],
+      "totalNodes": 34
+    },
+    {
+      "id": 10,
+      "name": "User Management Views",
+      "count": 33,
+      "files": [
+        "client/src/components/DepartmentUsersView.tsx",
+        "server/activityFilterRules.test.ts",
+        "server/adminDashboardRules.test.ts",
+        "server/dashboardGreetingRules.test.ts",
+        "shared/activityExport.ts",
+        "shared/activityFilterRules.ts",
+        "shared/dashboardGreeting.ts",
+        "shared/departmentDashboardRules.ts",
+        "shared/userManagementRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_departmentusersview_accounteditorform",
+          "label": "AccountEditorForm",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "client_src_components_departmentusersview_accountform",
+          "label": "AccountForm",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L21"
+        },
+        {
+          "id": "client_src_components_departmentusersview_departmentform",
+          "label": "DepartmentForm",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L37"
+        },
+        {
+          "id": "client_src_components_departmentusersview_departmentusersviewprops",
+          "label": "DepartmentUsersViewProps",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L46"
+        },
+        {
+          "id": "shared_activityexport_activityexportrow",
+          "label": "ActivityExportRow",
+          "source_file": "shared/activityExport.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_departmentdashboardrules_departmentdashboardaccent",
+          "label": "DepartmentDashboardAccent",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "shared_departmentdashboardrules_departmentdashboardicon",
+          "label": "DepartmentDashboardIcon",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L10"
+        },
+        {
+          "id": "shared_departmentdashboardrules_departmentworkstream",
+          "label": "DepartmentWorkstream",
+          "source_file": "shared/departmentDashboardRules.ts",
+          "source_location": "L11"
+        },
+        {
+          "id": "shared_usermanagementrules_accountstatusfilter",
+          "label": "AccountStatusFilter",
+          "source_file": "shared/userManagementRules.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "shared_usermanagementrules_filterableaccount",
+          "label": "FilterableAccount",
+          "source_file": "shared/userManagementRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_departmentusersview_activitylabel",
+          "label": "activityLabel()",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L54"
+        },
+        {
+          "id": "client_src_components_departmentusersview_departmentusersview",
+          "label": "DepartmentUsersView()",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L56"
+        },
+        {
+          "id": "client_src_components_departmentusersview_displaydate",
+          "label": "displayDate()",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L52"
+        },
+        {
+          "id": "client_src_components_departmentusersview_displaydatetime",
+          "label": "displayDateTime()",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L53"
+        },
+        {
+          "id": "client_src_components_departmentusersview_initials",
+          "label": "initials()",
+          "source_file": "client/src/components/DepartmentUsersView.tsx",
+          "source_location": "L51"
+        },
+        {
+          "id": "shared_activityexport_activitytocsv",
+          "label": "activityToCsv()",
+          "source_file": "shared/activityExport.ts",
+          "source_location": "L17"
+        },
+        {
+          "id": "shared_activityexport_csvcell",
+          "label": "csvCell()",
+          "source_file": "shared/activityExport.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "shared_activityfilterrules_activityfilterinput",
+          "label": "activityFilterInput()",
+          "source_file": "shared/activityFilterRules.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "shared_activityfilterrules_isvalidactivitydate",
+          "label": "isValidActivityDate()",
+          "source_file": "shared/activityFilterRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_dashboardgreeting_formatdashboardgreeting",
+          "label": "formatDashboardGreeting()",
+          "source_file": "shared/dashboardGreeting.ts",
+          "source_location": "L13"
+        }
+      ],
+      "totalNodes": 33
+    },
+    {
+      "id": 11,
+      "name": "Sales Inbox & PDF Generation",
+      "count": 32,
+      "files": [
+        "client/src/components/SalesEnquiryInbox.tsx",
+        "client/src/lib/dispatchBundlePdf.ts",
+        "client/src/lib/pdfBrand.ts",
+        "client/src/lib/rentalQuotePdf.ts",
+        "client/src/pages/Home.tsx",
+        "server/dispatchBundlePdf.test.ts",
+        "server/rentalQuotePdf.test.ts",
+        "shared/bookingRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_salesenquiryinbox_assignmentfilter",
+          "label": "AssignmentFilter",
+          "source_file": "client/src/components/SalesEnquiryInbox.tsx",
+          "source_location": "L11"
+        },
+        {
+          "id": "client_src_components_salesenquiryinbox_bookingpreview",
+          "label": "BookingPreview",
+          "source_file": "client/src/components/SalesEnquiryInbox.tsx",
+          "source_location": "L14"
+        },
+        {
+          "id": "client_src_components_salesenquiryinbox_enquirystatusfilter",
+          "label": "EnquiryStatusFilter",
+          "source_file": "client/src/components/SalesEnquiryInbox.tsx",
+          "source_location": "L10"
+        },
+        {
+          "id": "client_src_components_salesenquiryinbox_salesfilterpreset",
+          "label": "SalesFilterPreset",
+          "source_file": "client/src/components/SalesEnquiryInbox.tsx",
+          "source_location": "L12"
+        },
+        {
+          "id": "client_src_lib_dispatchbundlepdf_dispatchbundlebooking",
+          "label": "DispatchBundleBooking",
+          "source_file": "client/src/lib/dispatchBundlePdf.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "client_src_lib_dispatchbundlepdf_dispatchbundlecrew",
+          "label": "DispatchBundleCrew",
+          "source_file": "client/src/lib/dispatchBundlePdf.ts",
+          "source_location": "L17"
+        },
+        {
+          "id": "client_src_lib_rentalquotepdf_rentalquotebrief",
+          "label": "RentalQuoteBrief",
+          "source_file": "client/src/lib/rentalQuotePdf.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "shared_bookingrules_documentitem",
+          "label": "DocumentItem",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L23"
+        },
+        {
+          "id": "client_src_components_salesenquiryinbox_salesenquiryinbox",
+          "label": "SalesEnquiryInbox()",
+          "source_file": "client/src/components/SalesEnquiryInbox.tsx",
+          "source_location": "L26"
+        },
+        {
+          "id": "client_src_lib_dispatchbundlepdf_drawcrewmanifest",
+          "label": "drawCrewManifest()",
+          "source_file": "client/src/lib/dispatchBundlePdf.ts",
+          "source_location": "L350"
+        },
+        {
+          "id": "client_src_lib_dispatchbundlepdf_drawlabelvalue",
+          "label": "drawLabelValue()",
+          "source_file": "client/src/lib/dispatchBundlePdf.ts",
+          "source_location": "L55"
+        },
+        {
+          "id": "client_src_lib_dispatchbundlepdf_drawwrappedtext",
+          "label": "drawWrappedText()",
+          "source_file": "client/src/lib/dispatchBundlePdf.ts",
+          "source_location": "L38"
+        },
+        {
+          "id": "client_src_lib_dispatchbundlepdf_generatedispatchbundlepdf",
+          "label": "generateDispatchBundlePdf()",
+          "source_file": "client/src/lib/dispatchBundlePdf.ts",
+          "source_location": "L83"
+        },
+        {
+          "id": "client_src_lib_dispatchbundlepdf_wrapline",
+          "label": "wrapLine()",
+          "source_file": "client/src/lib/dispatchBundlePdf.ts",
+          "source_location": "L23"
+        },
+        {
+          "id": "client_src_lib_pdfbrand_drawbobdocumentlogo",
+          "label": "drawBobDocumentLogo()",
+          "source_file": "client/src/lib/pdfBrand.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "client_src_lib_pdfbrand_embedbobfulllogo",
+          "label": "embedBobFullLogo()",
+          "source_file": "client/src/lib/pdfBrand.ts",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_lib_rentalquotepdf_drawlabelvalue",
+          "label": "drawLabelValue()",
+          "source_file": "client/src/lib/rentalQuotePdf.ts",
+          "source_location": "L42"
+        },
+        {
+          "id": "client_src_lib_rentalquotepdf_drawwrappedtext",
+          "label": "drawWrappedText()",
+          "source_file": "client/src/lib/rentalQuotePdf.ts",
+          "source_location": "L36"
+        },
+        {
+          "id": "client_src_lib_rentalquotepdf_generaterentalquotepdf",
+          "label": "generateRentalQuotePdf()",
+          "source_file": "client/src/lib/rentalQuotePdf.ts",
+          "source_location": "L51"
+        },
+        {
+          "id": "client_src_lib_rentalquotepdf_wrapline",
+          "label": "wrapLine()",
+          "source_file": "client/src/lib/rentalQuotePdf.ts",
+          "source_location": "L21"
+        }
+      ],
+      "totalNodes": 32
+    },
+    {
+      "id": 12,
+      "name": "AI Chat & Input Components",
+      "count": 31,
+      "files": [
+        "client/src/components/AIChatBox.tsx",
+        "client/src/components/ui/badge.tsx",
+        "client/src/components/ui/button.tsx",
+        "client/src/components/ui/calendar.tsx",
+        "client/src/components/ui/dialog.tsx",
+        "client/src/components/ui/input-group.tsx",
+        "client/src/components/ui/input.tsx",
+        "client/src/components/ui/scroll-area.tsx",
+        "client/src/components/ui/textarea.tsx",
+        "client/src/hooks/useComposition.ts",
+        "client/src/lib/utils.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_aichatbox_aichatboxprops",
+          "label": "AIChatBoxProps",
+          "source_file": "client/src/components/AIChatBox.tsx",
+          "source_location": "L17"
+        },
+        {
+          "id": "client_src_components_aichatbox_message",
+          "label": "Message",
+          "source_file": "client/src/components/AIChatBox.tsx",
+          "source_location": "L12"
+        },
+        {
+          "id": "client_src_components_aichatbox_aichatbox",
+          "label": "AIChatBox()",
+          "source_file": "client/src/components/AIChatBox.tsx",
+          "source_location": "L113"
+        },
+        {
+          "id": "client_src_components_ui_badge_badge",
+          "label": "Badge()",
+          "source_file": "client/src/components/ui/badge.tsx",
+          "source_location": "L28"
+        },
+        {
+          "id": "client_src_components_ui_button_button",
+          "label": "Button()",
+          "source_file": "client/src/components/ui/button.tsx",
+          "source_location": "L39"
+        },
+        {
+          "id": "client_src_components_ui_calendar_calendar",
+          "label": "Calendar()",
+          "source_file": "client/src/components/ui/calendar.tsx",
+          "source_location": "L12"
+        },
+        {
+          "id": "client_src_components_ui_calendar_calendardaybutton",
+          "label": "CalendarDayButton()",
+          "source_file": "client/src/components/ui/calendar.tsx",
+          "source_location": "L173"
+        },
+        {
+          "id": "client_src_components_ui_dialog_usedialogcomposition",
+          "label": "useDialogComposition()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L19"
+        },
+        {
+          "id": "client_src_components_ui_input_group_inputgroup",
+          "label": "InputGroup()",
+          "source_file": "client/src/components/ui/input-group.tsx",
+          "source_location": "L9"
+        },
+        {
+          "id": "client_src_components_ui_input_group_inputgroupaddon",
+          "label": "InputGroupAddon()",
+          "source_file": "client/src/components/ui/input-group.tsx",
+          "source_location": "L58"
+        },
+        {
+          "id": "client_src_components_ui_input_group_inputgroupbutton",
+          "label": "InputGroupButton()",
+          "source_file": "client/src/components/ui/input-group.tsx",
+          "source_location": "L98"
+        },
+        {
+          "id": "client_src_components_ui_input_group_inputgroupinput",
+          "label": "InputGroupInput()",
+          "source_file": "client/src/components/ui/input-group.tsx",
+          "source_location": "L129"
+        },
+        {
+          "id": "client_src_components_ui_input_group_inputgrouptext",
+          "label": "InputGroupText()",
+          "source_file": "client/src/components/ui/input-group.tsx",
+          "source_location": "L117"
+        },
+        {
+          "id": "client_src_components_ui_input_group_inputgrouptextarea",
+          "label": "InputGroupTextarea()",
+          "source_file": "client/src/components/ui/input-group.tsx",
+          "source_location": "L145"
+        },
+        {
+          "id": "client_src_components_ui_input_input",
+          "label": "Input()",
+          "source_file": "client/src/components/ui/input.tsx",
+          "source_location": "L6"
+        },
+        {
+          "id": "client_src_components_ui_scroll_area_scrollarea",
+          "label": "ScrollArea()",
+          "source_file": "client/src/components/ui/scroll-area.tsx",
+          "source_location": "L6"
+        },
+        {
+          "id": "client_src_components_ui_scroll_area_scrollbar",
+          "label": "ScrollBar()",
+          "source_file": "client/src/components/ui/scroll-area.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "client_src_components_ui_textarea_textarea",
+          "label": "Textarea()",
+          "source_file": "client/src/components/ui/textarea.tsx",
+          "source_location": "L6"
+        },
+        {
+          "id": "client_src_hooks_usecomposition_usecomposition",
+          "label": "useComposition()",
+          "source_file": "client/src/hooks/useComposition.ts",
+          "source_location": "L23"
+        },
+        {
+          "id": "client_src_components_aichatbox",
+          "label": "AIChatBox.tsx",
+          "source_file": "client/src/components/AIChatBox.tsx",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 31
+    },
+    {
+      "id": 13,
+      "name": "TypeScript Configuration",
+      "count": 31,
+      "files": [
+        "tsconfig.json"
+      ],
+      "nodes": [
+        {
+          "id": "tsconfig",
+          "label": "tsconfig.json",
+          "source_file": "tsconfig.json",
+          "source_location": "L1"
+        },
+        {
+          "id": "tsconfig_compileroptions",
+          "label": "compilerOptions",
+          "source_file": "tsconfig.json",
+          "source_location": "L4"
+        },
+        {
+          "id": "tsconfig_compileroptions_allowimportingtsextensions",
+          "label": "allowImportingTsExtensions",
+          "source_file": "tsconfig.json",
+          "source_location": "L14"
+        },
+        {
+          "id": "tsconfig_compileroptions_baseurl",
+          "label": "baseUrl",
+          "source_file": "tsconfig.json",
+          "source_location": "L16"
+        },
+        {
+          "id": "tsconfig_compileroptions_esmoduleinterop",
+          "label": "esModuleInterop",
+          "source_file": "tsconfig.json",
+          "source_location": "L12"
+        },
+        {
+          "id": "tsconfig_compileroptions_incremental",
+          "label": "incremental",
+          "source_file": "tsconfig.json",
+          "source_location": "L5"
+        },
+        {
+          "id": "tsconfig_compileroptions_jsx",
+          "label": "jsx",
+          "source_file": "tsconfig.json",
+          "source_location": "L11"
+        },
+        {
+          "id": "tsconfig_compileroptions_lib",
+          "label": "lib",
+          "source_file": "tsconfig.json",
+          "source_location": "L10"
+        },
+        {
+          "id": "tsconfig_compileroptions_module",
+          "label": "module",
+          "source_file": "tsconfig.json",
+          "source_location": "L8"
+        },
+        {
+          "id": "tsconfig_compileroptions_moduleresolution",
+          "label": "moduleResolution",
+          "source_file": "tsconfig.json",
+          "source_location": "L15"
+        },
+        {
+          "id": "tsconfig_compileroptions_noemit",
+          "label": "noEmit",
+          "source_file": "tsconfig.json",
+          "source_location": "L7"
+        },
+        {
+          "id": "tsconfig_compileroptions_paths",
+          "label": "paths",
+          "source_file": "tsconfig.json",
+          "source_location": "L18"
+        },
+        {
+          "id": "tsconfig_compileroptions_skiplibcheck",
+          "label": "skipLibCheck",
+          "source_file": "tsconfig.json",
+          "source_location": "L13"
+        },
+        {
+          "id": "tsconfig_compileroptions_strict",
+          "label": "strict",
+          "source_file": "tsconfig.json",
+          "source_location": "L9"
+        },
+        {
+          "id": "tsconfig_compileroptions_tsbuildinfofile",
+          "label": "tsBuildInfoFile",
+          "source_file": "tsconfig.json",
+          "source_location": "L6"
+        },
+        {
+          "id": "tsconfig_compileroptions_types",
+          "label": "types",
+          "source_file": "tsconfig.json",
+          "source_location": "L17"
+        },
+        {
+          "id": "tsconfig_exclude",
+          "label": "exclude",
+          "source_file": "tsconfig.json",
+          "source_location": "L3"
+        },
+        {
+          "id": "tsconfig_include",
+          "label": "include",
+          "source_file": "tsconfig.json",
+          "source_location": "L2"
+        },
+        {
+          "id": "tsconfig_paths_shared",
+          "label": "@shared/*",
+          "source_file": "tsconfig.json",
+          "source_location": "L20"
+        },
+        {
+          "id": "ref_build",
+          "label": "build",
+          "source_file": "tsconfig.json",
+          "source_location": "L3"
+        }
+      ],
+      "totalNodes": 31
+    },
+    {
+      "id": 14,
+      "name": "Booking Lifecycle & Progress",
+      "count": 29,
+      "files": [
+        "client/src/pages/Home.tsx",
+        "server/bookingRules.test.ts",
+        "shared/bookingRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_bookingrules_availability",
+          "label": "Availability",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L14"
+        },
+        {
+          "id": "shared_bookingrules_bookingdossier",
+          "label": "BookingDossier",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L38"
+        },
+        {
+          "id": "shared_bookingrules_bookingstage",
+          "label": "BookingStage",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "shared_bookingrules_chatmessage",
+          "label": "ChatMessage",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L36"
+        },
+        {
+          "id": "shared_bookingrules_craneasset",
+          "label": "CraneAsset",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "shared_bookingrules_crewmember",
+          "label": "CrewMember",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L20"
+        },
+        {
+          "id": "shared_bookingrules_department",
+          "label": "Department",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L18"
+        },
+        {
+          "id": "shared_bookingrules_departmentcode",
+          "label": "DepartmentCode",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L17"
+        },
+        {
+          "id": "shared_bookingrules_documentstate",
+          "label": "DocumentState",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L15"
+        },
+        {
+          "id": "shared_bookingrules_lifecyclenotification",
+          "label": "LifecycleNotification",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L74"
+        },
+        {
+          "id": "shared_bookingrules_liftinggear",
+          "label": "LiftingGear",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "shared_bookingrules_notification",
+          "label": "Notification",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L37"
+        },
+        {
+          "id": "shared_bookingrules_prioritytier",
+          "label": "PriorityTier",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "shared_bookingrules_trailerasset",
+          "label": "TrailerAsset",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L22"
+        },
+        {
+          "id": "client_src_pages_home_bookingdetail",
+          "label": "BookingDetail()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L4870"
+        },
+        {
+          "id": "client_src_pages_home_progressgraph",
+          "label": "ProgressGraph()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L1475"
+        },
+        {
+          "id": "shared_bookingrules_canadvancestage",
+          "label": "canAdvanceStage()",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L64"
+        },
+        {
+          "id": "shared_bookingrules_candispatch",
+          "label": "canDispatch()",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L118"
+        },
+        {
+          "id": "shared_bookingrules_departmentcompletion",
+          "label": "departmentCompletion()",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L114"
+        },
+        {
+          "id": "shared_bookingrules_documentcompletion",
+          "label": "documentCompletion()",
+          "source_file": "shared/bookingRules.ts",
+          "source_location": "L107"
+        }
+      ],
+      "totalNodes": 29
+    },
+    {
+      "id": 15,
+      "name": "Command Palette & Dialog",
+      "count": 25,
+      "files": [
+        "client/src/components/ManusDialog.tsx",
+        "client/src/components/ui/command.tsx",
+        "client/src/components/ui/dialog.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_manusdialog_manusdialogprops",
+          "label": "ManusDialogProps",
+          "source_file": "client/src/components/ManusDialog.tsx",
+          "source_location": "L12"
+        },
+        {
+          "id": "client_src_components_manusdialog_manusdialog",
+          "label": "ManusDialog()",
+          "source_file": "client/src/components/ManusDialog.tsx",
+          "source_location": "L21"
+        },
+        {
+          "id": "client_src_components_ui_command_command",
+          "label": "Command()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L16"
+        },
+        {
+          "id": "client_src_components_ui_command_commanddialog",
+          "label": "CommandDialog()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L32"
+        },
+        {
+          "id": "client_src_components_ui_command_commandempty",
+          "label": "CommandEmpty()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L101"
+        },
+        {
+          "id": "client_src_components_ui_command_commandgroup",
+          "label": "CommandGroup()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L113"
+        },
+        {
+          "id": "client_src_components_ui_command_commandinput",
+          "label": "CommandInput()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L63"
+        },
+        {
+          "id": "client_src_components_ui_command_commanditem",
+          "label": "CommandItem()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L142"
+        },
+        {
+          "id": "client_src_components_ui_command_commandlist",
+          "label": "CommandList()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L85"
+        },
+        {
+          "id": "client_src_components_ui_command_commandseparator",
+          "label": "CommandSeparator()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L129"
+        },
+        {
+          "id": "client_src_components_ui_command_commandshortcut",
+          "label": "CommandShortcut()",
+          "source_file": "client/src/components/ui/command.tsx",
+          "source_location": "L158"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialog",
+          "label": "Dialog()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L22"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogclose",
+          "label": "DialogClose()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L68"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogcontent",
+          "label": "DialogContent()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L92"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogdescription",
+          "label": "DialogDescription()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L184"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogfooter",
+          "label": "DialogFooter()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L158"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogheader",
+          "label": "DialogHeader()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L148"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogoverlay",
+          "label": "DialogOverlay()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L74"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogportal",
+          "label": "DialogPortal()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L62"
+        },
+        {
+          "id": "client_src_components_ui_dialog_dialogtitle",
+          "label": "DialogTitle()",
+          "source_file": "client/src/components/ui/dialog.tsx",
+          "source_location": "L171"
+        }
+      ],
+      "totalNodes": 25
+    },
+    {
+      "id": 16,
+      "name": "Alert Dialog & Pagination",
+      "count": 22,
+      "files": [
+        "client/src/components/ui/alert-dialog.tsx",
+        "client/src/components/ui/button.tsx",
+        "client/src/components/ui/pagination.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_pagination_paginationlinkprops",
+          "label": "PaginationLinkProps",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L40"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialog",
+          "label": "AlertDialog()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogaction",
+          "label": "AlertDialogAction()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L119"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogcancel",
+          "label": "AlertDialogCancel()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L131"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogcontent",
+          "label": "AlertDialogContent()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L45"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogdescription",
+          "label": "AlertDialogDescription()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L106"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogfooter",
+          "label": "AlertDialogFooter()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L77"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogheader",
+          "label": "AlertDialogHeader()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L64"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogoverlay",
+          "label": "AlertDialogOverlay()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogportal",
+          "label": "AlertDialogPortal()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L21"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogtitle",
+          "label": "AlertDialogTitle()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L93"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog_alertdialogtrigger",
+          "label": "AlertDialogTrigger()",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_components_ui_pagination_pagination",
+          "label": "Pagination()",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L11"
+        },
+        {
+          "id": "client_src_components_ui_pagination_paginationcontent",
+          "label": "PaginationContent()",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L23"
+        },
+        {
+          "id": "client_src_components_ui_pagination_paginationellipsis",
+          "label": "PaginationEllipsis()",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L102"
+        },
+        {
+          "id": "client_src_components_ui_pagination_paginationitem",
+          "label": "PaginationItem()",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L36"
+        },
+        {
+          "id": "client_src_components_ui_pagination_paginationlink",
+          "label": "PaginationLink()",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L45"
+        },
+        {
+          "id": "client_src_components_ui_pagination_paginationnext",
+          "label": "PaginationNext()",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L85"
+        },
+        {
+          "id": "client_src_components_ui_pagination_paginationprevious",
+          "label": "PaginationPrevious()",
+          "source_file": "client/src/components/ui/pagination.tsx",
+          "source_location": "L68"
+        },
+        {
+          "id": "client_src_components_ui_alert_dialog",
+          "label": "alert-dialog.tsx",
+          "source_file": "client/src/components/ui/alert-dialog.tsx",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 22
+    },
+    {
+      "id": 17,
+      "name": "Charts & Web Vitals Analytics",
+      "count": 21,
+      "files": [
+        "client/src/components/WebVitalsAnalyticsView.tsx",
+        "client/src/components/ui/chart.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_chart_chartconfig",
+          "label": "ChartConfig",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L9"
+        },
+        {
+          "id": "client_src_components_ui_chart_chartcontextprops",
+          "label": "ChartContextProps",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L19"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_datepreset",
+          "label": "DatePreset",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L17"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_daterange",
+          "label": "DateRange",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L15"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_trendkey",
+          "label": "TrendKey",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L16"
+        },
+        {
+          "id": "client_src_components_ui_chart_chartcontainer",
+          "label": "ChartContainer()",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L35"
+        },
+        {
+          "id": "client_src_components_ui_chart_chartlegendcontent",
+          "label": "ChartLegendContent()",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L253"
+        },
+        {
+          "id": "client_src_components_ui_chart_chartstyle",
+          "label": "ChartStyle()",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L70"
+        },
+        {
+          "id": "client_src_components_ui_chart_charttooltipcontent",
+          "label": "ChartTooltipContent()",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L105"
+        },
+        {
+          "id": "client_src_components_ui_chart_getpayloadconfigfrompayload",
+          "label": "getPayloadConfigFromPayload()",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L310"
+        },
+        {
+          "id": "client_src_components_ui_chart_usechart",
+          "label": "useChart()",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L25"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_average",
+          "label": "average()",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_formatday",
+          "label": "formatDay()",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L28"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_metricnumber",
+          "label": "metricNumber()",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L27"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_webvitalsanalyticsview",
+          "label": "WebVitalsAnalyticsView()",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L31"
+        },
+        {
+          "id": "client_src_components_ui_chart",
+          "label": "chart.tsx",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_ui_chart_chartcontext",
+          "label": "ChartContext",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L23"
+        },
+        {
+          "id": "client_src_components_ui_chart_themes",
+          "label": "THEMES",
+          "source_file": "client/src/components/ui/chart.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview",
+          "label": "WebVitalsAnalyticsView.tsx",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_webvitalsanalyticsview_vital_thresholds",
+          "label": "VITAL_THRESHOLDS",
+          "source_file": "client/src/components/WebVitalsAnalyticsView.tsx",
+          "source_location": "L21"
+        }
+      ],
+      "totalNodes": 21
+    },
+    {
+      "id": 18,
+      "name": "Auth Context & Tests",
+      "count": 21,
+      "files": [
+        "server/_core/context.ts",
+        "server/auth.logout.test.ts",
+        "server/authAccess.test.ts",
+        "server/governanceFeatures.test.ts",
+        "server/operations.test.ts",
+        "server/rentalEnquiry.test.ts",
+        "server/salesEnquiryWorkflow.test.ts",
+        "shared/const.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_auth_logout_test_authenticateduser",
+          "label": "AuthenticatedUser",
+          "source_file": "server/auth.logout.test.ts",
+          "source_location": "L11"
+        },
+        {
+          "id": "server_auth_logout_test_cookiecall",
+          "label": "CookieCall",
+          "source_file": "server/auth.logout.test.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_core_context_trpccontext",
+          "label": "TrpcContext",
+          "source_file": "server/_core/context.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_auth_logout_test_createauthcontext",
+          "label": "createAuthContext()",
+          "source_file": "server/auth.logout.test.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "server_authaccess_test_admincontext",
+          "label": "adminContext()",
+          "source_file": "server/authAccess.test.ts",
+          "source_location": "L28"
+        },
+        {
+          "id": "server_authaccess_test_departmentusercontext",
+          "label": "departmentUserContext()",
+          "source_file": "server/authAccess.test.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_authaccess_test_supervisorcontext",
+          "label": "supervisorContext()",
+          "source_file": "server/authAccess.test.ts",
+          "source_location": "L92"
+        },
+        {
+          "id": "server_governancefeatures_test_context",
+          "label": "context()",
+          "source_file": "server/governanceFeatures.test.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_operations_test_createsalescontext",
+          "label": "createSalesContext()",
+          "source_file": "server/operations.test.ts",
+          "source_location": "L24"
+        },
+        {
+          "id": "server_operations_test_createtestcontext",
+          "label": "createTestContext()",
+          "source_file": "server/operations.test.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_rentalenquiry_test_publiccontext",
+          "label": "publicContext()",
+          "source_file": "server/rentalEnquiry.test.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_salesenquiryworkflow_test_contextfor",
+          "label": "contextFor()",
+          "source_file": "server/salesEnquiryWorkflow.test.ts",
+          "source_location": "L22"
+        },
+        {
+          "id": "server_auth_logout_test",
+          "label": "auth.logout.test.ts",
+          "source_file": "server/auth.logout.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_authaccess_test",
+          "label": "authAccess.test.ts",
+          "source_file": "server/authAccess.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_context",
+          "label": "context.ts",
+          "source_file": "server/_core/context.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_governancefeatures_test",
+          "label": "governanceFeatures.test.ts",
+          "source_file": "server/governanceFeatures.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_operations_test",
+          "label": "operations.test.ts",
+          "source_file": "server/operations.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_rentalenquiry_test",
+          "label": "rentalEnquiry.test.ts",
+          "source_file": "server/rentalEnquiry.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_salesenquiryworkflow_test",
+          "label": "salesEnquiryWorkflow.test.ts",
+          "source_file": "server/salesEnquiryWorkflow.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_salesenquiryworkflow_test_enquiry",
+          "label": "enquiry",
+          "source_file": "server/salesEnquiryWorkflow.test.ts",
+          "source_location": "L6"
+        }
+      ],
+      "totalNodes": 21
+    },
+    {
+      "id": 19,
+      "name": "Attendance & Roster Tracking",
+      "count": 20,
+      "files": [
+        "client/src/pages/Home.tsx",
+        "server/attendanceRules.test.ts",
+        "shared/attendanceRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_attendancerules_attendancerecord",
+          "label": "AttendanceRecord",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "shared_attendancerules_attendancestatus",
+          "label": "AttendanceStatus",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_attendancerules_attendancesummary",
+          "label": "AttendanceSummary",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L108"
+        },
+        {
+          "id": "client_src_pages_home_attendancesummarycard",
+          "label": "AttendanceSummaryCard()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L1879"
+        },
+        {
+          "id": "client_src_pages_home_attendanceview",
+          "label": "AttendanceView()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L7104"
+        },
+        {
+          "id": "client_src_pages_home_overview",
+          "label": "Overview()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L2016"
+        },
+        {
+          "id": "shared_attendancerules_attendancecompletion",
+          "label": "attendanceCompletion()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L20"
+        },
+        {
+          "id": "shared_attendancerules_attendancerosterkey",
+          "label": "attendanceRosterKey()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L44"
+        },
+        {
+          "id": "shared_attendancerules_computemonthlyattendancesummary",
+          "label": "computeMonthlyAttendanceSummary()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L62"
+        },
+        {
+          "id": "shared_attendancerules_datekey",
+          "label": "dateKey()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L25"
+        },
+        {
+          "id": "shared_attendancerules_defaultattendancerecord",
+          "label": "defaultAttendanceRecord()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L48"
+        },
+        {
+          "id": "shared_attendancerules_formatattendancedate",
+          "label": "formatAttendanceDate()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L35"
+        },
+        {
+          "id": "shared_attendancerules_historicalattendancerecord",
+          "label": "historicalAttendanceRecord()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L54"
+        },
+        {
+          "id": "shared_attendancerules_shiftdate",
+          "label": "shiftDate()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L29"
+        },
+        {
+          "id": "shared_attendancerules_summarizeattendance",
+          "label": "summarizeAttendance()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "shared_attendancerules_updateattendance",
+          "label": "updateAttendance()",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "client_src_pages_home_attendanceroster",
+          "label": "attendanceRoster",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L456"
+        },
+        {
+          "id": "server_attendancerules_test",
+          "label": "attendanceRules.test.ts",
+          "source_file": "server/attendanceRules.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_attendancerules",
+          "label": "attendanceRules.ts",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_attendancerules_attendance_statuses",
+          "label": "ATTENDANCE_STATUSES",
+          "source_file": "shared/attendanceRules.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 20
+    },
+    {
+      "id": 20,
+      "name": "Crew Assignment Workspace",
+      "count": 19,
+      "files": [
+        "client/src/components/CrewAssignmentWorkspace.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_crewassignmentworkspace_availability",
+          "label": "Availability",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L25"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_booking",
+          "label": "Booking",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_crewsearchpreset",
+          "label": "CrewSearchPreset",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L26"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_csvcolumnkey",
+          "label": "CsvColumnKey",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L28"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_rostercrew",
+          "label": "RosterCrew",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L27"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_allocationmatches",
+          "label": "allocationMatches()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L38"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_badge",
+          "label": "Badge()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L41"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_bookingdetailsdialog",
+          "label": "BookingDetailsDialog()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L53"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_bookingidchip",
+          "label": "BookingIdChip()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L191"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_crewview",
+          "label": "CrewView()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L262"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_csvcell",
+          "label": "csvCell()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L39"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_csvcolumndialog",
+          "label": "CsvColumnDialog()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L257"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_todaykey",
+          "label": "todayKey()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L37"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_topersistedbookingid",
+          "label": "toPersistedBookingId()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L35"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_touibookingid",
+          "label": "toUiBookingId()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L36"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_undoassignmenttoast",
+          "label": "UndoAssignmentToast()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L42"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace",
+          "label": "CrewAssignmentWorkspace.tsx",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_default_export_columns",
+          "label": "DEFAULT_EXPORT_COLUMNS",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L34"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_export_columns",
+          "label": "EXPORT_COLUMNS",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L31"
+        }
+      ],
+      "totalNodes": 19
+    },
+    {
+      "id": 21,
+      "name": "OAuth & SDK Integration",
+      "count": 18,
+      "files": [
+        "client/src/const.ts",
+        "server/_core/oauth.ts",
+        "server/_core/sdk.ts",
+        "shared/const.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_sdk_authenticateduser",
+          "label": "AuthenticatedUser",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L326"
+        },
+        {
+          "id": "server_core_sdk_sessionpayload",
+          "label": "SessionPayload",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "shared_const_oauthstate",
+          "label": "OAuthState",
+          "source_file": "shared/const.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "client_src_const_startlogin",
+          "label": "startLogin()",
+          "source_file": "client/src/const.ts",
+          "source_location": "L15"
+        },
+        {
+          "id": "server_core_oauth_getqueryparam",
+          "label": "getQueryParam()",
+          "source_file": "server/_core/oauth.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "server_core_oauth_registeroauthroutes",
+          "label": "registerOAuthRoutes()",
+          "source_file": "server/_core/oauth.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "server_core_sdk_createoauthhttpclient",
+          "label": "createOAuthHttpClient()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L78"
+        },
+        {
+          "id": "shared_const_decodeoauthstate",
+          "label": "decodeOAuthState()",
+          "source_file": "shared/const.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "shared_const_encodeoauthstate",
+          "label": "encodeOAuthState()",
+          "source_file": "shared/const.ts",
+          "source_location": "L18"
+        },
+        {
+          "id": "client_src_const",
+          "label": "src/const.ts",
+          "source_file": "client/src/const.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_oauth",
+          "label": "oauth.ts",
+          "source_file": "server/_core/oauth.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_sdk",
+          "label": "sdk.ts",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_sdk_sdk",
+          "label": "sdk",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L350"
+        },
+        {
+          "id": "shared_const",
+          "label": "shared/const.ts",
+          "source_file": "shared/const.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_const_axios_timeout_ms",
+          "label": "AXIOS_TIMEOUT_MS",
+          "source_file": "shared/const.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "shared_const_cookie_name",
+          "label": "COOKIE_NAME",
+          "source_file": "shared/const.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_const_oauth_state_cookie",
+          "label": "OAUTH_STATE_COOKIE",
+          "source_file": "shared/const.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "shared_const_one_year_ms",
+          "label": "ONE_YEAR_MS",
+          "source_file": "shared/const.ts",
+          "source_location": "L3"
+        }
+      ],
+      "totalNodes": 18
+    },
+    {
+      "id": 22,
+      "name": "Notifications & Training Expiry",
+      "count": 18,
+      "files": [
+        "client/src/pages/Home.tsx",
+        "server/headerDossierSearchInteraction.test.tsx",
+        "server/newFeatures.test.ts",
+        "server/trainingData.test.ts",
+        "shared/notificationAndExpiryRules.ts",
+        "shared/trainingData.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_notificationandexpiryrules_departmentnotificationfilter",
+          "label": "DepartmentNotificationFilter",
+          "source_file": "shared/notificationAndExpiryRules.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "shared_notificationandexpiryrules_urgencyfilter",
+          "label": "UrgencyFilter",
+          "source_file": "shared/notificationAndExpiryRules.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_trainingdata_trainingcertification",
+          "label": "TrainingCertification",
+          "source_file": "shared/trainingData.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "shared_trainingdata_trainingemployee",
+          "label": "TrainingEmployee",
+          "source_file": "shared/trainingData.ts",
+          "source_location": "L11"
+        },
+        {
+          "id": "shared_trainingdata_trainingstatus",
+          "label": "TrainingStatus",
+          "source_file": "shared/trainingData.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_trainingdata_trainingworkstream",
+          "label": "TrainingWorkstream",
+          "source_file": "shared/trainingData.ts",
+          "source_location": "L2"
+        },
+        {
+          "id": "client_src_pages_home_expiringcertificateswidget",
+          "label": "ExpiringCertificatesWidget()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L1964"
+        },
+        {
+          "id": "client_src_pages_home_shell",
+          "label": "Shell()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L656"
+        },
+        {
+          "id": "shared_notificationandexpiryrules_filternotifications",
+          "label": "filterNotifications()",
+          "source_file": "shared/notificationAndExpiryRules.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "shared_notificationandexpiryrules_getexpiringtrainingemployees",
+          "label": "getExpiringTrainingEmployees()",
+          "source_file": "shared/notificationAndExpiryRules.ts",
+          "source_location": "L43"
+        },
+        {
+          "id": "server_headerdossiersearchinteraction_test",
+          "label": "headerDossierSearchInteraction.test.tsx",
+          "source_file": "server/headerDossierSearchInteraction.test.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_headerdossiersearchinteraction_test_bookings",
+          "label": "bookings",
+          "source_file": "server/headerDossierSearchInteraction.test.tsx",
+          "source_location": "L23"
+        },
+        {
+          "id": "server_newfeatures_test",
+          "label": "newFeatures.test.ts",
+          "source_file": "server/newFeatures.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_trainingdata_test",
+          "label": "trainingData.test.ts",
+          "source_file": "server/trainingData.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_notificationandexpiryrules",
+          "label": "notificationAndExpiryRules.ts",
+          "source_file": "shared/notificationAndExpiryRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_trainingdata",
+          "label": "trainingData.ts",
+          "source_file": "shared/trainingData.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_trainingdata_training_employees",
+          "label": "TRAINING_EMPLOYEES",
+          "source_file": "shared/trainingData.ts",
+          "source_location": "L20"
+        },
+        {
+          "id": "shared_trainingdata_training_source_file",
+          "label": "TRAINING_SOURCE_FILE",
+          "source_file": "shared/trainingData.ts",
+          "source_location": "L19"
+        }
+      ],
+      "totalNodes": 18
+    },
+    {
+      "id": 27,
+      "name": "Maps & Geolocation Service",
+      "count": 17,
+      "files": [
+        "server/_core/map.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_map_directionsresult",
+          "label": "DirectionsResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L105"
+        },
+        {
+          "id": "server_core_map_distancematrixresult",
+          "label": "DistanceMatrixResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L131"
+        },
+        {
+          "id": "server_core_map_elevationresult",
+          "label": "ElevationResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L209"
+        },
+        {
+          "id": "server_core_map_geocodingresult",
+          "label": "GeocodingResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L144"
+        },
+        {
+          "id": "server_core_map_latlng",
+          "label": "LatLng",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L100"
+        },
+        {
+          "id": "server_core_map_mapsconfig",
+          "label": "MapsConfig",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "server_core_map_maptype",
+          "label": "MapType",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L97"
+        },
+        {
+          "id": "server_core_map_placedetailsresult",
+          "label": "PlaceDetailsResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L182"
+        },
+        {
+          "id": "server_core_map_placessearchresult",
+          "label": "PlacesSearchResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L166"
+        },
+        {
+          "id": "server_core_map_requestoptions",
+          "label": "RequestOptions",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L41"
+        },
+        {
+          "id": "server_core_map_roadsresult",
+          "label": "RoadsResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L226"
+        },
+        {
+          "id": "server_core_map_speedunit",
+          "label": "SpeedUnit",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L98"
+        },
+        {
+          "id": "server_core_map_timezoneresult",
+          "label": "TimeZoneResult",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L218"
+        },
+        {
+          "id": "server_core_map_travelmode",
+          "label": "TravelMode",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L96"
+        },
+        {
+          "id": "server_core_map_getmapsconfig",
+          "label": "getMapsConfig()",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "server_core_map_makerequest",
+          "label": "makeRequest()",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L54"
+        },
+        {
+          "id": "server_core_map",
+          "label": "map.ts",
+          "source_file": "server/_core/map.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 17
+    },
+    {
+      "id": 24,
+      "name": "Debug Event Collector",
+      "count": 17,
+      "files": [
+        "client/public/__manus__/debug-collector.js"
+      ],
+      "nodes": [
+        {
+          "id": "client_public_manus_debug_collector_compacttext",
+          "label": "compactText()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L142"
+        },
+        {
+          "id": "client_public_manus_debug_collector_describeelement",
+          "label": "describeElement()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L161"
+        },
+        {
+          "id": "client_public_manus_debug_collector_eltext",
+          "label": "elText()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L152"
+        },
+        {
+          "id": "client_public_manus_debug_collector_formatarg",
+          "label": "formatArg()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L98"
+        },
+        {
+          "id": "client_public_manus_debug_collector_formatargs",
+          "label": "formatArgs()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L110"
+        },
+        {
+          "id": "client_public_manus_debug_collector_getinputvaluesafe",
+          "label": "getInputValueSafe()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L222"
+        },
+        {
+          "id": "client_public_manus_debug_collector_installuieventlisteners",
+          "label": "installUiEventListeners()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L252"
+        },
+        {
+          "id": "client_public_manus_debug_collector_installuieventlisteners_nav",
+          "label": "nav()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L347"
+        },
+        {
+          "id": "client_public_manus_debug_collector_issensitivefield",
+          "label": "isSensitiveField()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L206"
+        },
+        {
+          "id": "client_public_manus_debug_collector_loguievent",
+          "label": "logUiEvent()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L240"
+        },
+        {
+          "id": "client_public_manus_debug_collector_prunebuffer",
+          "label": "pruneBuffer()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L116"
+        },
+        {
+          "id": "client_public_manus_debug_collector_reportlogs",
+          "label": "reportLogs()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L716"
+        },
+        {
+          "id": "client_public_manus_debug_collector_sanitizevalue",
+          "label": "sanitizeValue()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L64"
+        },
+        {
+          "id": "client_public_manus_debug_collector_shouldignoretarget",
+          "label": "shouldIgnoreTarget()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L133"
+        },
+        {
+          "id": "client_public_manus_debug_collector_tryparsejson",
+          "label": "tryParseJson()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L120"
+        },
+        {
+          "id": "client_public_manus_debug_collector_xmlhttprequest_send",
+          "label": ".send()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L609"
+        },
+        {
+          "id": "client_public_manus_debug_collector",
+          "label": "debug-collector.js",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 17
+    },
+    {
+      "id": 25,
+      "name": "Menu Bar Components",
+      "count": 17,
+      "files": [
+        "client/src/components/ui/menubar.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_menubar_menubar",
+          "label": "Menubar()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarcheckboxitem",
+          "label": "MenubarCheckboxItem()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L112"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarcontent",
+          "label": "MenubarContent()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L65"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubargroup",
+          "label": "MenubarGroup()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubaritem",
+          "label": "MenubarItem()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L89"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarlabel",
+          "label": "MenubarLabel()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L162"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarmenu",
+          "label": "MenubarMenu()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L23"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarportal",
+          "label": "MenubarPortal()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L35"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarradiogroup",
+          "label": "MenubarRadioGroup()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L41"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarradioitem",
+          "label": "MenubarRadioItem()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L138"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarseparator",
+          "label": "MenubarSeparator()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L182"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarshortcut",
+          "label": "MenubarShortcut()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L195"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarsub",
+          "label": "MenubarSub()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L211"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarsubcontent",
+          "label": "MenubarSubContent()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L241"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubarsubtrigger",
+          "label": "MenubarSubTrigger()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L217"
+        },
+        {
+          "id": "client_src_components_ui_menubar_menubartrigger",
+          "label": "MenubarTrigger()",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L49"
+        },
+        {
+          "id": "client_src_components_ui_menubar",
+          "label": "menubar.tsx",
+          "source_file": "client/src/components/ui/menubar.tsx",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 17
+    },
+    {
+      "id": 23,
+      "name": "Dev Dependencies Bundle",
+      "count": 17,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies",
+          "label": "devDependencies",
+          "source_file": "package.json",
+          "source_location": "L85"
+        },
+        {
+          "id": "package_devdependencies_autoprefixer",
+          "label": "autoprefixer",
+          "source_file": "package.json",
+          "source_location": "L99"
+        },
+        {
+          "id": "package_devdependencies_jsdom",
+          "label": "jsdom",
+          "source_file": "package.json",
+          "source_location": "L102"
+        },
+        {
+          "id": "package_devdependencies_tailwindcss",
+          "label": "tailwindcss",
+          "source_file": "package.json",
+          "source_location": "L106"
+        },
+        {
+          "id": "package_devdependencies_testing_library_user_event",
+          "label": "@testing-library/user-event",
+          "source_file": "package.json",
+          "source_location": "L91"
+        },
+        {
+          "id": "package_devdependencies_tw_animate_css",
+          "label": "tw-animate-css",
+          "source_file": "package.json",
+          "source_location": "L108"
+        },
+        {
+          "id": "package_devdependencies_types_google_maps",
+          "label": "@types/google.maps",
+          "source_file": "package.json",
+          "source_location": "L93"
+        },
+        {
+          "id": "package_devdependencies_types_react",
+          "label": "@types/react",
+          "source_file": "package.json",
+          "source_location": "L95"
+        },
+        {
+          "id": "package_devdependencies_vite_plugin_manus_runtime",
+          "label": "vite-plugin-manus-runtime",
+          "source_file": "package.json",
+          "source_location": "L111"
+        },
+        {
+          "id": "autoprefixer",
+          "label": "autoprefixer",
+          "source_file": "package.json",
+          "source_location": "L99"
+        },
+        {
+          "id": "jsdom",
+          "label": "jsdom",
+          "source_file": "package.json",
+          "source_location": "L102"
+        },
+        {
+          "id": "tailwindcss",
+          "label": "tailwindcss",
+          "source_file": "package.json",
+          "source_location": "L106"
+        },
+        {
+          "id": "testing_library_user_event",
+          "label": "@testing-library/user-event",
+          "source_file": "package.json",
+          "source_location": "L91"
+        },
+        {
+          "id": "tw_animate_css",
+          "label": "tw-animate-css",
+          "source_file": "package.json",
+          "source_location": "L108"
+        },
+        {
+          "id": "types_google_maps",
+          "label": "@types/google.maps",
+          "source_file": "package.json",
+          "source_location": "L93"
+        },
+        {
+          "id": "types_react",
+          "label": "@types/react",
+          "source_file": "package.json",
+          "source_location": "L95"
+        },
+        {
+          "id": "vite_plugin_manus_runtime",
+          "label": "vite-plugin-manus-runtime",
+          "source_file": "package.json",
+          "source_location": "L111"
+        }
+      ],
+      "totalNodes": 17
+    },
+    {
+      "id": 26,
+      "name": "External Dependencies Bundle",
+      "count": 17,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies",
+          "label": "dependencies",
+          "source_file": "package.json",
+          "source_location": "L17"
+        },
+        {
+          "id": "package_dependencies_clsx",
+          "label": "clsx",
+          "source_file": "package.json",
+          "source_location": "L53"
+        },
+        {
+          "id": "package_dependencies_drizzle_orm",
+          "label": "drizzle-orm",
+          "source_file": "package.json",
+          "source_location": "L58"
+        },
+        {
+          "id": "package_dependencies_hookform_resolvers",
+          "label": "@hookform/resolvers",
+          "source_file": "package.json",
+          "source_location": "L20"
+        },
+        {
+          "id": "package_dependencies_next_themes",
+          "label": "next-themes",
+          "source_file": "package.json",
+          "source_location": "L67"
+        },
+        {
+          "id": "package_dependencies_radix_ui_react_avatar",
+          "label": "@radix-ui/react-avatar",
+          "source_file": "package.json",
+          "source_location": "L24"
+        },
+        {
+          "id": "package_dependencies_radix_ui_react_label",
+          "label": "@radix-ui/react-label",
+          "source_file": "package.json",
+          "source_location": "L31"
+        },
+        {
+          "id": "package_dependencies_radix_ui_react_popover",
+          "label": "@radix-ui/react-popover",
+          "source_file": "package.json",
+          "source_location": "L34"
+        },
+        {
+          "id": "package_dependencies_radix_ui_react_slider",
+          "label": "@radix-ui/react-slider",
+          "source_file": "package.json",
+          "source_location": "L40"
+        },
+        {
+          "id": "clsx",
+          "label": "clsx",
+          "source_file": "package.json",
+          "source_location": "L53"
+        },
+        {
+          "id": "drizzle_orm",
+          "label": "drizzle-orm",
+          "source_file": "package.json",
+          "source_location": "L58"
+        },
+        {
+          "id": "hookform_resolvers",
+          "label": "@hookform/resolvers",
+          "source_file": "package.json",
+          "source_location": "L20"
+        },
+        {
+          "id": "next_themes",
+          "label": "next-themes",
+          "source_file": "package.json",
+          "source_location": "L67"
+        },
+        {
+          "id": "radix_ui_react_avatar",
+          "label": "@radix-ui/react-avatar",
+          "source_file": "package.json",
+          "source_location": "L24"
+        },
+        {
+          "id": "radix_ui_react_label",
+          "label": "@radix-ui/react-label",
+          "source_file": "package.json",
+          "source_location": "L31"
+        },
+        {
+          "id": "radix_ui_react_popover",
+          "label": "@radix-ui/react-popover",
+          "source_file": "package.json",
+          "source_location": "L34"
+        },
+        {
+          "id": "radix_ui_react_slider",
+          "label": "@radix-ui/react-slider",
+          "source_file": "package.json",
+          "source_location": "L40"
+        }
+      ],
+      "totalNodes": 17
+    },
+    {
+      "id": 28,
+      "name": "Context Menu Components",
+      "count": 16,
+      "files": [
+        "client/src/components/ui/context-menu.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_context_menu_contextmenu",
+          "label": "ContextMenu()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L7"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenucheckboxitem",
+          "label": "ContextMenuCheckboxItem()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L135"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenucontent",
+          "label": "ContextMenuContent()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L94"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenugroup",
+          "label": "ContextMenuGroup()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L21"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenuitem",
+          "label": "ContextMenuItem()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L112"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenulabel",
+          "label": "ContextMenuLabel()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L185"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenuportal",
+          "label": "ContextMenuPortal()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenuradiogroup",
+          "label": "ContextMenuRadioGroup()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L43"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenuradioitem",
+          "label": "ContextMenuRadioItem()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L161"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenuseparator",
+          "label": "ContextMenuSeparator()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L205"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenushortcut",
+          "label": "ContextMenuShortcut()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L218"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenusub",
+          "label": "ContextMenuSub()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L37"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenusubcontent",
+          "label": "ContextMenuSubContent()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L78"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenusubtrigger",
+          "label": "ContextMenuSubTrigger()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L54"
+        },
+        {
+          "id": "client_src_components_ui_context_menu_contextmenutrigger",
+          "label": "ContextMenuTrigger()",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_components_ui_context_menu",
+          "label": "context-menu.tsx",
+          "source_file": "client/src/components/ui/context-menu.tsx",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 16
+    },
+    {
+      "id": 29,
+      "name": "Component Architecture Config",
+      "count": 16,
+      "files": [
+        "components.json"
+      ],
+      "nodes": [
+        {
+          "id": "components",
+          "label": "components.json",
+          "source_file": "components.json",
+          "source_location": "L1"
+        },
+        {
+          "id": "components_aliases",
+          "label": "aliases",
+          "source_file": "components.json",
+          "source_location": "L12"
+        },
+        {
+          "id": "components_aliases_components",
+          "label": "components",
+          "source_file": "components.json",
+          "source_location": "L13"
+        },
+        {
+          "id": "components_aliases_hooks",
+          "label": "hooks",
+          "source_file": "components.json",
+          "source_location": "L17"
+        },
+        {
+          "id": "components_aliases_lib",
+          "label": "lib",
+          "source_file": "components.json",
+          "source_location": "L16"
+        },
+        {
+          "id": "components_aliases_ui",
+          "label": "ui",
+          "source_file": "components.json",
+          "source_location": "L15"
+        },
+        {
+          "id": "components_aliases_utils",
+          "label": "utils",
+          "source_file": "components.json",
+          "source_location": "L14"
+        },
+        {
+          "id": "components_rsc",
+          "label": "rsc",
+          "source_file": "components.json",
+          "source_location": "L4"
+        },
+        {
+          "id": "components_schema",
+          "label": "$schema",
+          "source_file": "components.json",
+          "source_location": "L2"
+        },
+        {
+          "id": "components_style",
+          "label": "style",
+          "source_file": "components.json",
+          "source_location": "L3"
+        },
+        {
+          "id": "components_tailwind",
+          "label": "tailwind",
+          "source_file": "components.json",
+          "source_location": "L6"
+        },
+        {
+          "id": "components_tailwind_basecolor",
+          "label": "baseColor",
+          "source_file": "components.json",
+          "source_location": "L8"
+        },
+        {
+          "id": "components_tailwind_css",
+          "label": "css",
+          "source_file": "components.json",
+          "source_location": "L7"
+        },
+        {
+          "id": "components_tailwind_cssvariables",
+          "label": "cssVariables",
+          "source_file": "components.json",
+          "source_location": "L9"
+        },
+        {
+          "id": "components_tailwind_prefix",
+          "label": "prefix",
+          "source_file": "components.json",
+          "source_location": "L10"
+        },
+        {
+          "id": "components_tsx",
+          "label": "tsx",
+          "source_file": "components.json",
+          "source_location": "L5"
+        }
+      ],
+      "totalNodes": 16
+    },
+    {
+      "id": 30,
+      "name": "SDK Server Auth",
+      "count": 15,
+      "files": [
+        "server/_core/sdk.ts",
+        "server/_core/types/manusTypes.ts",
+        "shared/_core/errors.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_sdk_sdkserver",
+          "label": "SDKServer",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L84"
+        },
+        {
+          "id": "server_core_types_manustypes_getuserinfowithjwtresponse",
+          "label": "GetUserInfoWithJwtResponse",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L62"
+        },
+        {
+          "id": "server_core_sdk_buildcronuser",
+          "label": "buildCronUser()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L331"
+        },
+        {
+          "id": "server_core_sdk_isnonemptystring",
+          "label": "isNonEmptyString()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L18"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_authenticaterequest",
+          "label": ".authenticateRequest()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L258"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_constructor",
+          "label": ".constructor()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L88"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_createsessiontoken",
+          "label": ".createSessionToken()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L166"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_deriveloginmethod",
+          "label": ".deriveLoginMethod()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L93"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_getsessionsecret",
+          "label": ".getSessionSecret()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L156"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_getuserinfo",
+          "label": ".getUserInfo()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L132"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_getuserinfowithjwt",
+          "label": ".getUserInfoWithJwt()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L234"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_parsecookies",
+          "label": ".parseCookies()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L147"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_signsession",
+          "label": ".signSession()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L180"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_verifysession",
+          "label": ".verifySession()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L199"
+        },
+        {
+          "id": "shared_core_errors_forbiddenerror",
+          "label": "ForbiddenError()",
+          "source_file": "shared/_core/errors.ts",
+          "source_location": "L18"
+        }
+      ],
+      "totalNodes": 15
+    },
+    {
+      "id": 31,
+      "name": "Account & Activity Rules",
+      "count": 15,
+      "files": [
+        "server/localAuth.test.ts",
+        "shared/accountManagementRules.ts",
+        "shared/accountNotifications.ts",
+        "shared/activityRules.ts",
+        "shared/departmentAccess.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_accountmanagementrules_managedaccount",
+          "label": "ManagedAccount",
+          "source_file": "shared/accountManagementRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_activityrules_useractivityaction",
+          "label": "UserActivityAction",
+          "source_file": "shared/activityRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_activityrules_useractivityentry",
+          "label": "UserActivityEntry",
+          "source_file": "shared/activityRules.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_accountmanagementrules_canmanageaccount",
+          "label": "canManageAccount()",
+          "source_file": "shared/accountManagementRules.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "shared_accountmanagementrules_nextaccountactivestate",
+          "label": "nextAccountActiveState()",
+          "source_file": "shared/accountManagementRules.ts",
+          "source_location": "L17"
+        },
+        {
+          "id": "shared_accountmanagementrules_requiresdeactivationconfirmation",
+          "label": "requiresDeactivationConfirmation()",
+          "source_file": "shared/accountManagementRules.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "shared_accountnotifications_accountupdatenotification",
+          "label": "accountUpdateNotification()",
+          "source_file": "shared/accountNotifications.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_activityrules_accountstatusactivity",
+          "label": "accountStatusActivity()",
+          "source_file": "shared/activityRules.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "shared_activityrules_profileupdateactivity",
+          "label": "profileUpdateActivity()",
+          "source_file": "shared/activityRules.ts",
+          "source_location": "L15"
+        },
+        {
+          "id": "shared_activityrules_signinactivity",
+          "label": "signInActivity()",
+          "source_file": "shared/activityRules.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "shared_departmentaccess_departmentsforuser",
+          "label": "departmentsForUser()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L70"
+        },
+        {
+          "id": "server_localauth_test",
+          "label": "localAuth.test.ts",
+          "source_file": "server/localAuth.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_accountmanagementrules",
+          "label": "accountManagementRules.ts",
+          "source_file": "shared/accountManagementRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_accountnotifications",
+          "label": "accountNotifications.ts",
+          "source_file": "shared/accountNotifications.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_activityrules",
+          "label": "activityRules.ts",
+          "source_file": "shared/activityRules.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 15
+    },
+    {
+      "id": 32,
+      "name": "Carousel Components",
+      "count": 14,
+      "files": [
+        "client/src/components/ui/carousel.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_carousel_carouselapi",
+          "label": "CarouselApi",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L10"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselcontextprops",
+          "label": "CarouselContextProps",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L22"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouseloptions",
+          "label": "CarouselOptions",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L12"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselplugin",
+          "label": "CarouselPlugin",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselprops",
+          "label": "CarouselProps",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L15"
+        },
+        {
+          "id": "client_src_components_ui_carousel_usecarouselparameters",
+          "label": "UseCarouselParameters",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L11"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carousel",
+          "label": "Carousel()",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L43"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselcontent",
+          "label": "CarouselContent()",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L133"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselitem",
+          "label": "CarouselItem()",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L154"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselnext",
+          "label": "CarouselNext()",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L202"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselprevious",
+          "label": "CarouselPrevious()",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L172"
+        },
+        {
+          "id": "client_src_components_ui_carousel_usecarousel",
+          "label": "useCarousel()",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L33"
+        },
+        {
+          "id": "client_src_components_ui_carousel",
+          "label": "carousel.tsx",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_ui_carousel_carouselcontext",
+          "label": "CarouselContext",
+          "source_file": "client/src/components/ui/carousel.tsx",
+          "source_location": "L31"
+        }
+      ],
+      "totalNodes": 14
+    },
+    {
+      "id": 33,
+      "name": "Image Generation & Storage",
+      "count": 14,
+      "files": [
+        "server/_core/imageGeneration.ts",
+        "server/storage.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_imagegeneration_generateimageoptions",
+          "label": "GenerateImageOptions",
+          "source_file": "server/_core/imageGeneration.ts",
+          "source_location": "L26"
+        },
+        {
+          "id": "server_core_imagegeneration_generateimageresponse",
+          "label": "GenerateImageResponse",
+          "source_file": "server/_core/imageGeneration.ts",
+          "source_location": "L39"
+        },
+        {
+          "id": "server_core_imagegeneration_imagemodelinfo",
+          "label": "ImageModelInfo",
+          "source_file": "server/_core/imageGeneration.ts",
+          "source_location": "L109"
+        },
+        {
+          "id": "server_core_imagegeneration_listimagemodelsresponse",
+          "label": "ListImageModelsResponse",
+          "source_file": "server/_core/imageGeneration.ts",
+          "source_location": "L116"
+        },
+        {
+          "id": "server_core_imagegeneration_generateimage",
+          "label": "generateImage()",
+          "source_file": "server/_core/imageGeneration.ts",
+          "source_location": "L43"
+        },
+        {
+          "id": "server_core_imagegeneration_listimagemodels",
+          "label": "listImageModels()",
+          "source_file": "server/_core/imageGeneration.ts",
+          "source_location": "L124"
+        },
+        {
+          "id": "server_storage_appendhashsuffix",
+          "label": "appendHashSuffix()",
+          "source_file": "server/storage.ts",
+          "source_location": "L24"
+        },
+        {
+          "id": "server_storage_getforgeconfig",
+          "label": "getForgeConfig()",
+          "source_file": "server/storage.ts",
+          "source_location": "L7"
+        },
+        {
+          "id": "server_storage_normalizekey",
+          "label": "normalizeKey()",
+          "source_file": "server/storage.ts",
+          "source_location": "L20"
+        },
+        {
+          "id": "server_storage_storageget",
+          "label": "storageGet()",
+          "source_file": "server/storage.ts",
+          "source_location": "L74"
+        },
+        {
+          "id": "server_storage_storagegetsignedurl",
+          "label": "storageGetSignedUrl()",
+          "source_file": "server/storage.ts",
+          "source_location": "L79"
+        },
+        {
+          "id": "server_storage_storageput",
+          "label": "storagePut()",
+          "source_file": "server/storage.ts",
+          "source_location": "L31"
+        },
+        {
+          "id": "server_core_imagegeneration",
+          "label": "imageGeneration.ts",
+          "source_file": "server/_core/imageGeneration.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_storage",
+          "label": "storage.ts",
+          "source_file": "server/storage.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 14
+    },
+    {
+      "id": 34,
+      "name": "Department Access Control",
+      "count": 14,
+      "files": [
+        "server/departmentAccess.test.ts",
+        "shared/departmentAccess.test.ts",
+        "shared/departmentAccess.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_departmentaccess_departmentaccessuser",
+          "label": "DepartmentAccessUser",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L25"
+        },
+        {
+          "id": "shared_departmentaccess_departmentcode",
+          "label": "DepartmentCode",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L14"
+        },
+        {
+          "id": "shared_departmentaccess_canaccessdepartment",
+          "label": "canAccessDepartment()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L50"
+        },
+        {
+          "id": "shared_departmentaccess_canaccessworkspaceview",
+          "label": "canAccessWorkspaceView()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L76"
+        },
+        {
+          "id": "shared_departmentaccess_canmanagedepartmentusers",
+          "label": "canManageDepartmentUsers()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L38"
+        },
+        {
+          "id": "shared_departmentaccess_isadmin",
+          "label": "isAdmin()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L30"
+        },
+        {
+          "id": "shared_departmentaccess_issupervisor",
+          "label": "isSupervisor()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L34"
+        },
+        {
+          "id": "shared_departmentaccess_rolelabel",
+          "label": "roleLabel()",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L42"
+        },
+        {
+          "id": "server_departmentaccess_test",
+          "label": "server/departmentAccess.test.ts",
+          "source_file": "server/departmentAccess.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_departmentaccess",
+          "label": "departmentAccess.ts",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_departmentaccess_department_by_code",
+          "label": "DEPARTMENT_BY_CODE",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "shared_departmentaccess_department_label_to_code",
+          "label": "DEPARTMENT_LABEL_TO_CODE",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L20"
+        },
+        {
+          "id": "shared_departmentaccess_department_workspace_view",
+          "label": "DEPARTMENT_WORKSPACE_VIEW",
+          "source_file": "shared/departmentAccess.ts",
+          "source_location": "L57"
+        },
+        {
+          "id": "shared_departmentaccess_test",
+          "label": "shared/departmentAccess.test.ts",
+          "source_file": "shared/departmentAccess.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 14
+    },
+    {
+      "id": 35,
+      "name": "Heartbeat Service",
+      "count": 13,
+      "files": [
+        "server/_core/heartbeat.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_heartbeat_heartbeatjob",
+          "label": "HeartbeatJob",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "server_core_heartbeat_heartbeatjobinfo",
+          "label": "HeartbeatJobInfo",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L28"
+        },
+        {
+          "id": "server_core_heartbeat_heartbeatjobupdate",
+          "label": "HeartbeatJobUpdate",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L24"
+        },
+        {
+          "id": "server_core_heartbeat_buildendpoint",
+          "label": "buildEndpoint()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L45"
+        },
+        {
+          "id": "server_core_heartbeat_callforge",
+          "label": "callForge()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L63"
+        },
+        {
+          "id": "server_core_heartbeat_createheartbeatjob",
+          "label": "createHeartbeatJob()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L140"
+        },
+        {
+          "id": "server_core_heartbeat_deleteheartbeatjob",
+          "label": "deleteHeartbeatJob()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L186"
+        },
+        {
+          "id": "server_core_heartbeat_listheartbeatjobs",
+          "label": "listHeartbeatJobs()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L201"
+        },
+        {
+          "id": "server_core_heartbeat_mapforgeerror",
+          "label": "mapForgeError()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L102"
+        },
+        {
+          "id": "server_core_heartbeat_stringifypayload",
+          "label": "stringifyPayload()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L121"
+        },
+        {
+          "id": "server_core_heartbeat_updateheartbeatjob",
+          "label": "updateHeartbeatJob()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L163"
+        },
+        {
+          "id": "server_core_heartbeat_validatecallbackpath",
+          "label": "validateCallbackPath()",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L127"
+        },
+        {
+          "id": "server_core_heartbeat",
+          "label": "heartbeat.ts",
+          "source_file": "server/_core/heartbeat.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 13
+    },
+    {
+      "id": 36,
+      "name": "Crew Availability Rules",
+      "count": 12,
+      "files": [
+        "client/src/components/CrewAssignmentWorkspace.tsx",
+        "server/crewAssignmentAvailability.test.ts",
+        "server/crewAssignmentEnhancements.test.ts",
+        "shared/crewAssignmentAvailability.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_crewassignmentavailability_allocationtiming",
+          "label": "AllocationTiming",
+          "source_file": "shared/crewAssignmentAvailability.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "shared_crewassignmentavailability_crewavailability",
+          "label": "CrewAvailability",
+          "source_file": "shared/crewAssignmentAvailability.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_crewassignmentavailability_datedbooking",
+          "label": "DatedBooking",
+          "source_file": "shared/crewAssignmentAvailability.ts",
+          "source_location": "L22"
+        },
+        {
+          "id": "client_src_components_crewassignmentworkspace_dateavailability",
+          "label": "dateAvailability()",
+          "source_file": "client/src/components/CrewAssignmentWorkspace.tsx",
+          "source_location": "L52"
+        },
+        {
+          "id": "shared_crewassignmentavailability_allocationawareavailability",
+          "label": "allocationAwareAvailability()",
+          "source_file": "shared/crewAssignmentAvailability.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "shared_crewassignmentavailability_summarizeallocationtiming",
+          "label": "summarizeAllocationTiming()",
+          "source_file": "shared/crewAssignmentAvailability.ts",
+          "source_location": "L29"
+        },
+        {
+          "id": "server_crewassignmentavailability_test",
+          "label": "crewAssignmentAvailability.test.ts",
+          "source_file": "server/crewAssignmentAvailability.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_crewassignmentavailability_test_workspacesource",
+          "label": "workspaceSource",
+          "source_file": "server/crewAssignmentAvailability.test.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_crewassignmentenhancements_test",
+          "label": "crewAssignmentEnhancements.test.ts",
+          "source_file": "server/crewAssignmentEnhancements.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_crewassignmentenhancements_test_home",
+          "label": "home",
+          "source_file": "server/crewAssignmentEnhancements.test.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "server_crewassignmentenhancements_test_workspace",
+          "label": "workspace",
+          "source_file": "server/crewAssignmentEnhancements.test.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "shared_crewassignmentavailability",
+          "label": "crewAssignmentAvailability.ts",
+          "source_file": "shared/crewAssignmentAvailability.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 12
+    },
+    {
+      "id": 37,
+      "name": "Map View & Composition Hooks",
+      "count": 12,
+      "files": [
+        "client/src/components/Map.tsx",
+        "client/src/hooks/useComposition.ts",
+        "client/src/hooks/usePersistFn.ts"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_map_mapviewprops",
+          "label": "MapViewProps",
+          "source_file": "client/src/components/Map.tsx",
+          "source_location": "L112"
+        },
+        {
+          "id": "client_src_components_map_window",
+          "label": "Window",
+          "source_file": "client/src/components/Map.tsx",
+          "source_location": "L84"
+        },
+        {
+          "id": "client_src_hooks_usecomposition_timerresponse",
+          "label": "TimerResponse",
+          "source_file": "client/src/hooks/useComposition.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "client_src_hooks_usecomposition_usecompositionoptions",
+          "label": "UseCompositionOptions",
+          "source_file": "client/src/hooks/useComposition.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_hooks_usecomposition_usecompositionreturn",
+          "label": "UseCompositionReturn",
+          "source_file": "client/src/hooks/useComposition.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "client_src_hooks_usepersistfn_noop",
+          "label": "noop",
+          "source_file": "client/src/hooks/usePersistFn.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "client_src_components_map_loadmapscript",
+          "label": "loadMapScript()",
+          "source_file": "client/src/components/Map.tsx",
+          "source_location": "L95"
+        },
+        {
+          "id": "client_src_components_map_mapview",
+          "label": "MapView()",
+          "source_file": "client/src/components/Map.tsx",
+          "source_location": "L119"
+        },
+        {
+          "id": "client_src_hooks_usepersistfn_usepersistfn",
+          "label": "usePersistFn()",
+          "source_file": "client/src/hooks/usePersistFn.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "client_src_components_map",
+          "label": "Map.tsx",
+          "source_file": "client/src/components/Map.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_hooks_usecomposition",
+          "label": "useComposition.ts",
+          "source_file": "client/src/hooks/useComposition.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_hooks_usepersistfn",
+          "label": "usePersistFn.ts",
+          "source_file": "client/src/hooks/usePersistFn.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 12
+    },
+    {
+      "id": 38,
+      "name": "Form Control Components",
+      "count": 12,
+      "files": [
+        "client/src/components/ui/form.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_form_formfieldcontextvalue",
+          "label": "FormFieldContextValue",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L21"
+        },
+        {
+          "id": "client_src_components_ui_form_formitemcontextvalue",
+          "label": "FormItemContextValue",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L68"
+        },
+        {
+          "id": "client_src_components_ui_form_formcontrol",
+          "label": "FormControl()",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L107"
+        },
+        {
+          "id": "client_src_components_ui_form_formdescription",
+          "label": "FormDescription()",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L126"
+        },
+        {
+          "id": "client_src_components_ui_form_formfield",
+          "label": "FormField()",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L32"
+        },
+        {
+          "id": "client_src_components_ui_form_formitem",
+          "label": "FormItem()",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L76"
+        },
+        {
+          "id": "client_src_components_ui_form_formlabel",
+          "label": "FormLabel()",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L90"
+        },
+        {
+          "id": "client_src_components_ui_form_formmessage",
+          "label": "FormMessage()",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L139"
+        },
+        {
+          "id": "client_src_components_ui_form_useformfield",
+          "label": "useFormField()",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L45"
+        },
+        {
+          "id": "client_src_components_ui_form",
+          "label": "form.tsx",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_ui_form_formfieldcontext",
+          "label": "FormFieldContext",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L28"
+        },
+        {
+          "id": "client_src_components_ui_form_formitemcontext",
+          "label": "FormItemContext",
+          "source_file": "client/src/components/ui/form.tsx",
+          "source_location": "L72"
+        }
+      ],
+      "totalNodes": 12
+    },
+    {
+      "id": 39,
+      "name": "Package Configuration",
+      "count": 11,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package",
+          "label": "package.json",
+          "source_file": "package.json",
+          "source_location": "L1"
+        },
+        {
+          "id": "package_license",
+          "label": "license",
+          "source_file": "package.json",
+          "source_location": "L5"
+        },
+        {
+          "id": "package_name",
+          "label": "name",
+          "source_file": "package.json",
+          "source_location": "L2"
+        },
+        {
+          "id": "package_overrides_tailwindcss_nanoid",
+          "label": "tailwindcss>nanoid",
+          "source_file": "package.json",
+          "source_location": "L120"
+        },
+        {
+          "id": "package_packagemanager",
+          "label": "packageManager",
+          "source_file": "package.json",
+          "source_location": "L114"
+        },
+        {
+          "id": "package_patcheddependencies_wouter_3_7_1",
+          "label": "wouter@3.7.1",
+          "source_file": "package.json",
+          "source_location": "L117"
+        },
+        {
+          "id": "package_pnpm",
+          "label": "pnpm",
+          "source_file": "package.json",
+          "source_location": "L115"
+        },
+        {
+          "id": "package_pnpm_overrides",
+          "label": "overrides",
+          "source_file": "package.json",
+          "source_location": "L119"
+        },
+        {
+          "id": "package_pnpm_patcheddependencies",
+          "label": "patchedDependencies",
+          "source_file": "package.json",
+          "source_location": "L116"
+        },
+        {
+          "id": "package_type",
+          "label": "type",
+          "source_file": "package.json",
+          "source_location": "L4"
+        },
+        {
+          "id": "package_version",
+          "label": "version",
+          "source_file": "package.json",
+          "source_location": "L3"
+        }
+      ],
+      "totalNodes": 11
+    },
+    {
+      "id": 41,
+      "name": "Gear Selection & Compliance",
+      "count": 10,
+      "files": [
+        "client/src/pages/Home.tsx",
+        "server/gearDocumentRules.test.ts",
+        "shared/gearDocumentRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_geardocumentrules_gearcompliancestatus",
+          "label": "GearComplianceStatus",
+          "source_file": "shared/gearDocumentRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_pages_home_gearcertificatedialog",
+          "label": "GearCertificateDialog()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L4520"
+        },
+        {
+          "id": "client_src_pages_home_gearcreatedialog",
+          "label": "GearCreateDialog()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L4633"
+        },
+        {
+          "id": "client_src_pages_home_gearview",
+          "label": "GearView()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L4327"
+        },
+        {
+          "id": "shared_geardocumentrules_canselectgearforbooking",
+          "label": "canSelectGearForBooking()",
+          "source_file": "shared/gearDocumentRules.ts",
+          "source_location": "L14"
+        },
+        {
+          "id": "shared_geardocumentrules_formatgearvaliditydate",
+          "label": "formatGearValidityDate()",
+          "source_file": "shared/gearDocumentRules.ts",
+          "source_location": "L18"
+        },
+        {
+          "id": "shared_geardocumentrules_geardocumentstatus",
+          "label": "gearDocumentStatus()",
+          "source_file": "shared/gearDocumentRules.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "shared_geardocumentrules_isvalidgeardocumentperiod",
+          "label": "isValidGearDocumentPeriod()",
+          "source_file": "shared/gearDocumentRules.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "server_geardocumentrules_test",
+          "label": "gearDocumentRules.test.ts",
+          "source_file": "server/gearDocumentRules.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_geardocumentrules",
+          "label": "gearDocumentRules.ts",
+          "source_file": "shared/gearDocumentRules.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 42,
+      "name": "Vehicle Fleet Management",
+      "count": 10,
+      "files": [
+        "client/src/pages/Home.tsx",
+        "server/vehicleFleetRules.test.ts",
+        "shared/vehicleFleetData.ts",
+        "shared/vehicleFleetRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_vehiclefleetdata_fleetvehicle",
+          "label": "FleetVehicle",
+          "source_file": "shared/vehicleFleetData.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_vehiclefleetrules_vehicleregistrationstatus",
+          "label": "vehicleRegistrationStatus",
+          "source_file": "shared/vehicleFleetRules.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "client_src_pages_home_transportationfleetpanel",
+          "label": "TransportationFleetPanel()",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L7683"
+        },
+        {
+          "id": "shared_vehiclefleetrules_filtervehiclefleet",
+          "label": "filterVehicleFleet()",
+          "source_file": "shared/vehicleFleetRules.ts",
+          "source_location": "L23"
+        },
+        {
+          "id": "shared_vehiclefleetrules_parsemulkiyaexpiry",
+          "label": "parseMulkiyaExpiry()",
+          "source_file": "shared/vehicleFleetRules.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_vehiclefleetrules_test",
+          "label": "vehicleFleetRules.test.ts",
+          "source_file": "server/vehicleFleetRules.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_vehiclefleetdata",
+          "label": "vehicleFleetData.ts",
+          "source_file": "shared/vehicleFleetData.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_vehiclefleetdata_vehicle_fleet",
+          "label": "VEHICLE_FLEET",
+          "source_file": "shared/vehicleFleetData.ts",
+          "source_location": "L18"
+        },
+        {
+          "id": "shared_vehiclefleetdata_vehicle_fleet_source",
+          "label": "VEHICLE_FLEET_SOURCE",
+          "source_file": "shared/vehicleFleetData.ts",
+          "source_location": "L7483"
+        },
+        {
+          "id": "shared_vehiclefleetrules",
+          "label": "vehicleFleetRules.ts",
+          "source_file": "shared/vehicleFleetRules.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 43,
+      "name": "Local Authentication",
+      "count": 10,
+      "files": [
+        "drizzle/schema.ts",
+        "server/localAuth.ts"
+      ],
+      "nodes": [
+        {
+          "id": "drizzle_schema_user",
+          "label": "User",
+          "source_file": "drizzle/schema.ts",
+          "source_location": "L240"
+        },
+        {
+          "id": "server_localauth_createlocalsession",
+          "label": "createLocalSession()",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L40"
+        },
+        {
+          "id": "server_localauth_hashpassword",
+          "label": "hashPassword()",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L25"
+        },
+        {
+          "id": "server_localauth_normalizeemail",
+          "label": "normalizeEmail()",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "server_localauth_readlocalsession",
+          "label": "readLocalSession()",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L51"
+        },
+        {
+          "id": "server_localauth_sessionkey",
+          "label": "sessionKey()",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L14"
+        },
+        {
+          "id": "server_localauth_tosessionuser",
+          "label": "toSessionUser()",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L67"
+        },
+        {
+          "id": "server_localauth_verifypassword",
+          "label": "verifyPassword()",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L31"
+        },
+        {
+          "id": "server_localauth",
+          "label": "localAuth.ts",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_localauth_scryptasync",
+          "label": "scryptAsync",
+          "source_file": "server/localAuth.ts",
+          "source_location": "L9"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 45,
+      "name": "Crew Roster Data",
+      "count": 10,
+      "files": [
+        "server/attendanceCrewRoster.test.ts",
+        "shared/attendanceCrewRoster.ts",
+        "shared/crewAssignmentRoster.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_attendancecrewroster_attendancecrewmember",
+          "label": "AttendanceCrewMember",
+          "source_file": "shared/attendanceCrewRoster.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_crewassignmentroster_crewassignmentmember",
+          "label": "CrewAssignmentMember",
+          "source_file": "shared/crewAssignmentRoster.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_attendancecrewroster_isattendancecrewmember",
+          "label": "isAttendanceCrewMember()",
+          "source_file": "shared/attendanceCrewRoster.ts",
+          "source_location": "L8895"
+        },
+        {
+          "id": "shared_crewassignmentroster_isknowncrewassignmentmember",
+          "label": "isKnownCrewAssignmentMember()",
+          "source_file": "shared/crewAssignmentRoster.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "server_attendancecrewroster_test",
+          "label": "attendanceCrewRoster.test.ts",
+          "source_file": "server/attendanceCrewRoster.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_attendancecrewroster",
+          "label": "attendanceCrewRoster.ts",
+          "source_file": "shared/attendanceCrewRoster.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_attendancecrewroster_attendance_crew_roster",
+          "label": "ATTENDANCE_CREW_ROSTER",
+          "source_file": "shared/attendanceCrewRoster.ts",
+          "source_location": "L15"
+        },
+        {
+          "id": "shared_crewassignmentroster",
+          "label": "crewAssignmentRoster.ts",
+          "source_file": "shared/crewAssignmentRoster.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_crewassignmentroster_crew_assignment_roster",
+          "label": "CREW_ASSIGNMENT_ROSTER",
+          "source_file": "shared/crewAssignmentRoster.ts",
+          "source_location": "L14"
+        },
+        {
+          "id": "shared_crewassignmentroster_legacy_crew_assignment_roster",
+          "label": "LEGACY_CREW_ASSIGNMENT_ROSTER",
+          "source_file": "shared/crewAssignmentRoster.ts",
+          "source_location": "L5"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 46,
+      "name": "Booking Conflict Detection",
+      "count": 10,
+      "files": [
+        "server/bulkCrewAssignment.test.ts",
+        "shared/bulkCrewAssignmentRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_bulkcrewassignmentrules_crewidentity",
+          "label": "CrewIdentity",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "shared_bulkcrewassignmentrules_timelinebooking",
+          "label": "TimelineBooking",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_bulkcrewassignmentrules_buildbulkconflictsummary",
+          "label": "buildBulkConflictSummary()",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L32"
+        },
+        {
+          "id": "shared_bulkcrewassignmentrules_crewconflictbookings",
+          "label": "crewConflictBookings()",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "shared_bulkcrewassignmentrules_daterangesoverlap",
+          "label": "dateRangesOverlap()",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L15"
+        },
+        {
+          "id": "shared_bulkcrewassignmentrules_iscrewallocation",
+          "label": "isCrewAllocation()",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "shared_bulkcrewassignmentrules_todate",
+          "label": "toDate()",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L10"
+        },
+        {
+          "id": "server_bulkcrewassignment_test",
+          "label": "bulkCrewAssignment.test.ts",
+          "source_file": "server/bulkCrewAssignment.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_bulkcrewassignment_test_workspace",
+          "label": "workspace",
+          "source_file": "server/bulkCrewAssignment.test.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "shared_bulkcrewassignmentrules",
+          "label": "bulkCrewAssignmentRules.ts",
+          "source_file": "shared/bulkCrewAssignmentRules.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 40,
+      "name": "Card & NotFound Pages",
+      "count": 10,
+      "files": [
+        "client/src/components/ui/card.tsx",
+        "client/src/pages/NotFound.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_card_card",
+          "label": "Card()",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L5"
+        },
+        {
+          "id": "client_src_components_ui_card_cardaction",
+          "label": "CardAction()",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L51"
+        },
+        {
+          "id": "client_src_components_ui_card_cardcontent",
+          "label": "CardContent()",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L64"
+        },
+        {
+          "id": "client_src_components_ui_card_carddescription",
+          "label": "CardDescription()",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L41"
+        },
+        {
+          "id": "client_src_components_ui_card_cardfooter",
+          "label": "CardFooter()",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L74"
+        },
+        {
+          "id": "client_src_components_ui_card_cardheader",
+          "label": "CardHeader()",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L18"
+        },
+        {
+          "id": "client_src_components_ui_card_cardtitle",
+          "label": "CardTitle()",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L31"
+        },
+        {
+          "id": "client_src_pages_notfound_notfound",
+          "label": "NotFound()",
+          "source_file": "client/src/pages/NotFound.tsx",
+          "source_location": "L6"
+        },
+        {
+          "id": "client_src_components_ui_card",
+          "label": "card.tsx",
+          "source_file": "client/src/components/ui/card.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_pages_notfound",
+          "label": "NotFound.tsx",
+          "source_file": "client/src/pages/NotFound.tsx",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 47,
+      "name": "Cookies & Rate Limiting",
+      "count": 10,
+      "files": [
+        "server/_core/cookies.ts",
+        "server/_core/rateLimiter.ts",
+        "server/routers.ts",
+        "server/webVitalsAnalytics.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_cookies_getsessioncookieoptions",
+          "label": "getSessionCookieOptions()",
+          "source_file": "server/_core/cookies.ts",
+          "source_location": "L24"
+        },
+        {
+          "id": "server_core_cookies_isipaddress",
+          "label": "isIpAddress()",
+          "source_file": "server/_core/cookies.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_core_cookies_issecurerequest",
+          "label": "isSecureRequest()",
+          "source_file": "server/_core/cookies.ts",
+          "source_location": "L11"
+        },
+        {
+          "id": "server_core_ratelimiter_checktelemetryratelimit",
+          "label": "checkTelemetryRateLimit()",
+          "source_file": "server/_core/rateLimiter.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_routers_writelocalsession",
+          "label": "writeLocalSession()",
+          "source_file": "server/routers.ts",
+          "source_location": "L100"
+        },
+        {
+          "id": "server_core_cookies",
+          "label": "cookies.ts",
+          "source_file": "server/_core/cookies.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_cookies_local_hosts",
+          "label": "LOCAL_HOSTS",
+          "source_file": "server/_core/cookies.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "server_core_ratelimiter",
+          "label": "rateLimiter.ts",
+          "source_file": "server/_core/rateLimiter.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_ratelimiter_buckets",
+          "label": "buckets",
+          "source_file": "server/_core/rateLimiter.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_webvitalsanalytics_test",
+          "label": "webVitalsAnalytics.test.ts",
+          "source_file": "server/webVitalsAnalytics.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 44,
+      "name": "Build Scripts",
+      "count": 10,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_scripts",
+          "label": "scripts",
+          "source_file": "package.json",
+          "source_location": "L6"
+        },
+        {
+          "id": "package_scripts_build",
+          "label": "build",
+          "source_file": "package.json",
+          "source_location": "L8"
+        },
+        {
+          "id": "package_scripts_check",
+          "label": "check",
+          "source_file": "package.json",
+          "source_location": "L10"
+        },
+        {
+          "id": "package_scripts_db_push",
+          "label": "db:push",
+          "source_file": "package.json",
+          "source_location": "L15"
+        },
+        {
+          "id": "package_scripts_dev",
+          "label": "dev",
+          "source_file": "package.json",
+          "source_location": "L7"
+        },
+        {
+          "id": "package_scripts_format",
+          "label": "format",
+          "source_file": "package.json",
+          "source_location": "L11"
+        },
+        {
+          "id": "package_scripts_lighthouse_ci",
+          "label": "lighthouse:ci",
+          "source_file": "package.json",
+          "source_location": "L14"
+        },
+        {
+          "id": "package_scripts_start",
+          "label": "start",
+          "source_file": "package.json",
+          "source_location": "L9"
+        },
+        {
+          "id": "package_scripts_test",
+          "label": "test",
+          "source_file": "package.json",
+          "source_location": "L12"
+        },
+        {
+          "id": "package_scripts_test_e2e",
+          "label": "test:e2e",
+          "source_file": "package.json",
+          "source_location": "L13"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 48,
+      "name": "tRPC Procedures & Middleware",
+      "count": 10,
+      "files": [
+        "server/_core/systemRouter.ts",
+        "server/_core/trpc.ts",
+        "shared/const.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_systemrouter",
+          "label": "systemRouter.ts",
+          "source_file": "server/_core/systemRouter.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_trpc",
+          "label": "_core/trpc.ts",
+          "source_file": "server/_core/trpc.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_trpc_adminprocedure",
+          "label": "adminProcedure",
+          "source_file": "server/_core/trpc.ts",
+          "source_location": "L30"
+        },
+        {
+          "id": "server_core_trpc_protectedprocedure",
+          "label": "protectedProcedure",
+          "source_file": "server/_core/trpc.ts",
+          "source_location": "L28"
+        },
+        {
+          "id": "server_core_trpc_publicprocedure",
+          "label": "publicProcedure",
+          "source_file": "server/_core/trpc.ts",
+          "source_location": "L11"
+        },
+        {
+          "id": "server_core_trpc_requireuser",
+          "label": "requireUser",
+          "source_file": "server/_core/trpc.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "server_core_trpc_router",
+          "label": "router",
+          "source_file": "server/_core/trpc.ts",
+          "source_location": "L10"
+        },
+        {
+          "id": "server_core_trpc_t",
+          "label": "t",
+          "source_file": "server/_core/trpc.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "shared_const_not_admin_err_msg",
+          "label": "NOT_ADMIN_ERR_MSG",
+          "source_file": "shared/const.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "shared_const_unauthed_err_msg",
+          "label": "UNAUTHED_ERR_MSG",
+          "source_file": "shared/const.ts",
+          "source_location": "L5"
+        }
+      ],
+      "totalNodes": 10
+    },
+    {
+      "id": 50,
+      "name": "Voice Transcription Service",
+      "count": 9,
+      "files": [
+        "server/_core/voiceTranscription.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_voicetranscription_transcribeoptions",
+          "label": "TranscribeOptions",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L30"
+        },
+        {
+          "id": "server_core_voicetranscription_transcriptionerror",
+          "label": "TranscriptionError",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L61"
+        },
+        {
+          "id": "server_core_voicetranscription_transcriptionresponse",
+          "label": "TranscriptionResponse",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L59"
+        },
+        {
+          "id": "server_core_voicetranscription_whisperresponse",
+          "label": "WhisperResponse",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L51"
+        },
+        {
+          "id": "server_core_voicetranscription_whispersegment",
+          "label": "WhisperSegment",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L37"
+        },
+        {
+          "id": "server_core_voicetranscription_getfileextension",
+          "label": "getFileExtension()",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L200"
+        },
+        {
+          "id": "server_core_voicetranscription_getlanguagename",
+          "label": "getLanguageName()",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L218"
+        },
+        {
+          "id": "server_core_voicetranscription_transcribeaudio",
+          "label": "transcribeAudio()",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L73"
+        },
+        {
+          "id": "server_core_voicetranscription",
+          "label": "voiceTranscription.ts",
+          "source_file": "server/_core/voiceTranscription.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 9
+    },
+    {
+      "id": 51,
+      "name": "Vite Build & Logging",
+      "count": 9,
+      "files": [
+        "vite.config.ts"
+      ],
+      "nodes": [
+        {
+          "id": "vite_config_logsource",
+          "label": "LogSource",
+          "source_file": "vite.config.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "vite_config_ensurelogdir",
+          "label": "ensureLogDir()",
+          "source_file": "vite.config.ts",
+          "source_location": "L21"
+        },
+        {
+          "id": "vite_config_trimlogfile",
+          "label": "trimLogFile()",
+          "source_file": "vite.config.ts",
+          "source_location": "L27"
+        },
+        {
+          "id": "vite_config_vitepluginmanusdebugcollector",
+          "label": "vitePluginManusDebugCollector()",
+          "source_file": "vite.config.ts",
+          "source_location": "L77"
+        },
+        {
+          "id": "vite_config_writetologfile",
+          "label": "writeToLogFile()",
+          "source_file": "vite.config.ts",
+          "source_location": "L52"
+        },
+        {
+          "id": "vite_config",
+          "label": "vite.config.ts",
+          "source_file": "vite.config.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "vite_config_log_dir",
+          "label": "LOG_DIR",
+          "source_file": "vite.config.ts",
+          "source_location": "L15"
+        },
+        {
+          "id": "vite_config_plugins",
+          "label": "plugins",
+          "source_file": "vite.config.ts",
+          "source_location": "L153"
+        },
+        {
+          "id": "vite_config_trim_target_bytes",
+          "label": "TRIM_TARGET_BYTES",
+          "source_file": "vite.config.ts",
+          "source_location": "L17"
+        }
+      ],
+      "totalNodes": 9
+    },
+    {
+      "id": 49,
+      "name": "Server Bootstrap & Vite",
+      "count": 9,
+      "files": [
+        "server/_core/context.ts",
+        "server/_core/index.ts",
+        "server/_core/storageProxy.ts",
+        "server/_core/vite.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_context_createcontext",
+          "label": "createContext()",
+          "source_file": "server/_core/context.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "server_core_index_findavailableport",
+          "label": "findAvailablePort()",
+          "source_file": "server/_core/index.ts",
+          "source_location": "L22"
+        },
+        {
+          "id": "server_core_index_isportavailable",
+          "label": "isPortAvailable()",
+          "source_file": "server/_core/index.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "server_core_index_startserver",
+          "label": "startServer()",
+          "source_file": "server/_core/index.ts",
+          "source_location": "L31"
+        },
+        {
+          "id": "server_core_storageproxy_registerstorageproxy",
+          "label": "registerStorageProxy()",
+          "source_file": "server/_core/storageProxy.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "server_core_vite_servestatic",
+          "label": "serveStatic()",
+          "source_file": "server/_core/vite.ts",
+          "source_location": "L50"
+        },
+        {
+          "id": "server_core_vite_setupvite",
+          "label": "setupVite()",
+          "source_file": "server/_core/vite.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "server_core_index",
+          "label": "index.ts",
+          "source_file": "server/_core/index.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_vite",
+          "label": "vite.ts",
+          "source_file": "server/_core/vite.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 9
+    },
+    {
+      "id": 52,
+      "name": "System Router & Notifications",
+      "count": 8,
+      "files": [
+        "server/_core/notification.ts",
+        "server/_core/systemRouter.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_notification_notificationpayload",
+          "label": "NotificationPayload",
+          "source_file": "server/_core/notification.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "server_core_notification_buildendpointurl",
+          "label": "buildEndpointUrl()",
+          "source_file": "server/_core/notification.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "server_core_notification_isnonemptystring",
+          "label": "isNonEmptyString()",
+          "source_file": "server/_core/notification.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "server_core_notification_notifyowner",
+          "label": "notifyOwner()",
+          "source_file": "server/_core/notification.ts",
+          "source_location": "L66"
+        },
+        {
+          "id": "server_core_notification_trimvalue",
+          "label": "trimValue()",
+          "source_file": "server/_core/notification.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "server_core_notification_validatepayload",
+          "label": "validatePayload()",
+          "source_file": "server/_core/notification.ts",
+          "source_location": "L26"
+        },
+        {
+          "id": "server_core_notification",
+          "label": "notification.ts",
+          "source_file": "server/_core/notification.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_systemrouter_systemrouter",
+          "label": "systemRouter",
+          "source_file": "server/_core/systemRouter.ts",
+          "source_location": "L5"
+        }
+      ],
+      "totalNodes": 8
+    },
+    {
+      "id": 53,
+      "name": "OAuth Service Exchange",
+      "count": 8,
+      "files": [
+        "server/_core/sdk.ts",
+        "server/_core/types/manusTypes.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_sdk_oauthservice",
+          "label": "OAuthService",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L31"
+        },
+        {
+          "id": "server_core_types_manustypes_exchangetokenresponse",
+          "label": "ExchangeTokenResponse",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L26"
+        },
+        {
+          "id": "server_core_types_manustypes_getuserinforesponse",
+          "label": "GetUserInfoResponse",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L39"
+        },
+        {
+          "id": "server_core_sdk_oauthservice_constructor",
+          "label": ".constructor()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L32"
+        },
+        {
+          "id": "server_core_sdk_oauthservice_decodestate",
+          "label": ".decodeState()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L41"
+        },
+        {
+          "id": "server_core_sdk_oauthservice_gettokenbycode",
+          "label": ".getTokenByCode()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L45"
+        },
+        {
+          "id": "server_core_sdk_oauthservice_getuserinfobytoken",
+          "label": ".getUserInfoByToken()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L64"
+        },
+        {
+          "id": "server_core_sdk_sdkserver_exchangecodefortoken",
+          "label": ".exchangeCodeForToken()",
+          "source_file": "server/_core/sdk.ts",
+          "source_location": "L120"
+        }
+      ],
+      "totalNodes": 8
+    },
+    {
+      "id": 54,
+      "name": "Manus API Types",
+      "count": 8,
+      "files": [
+        "server/_core/types/manusTypes.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_types_manustypes_authorizerequest",
+          "label": "AuthorizeRequest",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_core_types_manustypes_authorizeresponse",
+          "label": "AuthorizeResponse",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "server_core_types_manustypes_canaccessrequest",
+          "label": "CanAccessRequest",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L48"
+        },
+        {
+          "id": "server_core_types_manustypes_canaccessresponse",
+          "label": "CanAccessResponse",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L53"
+        },
+        {
+          "id": "server_core_types_manustypes_exchangetokenrequest",
+          "label": "ExchangeTokenRequest",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L17"
+        },
+        {
+          "id": "server_core_types_manustypes_getuserinforequest",
+          "label": "GetUserInfoRequest",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L35"
+        },
+        {
+          "id": "server_core_types_manustypes_getuserinfowithjwtrequest",
+          "label": "GetUserInfoWithJwtRequest",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L57"
+        },
+        {
+          "id": "server_core_types_manustypes",
+          "label": "manusTypes.ts",
+          "source_file": "server/_core/types/manusTypes.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 8
+    },
+    {
+      "id": 55,
+      "name": "Runtime Monitoring Rules",
+      "count": 8,
+      "files": [
+        "server/runtimeMonitoring.test.ts",
+        "shared/runtimeMonitoring.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_runtimemonitoring_runtimeerrorsource",
+          "label": "RuntimeErrorSource",
+          "source_file": "shared/runtimeMonitoring.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_runtimemonitoring_runtimeerrorfingerprint",
+          "label": "runtimeErrorFingerprint()",
+          "source_file": "shared/runtimeMonitoring.ts",
+          "source_location": "L12"
+        },
+        {
+          "id": "shared_runtimemonitoring_sanitizeruntimemessage",
+          "label": "sanitizeRuntimeMessage()",
+          "source_file": "shared/runtimeMonitoring.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "server_runtimemonitoring_test",
+          "label": "runtimeMonitoring.test.ts",
+          "source_file": "server/runtimeMonitoring.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_runtimemonitoring_test_crewworkspace",
+          "label": "crewWorkspace",
+          "source_file": "server/runtimeMonitoring.test.ts",
+          "source_location": "L7"
+        },
+        {
+          "id": "server_runtimemonitoring_test_monitoringpanel",
+          "label": "monitoringPanel",
+          "source_file": "server/runtimeMonitoring.test.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "server_runtimemonitoring_test_reporter",
+          "label": "reporter",
+          "source_file": "server/runtimeMonitoring.test.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "shared_runtimemonitoring",
+          "label": "runtimeMonitoring.ts",
+          "source_file": "shared/runtimeMonitoring.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 8
+    },
+    {
+      "id": 57,
+      "name": "Booking Conflict Rules",
+      "count": 7,
+      "files": [
+        "server/bookingConflictRules.test.ts",
+        "shared/bookingConflictRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_bookingconflictrules_bookingwindow",
+          "label": "BookingWindow",
+          "source_file": "shared/bookingConflictRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_bookingconflictrules_bookingwindowsoverlap",
+          "label": "bookingWindowsOverlap()",
+          "source_file": "shared/bookingConflictRules.ts",
+          "source_location": "L18"
+        },
+        {
+          "id": "shared_bookingconflictrules_findemployeebookingconflicts",
+          "label": "findEmployeeBookingConflicts()",
+          "source_file": "shared/bookingConflictRules.ts",
+          "source_location": "L27"
+        },
+        {
+          "id": "shared_bookingconflictrules_parsedate",
+          "label": "parseDate()",
+          "source_file": "shared/bookingConflictRules.ts",
+          "source_location": "L13"
+        },
+        {
+          "id": "shared_bookingconflictrules_toggleemployeebookingallocation",
+          "label": "toggleEmployeeBookingAllocation()",
+          "source_file": "shared/bookingConflictRules.ts",
+          "source_location": "L42"
+        },
+        {
+          "id": "server_bookingconflictrules_test",
+          "label": "bookingConflictRules.test.ts",
+          "source_file": "server/bookingConflictRules.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_bookingconflictrules",
+          "label": "bookingConflictRules.ts",
+          "source_file": "shared/bookingConflictRules.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 7
+    },
+    {
+      "id": 58,
+      "name": "Shared Error Types",
+      "count": 7,
+      "files": [
+        "shared/_core/errors.ts",
+        "shared/types.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_core_errors_httperror",
+          "label": "HttpError",
+          "source_file": "shared/_core/errors.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "shared_core_errors_badrequesterror",
+          "label": "BadRequestError()",
+          "source_file": "shared/_core/errors.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "shared_core_errors_httperror_constructor",
+          "label": ".constructor()",
+          "source_file": "shared/_core/errors.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "shared_core_errors_notfounderror",
+          "label": "NotFoundError()",
+          "source_file": "shared/_core/errors.ts",
+          "source_location": "L19"
+        },
+        {
+          "id": "shared_core_errors_unauthorizederror",
+          "label": "UnauthorizedError()",
+          "source_file": "shared/_core/errors.ts",
+          "source_location": "L17"
+        },
+        {
+          "id": "shared_core_errors",
+          "label": "errors.ts",
+          "source_file": "shared/_core/errors.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_types",
+          "label": "types.ts",
+          "source_file": "shared/types.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 7
+    },
+    {
+      "id": 56,
+      "name": "Toggle Components",
+      "count": 7,
+      "files": [
+        "client/src/components/ui/toggle-group.tsx",
+        "client/src/components/ui/toggle.tsx"
+      ],
+      "nodes": [
+        {
+          "id": "client_src_components_ui_toggle_group_togglegroup",
+          "label": "ToggleGroup()",
+          "source_file": "client/src/components/ui/toggle-group.tsx",
+          "source_location": "L17"
+        },
+        {
+          "id": "client_src_components_ui_toggle_group_togglegroupitem",
+          "label": "ToggleGroupItem()",
+          "source_file": "client/src/components/ui/toggle-group.tsx",
+          "source_location": "L43"
+        },
+        {
+          "id": "client_src_components_ui_toggle_toggle",
+          "label": "Toggle()",
+          "source_file": "client/src/components/ui/toggle.tsx",
+          "source_location": "L29"
+        },
+        {
+          "id": "client_src_components_ui_toggle",
+          "label": "toggle.tsx",
+          "source_file": "client/src/components/ui/toggle.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_ui_toggle_group",
+          "label": "toggle-group.tsx",
+          "source_file": "client/src/components/ui/toggle-group.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "client_src_components_ui_toggle_group_togglegroupcontext",
+          "label": "ToggleGroupContext",
+          "source_file": "client/src/components/ui/toggle-group.tsx",
+          "source_location": "L10"
+        },
+        {
+          "id": "client_src_components_ui_toggle_togglevariants",
+          "label": "toggleVariants",
+          "source_file": "client/src/components/ui/toggle.tsx",
+          "source_location": "L7"
+        }
+      ],
+      "totalNodes": 7
+    },
+    {
+      "id": 59,
+      "name": "Assignment UI Tests",
+      "count": 6,
+      "files": [
+        "client/src/pages/Home.tsx",
+        "server/assignmentUi.test.tsx",
+        "shared/bookingConflictRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_bookingconflictrules_employeeallocation",
+          "label": "EmployeeAllocation",
+          "source_file": "shared/bookingConflictRules.ts",
+          "source_location": "L7"
+        },
+        {
+          "id": "server_assignmentui_test_assignmentharness",
+          "label": "AssignmentHarness()",
+          "source_file": "server/assignmentUi.test.tsx",
+          "source_location": "L40"
+        },
+        {
+          "id": "client_src_pages_home_crewview",
+          "label": "CrewView",
+          "source_file": "client/src/pages/Home.tsx",
+          "source_location": "L65"
+        },
+        {
+          "id": "server_assignmentui_test",
+          "label": "assignmentUi.test.tsx",
+          "source_file": "server/assignmentUi.test.tsx",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_assignmentui_test_booking",
+          "label": "booking",
+          "source_file": "server/assignmentUi.test.tsx",
+          "source_location": "L25"
+        },
+        {
+          "id": "server_assignmentui_test_savecrewallocations",
+          "label": "saveCrewAllocations",
+          "source_file": "server/assignmentUi.test.tsx",
+          "source_location": "L11"
+        }
+      ],
+      "totalNodes": 6
+    },
+    {
+      "id": 60,
+      "name": "Assignment Rules",
+      "count": 6,
+      "files": [
+        "server/assignmentRules.test.ts",
+        "shared/assignmentRules.ts"
+      ],
+      "nodes": [
+        {
+          "id": "shared_assignmentrules_assignmentallocation",
+          "label": "AssignmentAllocation",
+          "source_file": "shared/assignmentRules.ts",
+          "source_location": "L3"
+        },
+        {
+          "id": "shared_assignmentrules_assignmentbooking",
+          "label": "AssignmentBooking",
+          "source_file": "shared/assignmentRules.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_assignmentrules_assignedemployeeforbooking",
+          "label": "assignedEmployeeForBooking()",
+          "source_file": "shared/assignmentRules.ts",
+          "source_location": "L14"
+        },
+        {
+          "id": "shared_assignmentrules_focusassignmentbooking",
+          "label": "focusAssignmentBooking()",
+          "source_file": "shared/assignmentRules.ts",
+          "source_location": "L8"
+        },
+        {
+          "id": "server_assignmentrules_test",
+          "label": "assignmentRules.test.ts",
+          "source_file": "server/assignmentRules.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "shared_assignmentrules",
+          "label": "assignmentRules.ts",
+          "source_file": "shared/assignmentRules.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 6
+    },
+    {
+      "id": 61,
+      "name": "Data API & Environment",
+      "count": 6,
+      "files": [
+        "server/_core/dataApi.ts",
+        "server/_core/env.ts",
+        "server/_core/storageProxy.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_dataapi_dataapicalloptions",
+          "label": "DataApiCallOptions",
+          "source_file": "server/_core/dataApi.ts",
+          "source_location": "L9"
+        },
+        {
+          "id": "server_core_dataapi_calldataapi",
+          "label": "callDataApi()",
+          "source_file": "server/_core/dataApi.ts",
+          "source_location": "L16"
+        },
+        {
+          "id": "server_core_dataapi",
+          "label": "dataApi.ts",
+          "source_file": "server/_core/dataApi.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_env",
+          "label": "env.ts",
+          "source_file": "server/_core/env.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_env_env",
+          "label": "ENV",
+          "source_file": "server/_core/env.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_storageproxy",
+          "label": "storageProxy.ts",
+          "source_file": "server/_core/storageProxy.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 6
+    },
+    {
+      "id": 62,
+      "name": "Booking CRUD Operations",
+      "count": 4,
+      "files": [
+        "server/db.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_db_createbooking",
+          "label": "createBooking()",
+          "source_file": "server/db.ts",
+          "source_location": "L479"
+        },
+        {
+          "id": "server_db_getbookingbyid",
+          "label": "getBookingById()",
+          "source_file": "server/db.ts",
+          "source_location": "L468"
+        },
+        {
+          "id": "server_db_updatebookingassignment",
+          "label": "updateBookingAssignment()",
+          "source_file": "server/db.ts",
+          "source_location": "L527"
+        },
+        {
+          "id": "server_db_updatebookingstage",
+          "label": "updateBookingStage()",
+          "source_file": "server/db.ts",
+          "source_location": "L520"
+        }
+      ],
+      "totalNodes": 4
+    },
+    {
+      "id": 63,
+      "name": "Department Dashboard CRUD",
+      "count": 4,
+      "files": [
+        "server/db.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_db_createprovisioneddepartmentdashboard",
+          "label": "createProvisionedDepartmentDashboard()",
+          "source_file": "server/db.ts",
+          "source_location": "L814"
+        },
+        {
+          "id": "server_db_getprovisioneddepartmentdashboard",
+          "label": "getProvisionedDepartmentDashboard()",
+          "source_file": "server/db.ts",
+          "source_location": "L786"
+        },
+        {
+          "id": "server_db_setprovisioneddepartmentactive",
+          "label": "setProvisionedDepartmentActive()",
+          "source_file": "server/db.ts",
+          "source_location": "L870"
+        },
+        {
+          "id": "server_db_updateprovisioneddepartmentdashboardconfig",
+          "label": "updateProvisionedDepartmentDashboardConfig()",
+          "source_file": "server/db.ts",
+          "source_location": "L851"
+        }
+      ],
+      "totalNodes": 4
+    },
+    {
+      "id": 64,
+      "name": "Performance Workspace Tests",
+      "count": 4,
+      "files": [
+        "server/performanceWorkspaceExperience.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_performanceworkspaceexperience_test",
+          "label": "performanceWorkspaceExperience.test.ts",
+          "source_file": "server/performanceWorkspaceExperience.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_performanceworkspaceexperience_test_analytics",
+          "label": "analytics",
+          "source_file": "server/performanceWorkspaceExperience.test.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "server_performanceworkspaceexperience_test_styles",
+          "label": "styles",
+          "source_file": "server/performanceWorkspaceExperience.test.ts",
+          "source_location": "L6"
+        },
+        {
+          "id": "server_performanceworkspaceexperience_test_workspace",
+          "label": "workspace",
+          "source_file": "server/performanceWorkspaceExperience.test.ts",
+          "source_location": "L5"
+        }
+      ],
+      "totalNodes": 4
+    },
+    {
+      "id": 65,
+      "name": "Lighthouse CI Check",
+      "count": 3,
+      "files": [
+        "scripts/lighthouseCiCheck.mjs"
+      ],
+      "nodes": [
+        {
+          "id": "scripts_lighthousecicheck_checkserver",
+          "label": "checkServer()",
+          "source_file": "scripts/lighthouseCiCheck.mjs",
+          "source_location": "L4"
+        },
+        {
+          "id": "scripts_lighthousecicheck_run",
+          "label": "run()",
+          "source_file": "scripts/lighthouseCiCheck.mjs",
+          "source_location": "L14"
+        },
+        {
+          "id": "scripts_lighthousecicheck",
+          "label": "lighthouseCiCheck.mjs",
+          "source_file": "scripts/lighthouseCiCheck.mjs",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 3
+    },
+    {
+      "id": 66,
+      "name": "Rental Enquiry CRUD",
+      "count": 3,
+      "files": [
+        "server/db.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_db_getrentalenquirybyid",
+          "label": "getRentalEnquiryById()",
+          "source_file": "server/db.ts",
+          "source_location": "L1014"
+        },
+        {
+          "id": "server_db_markrentalenquiryconverted",
+          "label": "markRentalEnquiryConverted()",
+          "source_file": "server/db.ts",
+          "source_location": "L1039"
+        },
+        {
+          "id": "server_db_updaterentalenquirysalescontext",
+          "label": "updateRentalEnquirySalesContext()",
+          "source_file": "server/db.ts",
+          "source_location": "L1025"
+        }
+      ],
+      "totalNodes": 3
+    },
+    {
+      "id": 67,
+      "name": "Document Metadata CRUD",
+      "count": 3,
+      "files": [
+        "server/db.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_db_listpersisteddocumentmetadata",
+          "label": "listPersistedDocumentMetadata()",
+          "source_file": "server/db.ts",
+          "source_location": "L1615"
+        },
+        {
+          "id": "server_db_normalizetags",
+          "label": "normalizeTags()",
+          "source_file": "server/db.ts",
+          "source_location": "L1546"
+        },
+        {
+          "id": "server_db_upsertpersisteddocumentmetadata",
+          "label": "upsertPersistedDocumentMetadata()",
+          "source_file": "server/db.ts",
+          "source_location": "L1628"
+        }
+      ],
+      "totalNodes": 3
+    },
+    {
+      "id": 68,
+      "name": "Community 68",
+      "count": 3,
+      "files": [
+        "server/headerDossierSearch.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_headerdossiersearch_test",
+          "label": "headerDossierSearch.test.ts",
+          "source_file": "server/headerDossierSearch.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_headerdossiersearch_test_css",
+          "label": "css",
+          "source_file": "server/headerDossierSearch.test.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_headerdossiersearch_test_source",
+          "label": "source",
+          "source_file": "server/headerDossierSearch.test.ts",
+          "source_location": "L4"
+        }
+      ],
+      "totalNodes": 3
+    },
+    {
+      "id": 69,
+      "name": "Community 69",
+      "count": 3,
+      "files": [
+        "server/industrialTheme.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_industrialtheme_test",
+          "label": "industrialTheme.test.ts",
+          "source_file": "server/industrialTheme.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_industrialtheme_test_css",
+          "label": "css",
+          "source_file": "server/industrialTheme.test.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "server_industrialtheme_test_html",
+          "label": "html",
+          "source_file": "server/industrialTheme.test.ts",
+          "source_location": "L5"
+        }
+      ],
+      "totalNodes": 3
+    },
+    {
+      "id": 70,
+      "name": "Community 70",
+      "count": 3,
+      "files": [
+        "server/pageLocalSearch.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_pagelocalsearch_test",
+          "label": "pageLocalSearch.test.ts",
+          "source_file": "server/pageLocalSearch.test.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_pagelocalsearch_test_crew",
+          "label": "crew",
+          "source_file": "server/pageLocalSearch.test.ts",
+          "source_location": "L5"
+        },
+        {
+          "id": "server_pagelocalsearch_test_home",
+          "label": "home",
+          "source_file": "server/pageLocalSearch.test.ts",
+          "source_location": "L4"
+        }
+      ],
+      "totalNodes": 3
+    },
+    {
+      "id": 149,
+      "name": "Community 149",
+      "count": 2,
+      "files": [
+        "server/salesResponseExpansion.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_salesresponseexpansion_test_read",
+          "label": "read()",
+          "source_file": "server/salesResponseExpansion.test.ts",
+          "source_location": "L4"
+        },
+        {
+          "id": "server_salesresponseexpansion_test",
+          "label": "salesResponseExpansion.test.ts",
+          "source_file": "server/salesResponseExpansion.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 100,
+      "name": "Community 100",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_hover_card",
+          "label": "@radix-ui/react-hover-card",
+          "source_file": "package.json",
+          "source_location": "L30"
+        },
+        {
+          "id": "radix_ui_react_hover_card",
+          "label": "@radix-ui/react-hover-card",
+          "source_file": "package.json",
+          "source_location": "L30"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 101,
+      "name": "Community 101",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_menubar",
+          "label": "@radix-ui/react-menubar",
+          "source_file": "package.json",
+          "source_location": "L32"
+        },
+        {
+          "id": "radix_ui_react_menubar",
+          "label": "@radix-ui/react-menubar",
+          "source_file": "package.json",
+          "source_location": "L32"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 102,
+      "name": "Community 102",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_navigation_menu",
+          "label": "@radix-ui/react-navigation-menu",
+          "source_file": "package.json",
+          "source_location": "L33"
+        },
+        {
+          "id": "radix_ui_react_navigation_menu",
+          "label": "@radix-ui/react-navigation-menu",
+          "source_file": "package.json",
+          "source_location": "L33"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 103,
+      "name": "Community 103",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_progress",
+          "label": "@radix-ui/react-progress",
+          "source_file": "package.json",
+          "source_location": "L35"
+        },
+        {
+          "id": "radix_ui_react_progress",
+          "label": "@radix-ui/react-progress",
+          "source_file": "package.json",
+          "source_location": "L35"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 104,
+      "name": "Community 104",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_radio_group",
+          "label": "@radix-ui/react-radio-group",
+          "source_file": "package.json",
+          "source_location": "L36"
+        },
+        {
+          "id": "radix_ui_react_radio_group",
+          "label": "@radix-ui/react-radio-group",
+          "source_file": "package.json",
+          "source_location": "L36"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 105,
+      "name": "Community 105",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_scroll_area",
+          "label": "@radix-ui/react-scroll-area",
+          "source_file": "package.json",
+          "source_location": "L37"
+        },
+        {
+          "id": "radix_ui_react_scroll_area",
+          "label": "@radix-ui/react-scroll-area",
+          "source_file": "package.json",
+          "source_location": "L37"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 106,
+      "name": "Community 106",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_select",
+          "label": "@radix-ui/react-select",
+          "source_file": "package.json",
+          "source_location": "L38"
+        },
+        {
+          "id": "radix_ui_react_select",
+          "label": "@radix-ui/react-select",
+          "source_file": "package.json",
+          "source_location": "L38"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 107,
+      "name": "Community 107",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_separator",
+          "label": "@radix-ui/react-separator",
+          "source_file": "package.json",
+          "source_location": "L39"
+        },
+        {
+          "id": "radix_ui_react_separator",
+          "label": "@radix-ui/react-separator",
+          "source_file": "package.json",
+          "source_location": "L39"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 108,
+      "name": "Community 108",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_slot",
+          "label": "@radix-ui/react-slot",
+          "source_file": "package.json",
+          "source_location": "L41"
+        },
+        {
+          "id": "radix_ui_react_slot",
+          "label": "@radix-ui/react-slot",
+          "source_file": "package.json",
+          "source_location": "L41"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 109,
+      "name": "Community 109",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_switch",
+          "label": "@radix-ui/react-switch",
+          "source_file": "package.json",
+          "source_location": "L42"
+        },
+        {
+          "id": "radix_ui_react_switch",
+          "label": "@radix-ui/react-switch",
+          "source_file": "package.json",
+          "source_location": "L42"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 110,
+      "name": "Community 110",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_tabs",
+          "label": "@radix-ui/react-tabs",
+          "source_file": "package.json",
+          "source_location": "L43"
+        },
+        {
+          "id": "radix_ui_react_tabs",
+          "label": "@radix-ui/react-tabs",
+          "source_file": "package.json",
+          "source_location": "L43"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 111,
+      "name": "Community 111",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_toggle",
+          "label": "@radix-ui/react-toggle",
+          "source_file": "package.json",
+          "source_location": "L44"
+        },
+        {
+          "id": "radix_ui_react_toggle",
+          "label": "@radix-ui/react-toggle",
+          "source_file": "package.json",
+          "source_location": "L44"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 112,
+      "name": "Community 112",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_toggle_group",
+          "label": "@radix-ui/react-toggle-group",
+          "source_file": "package.json",
+          "source_location": "L45"
+        },
+        {
+          "id": "radix_ui_react_toggle_group",
+          "label": "@radix-ui/react-toggle-group",
+          "source_file": "package.json",
+          "source_location": "L45"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 113,
+      "name": "Community 113",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_tooltip",
+          "label": "@radix-ui/react-tooltip",
+          "source_file": "package.json",
+          "source_location": "L46"
+        },
+        {
+          "id": "radix_ui_react_tooltip",
+          "label": "@radix-ui/react-tooltip",
+          "source_file": "package.json",
+          "source_location": "L46"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 114,
+      "name": "Community 114",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_react",
+          "label": "react",
+          "source_file": "package.json",
+          "source_location": "L69"
+        },
+        {
+          "id": "react",
+          "label": "react",
+          "source_file": "package.json",
+          "source_location": "L69"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 115,
+      "name": "Community 115",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_react_day_picker",
+          "label": "react-day-picker",
+          "source_file": "package.json",
+          "source_location": "L70"
+        },
+        {
+          "id": "react_day_picker",
+          "label": "react-day-picker",
+          "source_file": "package.json",
+          "source_location": "L70"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 116,
+      "name": "Community 116",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_react_dom",
+          "label": "react-dom",
+          "source_file": "package.json",
+          "source_location": "L71"
+        },
+        {
+          "id": "react_dom",
+          "label": "react-dom",
+          "source_file": "package.json",
+          "source_location": "L71"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 117,
+      "name": "Community 117",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_react_hook_form",
+          "label": "react-hook-form",
+          "source_file": "package.json",
+          "source_location": "L72"
+        },
+        {
+          "id": "react_hook_form",
+          "label": "react-hook-form",
+          "source_file": "package.json",
+          "source_location": "L72"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 118,
+      "name": "Community 118",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_react_resizable_panels",
+          "label": "react-resizable-panels",
+          "source_file": "package.json",
+          "source_location": "L73"
+        },
+        {
+          "id": "react_resizable_panels",
+          "label": "react-resizable-panels",
+          "source_file": "package.json",
+          "source_location": "L73"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 119,
+      "name": "Community 119",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_recharts",
+          "label": "recharts",
+          "source_file": "package.json",
+          "source_location": "L74"
+        },
+        {
+          "id": "recharts",
+          "label": "recharts",
+          "source_file": "package.json",
+          "source_location": "L74"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 120,
+      "name": "Community 120",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_sonner",
+          "label": "sonner",
+          "source_file": "package.json",
+          "source_location": "L75"
+        },
+        {
+          "id": "sonner",
+          "label": "sonner",
+          "source_file": "package.json",
+          "source_location": "L75"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 121,
+      "name": "Community 121",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_streamdown",
+          "label": "streamdown",
+          "source_file": "package.json",
+          "source_location": "L76"
+        },
+        {
+          "id": "streamdown",
+          "label": "streamdown",
+          "source_file": "package.json",
+          "source_location": "L76"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 122,
+      "name": "Community 122",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_superjson",
+          "label": "superjson",
+          "source_file": "package.json",
+          "source_location": "L77"
+        },
+        {
+          "id": "superjson",
+          "label": "superjson",
+          "source_file": "package.json",
+          "source_location": "L77"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 123,
+      "name": "Community 123",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_tailwind_merge",
+          "label": "tailwind-merge",
+          "source_file": "package.json",
+          "source_location": "L78"
+        },
+        {
+          "id": "tailwind_merge",
+          "label": "tailwind-merge",
+          "source_file": "package.json",
+          "source_location": "L78"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 124,
+      "name": "Community 124",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_tailwindcss_animate",
+          "label": "tailwindcss-animate",
+          "source_file": "package.json",
+          "source_location": "L79"
+        },
+        {
+          "id": "tailwindcss_animate",
+          "label": "tailwindcss-animate",
+          "source_file": "package.json",
+          "source_location": "L79"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 125,
+      "name": "Community 125",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_tanstack_react_query",
+          "label": "@tanstack/react-query",
+          "source_file": "package.json",
+          "source_location": "L47"
+        },
+        {
+          "id": "tanstack_react_query",
+          "label": "@tanstack/react-query",
+          "source_file": "package.json",
+          "source_location": "L47"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 126,
+      "name": "Community 126",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_trpc_client",
+          "label": "@trpc/client",
+          "source_file": "package.json",
+          "source_location": "L48"
+        },
+        {
+          "id": "trpc_client",
+          "label": "@trpc/client",
+          "source_file": "package.json",
+          "source_location": "L48"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 127,
+      "name": "Community 127",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_trpc_react_query",
+          "label": "@trpc/react-query",
+          "source_file": "package.json",
+          "source_location": "L49"
+        },
+        {
+          "id": "trpc_react_query",
+          "label": "@trpc/react-query",
+          "source_file": "package.json",
+          "source_location": "L49"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 128,
+      "name": "Community 128",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_trpc_server",
+          "label": "@trpc/server",
+          "source_file": "package.json",
+          "source_location": "L50"
+        },
+        {
+          "id": "trpc_server",
+          "label": "@trpc/server",
+          "source_file": "package.json",
+          "source_location": "L50"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 129,
+      "name": "Community 129",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_vaul",
+          "label": "vaul",
+          "source_file": "package.json",
+          "source_location": "L80"
+        },
+        {
+          "id": "vaul",
+          "label": "vaul",
+          "source_file": "package.json",
+          "source_location": "L80"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 130,
+      "name": "Community 130",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_wouter",
+          "label": "wouter",
+          "source_file": "package.json",
+          "source_location": "L81"
+        },
+        {
+          "id": "wouter",
+          "label": "wouter",
+          "source_file": "package.json",
+          "source_location": "L81"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 131,
+      "name": "Community 131",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_xlsx",
+          "label": "xlsx",
+          "source_file": "package.json",
+          "source_location": "L82"
+        },
+        {
+          "id": "xlsx",
+          "label": "xlsx",
+          "source_file": "package.json",
+          "source_location": "L82"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 132,
+      "name": "Community 132",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_zod",
+          "label": "zod",
+          "source_file": "package.json",
+          "source_location": "L83"
+        },
+        {
+          "id": "zod",
+          "label": "zod",
+          "source_file": "package.json",
+          "source_location": "L83"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 133,
+      "name": "Community 133",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_pnpm",
+          "label": "pnpm",
+          "source_file": "package.json",
+          "source_location": "L103"
+        },
+        {
+          "id": "pnpm",
+          "label": "pnpm",
+          "source_file": "package.json",
+          "source_location": "L103"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 134,
+      "name": "Community 134",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_postcss",
+          "label": "postcss",
+          "source_file": "package.json",
+          "source_location": "L104"
+        },
+        {
+          "id": "postcss",
+          "label": "postcss",
+          "source_file": "package.json",
+          "source_location": "L104"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 135,
+      "name": "Community 135",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_prettier",
+          "label": "prettier",
+          "source_file": "package.json",
+          "source_location": "L105"
+        },
+        {
+          "id": "prettier",
+          "label": "prettier",
+          "source_file": "package.json",
+          "source_location": "L105"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 136,
+      "name": "Community 136",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_tailwindcss_typography",
+          "label": "@tailwindcss/typography",
+          "source_file": "package.json",
+          "source_location": "L87"
+        },
+        {
+          "id": "tailwindcss_typography",
+          "label": "@tailwindcss/typography",
+          "source_file": "package.json",
+          "source_location": "L87"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 137,
+      "name": "Community 137",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_tailwindcss_vite",
+          "label": "@tailwindcss/vite",
+          "source_file": "package.json",
+          "source_location": "L88"
+        },
+        {
+          "id": "tailwindcss_vite",
+          "label": "@tailwindcss/vite",
+          "source_file": "package.json",
+          "source_location": "L88"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 138,
+      "name": "Community 138",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_testing_library_jest_dom",
+          "label": "@testing-library/jest-dom",
+          "source_file": "package.json",
+          "source_location": "L89"
+        },
+        {
+          "id": "testing_library_jest_dom",
+          "label": "@testing-library/jest-dom",
+          "source_file": "package.json",
+          "source_location": "L89"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 139,
+      "name": "Community 139",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_testing_library_react",
+          "label": "@testing-library/react",
+          "source_file": "package.json",
+          "source_location": "L90"
+        },
+        {
+          "id": "testing_library_react",
+          "label": "@testing-library/react",
+          "source_file": "package.json",
+          "source_location": "L90"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 140,
+      "name": "Community 140",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_tsx",
+          "label": "tsx",
+          "source_file": "package.json",
+          "source_location": "L107"
+        },
+        {
+          "id": "tsx",
+          "label": "tsx",
+          "source_file": "package.json",
+          "source_location": "L107"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 141,
+      "name": "Community 141",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_types_express",
+          "label": "@types/express",
+          "source_file": "package.json",
+          "source_location": "L92"
+        },
+        {
+          "id": "types_express",
+          "label": "@types/express",
+          "source_file": "package.json",
+          "source_location": "L92"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 142,
+      "name": "Community 142",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_types_node",
+          "label": "@types/node",
+          "source_file": "package.json",
+          "source_location": "L94"
+        },
+        {
+          "id": "types_node",
+          "label": "@types/node",
+          "source_file": "package.json",
+          "source_location": "L94"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 143,
+      "name": "Community 143",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_types_react_dom",
+          "label": "@types/react-dom",
+          "source_file": "package.json",
+          "source_location": "L96"
+        },
+        {
+          "id": "types_react_dom",
+          "label": "@types/react-dom",
+          "source_file": "package.json",
+          "source_location": "L96"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 144,
+      "name": "Community 144",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_typescript",
+          "label": "typescript",
+          "source_file": "package.json",
+          "source_location": "L109"
+        },
+        {
+          "id": "typescript",
+          "label": "typescript",
+          "source_file": "package.json",
+          "source_location": "L109"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 145,
+      "name": "Community 145",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_vite",
+          "label": "vite",
+          "source_file": "package.json",
+          "source_location": "L110"
+        },
+        {
+          "id": "vite",
+          "label": "vite",
+          "source_file": "package.json",
+          "source_location": "L110"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 146,
+      "name": "Community 146",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_vitejs_plugin_react",
+          "label": "@vitejs/plugin-react",
+          "source_file": "package.json",
+          "source_location": "L97"
+        },
+        {
+          "id": "vitejs_plugin_react",
+          "label": "@vitejs/plugin-react",
+          "source_file": "package.json",
+          "source_location": "L97"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 147,
+      "name": "Community 147",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_vitest",
+          "label": "vitest",
+          "source_file": "package.json",
+          "source_location": "L112"
+        },
+        {
+          "id": "vitest",
+          "label": "vitest",
+          "source_file": "package.json",
+          "source_location": "L112"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 148,
+      "name": "Community 148",
+      "count": 2,
+      "files": [
+        "server/_core/types/cookie.d.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_core_types_cookie_d",
+          "label": "cookie.d.ts",
+          "source_file": "server/_core/types/cookie.d.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "server_core_types_cookie_d_cookie",
+          "label": "cookie",
+          "source_file": "server/_core/types/cookie.d.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 150,
+      "name": "Community 150",
+      "count": 2,
+      "files": [
+        "vitest.config.ts"
+      ],
+      "nodes": [
+        {
+          "id": "vitest_config",
+          "label": "vitest.config.ts",
+          "source_file": "vitest.config.ts",
+          "source_location": "L1"
+        },
+        {
+          "id": "vitest_config_templateroot",
+          "label": "templateRoot",
+          "source_file": "vitest.config.ts",
+          "source_location": "L4"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 71,
+      "name": "Community 71",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_add",
+          "label": "add",
+          "source_file": "package.json",
+          "source_location": "L98"
+        },
+        {
+          "id": "add",
+          "label": "add",
+          "source_file": "package.json",
+          "source_location": "L98"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 72,
+      "name": "Community 72",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_aws_sdk_client_s3",
+          "label": "@aws-sdk/client-s3",
+          "source_file": "package.json",
+          "source_location": "L18"
+        },
+        {
+          "id": "aws_sdk_client_s3",
+          "label": "@aws-sdk/client-s3",
+          "source_file": "package.json",
+          "source_location": "L18"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 73,
+      "name": "Community 73",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_aws_sdk_s3_request_presigner",
+          "label": "@aws-sdk/s3-request-presigner",
+          "source_file": "package.json",
+          "source_location": "L19"
+        },
+        {
+          "id": "aws_sdk_s3_request_presigner",
+          "label": "@aws-sdk/s3-request-presigner",
+          "source_file": "package.json",
+          "source_location": "L19"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 74,
+      "name": "Community 74",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_axios",
+          "label": "axios",
+          "source_file": "package.json",
+          "source_location": "L51"
+        },
+        {
+          "id": "axios",
+          "label": "axios",
+          "source_file": "package.json",
+          "source_location": "L51"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 75,
+      "name": "Community 75",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_builder_io_vite_plugin_jsx_loc",
+          "label": "@builder.io/vite-plugin-jsx-loc",
+          "source_file": "package.json",
+          "source_location": "L86"
+        },
+        {
+          "id": "builder_io_vite_plugin_jsx_loc",
+          "label": "@builder.io/vite-plugin-jsx-loc",
+          "source_file": "package.json",
+          "source_location": "L86"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 76,
+      "name": "Community 76",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_class_variance_authority",
+          "label": "class-variance-authority",
+          "source_file": "package.json",
+          "source_location": "L52"
+        },
+        {
+          "id": "class_variance_authority",
+          "label": "class-variance-authority",
+          "source_file": "package.json",
+          "source_location": "L52"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 77,
+      "name": "Community 77",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_cmdk",
+          "label": "cmdk",
+          "source_file": "package.json",
+          "source_location": "L54"
+        },
+        {
+          "id": "cmdk",
+          "label": "cmdk",
+          "source_file": "package.json",
+          "source_location": "L54"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 78,
+      "name": "Community 78",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_cookie",
+          "label": "cookie",
+          "source_file": "package.json",
+          "source_location": "L55"
+        },
+        {
+          "id": "cookie",
+          "label": "cookie",
+          "source_file": "package.json",
+          "source_location": "L55"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 79,
+      "name": "Community 79",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_date_fns",
+          "label": "date-fns",
+          "source_file": "package.json",
+          "source_location": "L56"
+        },
+        {
+          "id": "date_fns",
+          "label": "date-fns",
+          "source_file": "package.json",
+          "source_location": "L56"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 80,
+      "name": "Community 80",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_dotenv",
+          "label": "dotenv",
+          "source_file": "package.json",
+          "source_location": "L57"
+        },
+        {
+          "id": "dotenv",
+          "label": "dotenv",
+          "source_file": "package.json",
+          "source_location": "L57"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 81,
+      "name": "Community 81",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_drizzle_kit",
+          "label": "drizzle-kit",
+          "source_file": "package.json",
+          "source_location": "L100"
+        },
+        {
+          "id": "drizzle_kit",
+          "label": "drizzle-kit",
+          "source_file": "package.json",
+          "source_location": "L100"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 82,
+      "name": "Community 82",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_embla_carousel_react",
+          "label": "embla-carousel-react",
+          "source_file": "package.json",
+          "source_location": "L59"
+        },
+        {
+          "id": "embla_carousel_react",
+          "label": "embla-carousel-react",
+          "source_file": "package.json",
+          "source_location": "L59"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 83,
+      "name": "Community 83",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_devdependencies_esbuild",
+          "label": "esbuild",
+          "source_file": "package.json",
+          "source_location": "L101"
+        },
+        {
+          "id": "esbuild",
+          "label": "esbuild",
+          "source_file": "package.json",
+          "source_location": "L101"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 84,
+      "name": "Community 84",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_express",
+          "label": "express",
+          "source_file": "package.json",
+          "source_location": "L60"
+        },
+        {
+          "id": "express",
+          "label": "express",
+          "source_file": "package.json",
+          "source_location": "L60"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 85,
+      "name": "Community 85",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_framer_motion",
+          "label": "framer-motion",
+          "source_file": "package.json",
+          "source_location": "L61"
+        },
+        {
+          "id": "framer_motion",
+          "label": "framer-motion",
+          "source_file": "package.json",
+          "source_location": "L61"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 86,
+      "name": "Community 86",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_input_otp",
+          "label": "input-otp",
+          "source_file": "package.json",
+          "source_location": "L62"
+        },
+        {
+          "id": "input_otp",
+          "label": "input-otp",
+          "source_file": "package.json",
+          "source_location": "L62"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 87,
+      "name": "Community 87",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_jose",
+          "label": "jose",
+          "source_file": "package.json",
+          "source_location": "L63"
+        },
+        {
+          "id": "jose",
+          "label": "jose",
+          "source_file": "package.json",
+          "source_location": "L63"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 88,
+      "name": "Community 88",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_lucide_react",
+          "label": "lucide-react",
+          "source_file": "package.json",
+          "source_location": "L64"
+        },
+        {
+          "id": "lucide_react",
+          "label": "lucide-react",
+          "source_file": "package.json",
+          "source_location": "L64"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 89,
+      "name": "Community 89",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_mysql2",
+          "label": "mysql2",
+          "source_file": "package.json",
+          "source_location": "L65"
+        },
+        {
+          "id": "mysql2",
+          "label": "mysql2",
+          "source_file": "package.json",
+          "source_location": "L65"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 90,
+      "name": "Community 90",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_nanoid",
+          "label": "nanoid",
+          "source_file": "package.json",
+          "source_location": "L66"
+        },
+        {
+          "id": "nanoid",
+          "label": "nanoid",
+          "source_file": "package.json",
+          "source_location": "L66"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 91,
+      "name": "Community 91",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_pdf_lib",
+          "label": "pdf-lib",
+          "source_file": "package.json",
+          "source_location": "L68"
+        },
+        {
+          "id": "package_json_pdf_lib",
+          "label": "pdf-lib",
+          "source_file": "package.json",
+          "source_location": "L68"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 92,
+      "name": "Community 92",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_accordion",
+          "label": "@radix-ui/react-accordion",
+          "source_file": "package.json",
+          "source_location": "L21"
+        },
+        {
+          "id": "radix_ui_react_accordion",
+          "label": "@radix-ui/react-accordion",
+          "source_file": "package.json",
+          "source_location": "L21"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 93,
+      "name": "Community 93",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_alert_dialog",
+          "label": "@radix-ui/react-alert-dialog",
+          "source_file": "package.json",
+          "source_location": "L22"
+        },
+        {
+          "id": "radix_ui_react_alert_dialog",
+          "label": "@radix-ui/react-alert-dialog",
+          "source_file": "package.json",
+          "source_location": "L22"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 94,
+      "name": "Community 94",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_aspect_ratio",
+          "label": "@radix-ui/react-aspect-ratio",
+          "source_file": "package.json",
+          "source_location": "L23"
+        },
+        {
+          "id": "radix_ui_react_aspect_ratio",
+          "label": "@radix-ui/react-aspect-ratio",
+          "source_file": "package.json",
+          "source_location": "L23"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 95,
+      "name": "Community 95",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_checkbox",
+          "label": "@radix-ui/react-checkbox",
+          "source_file": "package.json",
+          "source_location": "L25"
+        },
+        {
+          "id": "radix_ui_react_checkbox",
+          "label": "@radix-ui/react-checkbox",
+          "source_file": "package.json",
+          "source_location": "L25"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 96,
+      "name": "Community 96",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_collapsible",
+          "label": "@radix-ui/react-collapsible",
+          "source_file": "package.json",
+          "source_location": "L26"
+        },
+        {
+          "id": "radix_ui_react_collapsible",
+          "label": "@radix-ui/react-collapsible",
+          "source_file": "package.json",
+          "source_location": "L26"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 97,
+      "name": "Community 97",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_context_menu",
+          "label": "@radix-ui/react-context-menu",
+          "source_file": "package.json",
+          "source_location": "L27"
+        },
+        {
+          "id": "radix_ui_react_context_menu",
+          "label": "@radix-ui/react-context-menu",
+          "source_file": "package.json",
+          "source_location": "L27"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 98,
+      "name": "Community 98",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_dialog",
+          "label": "@radix-ui/react-dialog",
+          "source_file": "package.json",
+          "source_location": "L28"
+        },
+        {
+          "id": "radix_ui_react_dialog",
+          "label": "@radix-ui/react-dialog",
+          "source_file": "package.json",
+          "source_location": "L28"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 99,
+      "name": "Community 99",
+      "count": 2,
+      "files": [
+        "package.json"
+      ],
+      "nodes": [
+        {
+          "id": "package_dependencies_radix_ui_react_dropdown_menu",
+          "label": "@radix-ui/react-dropdown-menu",
+          "source_file": "package.json",
+          "source_location": "L29"
+        },
+        {
+          "id": "radix_ui_react_dropdown_menu",
+          "label": "@radix-ui/react-dropdown-menu",
+          "source_file": "package.json",
+          "source_location": "L29"
+        }
+      ],
+      "totalNodes": 2
+    },
+    {
+      "id": 151,
+      "name": "Community 151",
+      "count": 1,
+      "files": [
+        "client/public/__manus__/debug-collector.js"
+      ],
+      "nodes": [
+        {
+          "id": "client_public_manus_debug_collector_xmlhttprequest_open",
+          "label": ".open()",
+          "source_file": "client/public/__manus__/debug-collector.js",
+          "source_location": "L600"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 152,
+      "name": "Community 152",
+      "count": 1,
+      "files": [
+        "drizzle.config.ts"
+      ],
+      "nodes": [
+        {
+          "id": "drizzle_config",
+          "label": "drizzle.config.ts",
+          "source_file": "drizzle.config.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 153,
+      "name": "Community 153",
+      "count": 1,
+      "files": [
+        "e2e/userFlows.spec.ts"
+      ],
+      "nodes": [
+        {
+          "id": "e2e_userflows_spec",
+          "label": "userFlows.spec.ts",
+          "source_file": "e2e/userFlows.spec.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 154,
+      "name": "Community 154",
+      "count": 1,
+      "files": [
+        "pdf-lib"
+      ],
+      "nodes": [
+        {
+          "id": "pdf_lib_pdf_lib",
+          "label": "pdf-lib",
+          "source_file": "pdf-lib",
+          "source_location": ""
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 155,
+      "name": "Community 155",
+      "count": 1,
+      "files": [
+        "playwright.config.ts"
+      ],
+      "nodes": [
+        {
+          "id": "playwright_config",
+          "label": "playwright.config.ts",
+          "source_file": "playwright.config.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 156,
+      "name": "Community 156",
+      "count": 1,
+      "files": [
+        "server/appLoading.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_apploading_test",
+          "label": "appLoading.test.ts",
+          "source_file": "server/appLoading.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 157,
+      "name": "Community 157",
+      "count": 1,
+      "files": [
+        "server/bookingKeyIntegrity.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_bookingkeyintegrity_test",
+          "label": "bookingKeyIntegrity.test.ts",
+          "source_file": "server/bookingKeyIntegrity.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 158,
+      "name": "Community 158",
+      "count": 1,
+      "files": [
+        "server/gearDocumentUi.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_geardocumentui_test",
+          "label": "gearDocumentUi.test.ts",
+          "source_file": "server/gearDocumentUi.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 159,
+      "name": "Community 159",
+      "count": 1,
+      "files": [
+        "server/lightThemeContrast.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_lightthemecontrast_test",
+          "label": "lightThemeContrast.test.ts",
+          "source_file": "server/lightThemeContrast.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 160,
+      "name": "Community 160",
+      "count": 1,
+      "files": [
+        "server/logoIntegration.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_logointegration_test",
+          "label": "logoIntegration.test.ts",
+          "source_file": "server/logoIntegration.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 161,
+      "name": "Community 161",
+      "count": 1,
+      "files": [
+        "server/overviewNavigation.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_overviewnavigation_test",
+          "label": "overviewNavigation.test.ts",
+          "source_file": "server/overviewNavigation.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 162,
+      "name": "Community 162",
+      "count": 1,
+      "files": [
+        "server/performanceTelemetry.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_performancetelemetry_test",
+          "label": "performanceTelemetry.test.ts",
+          "source_file": "server/performanceTelemetry.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 163,
+      "name": "Community 163",
+      "count": 1,
+      "files": [
+        "server/rentalEstimateCta.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_rentalestimatecta_test",
+          "label": "rentalEstimateCta.test.ts",
+          "source_file": "server/rentalEstimateCta.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 164,
+      "name": "Community 164",
+      "count": 1,
+      "files": [
+        "server/salesResponseControls.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_salesresponsecontrols_test",
+          "label": "salesResponseControls.test.ts",
+          "source_file": "server/salesResponseControls.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 165,
+      "name": "Community 165",
+      "count": 1,
+      "files": [
+        "server/salesResponseVisibility.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_salesresponsevisibility_test",
+          "label": "salesResponseVisibility.test.ts",
+          "source_file": "server/salesResponseVisibility.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    },
+    {
+      "id": 166,
+      "name": "Community 166",
+      "count": 1,
+      "files": [
+        "server/webVitalsAnalyticsEnhancements.test.ts"
+      ],
+      "nodes": [
+        {
+          "id": "server_webvitalsanalyticsenhancements_test",
+          "label": "webVitalsAnalyticsEnhancements.test.ts",
+          "source_file": "server/webVitalsAnalyticsEnhancements.test.ts",
+          "source_location": "L1"
+        }
+      ],
+      "totalNodes": 1
+    }
+  ],
+  "crossEdges": [
+    {
+      "source": 0,
+      "target": 3,
+      "count": 68,
+      "sourceName": "Radix UI Components",
+      "targetName": "Form & Input Components"
+    },
+    {
+      "source": 1,
+      "target": 3,
+      "count": 51,
+      "sourceName": "Dashboard Layout & Navigation",
+      "targetName": "Form & Input Components"
+    },
+    {
+      "source": 3,
+      "target": 12,
+      "count": 34,
+      "sourceName": "Form & Input Components",
+      "targetName": "AI Chat & Input Components"
+    },
+    {
+      "source": 0,
+      "target": 12,
+      "count": 30,
+      "sourceName": "Radix UI Components",
+      "targetName": "AI Chat & Input Components"
+    },
+    {
+      "source": 2,
+      "target": 6,
+      "count": 26,
+      "sourceName": "Database Access Layer",
+      "targetName": "Database Schema (Drizzle)"
+    },
+    {
+      "source": 0,
+      "target": 1,
+      "count": 24,
+      "sourceName": "Radix UI Components",
+      "targetName": "Dashboard Layout & Navigation"
+    },
+    {
+      "source": 5,
+      "target": 19,
+      "count": 19,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Attendance & Roster Tracking"
+    },
+    {
+      "source": 7,
+      "target": 18,
+      "count": 17,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Auth Context & Tests"
+    },
+    {
+      "source": 3,
+      "target": 16,
+      "count": 16,
+      "sourceName": "Form & Input Components",
+      "targetName": "Alert Dialog & Pagination"
+    },
+    {
+      "source": 3,
+      "target": 15,
+      "count": 16,
+      "sourceName": "Form & Input Components",
+      "targetName": "Command Palette & Dialog"
+    },
+    {
+      "source": 5,
+      "target": 7,
+      "count": 14,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Server Router & Department Rules"
+    },
+    {
+      "source": 0,
+      "target": 15,
+      "count": 14,
+      "sourceName": "Radix UI Components",
+      "targetName": "Command Palette & Dialog"
+    },
+    {
+      "source": 7,
+      "target": 10,
+      "count": 13,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "User Management Views"
+    },
+    {
+      "source": 5,
+      "target": 22,
+      "count": 13,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Notifications & Training Expiry"
+    },
+    {
+      "source": 3,
+      "target": 25,
+      "count": 12,
+      "sourceName": "Form & Input Components",
+      "targetName": "Menu Bar Components"
+    },
+    {
+      "source": 1,
+      "target": 12,
+      "count": 12,
+      "sourceName": "Dashboard Layout & Navigation",
+      "targetName": "AI Chat & Input Components"
+    },
+    {
+      "source": 5,
+      "target": 14,
+      "count": 11,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Booking Lifecycle & Progress"
+    },
+    {
+      "source": 4,
+      "target": 5,
+      "count": 11,
+      "sourceName": "App Shell & Error Boundary",
+      "targetName": "Home Page & Workspace Views"
+    },
+    {
+      "source": 7,
+      "target": 43,
+      "count": 11,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Local Authentication"
+    },
+    {
+      "source": 3,
+      "target": 28,
+      "count": 10,
+      "sourceName": "Form & Input Components",
+      "targetName": "Context Menu Components"
+    },
+    {
+      "source": 7,
+      "target": 31,
+      "count": 10,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Account & Activity Rules"
+    },
+    {
+      "source": 7,
+      "target": 34,
+      "count": 10,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Department Access Control"
+    },
+    {
+      "source": 5,
+      "target": 11,
+      "count": 10,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Sales Inbox & PDF Generation"
+    },
+    {
+      "source": 12,
+      "target": 16,
+      "count": 9,
+      "sourceName": "AI Chat & Input Components",
+      "targetName": "Alert Dialog & Pagination"
+    },
+    {
+      "source": 3,
+      "target": 40,
+      "count": 8,
+      "sourceName": "Form & Input Components",
+      "targetName": "Card & NotFound Pages"
+    },
+    {
+      "source": 12,
+      "target": 15,
+      "count": 8,
+      "sourceName": "AI Chat & Input Components",
+      "targetName": "Command Palette & Dialog"
+    },
+    {
+      "source": 2,
+      "target": 62,
+      "count": 8,
+      "sourceName": "Database Access Layer",
+      "targetName": "Booking CRUD Operations"
+    },
+    {
+      "source": 2,
+      "target": 63,
+      "count": 8,
+      "sourceName": "Database Access Layer",
+      "targetName": "Department Dashboard CRUD"
+    },
+    {
+      "source": 7,
+      "target": 47,
+      "count": 8,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Cookies & Rate Limiting"
+    },
+    {
+      "source": 3,
+      "target": 38,
+      "count": 7,
+      "sourceName": "Form & Input Components",
+      "targetName": "Form Control Components"
+    },
+    {
+      "source": 7,
+      "target": 55,
+      "count": 7,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Runtime Monitoring Rules"
+    },
+    {
+      "source": 15,
+      "target": 20,
+      "count": 7,
+      "sourceName": "Command Palette & Dialog",
+      "targetName": "Crew Assignment Workspace"
+    },
+    {
+      "source": 0,
+      "target": 16,
+      "count": 7,
+      "sourceName": "Radix UI Components",
+      "targetName": "Alert Dialog & Pagination"
+    },
+    {
+      "source": 0,
+      "target": 40,
+      "count": 7,
+      "sourceName": "Radix UI Components",
+      "targetName": "Card & NotFound Pages"
+    },
+    {
+      "source": 0,
+      "target": 25,
+      "count": 7,
+      "sourceName": "Radix UI Components",
+      "targetName": "Menu Bar Components"
+    },
+    {
+      "source": 5,
+      "target": 41,
+      "count": 7,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Gear Selection & Compliance"
+    },
+    {
+      "source": 2,
+      "target": 18,
+      "count": 7,
+      "sourceName": "Database Access Layer",
+      "targetName": "Auth Context & Tests"
+    },
+    {
+      "source": 20,
+      "target": 36,
+      "count": 6,
+      "sourceName": "Crew Assignment Workspace",
+      "targetName": "Crew Availability Rules"
+    },
+    {
+      "source": 1,
+      "target": 4,
+      "count": 6,
+      "sourceName": "Dashboard Layout & Navigation",
+      "targetName": "App Shell & Error Boundary"
+    },
+    {
+      "source": 3,
+      "target": 32,
+      "count": 6,
+      "sourceName": "Form & Input Components",
+      "targetName": "Carousel Components"
+    },
+    {
+      "source": 2,
+      "target": 66,
+      "count": 6,
+      "sourceName": "Database Access Layer",
+      "targetName": "Rental Enquiry CRUD"
+    },
+    {
+      "source": 7,
+      "target": 14,
+      "count": 6,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Booking Lifecycle & Progress"
+    },
+    {
+      "source": 4,
+      "target": 7,
+      "count": 6,
+      "sourceName": "App Shell & Error Boundary",
+      "targetName": "Server Router & Department Rules"
+    },
+    {
+      "source": 0,
+      "target": 32,
+      "count": 6,
+      "sourceName": "Radix UI Components",
+      "targetName": "Carousel Components"
+    },
+    {
+      "source": 5,
+      "target": 42,
+      "count": 6,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Vehicle Fleet Management"
+    },
+    {
+      "source": 7,
+      "target": 48,
+      "count": 6,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "tRPC Procedures & Middleware"
+    },
+    {
+      "source": 10,
+      "target": 31,
+      "count": 5,
+      "sourceName": "User Management Views",
+      "targetName": "Account & Activity Rules"
+    },
+    {
+      "source": 3,
+      "target": 56,
+      "count": 5,
+      "sourceName": "Form & Input Components",
+      "targetName": "Toggle Components"
+    },
+    {
+      "source": 12,
+      "target": 37,
+      "count": 5,
+      "sourceName": "AI Chat & Input Components",
+      "targetName": "Map View & Composition Hooks"
+    },
+    {
+      "source": 5,
+      "target": 57,
+      "count": 5,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Booking Conflict Rules"
+    },
+    {
+      "source": 5,
+      "target": 34,
+      "count": 5,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Department Access Control"
+    },
+    {
+      "source": 2,
+      "target": 67,
+      "count": 5,
+      "sourceName": "Database Access Layer",
+      "targetName": "Document Metadata CRUD"
+    },
+    {
+      "source": 0,
+      "target": 56,
+      "count": 5,
+      "sourceName": "Radix UI Components",
+      "targetName": "Toggle Components"
+    },
+    {
+      "source": 0,
+      "target": 28,
+      "count": 5,
+      "sourceName": "Radix UI Components",
+      "targetName": "Context Menu Components"
+    },
+    {
+      "source": 21,
+      "target": 30,
+      "count": 5,
+      "sourceName": "OAuth & SDK Integration",
+      "targetName": "SDK Server Auth"
+    },
+    {
+      "source": 3,
+      "target": 17,
+      "count": 4,
+      "sourceName": "Form & Input Components",
+      "targetName": "Charts & Web Vitals Analytics"
+    },
+    {
+      "source": 21,
+      "target": 53,
+      "count": 4,
+      "sourceName": "OAuth & SDK Integration",
+      "targetName": "OAuth Service Exchange"
+    },
+    {
+      "source": 1,
+      "target": 20,
+      "count": 4,
+      "sourceName": "Dashboard Layout & Navigation",
+      "targetName": "Crew Assignment Workspace"
+    },
+    {
+      "source": 4,
+      "target": 11,
+      "count": 4,
+      "sourceName": "App Shell & Error Boundary",
+      "targetName": "Sales Inbox & PDF Generation"
+    },
+    {
+      "source": 5,
+      "target": 10,
+      "count": 4,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "User Management Views"
+    },
+    {
+      "source": 5,
+      "target": 45,
+      "count": 4,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Crew Roster Data"
+    },
+    {
+      "source": 18,
+      "target": 43,
+      "count": 4,
+      "sourceName": "Auth Context & Tests",
+      "targetName": "Local Authentication"
+    },
+    {
+      "source": 33,
+      "target": 61,
+      "count": 4,
+      "sourceName": "Image Generation & Storage",
+      "targetName": "Data API & Environment"
+    },
+    {
+      "source": 31,
+      "target": 34,
+      "count": 4,
+      "sourceName": "Account & Activity Rules",
+      "targetName": "Department Access Control"
+    },
+    {
+      "source": 31,
+      "target": 43,
+      "count": 4,
+      "sourceName": "Account & Activity Rules",
+      "targetName": "Local Authentication"
+    },
+    {
+      "source": 20,
+      "target": 60,
+      "count": 3,
+      "sourceName": "Crew Assignment Workspace",
+      "targetName": "Assignment Rules"
+    },
+    {
+      "source": 20,
+      "target": 46,
+      "count": 3,
+      "sourceName": "Crew Assignment Workspace",
+      "targetName": "Booking Conflict Detection"
+    },
+    {
+      "source": 10,
+      "target": 34,
+      "count": 3,
+      "sourceName": "User Management Views",
+      "targetName": "Department Access Control"
+    },
+    {
+      "source": 11,
+      "target": 14,
+      "count": 3,
+      "sourceName": "Sales Inbox & PDF Generation",
+      "targetName": "Booking Lifecycle & Progress"
+    },
+    {
+      "source": 5,
+      "target": 60,
+      "count": 3,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Assignment Rules"
+    },
+    {
+      "source": 21,
+      "target": 49,
+      "count": 3,
+      "sourceName": "OAuth & SDK Integration",
+      "targetName": "Server Bootstrap & Vite"
+    },
+    {
+      "source": 21,
+      "target": 47,
+      "count": 3,
+      "sourceName": "OAuth & SDK Integration",
+      "targetName": "Cookies & Rate Limiting"
+    },
+    {
+      "source": 7,
+      "target": 45,
+      "count": 3,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Crew Roster Data"
+    },
+    {
+      "source": 7,
+      "target": 33,
+      "count": 3,
+      "sourceName": "Server Router & Department Rules",
+      "targetName": "Image Generation & Storage"
+    },
+    {
+      "source": 4,
+      "target": 10,
+      "count": 3,
+      "sourceName": "App Shell & Error Boundary",
+      "targetName": "User Management Views"
+    },
+    {
+      "source": 12,
+      "target": 32,
+      "count": 3,
+      "sourceName": "AI Chat & Input Components",
+      "targetName": "Carousel Components"
+    },
+    {
+      "source": 5,
+      "target": 59,
+      "count": 3,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Assignment UI Tests"
+    },
+    {
+      "source": 5,
+      "target": 8,
+      "count": 3,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Excel Upload & Data Mapping"
+    },
+    {
+      "source": 12,
+      "target": 40,
+      "count": 3,
+      "sourceName": "AI Chat & Input Components",
+      "targetName": "Card & NotFound Pages"
+    },
+    {
+      "source": 45,
+      "target": 57,
+      "count": 3,
+      "sourceName": "Crew Roster Data",
+      "targetName": "Booking Conflict Rules"
+    },
+    {
+      "source": 18,
+      "target": 21,
+      "count": 3,
+      "sourceName": "Auth Context & Tests",
+      "targetName": "OAuth & SDK Integration"
+    },
+    {
+      "source": 21,
+      "target": 54,
+      "count": 3,
+      "sourceName": "OAuth & SDK Integration",
+      "targetName": "Manus API Types"
+    },
+    {
+      "source": 48,
+      "target": 52,
+      "count": 3,
+      "sourceName": "tRPC Procedures & Middleware",
+      "targetName": "System Router & Notifications"
+    },
+    {
+      "source": 21,
+      "target": 48,
+      "count": 3,
+      "sourceName": "OAuth & SDK Integration",
+      "targetName": "tRPC Procedures & Middleware"
+    },
+    {
+      "source": 2,
+      "target": 7,
+      "count": 3,
+      "sourceName": "Database Access Layer",
+      "targetName": "Server Router & Department Rules"
+    },
+    {
+      "source": 3,
+      "target": 37,
+      "count": 2,
+      "sourceName": "Form & Input Components",
+      "targetName": "Map View & Composition Hooks"
+    },
+    {
+      "source": 22,
+      "target": 34,
+      "count": 2,
+      "sourceName": "Notifications & Training Expiry",
+      "targetName": "Department Access Control"
+    },
+    {
+      "source": 5,
+      "target": 20,
+      "count": 2,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Crew Assignment Workspace"
+    },
+    {
+      "source": 30,
+      "target": 53,
+      "count": 2,
+      "sourceName": "SDK Server Auth",
+      "targetName": "OAuth Service Exchange"
+    },
+    {
+      "source": 4,
+      "target": 40,
+      "count": 2,
+      "sourceName": "App Shell & Error Boundary",
+      "targetName": "Card & NotFound Pages"
+    },
+    {
+      "source": 4,
+      "target": 20,
+      "count": 2,
+      "sourceName": "App Shell & Error Boundary",
+      "targetName": "Crew Assignment Workspace"
+    },
+    {
+      "source": 20,
+      "target": 45,
+      "count": 2,
+      "sourceName": "Crew Assignment Workspace",
+      "targetName": "Crew Roster Data"
+    },
+    {
+      "source": 20,
+      "target": 59,
+      "count": 2,
+      "sourceName": "Crew Assignment Workspace",
+      "targetName": "Assignment UI Tests"
+    },
+    {
+      "source": 20,
+      "target": 57,
+      "count": 2,
+      "sourceName": "Crew Assignment Workspace",
+      "targetName": "Booking Conflict Rules"
+    },
+    {
+      "source": 1,
+      "target": 21,
+      "count": 2,
+      "sourceName": "Dashboard Layout & Navigation",
+      "targetName": "OAuth & SDK Integration"
+    },
+    {
+      "source": 4,
+      "target": 17,
+      "count": 2,
+      "sourceName": "App Shell & Error Boundary",
+      "targetName": "Charts & Web Vitals Analytics"
+    },
+    {
+      "source": 5,
+      "target": 17,
+      "count": 2,
+      "sourceName": "Home Page & Workspace Views",
+      "targetName": "Charts & Web Vitals Analytics"
+    },
+    {
+      "source": 57,
+      "target": 60,
+      "count": 2,
+      "sourceName": "Booking Conflict Rules",
+      "targetName": "Assignment Rules"
+    },
+    {
+      "source": 45,
+      "target": 59,
+      "count": 2,
+      "sourceName": "Crew Roster Data",
+      "targetName": "Assignment UI Tests"
+    },
+    {
+      "source": 35,
+      "target": 61,
+      "count": 2,
+      "sourceName": "Heartbeat Service",
+      "targetName": "Data API & Environment"
+    }
+  ],
+  "totalNodes": 1532,
+  "totalLinks": 2981,
+  "totalCommunities": 167
+};

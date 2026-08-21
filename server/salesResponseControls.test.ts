@@ -25,10 +25,10 @@ describe("Sales enquiry response controls", () => {
   });
 
   it("uses a pulsing class for open unassigned enquiries and respects reduced motion", () => {
-    const pageSource = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.url), "utf8");
+    const overviewSource = readFileSync(new URL("../client/src/pages/views/Overview.tsx", import.meta.url), "utf8");
     const styleSource = readFileSync(new URL("../client/src/index.css", import.meta.url), "utf8");
 
-    expect(pageSource).toContain('className={`unassigned-enquiry-status ${unassignedSeverity}`}');
+    expect(overviewSource).toContain('className={`unassigned-enquiry-status ${unassignedSeverity}`}');
     expect(styleSource).toContain(".unassigned-enquiry-status.needs-response");
     expect(styleSource).toContain("@media (prefers-reduced-motion: reduce)");
   });

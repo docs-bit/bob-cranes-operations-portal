@@ -11,7 +11,7 @@ describe("light theme foreground contrast", () => {
   });
 
   it("uses dark lifecycle labels on the light booking dossier instead of legacy light-on-dark colors", () => {
-    const source = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.url), "utf8");
+    const source = readFileSync(new URL("../client/src/pages/views/BookingDetail.tsx", import.meta.url), "utf8");
 
     expect(source).toContain('color: active ? "#000000" : "#27313d"');
     expect(source).toContain('background: active ? "var(--equipment-orange)" : "#edf0f4"');

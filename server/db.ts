@@ -1451,7 +1451,7 @@ export async function seedInitialDataIfNeeded() {
         {
           id: `${b.id}-d1`,
           bookingId: b.id,
-          departmentCode: "DOC",
+          departmentCode: "documentation",
           name: "Client LPO & Contract",
           state: "Approved",
           required: 1,
@@ -1459,7 +1459,7 @@ export async function seedInitialDataIfNeeded() {
         {
           id: `${b.id}-d2`,
           bookingId: b.id,
-          departmentCode: "HSE",
+          departmentCode: "hse",
           name: "Third Party Crane Inspection",
           state: "Uploaded",
           required: 1,
@@ -1467,7 +1467,7 @@ export async function seedInitialDataIfNeeded() {
         {
           id: `${b.id}-d3`,
           bookingId: b.id,
-          departmentCode: "LG",
+          departmentCode: "lifting-gears",
           name: "Rigging Study & SWL Certification",
           state: "Required",
           required: 1,
@@ -1475,7 +1475,7 @@ export async function seedInitialDataIfNeeded() {
         {
           id: `${b.id}-d4`,
           bookingId: b.id,
-          departmentCode: "CRW",
+          departmentCode: "crew",
           name: "Operator Medical & License Verification",
           state: "Approved",
           required: 1,
@@ -1483,7 +1483,7 @@ export async function seedInitialDataIfNeeded() {
         {
           id: `${b.id}-d5`,
           bookingId: b.id,
-          departmentCode: "ACC",
+          departmentCode: "accounts",
           name: "Advance Payment Receipt",
           state: "Uploaded",
           required: 1,

@@ -36,7 +36,7 @@ describe("Client Response Portal navigation", () => {
     const onUploadAll = vi.fn().mockResolvedValue(undefined);
     render(<ClientPortal
       booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
-      documents={[{ id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Required", required: true }] as any}
+      documents={[{ id: "doc-1", departmentCode: "documentation", name: "Site access pass", state: "Required", required: true }] as any}
       onUpdate={vi.fn()}
       onUploadAll={onUploadAll}
       onBackToInternal={vi.fn()}
@@ -52,7 +52,7 @@ describe("Client Response Portal navigation", () => {
     const onUploadAll = vi.fn();
     render(<ClientPortal
       booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
-      documents={[{ id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Uploaded", required: true }] as any}
+      documents={[{ id: "doc-1", departmentCode: "documentation", name: "Site access pass", state: "Uploaded", required: true }] as any}
       onUpdate={vi.fn()}
       onUploadAll={onUploadAll}
       onBackToInternal={vi.fn()}
@@ -69,7 +69,7 @@ describe("Client Response Portal navigation", () => {
     const user = userEvent.setup();
     render(<ClientPortal
       booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
-      documents={[{ id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Uploaded", required: true }] as any}
+      documents={[{ id: "doc-1", departmentCode: "documentation", name: "Site access pass", state: "Uploaded", required: true }] as any}
       onUpdate={vi.fn()}
       onUploadAll={vi.fn()}
       onBackToInternal={vi.fn()}
@@ -88,8 +88,8 @@ describe("Client Response Portal navigation", () => {
     render(<ClientPortal
       booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
       documents={[
-        { id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Required", required: true, category: "Access & Permits", tags: ["permit", "site"] },
-        { id: "doc-2", departmentCode: "ACC", name: "Signed LPO", state: "Required", required: true, category: "Commercial", tags: ["lpo", "commercial"] },
+        { id: "doc-1", departmentCode: "documentation", name: "Site access pass", state: "Required", required: true, category: "Access & Permits", tags: ["permit", "site"] },
+        { id: "doc-2", departmentCode: "accounts", name: "Signed LPO", state: "Required", required: true, category: "Commercial", tags: ["lpo", "commercial"] },
       ] as any}
       onUpdate={vi.fn()}
       onUploadAll={onUploadAll}
@@ -116,8 +116,8 @@ describe("Client Response Portal navigation", () => {
     render(<ClientPortal
       booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
       documents={[
-        { id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Required", required: true },
-        { id: "doc-2", departmentCode: "ACC", name: "Signed LPO", state: "Required", required: true },
+        { id: "doc-1", departmentCode: "documentation", name: "Site access pass", state: "Required", required: true },
+        { id: "doc-2", departmentCode: "accounts", name: "Signed LPO", state: "Required", required: true },
       ] as any}
       onUpdate={vi.fn()}
       onUploadAll={onUploadAll}
@@ -145,7 +145,7 @@ describe("Client Response Portal navigation", () => {
     const onBackToInternal = vi.fn();
     render(<ClientPortal
       booking={{ id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", pm: "Nishanth", mob: "11 Aug 2026", offHire: "14 Aug 2026", crane: "200T Mobile Crane", site: "Dubai Downtown", progress: 72, stage: "Docs In Progress", priority: "Critical", crewIds: [], gearIds: [], trailerIds: [] } as any}
-      documents={[{ id: "doc-1", departmentCode: "DOC", name: "Site access pass", state: "Required", required: true }] as any}
+      documents={[{ id: "doc-1", departmentCode: "documentation", name: "Site access pass", state: "Required", required: true }] as any}
       onUpdate={vi.fn()}
       onUploadAll={vi.fn()}
       onBackToInternal={onBackToInternal}
