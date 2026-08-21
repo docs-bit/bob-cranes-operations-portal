@@ -1764,3 +1764,93 @@ export async function deleteClientFilterPreset(userId: number, name: string) {
     .delete(clientFilterPresets)
     .where(and(eq(clientFilterPresets.userId, userId), eq(clientFilterPresets.name, name)));
 }
+
+// ---- Client Portal Tokens ----
+
+import { clientPortalTokens } from "../drizzle/schema";
+
+export async function createClientPortalToken(input: {
+  bookingId: string;
+  token: string;
+  channel: string;
+  otp: string | null;
+  email: string;
+  expiresAt: Date;
+  createdBy: number | null;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  const id = nanoid();
+  await db.insert(clientPortalTokens).values({ id, ...input });
+  const [row] = await db.select().from(clientPortalTokens).where(eq(clientPortalTokens.id, id)).limit(1);
+  return row;
+}
+
+export async function verifyClientPortalToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [row] = await db.select().from(clientPortalTokens).where(eq(clientPortalTokens.token, token)).limit(1);
+  if (!row) return null;
+  if (row.usedAt) return null;
+  if (new Date(row.expiresAt) < new Date()) return null;
+  await db.update(clientPortalTokens).set({ usedAt: new Date() }).where(eq(clientPortalTokens.id, row.id));
+  return row;
+}
+
+export async function verifyClientPortalOtp(bookingId: string, otp: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const now = new Date();
+  const [row] = await db.select().from(clientPortalTokens)
+    .where(and(
+      eq(clientPortalTokens.bookingId, bookingId),
+      eq(clientPortalTokens.otp, otp),
+      eq(clientPortalTokens.channel, "otp"),
+      isNull(clientPortalTokens.usedAt),
+      gte(clientPortalTokens.expiresAt, now),
+    ))
+    .orderBy(desc(clientPortalTokens.createdAt))
+    .limit(1);
+  if (!row) return null;
+  await db.update(clientPortalTokens).set({ usedAt: now }).where(eq(clientPortalTokens.id, row.id));
+  return row;
+}
+
+export async function getBookingDocuments(bookingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(documents).where(eq(documents.bookingId, bookingId));
+}
+
+export async function getBookingChatMessages(bookingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(chatMessages).where(eq(chatMessages.bookingId, bookingId)).orderBy(chatMessages.createdAt);
+}
+
+export async function addClientChatMessage(input: {
+  bookingId: string;
+  sender: string;
+  body: string;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  const id = nanoid();
+  await db.insert(chatMessages).values({
+    id,
+    bookingId: input.bookingId,
+    team: "client",
+    sender: input.sender,
+    body: input.body,
+  });
+  const [row] = await db.select().from(chatMessages).where(eq(chatMessages.id, id)).limit(1);
+  return row;
+}
+
+export async function listClientPortalTokensForBooking(bookingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(clientPortalTokens)
+    .where(eq(clientPortalTokens.bookingId, bookingId))
+    .orderBy(desc(clientPortalTokens.createdAt));
+}

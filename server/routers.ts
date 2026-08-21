@@ -10,6 +10,7 @@ import { rentalRouter, salesEnquiriesRouter } from "./routers/sales";
 import { operationsRouter } from "./routers/operations";
 import { monitoringRouter } from "./routers/monitoring";
 import { miscRouter } from "./routers/misc";
+import { clientPortalRouter } from "./routers/clientPortal";
 
 db.seedInitialDataIfNeeded().catch(console.error);
 
@@ -25,6 +26,7 @@ export const appRouter = router({
   telemetry: monitoringRouter.telemetry,
   filterPresets: miscRouter.filterPresets,
   clientFeedback: miscRouter.clientFeedback,
+  clientPortal: clientPortalRouter,
 });
 
 export type AppRouter = typeof appRouter;

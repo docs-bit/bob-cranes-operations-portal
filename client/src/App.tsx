@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import RentalLanding from "./pages/RentalLanding";
 import RuntimeErrorReporter from "./components/RuntimeErrorReporter";
 import PerformanceTelemetry from "./components/PerformanceTelemetry";
+import ClientPortalPage from "./pages/ClientPortalPage";
 
 function ProtectedPortal() {
   const { user, loading, refresh } = useAuth();
@@ -40,7 +41,9 @@ function Router() {
       <Route path={"/crew"} component={ProtectedPortal} />
       <Route path={"/gear"} component={ProtectedPortal} />
       <Route path={"/login"} component={Login} />
-      <Route path="/client/:token" component={Home} />
+      <Route path="/client/verify/:token" component={ClientPortalPage} />
+      <Route path="/client/otp/:bookingId" component={ClientPortalPage} />
+      <Route path="/client/:bookingId" component={ClientPortalPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

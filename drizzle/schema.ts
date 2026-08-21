@@ -304,3 +304,18 @@ export const clientFilterPresets = mysqlTable("client_filter_presets", {
 });
 
 export type ClientFilterPresetRecord = typeof clientFilterPresets.$inferSelect;
+
+export const clientPortalTokens = mysqlTable("client_portal_tokens", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  token: varchar("token", { length: 128 }).notNull().unique(),
+  channel: varchar("channel", { length: 16 }).notNull().default("magic_link"),
+ otp: varchar("otp", { length: 8 }),
+  email: varchar("email", { length: 320 }).notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ClientPortalToken = typeof clientPortalTokens.$inferSelect;
