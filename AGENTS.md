@@ -10,6 +10,7 @@
 
 - **Text-scanning tests**: `server/gearDocumentUi.test.ts`, `server/salesResponseExpansion.test.ts`, and similar files `readFileSync` source files as raw strings to assert procedure names exist. After any router split/move, update the scanned file path â€” these tests don't import the code, they grep it.
 - **Pre-existing failures (as of 2026-08-20)**: 5 `.tsx` test files fail due to missing `@testing-library/dom` when installed via `npm` (project uses `pnpm`). `server/operations.test.ts` has a flaky seed-dependent assertion (`equipment.length > 0`). Do not treat these as regressions.
+- **Fixed: @testing-library/dom missing**: Install `@testing-library/dom` to fix TS2305 errors in `.tsx` test files. Run: `npm install @testing-library/dom --legacy-peer-deps`
 - **Package manager**: Project has `pnpm-lock.yaml` but `npm install --legacy-peer-deps` works as fallback. Pure `npm install` may miss peer deps needed by `.tsx` tests.
 
 ## Department Code Unification
@@ -28,16 +29,29 @@
 - **`shared/bookingRules.ts` relies on `DepartmentCode` from `shared/departmentAccess.ts`**: After the department code unification, `bookingRules.ts` imports the type rather than defining its own. The `lifecycleStageDepartment` map (booking stage â†’ owning department) lives in `server/routers/operations.ts` as a module-local constant.
 - **`requireDocumentTaxonomyManager`**: Lives in `server/_core/helpers.ts`, not in the documents router. Used by `documents.ts` and would be needed by any future router touching taxonomy.
 
-- **Client portal uses `sessionStorage` for JWT, not cookies**: The `clientSession` JWT travels in tRPC request bodies (input params), not httpOnly cookies. This is by design — the client portal has no traditional browser session; magic-link auth issues a short-lived JWT after verify. `sessionStorage` clears on tab close, which is correct for this auth model.
-- **`routers.ts` has pre-existing broken refs**: `miscRouter.auditLog` and `miscRouter.retention` are referenced in the composer but these sub-routers don't exist on `miscRouter`. Causes 2 extra type errors (97 vs 95 baseline). Left as-is — fixing requires adding the sub-routers to `misc.ts`.
+- **Client portal uses `sessionStorage` for JWT, not cookies**: The `clientSession` JWT travels in tRPC request bodies (input params), not httpOnly cookies. This is by design ï¿½ the client portal has no traditional browser session; magic-link auth issues a short-lived JWT after verify. `sessionStorage` clears on tab close, which is correct for this auth model.
+- **`routers.ts` has pre-existing broken refs**: `miscRouter.auditLog` and `miscRouter.retention` are referenced in the composer but these sub-routers don't exist on `miscRouter`. Causes 2 extra type errors (97 vs 95 baseline). Left as-is ï¿½ fixing requires adding the sub-routers to `misc.ts`.
 
 ## Build & Run
 
 - **Dev server fails on Windows with `NODE_ENV=xxx` syntax**: `NODE_ENV=development tsx watch server/_core/index.ts` fails because `set VAR=val` is Windows-only. Use `cross-env` or set env vars separately. The production build (`node dist/index.js`) works without this.
+- **drizzle-orm type declarations**: Version 0.44.7 ships `.d.cts` but not `.d.ts` files. Upgrade to 0.45.2+ for proper TypeScript support: `npm install drizzle-orm@latest --legacy-peer-deps`
 - **Server uses dynamic port discovery**: `server/_core/index.ts` calls `findAvailablePort(PORT)` starting at `PORT` env var (default 3000), trying up to 20 ports. For Playwright tests, set `PORT=3000` explicitly to match the `--port` flag, or parse the actual port from stdout (`Server running on http://localhost:N/`).
 - **React hydration in production builds is slow**: The production build serves HTML shells with JS bundles. `networkidle` fires before React renders client-side content. Add `wait_for_timeout(5000+)` after `networkidle` in Playwright tests to wait for hydration.
+
+- **Shell heredocs on Git Bash truncate at special characters**: Multi-line heredocs (especially with HTML or embedded quotes) silently fail. Write a `.js` file to `/tmp/` via heredoc, then run `node /tmp/script.js` separately.
+- **`register_preview` needs Windows-native paths**: Git Bash paths (`/c/Users/...`) don't work. Use `cygpath -w "$(realpath ...)"` to convert to `C:\Users\...` format.
 
 ## Graphify
 
 - Knowledge graph outputs live in `graphify-out/`. The `graph.json` can be queried with `graphify query "<question>"` after verifying `.graphify_python` exists (re-resolve if missing).
 - `cn()` has 275 edges (CSS class merger) and `getDb()` has 78 edges â€” both are "god nodes" in the dependency graph. This is expected and not a problem.
+
+## Deployment
+
+- **Environment variables required**: `DATABASE_URL` (MySQL), `JWT_SECRET` (for auth tokens), `VITE_APP_ID` (optional), `OWNER_OPEN_ID` (optional admin OpenID)
+- **Database setup**: Run `npm run db:push` to generate and apply migrations
+- **Build command**: `npm run build` (outputs to `dist/`)
+- **Start command**: `npm run start` (runs `node dist/index.js`)
+- **Port**: Server uses dynamic port discovery starting at 3000
+- **Client portal auth**: Uses sessionStorage for JWT, not cookies. Magic-link auth issues short-lived JWT after verify.

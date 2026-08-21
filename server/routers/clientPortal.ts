@@ -37,6 +37,12 @@ async function validateAndScope(clientSession: string, bookingId: string) {
   return payload;
 }
 
+function requireAdminOrSupervisor(ctx: { user: { role: string } | null }) {
+  if (!ctx.user || (ctx.user.role !== "admin" && ctx.user.role !== "supervisor")) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Only admins and supervisors can generate client portal links." });
+  }
+}
+
 export const clientPortalRouter = router({
   generateMagicLink: protectedProcedure
     .input(z.object({
@@ -44,9 +50,7 @@ export const clientPortalRouter = router({
       email: z.string().email(),
     }))
     .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin" && ctx.user.role !== "supervisor") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Only admins and supervisors can generate client portal links." });
-      }
+      requireAdminOrSupervisor(ctx);
       const booking = await db.getBookingById(input.bookingId);
       if (!booking) throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found." });
 
@@ -77,9 +81,7 @@ export const clientPortalRouter = router({
       email: z.string().email(),
     }))
     .mutation(async ({ ctx, input }) => {
-      if (ctx.user.role !== "admin" && ctx.user.role !== "supervisor") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Only admins and supervisors can generate client portal OTPs." });
-      }
+      requireAdminOrSupervisor(ctx);
       const booking = await db.getBookingById(input.bookingId);
       if (!booking) throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found." });
 

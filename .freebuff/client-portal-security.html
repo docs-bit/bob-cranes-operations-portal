@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal Security — Visual Explanation</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --red: #f85149;
+  --orange: #d29922;
+  --purple: #bc8cff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 2rem;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.subtitle { color: var(--muted); margin-bottom: 2.5rem; font-size: 1.1rem; }
+h2 {
+  font-size: 1.4rem;
+  margin: 2.5rem 0 1rem;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+h2::before {
+  content: '';
+  width: 4px;
+  height: 1.4rem;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* Flow diagram */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+.flow-step {
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  position: relative;
+}
+.flow-step.auth { background: #1a3a2a; color: var(--green); border: 1px solid #2a5a3a; }
+.flow-step.danger { background: #3a1a1a; color: var(--red); border: 1px solid #5a2a2a; }
+.flow-step.info { background: #1a2a3a; color: var(--accent); border: 1px solid #2a3a5a; }
+.flow-step.warn { background: #3a2a1a; color: var(--orange); border: 1px solid #5a4a2a; }
+.flow-step.purple { background: #2a1a3a; color: var(--purple); border: 1px solid #4a2a5a; }
+.flow-arrow {
+  color: var(--muted);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.card p, .card li {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.card ul { list-style: none; padding: 0; }
+.card li { padding: 0.25rem 0; }
+.card li::before { content: '→ '; color: var(--accent); }
+
+.tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tag-fix { background: #1a3a2a; color: var(--green); }
+.tag-before { background: #3a1a1a; color: var(--red); }
+
+/* Architecture SVG */
+.arch-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+.arch-container svg { display: block; margin: 0 auto; }
+
+/* Comparison table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+th {
+  background: #1c2128;
+  color: var(--accent);
+  font-weight: 600;
+}
+td { color: var(--muted); }
+tr:last-child td { border-bottom: none; }
+.code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  background: #1c2128;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.badge-green { background: #1a3a2a; color: var(--green); }
+.badge-red { background: #3a1a1a; color: var(--red); }
+
+/* Callout */
+.callout {
+  border-left: 3px solid var(--orange);
+  background: #1a1a1a;
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.callout strong { color: var(--orange); }
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.75rem;
+  text-align: center;
+  min-width: 140px;
+}
+.stat-num {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.stat-label { color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate { animation: fadeIn 0.4s ease-out both; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate { animation: none; opacity: 1; }
+}
+@media (max-width: 768px) {
+  body { padding: 1rem; }
+  .flow { flex-direction: column; align-items: stretch; }
+  .flow-arrow { transform: rotate(90deg); align-self: center; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="animate">Client Portal Security</h1>
+  <p class="subtitle animate delay-1">JWT session hardening for the BOB Cranes client-facing portal — 4 files, 201 lines added, 44 removed.</p>
+
+  <div class="stats animate delay-2">
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Endpoints hardened</div></div>
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">Security tests</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">New regressions</div></div>
+    <div class="stat"><div class="stat-num">97</div><div class="stat-label">Type errors (baseline)</div></div>
+  </div>
+
+  <!-- The Problem -->
+  <h2 class="animate delay-3">The Problem</h2>
+  <div class="card-grid">
+    <div class="card">
+      <h3><span class="tag tag-before">VULN</span> Data endpoints fully public</h3>
+      <p>All 4 data endpoints (<span class="code">getBookingSummary</span>, <span class="code">getDocuments</span>, <span class="code">getChatMessages</span>, <span class="code">sendChatMessage</span>) were <span class="code">publicProcedure</span> with no auth check. Anyone who knew a booking ID could read all client data or post chat messages.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-before">VULN</span> Sender spoofing</h3>
+      <p><span class="code">sendChatMessage</span> accepted <span class="code">sender</span> as user input. An attacker could impersonate any identity when posting messages.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-before">VULN</span> Token generation unprotected</h3>
+      <p><span class="code">generateMagicLink</span> and <span class="code">generateOtp</span> were unauthenticated. Anyone could mint client portal tokens for any booking.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag tag-before">WEAK</span> Insecure OTP generation</h3>
+      <p>OTP values were generated with <span class="code">Math.random()</span> — not cryptographically secure. An attacker could predict OTP values.</p>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <h2>Authentication Flow</h2>
+  <div class="arch-container">
+    <svg width="100%" viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+      <!-- Legend -->
+      <rect x="10" y="5" width="12" height="12" rx="2" fill="#2a5a3a" stroke="#3fb950" stroke-width="1"/>
+      <text x="27" y="15" fill="#8b949e" font-size="11">Protected (admin/supervisor)</t

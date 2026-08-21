@@ -3,7 +3,8 @@ import React from "react";
 import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Wizard, gears } from "../client/src/pages/Home";
+import { Wizard } from "../client/src/pages/views";
+import { gears } from "../client/src/pages/views/shared";
 
 describe("booking wizard gear-document compliance gate", () => {
   it("shows a newly added expired gear record but refuses to select it for the booking", () => {

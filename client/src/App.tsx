@@ -12,6 +12,10 @@ import RentalLanding from "./pages/RentalLanding";
 import RuntimeErrorReporter from "./components/RuntimeErrorReporter";
 import PerformanceTelemetry from "./components/PerformanceTelemetry";
 import ClientPortalPage from "./pages/ClientPortalPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import DepartmentPage from "./pages/DepartmentPage";
+import BookingsPage from "./pages/BookingsPage";
+import BookingDetailPage from "./pages/BookingDetailPage";
 
 function ProtectedPortal() {
   const { user, loading, refresh } = useAuth();
@@ -34,16 +38,28 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={RentalLanding} />
+      <Route path={"/login"} component={Login} />
+      
+      {/* PRD Routes - Internal */}
+      <Route path={"/admin"} component={AdminDashboard} />
+      <Route path={"/dept/:deptCode"} component={DepartmentPage} />
+      <Route path={"/dept/doc/console"} component={DepartmentPage} />
+      <Route path={"/bookings"} component={BookingsPage} />
+      <Route path={"/bookings/:id"} component={BookingDetailPage} />
+      
+      {/* Legacy routes - redirect to portal */}
       <Route path={"/portal"} component={ProtectedPortal} />
       <Route path={"/uploads"} component={ProtectedPortal} />
       <Route path={"/attendance"} component={ProtectedPortal} />
       <Route path={"/training"} component={ProtectedPortal} />
       <Route path={"/crew"} component={ProtectedPortal} />
       <Route path={"/gear"} component={ProtectedPortal} />
-      <Route path={"/login"} component={Login} />
+      
+      {/* Client Portal Routes */}
       <Route path="/client/verify/:token" component={ClientPortalPage} />
       <Route path="/client/otp/:bookingId" component={ClientPortalPage} />
       <Route path="/client/:bookingId" component={ClientPortalPage} />
+      
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

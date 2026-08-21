@@ -18,7 +18,7 @@ vi.mock("../client/src/lib/trpc", () => ({
   },
 }));
 
-import { Shell } from "../client/src/pages/Home";
+import { Shell } from "../client/src/pages/views";
 
 const bookings = [
   { id: "BOB Booking-31511", client: "Gulf Contracting LLC", project: "Downtown Tower Lift", crane: "200T Mobile Crane", site: "Dubai Downtown", stage: "Docs In Progress", priority: "Critical", progress: 72, pm: "Admin", mob: "11 Aug 2026", offHire: "14 Aug 2026", crewIds: [], gearIds: [], trailerIds: [] },

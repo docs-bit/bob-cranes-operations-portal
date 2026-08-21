@@ -432,7 +432,7 @@ export function DepartmentView({
           </div>
           <div className="panel-body">
             <div className="department-checklist">
-              {config.checklist.map((item, index) => (
+              {config.checklist.map((item: string, index: number) => (
                 <div className="department-checklist-row" key={item}>
                   <span>{index + 1}</span>
                   <div>

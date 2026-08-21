@@ -28,7 +28,7 @@ vi.mock("../client/src/lib/trpc", () => ({
   },
 }));
 
-import { ClientPortal } from "../client/src/pages/Home";
+import { ClientPortal } from "../client/src/pages/views";
 
 describe("Client Response Portal navigation", () => {
   it("opens the required-documents upload flow and forwards selected files", async () => {

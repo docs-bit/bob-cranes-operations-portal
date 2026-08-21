@@ -37,7 +37,8 @@ export const rentalRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const clientIp = ctx.req.socket?.remoteAddress ?? ctx.req.headers?.["x-forwarded-for"] ?? "unknown";
+      const forwardedFor = ctx.req.headers?.["x-forwarded-for"];
+      const clientIp = ctx.req.socket?.remoteAddress ?? (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor) ?? "unknown";
       if (!checkEnquiryRateLimit(clientIp)) {
         throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many enquiries. Please try again later." });
       }

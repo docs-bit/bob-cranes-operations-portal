@@ -6,6 +6,7 @@ import {
   type Stage,
   initialBookings,
   uiBookingIdForPersisted,
+  PARALLEL_WORKSTREAMS,
 } from "@/pages/views/shared";
 import { type EmployeeAllocation } from "@shared/bookingConflictRules";
 
@@ -64,7 +65,7 @@ export function useBookingWorkspace() {
 
   const advanceDepartmentBooking = async (
     booking: Booking,
-    config: { nextStage?: string; secondaryStage?: string; secondaryNextStage?: string }
+    config: { nextStage?: Stage; secondaryStage?: Stage; secondaryNextStage?: Stage }
   ) => {
     const nextStage =
       booking.stage === config.secondaryStage
@@ -100,7 +101,7 @@ export function useBookingWorkspace() {
 
   const completeDepartmentWorkstream = async (
     booking: Booking,
-    config: { parallelCode?: string }
+    config: { parallelCode?: (typeof PARALLEL_WORKSTREAMS)[number] }
   ) => {
     if (!config.parallelCode) return;
     try {

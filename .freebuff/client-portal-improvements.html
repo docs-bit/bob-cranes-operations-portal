@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal Security — Architectural Improvements</title>
+<style>
+:root{--bg:#0d1117;--sf:#161b22;--bd:#30363d;--tx:#e6edf3;--mu:#8b949e;--ac:#58a6ff;--gn:#3fb950;--rd:#f85149;--or:#d29922;--pu:#bc8cff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;padding:2rem}
+.ct{max-width:1100px;margin:0 auto}
+h1{font-size:2rem;margin-bottom:.5rem;background:linear-gradient(135deg,var(--ac),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--mu);margin-bottom:2rem;font-size:1.05rem}
+h2{font-size:1.3rem;margin:2.5rem 0 1rem;color:var(--ac)}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:1.5rem;margin:1.5rem 0}
+.cd h3{font-size:1.1rem;margin-bottom:.75rem;color:var(--tx)}
+.cd p,.cd li{color:var(--mu);font-size:.9rem;line-height:1.7}
+.cm{font-family:monospace;background:#1c2128;padding:.15rem .4rem;border-radius:4px;font-size:.85rem;color:var(--ac)}
+.tg{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.tg-g{background:#1a3a2a;color:var(--gn)}.tg-o{background:#3a2a1a;color:var(--or)}.tg-r{background:#3a1a1a;color:var(--rd)}.tg-b{background:#1a2a3a;color:var(--ac)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.vs>div{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:1.25rem}
+.vs h4{font-size:.9rem;margin-bottom:.75rem;color:var(--mu);text-transform:uppercase;letter-spacing:.05em}
+.bf{border-left:3px solid var(--rd)}.af{border-left:3px solid var(--gn)}
+table{width:100%;border-collapse:collapse;margin:1rem 0;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+th,td{padding:.6rem .8rem;text-align:left;border-bottom:1px solid var(--bd);font-size:.85rem}
+th{background:#1c2128;color:var(--ac);font-weight:600}td{color:var(--mu)}
+tr:last-child td{border-bottom:none}
+.co{border-left:3px solid var(--or);background:#1a1a1a;padding:1rem 1.25rem;border-radius:0 8px 8px 0;margin:1.5rem 0;font-size:.9rem;color:var(--mu)}
+.co strong{color:var(--or)}
+.rk{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:50%;font-weight:700;font-size:.9rem;margin-right:.5rem}
+.r1{background:#1a3a2a;color:var(--gn)}.r2{background:#3a2a1a;color:var(--or)}.r3{background:#3a1a1a;color:var(--rd)}.r4{background:#1a2a3a;color:var(--ac)}
+.fl{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.8rem;background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin:.75rem 0;font-size:.8rem}
+.fl .st{padding:.4rem .7rem;border-radius:6px;font-weight:600;white-space:nowrap}
+.fl .ar{color:var(--mu);font-size:1rem}
+.ok{background:#1a3a2a;color:var(--gn);border:1px solid #2a5a3a}
+.wn{background:#3a2a1a;color:var(--or);border:1px solid #5a4a2a}
+.bd2{background:#3a1a1a;color:var(--rd);border:1px solid #5a2a2a}
+.in{background:#1a2a3a;color:var(--ac);border:1px solid #2a3a5a}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+@media(max-width:768px){body{padding:1rem}.vs,.g2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="ct">
+<h1>Client Portal Security — Architectural Improvements</h1>
+<p class="sub">4 recommendations from a fresh-eyes review. Each targets a real gap, not theoretical risk.</p>
+
+<h2><span class="rk r1">1</span> Client Procedure Middleware</h2>
+<div class="cd"><h3><span class="tg tg-g">HIGH IMPACT</span> Secure by default, not opt-in</h3>
+<p>Every data endpoint manually calls <span class="cm">validateAndScope()</span>. One forgotten call = unauthenticated access. The rest of the app uses tRPC middleware (<span class="cm">protectedProcedure</span>) to enforce auth automatically.</p></div>
+<div class="vs"><div class="bf"><h4>Before — Manual per-endpoint</h4>
+<div class="fl"><span class="st in">publicProcedure</span><span class="ar">→</span><span class="st wn">validateAndScope()</span><span class="ar">→</span><span class="st ok">DB query</span></div>
+<p style="font-size:.85rem;color:var(--mu);margin-top:.5rem">Each endpoint must remember to call it. 4 do today. The 5th might forget.</p></div>
+<div class="af"><h4>After — Middleware enforces automatically</h4>
+<div class="fl"><span class="st ok">clientProcedure</span><span class="ar">→</span><span class="st in">ctx.clientPayload</span><span class="ar">→</span><span class="st ok">DB query</span></div>
+<p style="font-size:.85rem;color:var(--mu);margin-top:.5rem">New endpoints secure by default. JWT validated once, payload on context.</p></div></div>
+<div class="g2"><div class="cd"><h3>Effort</h3><p>~15 lines of middleware + updating 4 endpoints. Reuses existing <span class="cm">requireUser</span> pattern.</p></div>
+<div class="cd"><h3>Tradeoff</h3><p>Adds <span class="cm">clientProcedure</span> but pattern already exists for <span class="cm">protectedProcedure</span>.</p></div></div>
+
+<h2><span class="rk r2">2</span> Rate Limit Verify Endpoints</h2>
+<div class="cd"><h3><span class="tg tg-o">MEDIUM IMPACT</span> OTP brute-force prevention</h3>
+<p><span class="cm">verifyOtp</span> is public. Anyone with a booking ID can brute-force the 6-digit OTP (900K possibilities, no rate limit).</p></div>
+<div class="fl"><span class="st bd2">Attacker knows booking ID</span><span class="ar">→</span><span class="st bd2">Brute-force OTP</span><span class="ar">→</span><span class="st bd2">No rate limit = fast</span></div>
+<div class="cd"><h3>Fix</h3><p>Reuse rate limiter from <span class="cm">sales.ts</span>. Max 5 attempts per IP per 15 minutes.</p></div>
+<div class="g2"><div class="cd"><h3>Effort</h3><p>Low — reuse existing pattern. ~10 lines.</p></div>
+<div class="cd"><h3>Tradeoff</h3><p>Legitimate mistypes get temporarily locked. 5 attempts / 15 min is generous.</p></div></div>
+
+<h2><span class="rk r3">3</span> Fix TOCTOU Race in Token Verification</h2>
+<div class="cd"><h3><span class="tg tg-r">SECURITY BUG</span> Duplicate session issuance</h3>
+<p><span class="cm">db.verifyClientPortalToken</span> does SELECT then UPDATE. Two concurrent requests can both see <span class="cm">usedAt=NULL</span>.</p></div>
+<div class="vs"><div class="bf"><h4>Before — Two separate queries</h4>
+<div class="fl"><span class="st in">SELECT usedAt</span><span class="ar">→</span><span class="st wn">check null</span><span class="ar">→</span><span class="st in">UPDATE usedAt</span></div>
+<p style="font-size:.85rem;color:var(--mu);margin-top:.5rem">Race window between SELECT and UPDATE.</p></div>
+<div class="af"><h4>After — Atomic single query</h4>
+<div class="fl"><span class="st ok">UPDATE SET usedAt=NOW()</span><span class="ar">→</span><span class="st ok">WHERE usedAt IS NULL</span><span class="ar">→</span><span class="st ok">RETURNING *</span></div>
+<p style="font-size:.85rem;color:var(--mu);margin-top:.5rem">Single atomic operation. Only one request wins.</p></div></div>
+<div class="g2"><div class="cd"><h3>Effort</h3><p>Low — replace 2 queries with 1 in db.ts. 3 lines.</p></div>
+<div class="cd"><h3>Tradeoff</h3><p>Changes db.ts but surgical, not a refactor.</p></div></div>
+
+<h2><span class="rk r4">4</span> Filter Client Portal Data</h2>
+<div class="cd"><h3><span class="tg tg-b">PRD COMPLIANCE</span> Information leakage</h3>
+<p><span class="cm">getBookingSummary</span> returns the full Booking record. PRD §6.14 says clients should only see relevant info.</p></div>
+<table><tr><th>Field</th><th>Currently</th><th>Should</th></tr>
+<tr><td><span class="cm">lpoReference</span></td><td style="color:var(--rd)">Yes (internal)</td><td style="color:var(--gn)">No</td></tr>
+<tr><td><span class="cm">projectManager</span></td><td style="color:var(--rd)">Yes (internal)</td><td style="color:var(--gn)">No</td></tr>
+<tr><td><span class="cm">costCode</span></td><td style="color:var(--rd)">Yes (internal)</td><td style="color:var(--gn)">No</td></tr>
+<tr><td><span class="cm">stage</span></td><td style="color:var(--or)">Raw string</td><td style="color:var(--gn)">Display label</td></tr>
+<tr><td><span class="cm">clientContactName</span></td><td style="color:var(--gn)">Yes</td><td style="color:var(--gn)">Yes</td></tr>
+<tr><td><span class="cm">bookingId</span></td><td style="color:var(--gn)">Yes</td><td style="color:var(--gn)">Yes</td></tr></table>
+<div class="g2"><div class="cd"><h3>Effort</h3><p>Medium — map Booking to ClientBookingView type.</p></div>
+<div class="cd"><h3>Tradeoff</h3><p>Adds a type, but internal vs. external data should never share the same shape.</p></div></div>
+
+<h2>Priority Summary</h2>
+<table><tr><th>#</th><th>Recommendation</th><th>Impact</th><th>Effort</th><th>Why First</th></tr>
+<tr><td><span class="rk r1" style="width:1.5rem;height:1.5rem;font-size:.75rem">1</span></td><td>clientProcedure middleware</td><td><span class="tg tg-g">High</span></td><td>Low</td><td>Prevents entire class of future bugs</td></tr>
+<tr><td><span class="rk r2" style="width:1.5rem;height:1.5rem;font-size:.75rem">2</span></td><td>Rate limit verify endpoints</td><td><span class="tg tg-o">Medium</span></td><td>Low</td><td>Closes brute-force vector</td></tr>
+<tr><td><span class="rk r3" style="width:1.5rem;height:1.5rem;font-size:.75rem">3</span></td><td>Fix TOCTOU race</td><td><span class="tg tg-r">Security</span></td><td>Low</td><td>Real bug, 3-line fix</td></tr>
+<tr><td><span class="rk r4" style="width:1.5rem;height:1.5rem;font-size:.75rem">4</span></td><td>Filter client data</td><td><span class="tg tg-b">PRD</span></td><td>Medium</td><td>Closes info leakage per spec</td></tr></table>
+
+<div class="co"><strong>Remaining tradeoffs:</strong> Client session as input param vs cookie (correct for magic-link auth). ENV.cookieSecret shared with local auth (acceptable for single-app). In-memory rate limiter resets on restart (adequate for single instance).</div>
+
+<p style="text-align:center;color:var(--mu);margin-top:3rem;font-size:.85rem">BOB Cranes Operations Portal · Client Portal Security · August 2026</p>
+</div>
+</body>
+</html>
