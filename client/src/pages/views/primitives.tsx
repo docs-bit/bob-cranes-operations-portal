@@ -1,4 +1,5 @@
 
+import React from "react";
 import { CircleDot } from "lucide-react";
 import { statusTone } from "./shared";
 

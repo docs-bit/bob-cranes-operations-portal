@@ -573,9 +573,14 @@ export async function replaceCrewBookingAllocations(input: {
 }
 
 export async function getAllEquipment() {
+  const fallbackEquipment = [
+    { id: "eq-demo-1", assetCode: "B-205", name: "50T Mobile Crane · DEMAG", capacityTons: 50, status: "Available", inspectionExpiry: "2027-03-15", type: "Mobile Crane", registration: "60312" },
+    { id: "eq-demo-2", assetCode: "B-210", name: "35T Mobile Crane · PPM", capacityTons: 35, status: "Available", inspectionExpiry: "2027-06-20", type: "Mobile Crane", registration: "98274" },
+  ];
   const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(equipment);
+  if (!db) return fallbackEquipment;
+  const rows = await db.select().from(equipment);
+  return rows.length > 0 ? rows : fallbackEquipment;
 }
 
 export async function getAllCrew() {

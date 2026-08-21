@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { FC, ReactNode } from "react";
+import React, { type FC, type ReactNode } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, ArrowRight, CalendarDays, Check, CheckCircle2, ClipboardCheck, Clock3, CloudUpload, FileText, HardHat, LayoutDashboard, LoaderCircle, MapPin, TrendingUp, Truck, Users, Wrench } from "lucide-react";
 import { attendanceRoster, gears, initials, stageShort, stages, dateKey, defaultAttendanceRecord, formatAttendanceDate, summarizeAttendance, updateAttendance, ATTENDANCE_STATUSES, TRAINING_EMPLOYEES, type AttendanceRecord, type AttendanceStatus, type Booking, type View } from "./shared";

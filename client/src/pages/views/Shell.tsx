@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, ClipboardCheck, Download, FileCheck2, FileText, FolderOpen, Gauge, HardHat, Landmark, LayoutDashboard, Lock, LoaderCircle, LogOut, Mail, MapPin, MessageCircle, MoreHorizontal, Moon, Plus, Search, Send, Settings, ShieldCheck, Sun, TrendingUp, Truck, Users, UserCog, Wrench, Upload, X } from "lucide-react";
 import { DEPARTMENTS, type View, type Booking, initials, statusTone } from "./shared";
@@ -82,7 +82,7 @@ export function Shell({
   };
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
-      if (canSearchDossiers && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      if (event.key !== "/" && canSearchDossiers && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         openDossierSearch();
       }

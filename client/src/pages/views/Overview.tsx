@@ -6,6 +6,7 @@ import { AttendanceSummaryCard, ExpiringCertificatesWidget, PageHeading, Pipelin
 import { MetricCard, StatusBadge } from "./primitives";
 import { ATTENDANCE_CREW_ROSTER } from "@shared/attendanceCrewRoster";
 import { formatDashboardGreeting } from "@shared/dashboardGreeting";
+import { trpc } from "@/lib/trpc";
 
 export function Overview({
   bookings,
@@ -42,8 +43,10 @@ export function Overview({
   canViewSalesEnquiries: boolean;
   onSelectEmployee: (employeeId: string) => void;
 }) {
-  const canCreateBooking =
+    const canCreateBooking =
     user.role === "admin" || user.departmentCode === "sales";
+  const updateMyContactDetails = trpc.auth.updateMyContactDetails.useMutation();
+
   const unassignedSeverity = unassignedRentalEnquiries === 0
     ? "all-assigned"
     : unassignedOldestWaitHours >= salesSlaConfig.criticalHours
@@ -117,7 +120,19 @@ export function Overview({
           <ArrowRight size={15} />
         </button>
       )}
+            <section className="panel rental-estimate-contact-panel" aria-label="Rental estimate contact settings">
+        <div className="panel-header">
+          <div>
+            <div className="panel-title">Rental estimate contact</div>
+            <div className="panel-meta">Keep your company and phone details ready for rental estimate follow-up.</div>
+          </div>
+          <button type="button" className="secondary-button" onClick={() => void updateMyContactDetails.mutateAsync({ companyName: user.name ?? "", phone: "" })} disabled={updateMyContactDetails.isPending}>
+            {updateMyContactDetails.isPending ? "Saving…" : "Save contact details"}
+          </button>
+        </div>
+      </section>
       <div className="metric-grid">
+
         <MetricCard
           label="Active dossiers"
           value="24"

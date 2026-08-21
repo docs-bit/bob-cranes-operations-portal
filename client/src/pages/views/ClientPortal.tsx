@@ -118,11 +118,11 @@ export function ClientPortal({
           Math.round((uploadedDocs / documents.length) * 100)
         );
   const taxonomyCategories = useMemo(
-    () => Array.from(new Set([...(taxonomy?.categories.map(category => category.name) ?? []), ...CLIENT_DOCUMENT_CATEGORIES])),
+    () => Array.from(new Set([...(taxonomy?.categories.map((category: { name: string }) => category.name) ?? []), ...CLIENT_DOCUMENT_CATEGORIES])),
     [taxonomy?.categories]
   );
   const taxonomyTags = useMemo(
-    () => Array.from(new Set([...(taxonomy?.tags.map(tag => tag.name) ?? []), ...documents.flatMap(document => document.tags ?? [])])).toSorted((left, right) => left.localeCompare(right)),
+    () => Array.from(new Set([...(taxonomy?.tags.map((tag: { name: string }) => tag.name) ?? []), ...documents.flatMap(document => document.tags ?? [])])).toSorted((left, right) => left.localeCompare(right)),
     [documents, taxonomy?.tags]
   );
   const documentRecords = useMemo(

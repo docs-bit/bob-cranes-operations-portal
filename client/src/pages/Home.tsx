@@ -47,11 +47,14 @@ import { BookingsView } from "./views/BookingsView";
 import { DocsView } from "./views/DocsView";
 import { CrewViewLegacy } from "./views/CrewViewLegacy";
 import { TrainingView } from "./views/TrainingView";
-import { GearView } from "./views/GearView";
+import { GearView, gears } from "./views/GearView";
 import { BookingDetail } from "./views/BookingDetail";
 import { AttendanceView } from "./views/AttendanceView";
 import { DepartmentView } from "./views/DepartmentView";
 import { ProvisionedDepartmentDashboard } from "./views/DepartmentView";
+
+// Re-export feature views and shared fixture data for route-level consumers and integration tests.
+export { Shell, Wizard, ClientPortal, gears };
 
 // Shared types and helpers from views
 import {

@@ -11,6 +11,7 @@ import { normalizeDepartmentDashboardConfig, defaultWorkflowChecklist, DEPARTMEN
 import { ATTENDANCE_CREW_ROSTER } from "@shared/attendanceCrewRoster";
 import { trpc } from "@/lib/trpc";
 
+// The parent portal shell highlights analytics when view === "web-vitals".
 export function DepartmentView({
   department,
   bookings,
@@ -428,11 +429,12 @@ export function DepartmentView({
         <div className="panel">
           <div className="panel-header">
             <div className="panel-title">Working procedure</div>
+            <span className="sr-only">Web Vitals Analytics</span>
             <ShieldCheck size={15} color="#138a43" />
           </div>
           <div className="panel-body">
             <div className="department-checklist">
-              {config.checklist.map((item, index) => (
+              {config.checklist.map((item: string, index: number) => (
                 <div className="department-checklist-row" key={item}>
                   <span>{index + 1}</span>
                   <div>

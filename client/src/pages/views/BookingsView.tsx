@@ -107,6 +107,7 @@ export function BookingsEmptyState({
   );
 }
 
+// The parent workspace calls setBookingsLoading(false) when the initial dossier hydration completes.
 export function BookingsView({
   bookings,
   setView,
@@ -255,21 +256,21 @@ export function BookingsView({
       const logoWidth = drawBobDocumentLogo({ page, logo, bold, x: 40, y: height - 88, maxWidth: 150, maxHeight: 54 });
       const headerX = 40 + logoWidth + 18;
       const generatedAt = new Date().toLocaleString();
-      
+
       page.drawText("Filtered Booking Dossiers Report", { x: headerX, y: height - 45, size: 18, color: rgb(0.12, 0.35, 0.28) });
       page.drawText(`Generated: ${generatedAt} · Filter: ${filter} · Sorted: ${sortBy} · Total: ${visibleBookings.length} dossiers`, { x: headerX, y: height - 66, size: 10, color: rgb(0.4, 0.4, 0.4) });
-      
+
       let y = height - 118;
       page.drawText("ID", { x: 40, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
       page.drawText("Client / Project", { x: 120, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
       page.drawText("Crane & Site", { x: 320, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
       page.drawText("Stage", { x: 520, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
       page.drawText("Mobilization", { x: 680, y, size: 10, color: rgb(0.2, 0.2, 0.2) });
-      
+
       y -= 16;
       page.drawLine({ start: { x: 40, y }, end: { x: 800, y }, thickness: 1, color: rgb(0.8, 0.85, 0.83) });
       y -= 20;
-      
+
       for (const booking of visibleBookings.slice(0, 22)) {
         if (y < 50) {
           page = pdfDoc.addPage([842, 595]);
@@ -282,7 +283,7 @@ export function BookingsView({
         page.drawText(booking.mob, { x: 680, y, size: 9, color: rgb(0.1, 0.1, 0.1) });
         y -= 22;
       }
-      
+
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, ArrowRight, FileText, Lock, Plus, Truck, Upload, Users, Wrench, X } from "lucide-react";
 import { gears, type GearRecord } from "./shared";
+
+export { gears };
 import { PageHeading } from "./OverviewHelpers";
 import { MetricCard, StatusBadge } from "./primitives";
 import { formatGearValidityDate, gearDocumentStatus, isValidGearDocumentPeriod } from "@shared/gearDocumentRules";
