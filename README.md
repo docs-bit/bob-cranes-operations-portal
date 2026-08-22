@@ -52,3 +52,31 @@ A production-grade, full-stack role-based operations portal built for **BOB Cran
    ```bash
    pnpm exec vitest run
    ```
+
+---
+
+## Production Deployment
+
+The permanent production site is available at **https://bob-cranes-portal.vercel.app**. The React client and Express/tRPC API are deployed together on Vercel as a Git-linked production project. Pushes to the `main` branch trigger automatic production deployments.
+
+The production database is a Railway MySQL service. Its connection string is stored only in Vercel as a **sensitive** environment variable and must never be committed to the repository or copied into client-side code.
+
+| Variable | Required in Production | Purpose |
+|---|---:|---|
+| `DATABASE_URL` | Yes | Server-side Railway MySQL connection string. |
+| `JWT_SECRET` | Yes | Server-side signing key for authenticated portal sessions. |
+| `NODE_ENV` | Recommended | Set to `production` for production deployments. |
+
+> The production database is initialized without an administrator account. Open **Portal Sign In** on the production site and complete the initial administrator setup before inviting operational users.
+
+### Deployment Verification
+
+The production deployment is considered healthy when the public landing page returns HTTP 200 and the read-only `auth.setupStatus` tRPC procedure returns successfully through `/api/trpc`. This confirms that the Vercel serverless API can connect to the Railway MySQL database without exposing database credentials to visitors.
+
+### Security Notes
+
+Keep `DATABASE_URL` and `JWT_SECRET` in the hosting provider's protected environment-variable settings only. If either value is ever exposed, rotate it immediately and redeploy the production application.
+
+Repository: https://github.com/docs-bit/bob-cranes-operations-portal
+
+---
