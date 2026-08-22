@@ -38,6 +38,70 @@ A production-grade, full-stack role-based operations portal built for **BOB Cran
 
 ---
 
+## Portal Walkthrough
+
+The following screenshots document the main public and authenticated experiences provided by the portal. They are stored in the repository under [`client/public/assets/portal-screenshots/`](client/public/assets/portal-screenshots/) so they can also be reused in product documentation and release notes.
+
+| Experience | Screenshot asset | What it demonstrates |
+|---|---|---|
+| Public landing page | `landing-hero.png` | The core value proposition, public navigation, quote request, and capability entry points. |
+| Services and planning | `rental-services.png` | Rental service categories and the path from enquiry to lift planning. |
+| Capability overview | `capability-and-cta.png` | Equipment support context, mobilisation capability, and the sales handoff call to action. |
+| Working process | `working-process.png` | The coordinated operating workflow from brief intake through controlled mobilisation. |
+| Enquiry and contact | `rental-enquiry-and-footer.png` | The structured rental enquiry form, contact capture, and footer navigation. |
+| Secure sign-in | `portal-sign-in.png` | The role-based portal entry point for authorised operational users. |
+| Operations cockpit | `operations-dashboard.png` | The authenticated administrator dashboard for booking, crew, compliance, and departmental work. |
+
+### Public Landing and Rental Planning
+
+The public experience explains the company’s lifting-rental capability and gives prospective clients direct routes to request a quotation, explore services, and begin a structured rental enquiry.
+
+![BOB Cranes public landing page showing the controlled-lifting hero message, navigation, rental quote action, and capability action](client/public/assets/portal-screenshots/landing-hero.png)
+
+*Public landing page: positioning, navigation, and an operations-ready rental quote pathway.*
+
+The services section connects the initial enquiry to practical service lines, including mobile crane rental, complex lift planning, lifting gear support, qualified crew, document control, and dispatch coordination.
+
+![BOB Cranes rental services and lift planning section showing six service cards and a crane-planning panel](client/public/assets/portal-screenshots/rental-services.png)
+
+*Rental services and planning: the operational support available before a crane arrives on site.*
+
+The capability section presents equipment support in operational context and clarifies how a public enquiry becomes a coordinated handoff into the sales and operations workflow.
+
+![BOB Cranes capability section showing site-lift support, branded fleet, managed mobilisation, and the rental quote call to action](client/public/assets/portal-screenshots/capability-and-cta.png)
+
+*Capability overview: site-lift support, BOB fleet visibility, managed mobilisation, and a clear next action.*
+
+### Coordinated Delivery and Enquiry Capture
+
+The operating-process view shows the three controlled steps used to turn a project requirement into an actionable booking route: share the brief, coordinate readiness, and mobilise with a controlled handoff.
+
+![BOB Cranes working-process section showing the brief, readiness, and mobilisation workflow steps](client/public/assets/portal-screenshots/working-process.png)
+
+*Working process: a concise workflow that keeps sales, documentation, crew, gear, and operations aligned.*
+
+The enquiry area collects the essentials that the sales team needs to start an informed response: contact details, project location, equipment type, rental duration, and lift or project context.
+
+![BOB Cranes rental enquiry form and footer showing the project requirements form, rental estimate action, and site navigation](client/public/assets/portal-screenshots/rental-enquiry-and-footer.png)
+
+*Rental enquiry: structured client inputs become an actionable sales and operations handoff.*
+
+### Secure Operations Workspace
+
+Authorised users enter through a dedicated sign-in experience, supporting controlled access to the role-based operational workspace.
+
+![BOB Cranes portal sign-in screen showing the secure work-email and password form](client/public/assets/portal-screenshots/portal-sign-in.png)
+
+*Secure portal access: a focused entry point for authenticated BOB Cranes operational users.*
+
+After authentication, the Operations Cockpit provides an administrator-facing view of capacity, booking pipeline, compliance signals, department navigation, and priority actions.
+
+![BOB Cranes Operations Cockpit dashboard showing booking statistics, crew availability, compliance watch, and department navigation](client/public/assets/portal-screenshots/operations-dashboard.png)
+
+*Operations Cockpit: a consolidated dashboard for active dossiers, crew availability, compliance, and coordinated departmental execution.*
+
+---
+
 ## 📦 Getting Started
 
 1. **Install Dependencies**:
