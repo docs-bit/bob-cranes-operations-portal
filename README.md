@@ -210,6 +210,92 @@ The runtime also seeds baseline operational fixtures when required. This support
 
 ---
 
+## Database migration and seeding workflow
+
+The portal uses Drizzle ORM with a MySQL dialect. The schema definition lives in [`drizzle/schema.ts`](drizzle/schema.ts), Drizzle configuration is in [`drizzle.config.ts`](drizzle.config.ts), and generated migration artifacts are stored under `drizzle/`. Every migration or seed command reads `DATABASE_URL`; therefore, confirm the target environment before running a command.
+
+| Task | Command | Outcome |
+|---|---|---|
+| Generate and apply local migrations | `pnpm run db:push` | Runs `drizzle-kit generate` followed by `drizzle-kit migrate`. |
+| Generate migration files only | `pnpm exec drizzle-kit generate` | Compares the Drizzle schema with the migration history and creates migration artifacts when required. |
+| Apply existing migrations only | `pnpm exec drizzle-kit migrate` | Applies committed migrations to the database selected by `DATABASE_URL`. |
+| Load the demonstration dataset | `pnpm run db:seed:sample` | Loads the sample-data script after schema creation; use it once on an empty or disposable database. |
+
+### Development schema workflow
+
+Use this workflow when changing a development database. It keeps the TypeScript schema and the committed migration history aligned.
+
+```bash
+# 1. Update drizzle/schema.ts.
+# 2. Confirm DATABASE_URL points to a local or disposable development database.
+pnpm run db:push
+
+# 3. Review the generated files before committing them.
+git status --short drizzle/
+git diff -- drizzle/
+
+# 4. Commit schema and migration changes together.
+git add drizzle/schema.ts drizzle/
+```
+
+`pnpm run db:push` is appropriate for a developer environment because it both generates and applies migrations. Do not use it blindly against a shared production database: review the generated SQL and coordinate the deployment first.
+
+### Controlled production migration workflow
+
+Production deployment should use the migrations already committed to Git rather than generating new migrations on the production database. Take a backup, verify the target connection string, and run the apply-only command from a trusted environment.
+
+```bash
+# DATABASE_URL must point to the intended production database.
+pnpm exec drizzle-kit migrate
+```
+
+After the migration completes, deploy the application version that expects the new schema. When a change adds non-null fields, transforms existing data, or removes columns, include an explicit data migration and validate it in a staging or disposable copy before production.
+
+> Vercel uses the prebuilt serverless application and does not run migrations automatically. Set the production `DATABASE_URL`, run the reviewed migrations separately, and then deploy or redeploy the Vercel application. The Railway container configuration currently invokes a schema push at startup; review this behavior carefully before using it for sensitive production migrations.
+
+### Sample data workflow
+
+The sample seeder in [`scripts/seedSampleDatabase.ts`](scripts/seedSampleDatabase.ts) runs in a transaction and uses upserts for many named core entities. It also writes allocation and activity-style operational records. Run it once on an empty or disposable database to create a coherent, non-production dataset for local evaluation; it is not a production data-management tool.
+
+```bash
+# Use only a local or disposable database.
+SAMPLE_DB_PASSWORD='choose-a-local-demo-password' pnpm run db:seed:sample
+```
+
+| Seeded domain | Included sample records |
+|---|---|
+| Departments and users | Seven departments and four local demonstration accounts, including one administrator. |
+| Fleet and workforce | Four cranes, six crew records, four lifting-gear records, and three trailers. |
+| Booking operations | Four bookings, persisted crew allocations, required documents, chat messages, and notifications. |
+| Sales workflow | Two rental enquiries with associated enquiry events. |
+| Governance and visibility | System settings, client feedback, activity records, telemetry events, audit entries, and two provisioned department dashboards. |
+
+The default demonstration administrator is `admin@bobcranes.demo`. Its default password is `Demo123!` **only when** `SAMPLE_DB_PASSWORD` is not supplied. Set `SAMPLE_DB_PASSWORD` explicitly for every seeded environment, never use the default password in a public or shared environment, and rotate or delete demonstration accounts before any external access is enabled.
+
+### Resetting a local development database
+
+For a disposable local database, drop and recreate the database with your MySQL administration tool, then apply the schema and seed only if sample records are desired.
+
+```bash
+# Recreate the empty database using your local MySQL administrator.
+# Then use the application commands:
+pnpm run db:push
+SAMPLE_DB_PASSWORD='choose-a-local-demo-password' pnpm run db:seed:sample
+```
+
+This reset procedure is intentionally limited to local or explicitly disposable environments. Do not drop, reseed, or overwrite a shared, staging, or production database without an approved backup and recovery plan.
+
+### Database safety checklist
+
+1. Check `DATABASE_URL` and database name before every migration or seed operation.
+2. Commit generated migrations with the schema change that created them.
+3. Back up production data and test irreversible changes in a staging or disposable copy.
+4. Use `drizzle-kit migrate` to apply reviewed migration history to production.
+5. Keep `SAMPLE_DB_PASSWORD` local and never expose sample accounts or default credentials in public environments.
+6. Verify the public site, portal sign-in flow, and a database-backed tRPC query after deployment.
+
+---
+
 ## Application routes
 
 | Route | Audience | Purpose |
