@@ -55,9 +55,9 @@ const serviceCards = [
 ] as const;
 
 const projectCards = [
-  ["/assets/cranes/capability-wind-component-lift.jpeg", "Industrial heavy lift", "Project execution", "Engineered lifting support for complex installation scopes."],
-  ["/assets/cranes/capability-highrise-lift.jpeg", "Marine and yacht lifting", "Specialist handling", "Coordinated access, equipment and crew readiness for sensitive waterfront work."],
-  ["/assets/cranes/capability-residential-lift.jpeg", "Urban crane deployment", "Site coordination", "A controlled operational route for demanding city-centre project conditions."],
+  { image640: "/assets/cranes/capability-wind-component-lift-640.webp", image1280: "/assets/cranes/capability-wind-component-lift-1280.webp", fallback: "/assets/cranes/capability-wind-component-lift.jpeg", width: 1280, height: 807, title: "Industrial heavy lift", tag: "Project execution", copy: "Engineered lifting support for complex installation scopes." },
+  { image640: "/assets/cranes/capability-highrise-lift-640.webp", image1280: "/assets/cranes/capability-highrise-lift-1280.webp", fallback: "/assets/cranes/capability-highrise-lift.jpeg", width: 1280, height: 790, title: "Marine and yacht lifting", tag: "Specialist handling", copy: "Coordinated access, equipment and crew readiness for sensitive waterfront work." },
+  { image640: "/assets/cranes/capability-residential-lift-640.webp", image1280: "/assets/cranes/capability-residential-lift-1280.webp", fallback: "/assets/cranes/capability-residential-lift.jpeg", width: 1280, height: 796, title: "Urban crane deployment", tag: "Site coordination", copy: "A controlled operational route for demanding city-centre project conditions." },
 ] as const;
 
 const processSteps = [
@@ -82,6 +82,7 @@ export default function RentalLanding() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [form, setForm] = useState<EnquiryForm>(emptyEnquiry);
   const [submittedEnquiry, setSubmittedEnquiry] = useState<{ companyName: string; equipmentInterest: string } | null>(null);
+  const [imagePreview, setImagePreview] = useState<{ image: string; title: string; alt: string } | null>(null);
   useEffect(() => {
     if (!user) return;
     setForm(current => ({
@@ -92,6 +93,12 @@ export default function RentalLanding() {
       phone: current.phone || user.phone || "",
     }));
   }, [user?.email, user?.id, user?.name]);
+  useEffect(() => {
+    if (!imagePreview) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setImagePreview(null); };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [imagePreview]);
   const fieldErrors = {
     contactName: form.contactName.length > 0 && form.contactName.trim().length < 2 ? "Enter at least two characters." : "",
     companyName: form.companyName.length > 0 && form.companyName.trim().length < 2 ? "Enter your company name." : "",
@@ -145,7 +152,9 @@ export default function RentalLanding() {
 
     <section className="bob-services bob-section" id="services"><div className="bob-frame"><div className="bob-section-head"><div><div className="bob-kicker"><i /> Our lift services</div><h2>Rental support that follows the work.</h2></div><button className="bob-inline-action" onClick={() => scrollToId("enquire")}>Start an enquiry <ArrowRight size={14} /></button></div><div className="bob-service-grid">{serviceCards.map(([Icon, title, copy]) => <article key={title}><Icon size={26} /><div><h3>{title}</h3><p>{copy}</p><button onClick={() => scrollToId("enquire")}>Learn more <ArrowRight size={13} /></button></div></article>)}</div><div className="bob-service-callout"><img src={BOB_AIRCRAFT_LIFT} alt="BOB Cranes supporting an aircraft lifting project" /><div><div className="bob-kicker"><i /> Rental planning route</div><h3>Prepare the scope before the crane arrives.</h3><p>Use the public enquiry to start the conversation, then let Sales and Operations turn it into a controlled booking route.</p><button className="bob-button dark" onClick={() => scrollToId("enquire")}>Plan a lift <ArrowRight size={15} /></button></div></div></div></section>
 
-    <section className="bob-projects bob-section" id="projects"><div className="bob-frame"><div className="bob-section-head centered"><div className="bob-kicker"><i /> BOB project capability</div><h2>Equipment and operational support in context.</h2><p>Explore the types of support the BOB team coordinates around the lift—not stock claims or invented project outcomes.</p></div><div className="bob-project-grid">{projectCards.map(([image, title, tag, copy]) => <article key={title}><img src={image} alt={`${title} — BOB Cranes project photography`} loading="lazy" /><div><span>{tag}</span><h3>{title}</h3><p>{copy}</p><button onClick={() => scrollToId("enquire")} aria-label={`Discuss ${title}`}><ArrowRight size={15} /></button></div></article>)}</div></div></section>
+    <section className="bob-projects bob-section" id="projects"><div className="bob-frame"><div className="bob-section-head centered"><div className="bob-kicker"><i /> BOB project capability</div><h2>Equipment and operational support in context.</h2><p>Explore the types of support the BOB team coordinates around the lift—not stock claims or invented project outcomes.</p></div><div className="bob-project-grid">{projectCards.map((project) => <article key={project.title}><button className="bob-project-image-trigger" type="button" onClick={() => setImagePreview({ image: project.image1280, title: project.title, alt: `${project.title} — BOB Cranes project photography` })} aria-label={`Preview ${project.title} project photo`}><picture><source type="image/webp" srcSet={`${project.image640} 640w, ${project.image1280} 1280w`} sizes="(max-width: 640px) calc(100vw - 28px), (max-width: 900px) calc(50vw - 32px), 380px" /><img src={project.fallback} alt={`${project.title} — BOB Cranes project photography`} width={project.width} height={project.height} loading="lazy" decoding="async" /></picture></button><div><span>{project.tag}</span><h3>{project.title}</h3><p>{project.copy}</p><button className="bob-project-discuss" onClick={() => scrollToId("enquire")} aria-label={`Discuss ${project.title}`}>Discuss scope <ArrowRight size={15} /></button></div></article>)}</div></div></section>
+
+    {imagePreview && <div className="bob-image-modal" role="dialog" aria-modal="true" aria-label={`${imagePreview.title} project photo preview`} onClick={() => setImagePreview(null)}><div className="bob-image-modal-content" onClick={event => event.stopPropagation()}><button className="bob-image-modal-close" type="button" onClick={() => setImagePreview(null)} aria-label="Close image preview"><X size={18} /></button><img src={imagePreview.image} alt={imagePreview.alt} /><div><span>Project photo preview</span><strong>{imagePreview.title}</strong></div></div></div>}
 
     <section className="bob-assurance"><div className="bob-frame bob-assurance-grid"><div className="bob-assurance-cta"><div className="bob-kicker light"><i /> Need to start a lift?</div><h2>Give Sales the operational context, not just a crane size.</h2><p>Each rental enquiry becomes a structured follow-up in the Sales workspace, ready for a named owner and clear next action.</p><button className="bob-button light" onClick={() => scrollToId("enquire")}>Request a rental quote <ArrowRight size={15} /></button></div><div className="bob-assurance-card"><img src={BOB_PIPELINE_LIFT} alt="BOB Cranes lifting a pipeline section on a project site" loading="lazy" /><div className="bob-assurance-points"><span><ShieldCheck size={16} /> Readiness-led coordination</span><span><ClipboardCheck size={16} /> Booking dossier creation</span><span><HardHat size={16} /> Department ownership</span></div></div></div></section>
 
