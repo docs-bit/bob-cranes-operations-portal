@@ -55,9 +55,9 @@ const serviceCards = [
 ] as const;
 
 const projectCards = [
-  [BOB_MODULE_LIFT, "Industrial heavy lift", "Project execution", "Engineered lifting support for complex installation scopes."],
-  [BOB_YACHT_LIFT, "Marine and yacht lifting", "Specialist handling", "Coordinated access, equipment and crew readiness for sensitive waterfront work."],
-  [BOB_URBAN_LIFT, "Urban crane deployment", "Site coordination", "A controlled operational route for demanding city-centre project conditions."],
+  ["/assets/cranes/capability-wind-component-lift.jpeg", "Industrial heavy lift", "Project execution", "Engineered lifting support for complex installation scopes."],
+  ["/assets/cranes/capability-highrise-lift.jpeg", "Marine and yacht lifting", "Specialist handling", "Coordinated access, equipment and crew readiness for sensitive waterfront work."],
+  ["/assets/cranes/capability-residential-lift.jpeg", "Urban crane deployment", "Site coordination", "A controlled operational route for demanding city-centre project conditions."],
 ] as const;
 
 const processSteps = [
