@@ -4,6 +4,7 @@ import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import * as db from "../db";
 import { requireDepartmentAccess } from "../_core/helpers";
+import { checkPublicMutationRateLimit } from "../_core/rateLimiter";
 import { RENTAL_DURATION_OPTIONS, RENTAL_EQUIPMENT_TYPES } from "../../shared/rentalEnquiryOptions";
 
 const SALES_ENQUIRY_STATUSES = ["New", "In review", "Quoted", "Converted", "Closed"] as const;
@@ -22,7 +23,13 @@ export const rentalRouter = router({
         liftDetails: z.string().trim().min(12).max(2000),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      if (!checkPublicMutationRateLimit(ctx.req, "enquiry")) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many quote requests. Please try again later.",
+        });
+      }
       const enquiry = await db.createRentalEnquiry({ ...input, email: normalizeEmail(input.email) });
       await db.addNotification({
         id: `rental-enquiry-follow-up-${enquiry.id}`,

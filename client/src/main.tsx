@@ -6,6 +6,21 @@ import superjson from "superjson";
 import App from "./App";
 import "./index.css";
 
+function loadOptionalAnalytics() {
+  const endpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT?.trim().replace(/\/+$/, "");
+  const websiteId = import.meta.env.VITE_ANALYTICS_WEBSITE_ID?.trim();
+  if (!endpoint || !websiteId || document.querySelector("script[data-bob-analytics]")) return;
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = `${endpoint}/umami`;
+  script.dataset.websiteId = websiteId;
+  script.dataset.bobAnalytics = "true";
+  document.head.append(script);
+}
+
+loadOptionalAnalytics();
+
 const queryClient = new QueryClient();
 
 queryClient.getQueryCache().subscribe(event => {

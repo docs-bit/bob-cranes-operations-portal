@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "../_core/trpc";
 import { z } from "zod";
 import * as db from "../db";
+import { checkPublicMutationRateLimit } from "../_core/rateLimiter";
 
 export const miscRouter = router({
   filterPresets: router({
@@ -60,7 +61,13 @@ export const miscRouter = router({
             .or(z.literal("")),
         })
       )
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        if (!checkPublicMutationRateLimit(ctx.req, "feedback")) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: "Too many feedback submissions. Please try again later.",
+          });
+        }
         const booking = await db.getBookingById(input.bookingId);
         if (!booking)
           throw new TRPCError({

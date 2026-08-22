@@ -1,16 +1,28 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/_core/hooks/useAuth";
-import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import RentalLanding from "./pages/RentalLanding";
 import RuntimeErrorReporter from "./components/RuntimeErrorReporter";
 import PerformanceTelemetry from "./components/PerformanceTelemetry";
+
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const RentalLanding = lazy(() => import("./pages/RentalLanding"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+function RouteLoading() {
+  return (
+    <div className="auth-loading" role="status" aria-live="polite">
+      <div className="auth-loading-card">
+        <span className="auth-spinner" aria-hidden="true" />
+        <strong>Loading BOB Cranes Portal</strong>
+      </div>
+    </div>
+  );
+}
 
 function ProtectedPortal() {
   const { user, loading, refresh } = useAuth();
@@ -31,19 +43,21 @@ function ProtectedPortal() {
 
 function Router() {
   return (
-    <Switch>
-      <Route path={"/"} component={RentalLanding} />
-      <Route path={"/portal"} component={ProtectedPortal} />
-      <Route path={"/uploads"} component={ProtectedPortal} />
-      <Route path={"/attendance"} component={ProtectedPortal} />
-      <Route path={"/training"} component={ProtectedPortal} />
-      <Route path={"/crew"} component={ProtectedPortal} />
-      <Route path={"/gear"} component={ProtectedPortal} />
-      <Route path={"/login"} component={Login} />
-      <Route path="/client/:token" component={Home} />
-      <Route path="/404" component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<RouteLoading />}>
+      <Switch>
+        <Route path={"/"} component={RentalLanding} />
+        <Route path={"/portal"} component={ProtectedPortal} />
+        <Route path={"/uploads"} component={ProtectedPortal} />
+        <Route path={"/attendance"} component={ProtectedPortal} />
+        <Route path={"/training"} component={ProtectedPortal} />
+        <Route path={"/crew"} component={ProtectedPortal} />
+        <Route path={"/gear"} component={ProtectedPortal} />
+        <Route path={"/login"} component={Login} />
+        <Route path="/client/:token" component={Home} />
+        <Route path="/404" component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 

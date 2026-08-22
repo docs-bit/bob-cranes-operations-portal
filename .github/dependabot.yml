@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      trpc:
+        patterns:
+          - "@trpc/*"
+      testing:
+        patterns:
+          - "@playwright/test"
+          - "vitest"
+          - "@testing-library/*"

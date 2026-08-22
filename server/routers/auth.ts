@@ -23,6 +23,7 @@ import {
   toSessionUser,
   verifyPassword,
 } from "../localAuth";
+import { checkPublicMutationRateLimit } from "../_core/rateLimiter";
 import { isValidDashboardGreetingTemplate } from "../../shared/dashboardGreeting";
 import {
   accountInput,
@@ -72,6 +73,12 @@ export const authRouter = router({
   bootstrapAdmin: publicProcedure
     .input(accountInput)
     .mutation(async ({ ctx, input }) => {
+      if (!checkPublicMutationRateLimit(ctx.req, "bootstrap")) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many setup attempts. Please try again later.",
+        });
+      }
       if ((await db.countLocalUsers()) > 0) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -99,6 +106,12 @@ export const authRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      if (!checkPublicMutationRateLimit(ctx.req, "login")) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many sign-in attempts. Please try again later.",
+        });
+      }
       const user = await db.getUserByLocalEmail(
         normalizeEmail(input.email),
       );

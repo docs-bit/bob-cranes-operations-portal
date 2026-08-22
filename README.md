@@ -139,7 +139,7 @@ After authentication, the Operations Cockpit brings active dossiers, crew availa
 
 ## Requirements and configuration
 
-Use the repository’s pinned package manager: **pnpm 10**. The Docker deployment configuration uses **Node.js 22**, which is the recommended runtime for development and production. A reachable **MySQL-compatible** database is required for migrations and all persistent portal features.
+Use the repository’s pinned package manager: **pnpm 10**. The Docker deployment configuration uses **Node.js 22**; the current Vercel project uses the compatible Node.js 24 runtime. A reachable **MySQL-compatible** database is required for migrations and all persistent portal features.
 
 ### Required environment variables
 
@@ -334,6 +334,10 @@ Department ownership is checked in the API, not only hidden in the client interf
 3. Use a database account with only the privileges required by the application and restrict public network access whenever the hosting topology allows it.
 4. Run database migrations deliberately and back up production data before schema changes.
 5. Do not run `db:seed:sample` against shared, staging, or production data unless the environment is intentionally disposable.
+6. Public sign-in, first-administrator setup, rental enquiry, and feedback mutations use client-aware in-memory rate limits. These limits are a first line of defence; retain provider-level firewall, bot, and alerting controls for distributed abuse protection.
+7. The Vercel deployment adds `nosniff`, clickjacking, referrer, permissions, cross-origin opener, and API no-cache headers. Review header compatibility whenever introducing new third-party browser integrations.
+
+See [SECURITY.md](SECURITY.md) for responsible vulnerability-reporting guidance.
 
 ---
 
@@ -349,12 +353,16 @@ The following commands are defined by [`package.json`](package.json).
 | `pnpm run lighthouse:ci` | Lighthouse CI helper script. |
 | `pnpm run build` | Vite client build and esbuild Node server bundle. |
 
-The current repository validation completed successfully with **0 TypeScript errors**, **52 passing Vitest files**, **145 passing tests**, and a successful production build. To run the E2E suite on a newly provisioned machine, install the required Playwright browser first:
+The repository has local and continuous quality gates. The GitHub Actions workflow runs TypeScript validation, Vitest, a production build, and Chromium-based browser smoke tests on changes to `main` and pull requests. Dependabot opens weekly npm update pull requests, grouped where safe.
+
+To run the E2E suite on a newly provisioned machine, install the required Playwright browser first:
 
 ```bash
-pnpm exec playwright install
+pnpm exec playwright install chromium
 pnpm run test:e2e
 ```
+
+The browser tests run against a local development server and cover the public rental landing page plus the portal sign-in prompt. They do not create or alter production data.
 
 ---
 
@@ -372,21 +380,25 @@ The live project is hosted at [bob-cranes-portal.vercel.app](https://bob-cranes-
 | Serverless API | `api/index.js` bundles the Express/tRPC application for the Node runtime. |
 | Production variables | Configure `DATABASE_URL` and `JWT_SECRET` as sensitive variables. Add the optional analytics pair only when used. |
 | Git integration | The production Vercel project is linked to the `main` branch, so pushed commits create new deployments. |
+| Security headers | `vercel.json` sets browser hardening headers and marks `/api/*` responses as non-cacheable. |
+| Release checks | GitHub Actions validates types, tests, the production build, and browser smoke flows before a reviewed change is merged. |
 
 ### Fresh production database procedure
 
 1. Create a MySQL database and an application user using a protected connection string.
 2. Set `DATABASE_URL` and a strong `JWT_SECRET` in the Vercel Production environment before deployment.
-3. From a trusted environment with the production `DATABASE_URL`, run `pnpm run db:push` to generate and apply migrations.
-4. Deploy or redeploy Vercel after the required variables are set.
+3. From a trusted environment with the production `DATABASE_URL`, run `pnpm exec drizzle-kit migrate` to apply the reviewed migrations already committed to Git. Do not generate migrations against production.
+4. Deploy or redeploy Vercel after the required variables are set and the migration has completed.
 5. Open `/portal` and complete the first-administrator setup if the database has no user records.
 6. Verify the public site and the read-only `auth.setupStatus` API procedure.
 
 ### Railway container alternative
 
-The repository includes a `Dockerfile` and [`railway.toml`](railway.toml). The Railway configuration builds the Node application, then starts it with a schema push followed by `pnpm run start`. It exposes a root health check and restarts on failure.
+The repository includes a `Dockerfile` and [`railway.toml`](railway.toml) for a persistent Node deployment when needed. The retained Railway application services are not linked to GitHub auto-deploys; Vercel is the active production release path. The container starts the application only and intentionally does **not** mutate the database schema.
 
-This container configuration is useful when a persistent Node process is preferred. Review schema changes before relying on automatic startup migrations in a production environment, and keep the Railway database connection private or protected with network controls.
+Apply reviewed migrations separately before starting a Railway deployment, use the configured root health check, and keep any Railway database connection private or protected with network controls. Do not treat the Railway fallback as a second source of production release status.
+
+For the end-to-end release checklist, database safety process, live smoke checks, monitoring, rollback, and credential hygiene, see the [production-readiness runbook](docs/PRODUCTION_READINESS.md).
 
 ---
 
