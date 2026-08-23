@@ -12491,3 +12491,6 @@
 - [x] Implement backend database persistence for user-created filter presets across sessions.
 - [x] Update the reusable `portal-workflow-enhancements` skill package and validate success.
 - [x] Run full migration, 145 unit tests, production build, and publish checkpoint.
+
+- [x] Remove the interactive database schema push from Docker startup so production containers start directly through the built server.
+- [x] Reconcile shared GitHub changes, run the full validation suite, and confirm production startup configuration.
