@@ -1,4 +1,18 @@
-# Architecture guide
+# BOB Cranes architecture guide
+
+> **Maintained architecture source.** This Markdown guide is the canonical, reviewable architecture record for the repository. The supplied [Architecture Guide PDF](reference/BOB_Cranes_Architecture_Guide.pdf) is retained as a static reference artifact for readers who prefer a formatted document.
+
+## How to use this guide
+
+| Need | Start here |
+|---|---|
+| Understand system boundaries | [Runtime components](#runtime-components) |
+| Trace public or authenticated requests | [Request and authorization flow](#request-and-authorization-flow) |
+| Understand domain ownership around a booking | [Operational coordination flow](#operational-coordination-flow) |
+| Locate implementation source | [Source-of-truth references](#source-of-truth-references) |
+| Read the formatted companion | [Architecture Guide PDF](reference/BOB_Cranes_Architecture_Guide.pdf) |
+
+The diagrams present stable boundaries and verified execution paths. They are intentionally not a substitute for the typed routers, access-control middleware, schema, or deployment configuration linked throughout this guide.
 
 ## Purpose and scope
 
@@ -151,7 +165,7 @@ The architecture follows these operational constraints:
 4. **Release verification is repeatable.** Type checking, automated tests, production builds, and browser smoke tests form the baseline quality gate.
 5. **Secrets stay outside Git.** Connection strings, signing keys, and provider credentials belong in protected environment settings only.
 
-## Key implementation references
+## Source-of-truth references
 
 | Topic | File or directory |
 |---|---|
@@ -164,3 +178,9 @@ The architecture follows these operational constraints:
 | Database schema | [`drizzle/schema.ts`](../drizzle/schema.ts) |
 | Vercel entry and routing | [`api/index.js`](../api/index.js), [`vercel.json`](../vercel.json) |
 | Quality workflow | [`.github/workflows/quality.yml`](../.github/workflows/quality.yml) |
+
+## Architecture maintenance
+
+Update this Markdown guide when a system boundary, route family, API domain, authorization rule, persistence model, or deployment topology changes. Update the relevant source and tests first; then revise the affected diagram and narrative in the same change.
+
+The PDF is a reference publication, not a separate architectural source of truth. When the architecture changes materially, replace its stored companion copy only after the Markdown guide and diagrams have been reviewed.

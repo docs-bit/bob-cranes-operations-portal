@@ -171,7 +171,8 @@ Keep `DATABASE_URL`, `JWT_SECRET`, and third-party credentials only in protected
 
 | Document | Use it for |
 |---|---|
-| [Architecture guide](docs/ARCHITECTURE.md) | Components, API domains, data model, authentication, and route boundaries. |
+| [Architecture guide](docs/ARCHITECTURE.md) | Canonical Markdown source for components, API domains, data model, authentication, and route boundaries. |
+| [Architecture Guide PDF](docs/reference/BOB_Cranes_Architecture_Guide.pdf) | Formatted companion reference; the Markdown guide remains authoritative. |
 | [Development guide](docs/DEVELOPMENT.md) | Environment setup, database lifecycle, local workflows, and testing. |
 | [Operations guide](docs/OPERATIONS.md) | Vercel deployment, production migration, verification, rollback, and monitoring. |
 | [Production-readiness runbook](docs/PRODUCTION_READINESS.md) | Release checklist and ongoing operational safeguards. |

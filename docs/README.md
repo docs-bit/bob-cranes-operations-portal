@@ -4,7 +4,8 @@ This directory contains the maintained technical and operational documentation f
 
 | Guide | Purpose |
 |---|---|
-| [Architecture guide](ARCHITECTURE.md) | Client, API, data, authentication, route, and deployment boundaries. |
+| [Architecture guide](ARCHITECTURE.md) | Canonical, maintained source for client, API, data, authentication, route, and deployment boundaries. |
+| [Architecture Guide PDF](reference/BOB_Cranes_Architecture_Guide.pdf) | Formatted companion reference for the architecture guide; the Markdown guide remains authoritative. |
 | [Development guide](DEVELOPMENT.md) | Local environment setup, database workflow, testing, and implementation conventions. |
 | [Operations guide](OPERATIONS.md) | Vercel release path, production migrations, verification, rollback, monitoring, and ownership. |
 | [Production-readiness runbook](PRODUCTION_READINESS.md) | Detailed release controls and operational safeguards. |
