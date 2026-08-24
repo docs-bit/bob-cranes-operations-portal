@@ -108,15 +108,19 @@ describe("operations router", () => {
     vi.restoreAllMocks();
   });
 
-  it("fetches bookings and equipment successfully", async () => {
-    const ctx = createTestContext();
-    const caller = appRouter.createCaller(ctx);
+    it("fetches bookings and equipment successfully", async () => {
+    const getAllBookings = vi.spyOn(db, "getAllBookings").mockResolvedValue([{ id: "BOB-59116", stage: "Created by Salesperson" }] as any);
+    const getAllEquipment = vi.spyOn(db, "getAllEquipment").mockResolvedValue([{ id: "eq-1", name: "Tadano GR-600EX" }] as any);
+    const seedIfNeeded = vi.spyOn(db, "seedInitialDataIfNeeded").mockResolvedValue(undefined);
+    const caller = appRouter.createCaller(createTestContext());
 
     const bookings = await caller.operations.getBookings();
     expect(Array.isArray(bookings)).toBe(true);
+    expect(bookings.length).toBeGreaterThan(0);
 
     const equipment = await caller.operations.getEquipment();
     expect(Array.isArray(equipment)).toBe(true);
     expect(equipment.length).toBeGreaterThan(0);
-  }, 15000);
+    vi.restoreAllMocks();
+  });
 });

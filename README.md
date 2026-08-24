@@ -9,7 +9,7 @@ A production-grade, full-stack role-based operations portal built for **BOB Cran
 - **Frontend**: React 19, TypeScript, Tailwind CSS 4, Recharts, Wouter routing, Lucide icons, Sonner toasts.
 - **Backend**: Node.js, Express 4, tRPC 11 end-to-end typed contracts.
 - **Database & Persistence**: Drizzle ORM with MySQL/TiDB schema management and S3 storage proxies.
-- **Quality Assurance**: Comprehensive Vitest unit/integration test suite (138+ specs) and Playwright E2E testing workflows.
+- **Quality Assurance**: Comprehensive Vitest unit/integration test suite (158 specs) and Playwright E2E testing workflows.
 
 ---
 
@@ -42,13 +42,13 @@ A production-grade, full-stack role-based operations portal built for **BOB Cran
 
 1. **Install Dependencies**:
    ```bash
-   pnpm install
+   npm install --legacy-peer-deps
    ```
 2. **Run Development Server**:
    ```bash
-   pnpm run dev
+   npm run dev
    ```
 3. **Execute Test Suite**:
    ```bash
-   pnpm exec vitest run
+   npm test
    ```
