@@ -16,6 +16,32 @@ Vercel is the production application host. It builds the Vite client, serves `di
 
 The repository retains [`Dockerfile`](../Dockerfile) and [`railway.toml`](../railway.toml) for a persistent deployment alternative. Those retained Railway application services are not linked to GitHub auto-deploys and are not an active release-status source. The container starts the application only; it does not apply database migrations automatically.
 
+## Release and migration sequence
+
+Production database work is intentionally separate from application deployment. This sequence captures the required order and avoids schema generation or seeding during a runtime start.
+
+```mermaid
+sequenceDiagram
+  participant Maintainer as Maintainer
+  participant GitHub as GitHub main
+  participant CI as Quality gates
+  participant DB as Production MySQL
+  participant Vercel as Vercel
+  participant Portal as Live portal
+
+  Maintainer->>Maintainer: Review code, lockfile, and migration artifacts
+  Maintainer->>CI: Run local checks and open or merge reviewed change
+  GitHub->>CI: Trigger TypeScript, tests, build, and browser smoke
+  CI-->>GitHub: Record quality result
+  alt Schema change required
+    Maintainer->>DB: Back up target and run drizzle-kit migrate
+    DB-->>Maintainer: Apply committed migration history
+  end
+  GitHub->>Vercel: Linked main branch triggers deployment
+  Vercel->>Portal: Serve client and serverless API
+  Maintainer->>Portal: Verify public route, portal entry, and read-only API
+```
+
 ## Required Vercel configuration
 
 | Setting | Expected value or action |

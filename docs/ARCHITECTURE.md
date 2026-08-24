@@ -40,6 +40,41 @@ flowchart TB
 | Persistence | `server/db.ts` and `drizzle/` | Database helpers, MySQL entities, relations, migrations, and seed support. |
 | Serverless production entry | `api/index.js` | Bundled Express/tRPC handler used by Vercel. |
 
+## Request and authorization flow
+
+The runtime-component diagram shows the system boundaries. The following sequence shows the separate public and protected request paths that cross those boundaries.
+
+```mermaid
+sequenceDiagram
+  participant Visitor as Public visitor
+  participant Operator as Portal user
+  participant Client as React client
+  participant API as Express and tRPC API
+  participant Guard as Validation and access controls
+  participant Domain as Domain router
+  participant DB as MySQL
+
+  alt Public rental enquiry
+    Visitor->>Client: Complete rental enquiry
+    Client->>API: rental procedure under /api/trpc
+    API->>Guard: Validate input and apply client-aware rate limit
+    Guard->>Domain: Allow public rental procedure
+    Domain->>DB: Persist enquiry and related event
+    DB-->>Domain: Stored record
+    Domain-->>Client: Confirmed response
+  else Authenticated portal action
+    Operator->>Client: Sign in or open protected workspace
+    Client->>API: auth or protected procedure under /api/trpc
+    API->>Guard: Build session context and check role/department
+    Guard->>Domain: Allow the permitted protected procedure
+    Domain->>DB: Read or update operational data
+    DB-->>Domain: Query or mutation result
+    Domain-->>Client: Typed response
+  end
+```
+
+The client may hide inaccessible navigation for clarity, but authorization is resolved by the server-side procedure and request context.
+
 ## Client routes
 
 The client route map is maintained in [`client/src/App.tsx`](../client/src/App.tsx). The public rental experience is available at `/`; the internal workspace entry is `/portal`; and supporting routes include `/login`, `/uploads`, `/attendance`, `/training`, `/crew`, `/gear`, and `/client/:token`.
@@ -59,6 +94,26 @@ The root router composes several domain routers. The procedure names and input t
 | `documents` | Document taxonomy and persisted client-document metadata. |
 | `runtimeMonitoring` and `telemetry` | Browser runtime-event and web-vitals collection. |
 | `filterPresets` and `clientFeedback` | Persisted operational views and client feedback records. |
+
+## Operational coordination flow
+
+The portal coordinates several department-owned workstreams around a booking. This diagram represents the intended handoff model; it does not imply that one department can bypass another department’s procedure-level permissions.
+
+```mermaid
+flowchart LR
+  enquiry[Rental enquiry] --> sales[Sales triage and response]
+  sales --> booking[Booking dossier]
+  booking --> docs[Documents and client collaboration]
+  booking --> crew[Crew availability and allocation]
+  booking --> assets[Equipment, trailers, and lifting gear]
+  booking --> departments[Department workspaces]
+  docs --> readiness[Dispatch-readiness review]
+  crew --> readiness
+  assets --> readiness
+  departments --> readiness
+  readiness --> mobilisation[Controlled mobilisation]
+  mobilisation --> governance[Activity, audit, and telemetry records]
+```
 
 ## Authentication and authorization
 
