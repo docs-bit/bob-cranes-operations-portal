@@ -1,5 +1,7 @@
 # Development guide
 
+This guide explains the development workflow and maintenance conventions. For a complete copy-and-run setup, including environment variables, first-administrator setup, verification, and troubleshooting, use [Running BOB Cranes Operations Portal locally](RUNNING_LOCALLY.md).
+
 ## Local prerequisites
 
 Use the package-manager version pinned in [`package.json`](../package.json). Development and CI are validated with Node.js 22; a MySQL-compatible database is required for persistence, migrations, and full local-auth behavior.

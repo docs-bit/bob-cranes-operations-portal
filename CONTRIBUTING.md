@@ -2,7 +2,7 @@
 
 ## Contribution principles
 
-Keep each change focused, reviewable, and aligned with the portal’s operational boundaries. The public rental journey, authenticated departmental workspaces, database schema, and deployment configuration are connected; update the relevant code, tests, and documentation together.
+Keep each change focused, reviewable, and aligned with the portal’s operational boundaries. The public rental journey, authenticated departmental workspaces, database schema, and deployment configuration are connected; update the relevant code, tests, and documentation together. Participation is governed by the repository [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Before you start
 
@@ -54,4 +54,4 @@ Do not run the demonstration seeder against shared or production data. Refer to 
 
 A pull request should explain the operational reason for the change, identify any routes or roles affected, describe migration implications, and state the validation performed. Update screenshots or user-facing documentation when a visible workflow changes.
 
-For a security-sensitive issue, do not open a public pull request or issue containing the exploit details. Follow [SECURITY.md](SECURITY.md) instead.
+For a security-sensitive issue, do not open a public pull request or issue containing the exploit details. Follow the [security policy](.github/SECURITY.md) instead.

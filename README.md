@@ -174,11 +174,13 @@ Keep `DATABASE_URL`, `JWT_SECRET`, and third-party credentials only in protected
 | [Architecture guide](docs/ARCHITECTURE.md) | Canonical Markdown source for components, API domains, data model, authentication, and route boundaries. |
 | [Architecture Guide PDF](docs/reference/BOB_Cranes_Architecture_Guide.pdf) | Formatted companion reference; the Markdown guide remains authoritative. |
 | [Development guide](docs/DEVELOPMENT.md) | Environment setup, database lifecycle, local workflows, and testing. |
+| [Running locally](docs/RUNNING_LOCALLY.md) | Step-by-step clone, install, environment, database, first-admin, test, and troubleshooting instructions. |
 | [Operations guide](docs/OPERATIONS.md) | Vercel deployment, production migration, verification, rollback, and monitoring. |
 | [Production-readiness runbook](docs/PRODUCTION_READINESS.md) | Release checklist and ongoing operational safeguards. |
 | [Historical records](docs/HISTORY.md) | Index of retained QA, design-reference, and verification records. |
-| [Security policy](SECURITY.md) | Responsible reporting and supported release line. |
+| [Security policy](.github/SECURITY.md) | Responsible reporting and supported release line. |
 | [Contribution guide](CONTRIBUTING.md) | Change scope, validation, migration review, and pull-request expectations. |
+| [Code of conduct](CODE_OF_CONDUCT.md) | Professional participation, confidentiality, and reporting expectations. |
 
 ## Repository map
 
@@ -199,7 +201,7 @@ scripts/                     Sample-data and Lighthouse helpers
 
 ## Contributing
 
-Keep changes focused, update the relevant documentation with any behavior or configuration change, and run the applicable quality gates before opening a pull request. Do not commit secrets, database dumps, generated build output, or local environment files.
+Keep changes focused, update the relevant documentation with any behavior or configuration change, and run the applicable quality gates before opening a pull request. See the [contribution guide](CONTRIBUTING.md) for the pull-request checklist and [running locally](docs/RUNNING_LOCALLY.md) for the complete local setup procedure. Do not commit secrets, database dumps, generated build output, or local environment files.
 
 For operational changes, include a migration review where applicable and verify both the public rental path and the authorised portal after deployment.
 
