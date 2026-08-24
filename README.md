@@ -1,457 +1,207 @@
 # BOB Cranes Operations Portal
 
-> A full-stack operations workspace for crane rental, booking control, crew readiness, lifting-gear compliance, documentation, dispatch coordination, and rental-enquiry management.
+> A role-aware operations platform for crane-rental enquiries, booking control, crew and lifting-gear readiness, document coordination, dispatch preparation, and internal departmental workflows.
 
-**Live site:** [bob-cranes-portal.vercel.app](https://bob-cranes-portal.vercel.app)
+[![Quality gates](https://github.com/docs-bit/bob-cranes-operations-portal/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/docs-bit/bob-cranes-operations-portal/actions/workflows/quality.yml)
 
-**Repository:** [docs-bit/bob-cranes-operations-portal](https://github.com/docs-bit/bob-cranes-operations-portal)
+**Live portal:** [bob-cranes-portal.vercel.app](https://bob-cranes-portal.vercel.app)
 
+**Production branch:** [`main`](https://github.com/docs-bit/bob-cranes-operations-portal/tree/main)
 **Primary stack:** React 19, TypeScript, Vite, Express, tRPC, Drizzle ORM, and MySQL.
 
----
+## Overview
 
-## Contents
+The public site captures structured rental requirements. The internal portal gives authorised teams a shared workspace for progressing enquiries, coordinating bookings, assigning crew and equipment, managing supporting documents, and preparing controlled mobilisation.
 
-| Section | Purpose |
+| Area | Current capability |
 |---|---|
-| [What the portal does](#what-the-portal-does) | Business workflows and operational outcomes. |
-| [Architecture](#architecture) | Client, API, persistence, and deployment design. |
-| [Portal walkthrough](#portal-walkthrough) | Public, sign-in, and Operations Cockpit screenshots. |
-| [Requirements and configuration](#requirements-and-configuration) | Local prerequisites and environment variables. |
-| [Local development](#local-development) | Install, migrate, seed, and run instructions. |
-| [Testing and quality checks](#testing-and-quality-checks) | Type checking, unit tests, E2E tests, and production build. |
-| [Deployment](#deployment) | Vercel production hosting and Railway container alternative. |
-| [Security and operations](#security-and-operations) | Credential handling, first-admin setup, and operational safeguards. |
-| [Repository map](#repository-map) | Where to find the principal application modules. |
+| Public rental journey | Service information, project capability context, validated rental enquiries, and a direct route to portal sign-in. |
+| Sales and booking control | Enquiry triage, assignment, response controls, booking dossiers, staged workflow progression, and notifications. |
+| Operational readiness | Fleet, trailers, lifting gear, crew allocation, availability checks, attendance, training, documents, and dispatch readiness. |
+| Department workspaces | Role-aware views for Sales, Documentation, HSE, Crew, Accounts, HR, Transportation, and Lifting Gears. |
+| Governance and visibility | Audit/activity records, saved filters, client feedback, browser runtime-error capture, and web-vitals telemetry. |
 
----
+## System architecture
 
-## What the portal does
-
-BOB Cranes Operations Portal connects the public rental-enquiry journey with a role-based internal workspace. A prospective client can submit a structured crane-rental requirement; the Sales team can triage and convert it into a booking dossier; and the operational departments can coordinate documents, crew, equipment, lifting gears, trailers, notifications, and dispatch readiness from one system.
-
-| Operational area | Implemented capability |
-|---|---|
-| Rental enquiries | Public validated enquiry capture, Sales notifications, enquiry status tracking, ownership assignment, SLA settings, quick replies, audit events, and conversion into booking dossiers. |
-| Booking control | An 8-stage booking lifecycle with department-owned stage advancement, parallel workstreams, required-document progress, and notifications generated at handoff. |
-| Crew and attendance | Crew roster, allocation persistence, availability and conflict checks, attendance tracking, training visibility, and supervisor-controlled user access. |
-| Fleet and lifting gears | Equipment, trailers, lifting gear, inspection-aware selection, and gear-document workflows. |
-| Documents and client collaboration | Document taxonomies, persisted per-booking metadata, client-facing upload workflows, project chat, and dispatch-bundle readiness checks. |
-| Department workspaces | Department dashboards, configurable workflow templates, internal views for sales, documentation, HSE, crew, accounts, HR, transportation, and lifting gears. |
-| Reporting and governance | Runtime error events, web-vitals telemetry, audit logs, activity logs, filter presets, CSV/XLSX utilities, PDF generation, and administrative review views. |
-
-The server composes these domains under a typed tRPC router. The root route map is defined in [`server/routers.ts`](server/routers.ts), while the MySQL schema is defined in [`drizzle/schema.ts`](drizzle/schema.ts).
-
----
-
-## Architecture
-
-The application is a single TypeScript repository with a React/Vite client and an Express/tRPC backend. Browser requests use the public site or authenticated portal routes; the client calls the typed API under `/api/trpc`; and Drizzle ORM persists operational data to a MySQL-compatible database.
+The browser application uses typed tRPC requests under `/api/trpc`. Express applies authentication and authorization before the domain routers access MySQL through Drizzle ORM.
 
 ```mermaid
 flowchart LR
-  A[Public rental visitor] --> B[React and Vite client]
-  C[Authenticated operational user] --> B
-  B -->|typed requests| D[Express + tRPC API]
-  D --> E[Authentication and authorization]
-  D --> F[Operations, Sales, Documents, Departments, Monitoring routers]
-  F --> G[Drizzle ORM]
-  G --> H[(MySQL database)]
-  D --> I[Optional storage and OAuth integrations]
+  visitor[Public rental visitor] --> client[React and Vite client]
+  user[Authorised portal user] --> client
+  client -->|/api/trpc| api[Express and tRPC API]
+  api --> auth[Session and role checks]
+  api --> domains[Sales, operations, documents, departments, monitoring]
+  domains --> data[Drizzle ORM]
+  data --> mysql[(MySQL)]
 ```
 
-| Layer | Technology and responsibility |
+| Layer | Source of truth |
 |---|---|
-| Client | React 19, TypeScript, Wouter routing, Tailwind CSS 4, Radix primitives, React Query, Recharts, Framer Motion, and Sonner notifications. |
-| API | Express 4 hosts the tRPC middleware at `/api/trpc`; request context applies session-aware access control. |
-| Data access | Drizzle ORM and `mysql2` map operational entities to a MySQL schema and migrations. |
-| Authentication | Local credentials use `scrypt` password hashes and signed 12-hour JWT sessions stored in cookies. |
-| Files and integrations | The API registers storage and OAuth routes. Supporting SDK packages are present for S3-compatible storage, document/PDF utilities, spreadsheets, speech, maps, and platform integrations. |
-| Hosting | Vercel serves the Vite build and a bundled serverless API entry. The repository also includes Docker and Railway configuration for a persistent Node deployment. |
+| Client routes and page composition | [`client/src/App.tsx`](client/src/App.tsx) |
+| API router composition | [`server/routers.ts`](server/routers.ts) |
+| Express application and tRPC mount | [`server/_core/app.ts`](server/_core/app.ts) |
+| Authentication implementation | [`server/localAuth.ts`](server/localAuth.ts) |
+| Database schema and migration configuration | [`drizzle/schema.ts`](drizzle/schema.ts) and [`drizzle.config.ts`](drizzle.config.ts) |
+| Vercel routing and headers | [`vercel.json`](vercel.json) |
 
-### API domains
-
-| Router namespace | Responsibility |
-|---|---|
-| `auth` | Initial admin bootstrap, local login/logout, current-session lookup, profile and user management, activity settings, and permission audit. |
-| `rental` and `salesEnquiries` | Public rental quote submission and Sales enquiry lifecycle management. |
-| `operations` | Bookings, stage transitions, workstreams, assets, crew allocations, documents, chat, notifications, and dispatch readiness. |
-| `departments` | Provisioned department dashboards, department lifecycle, dashboard configuration, and workflow templates. |
-| `documents` | Document taxonomy and persisted client-document metadata. |
-| `runtimeMonitoring` and `telemetry` | Browser runtime-error capture and web-vitals collection. |
-| `filterPresets` and `clientFeedback` | Saved list filters and client feedback records. |
-
----
-
-## Portal walkthrough
-
-The screenshot assets below are committed under [`client/public/assets/portal-screenshots/`](client/public/assets/portal-screenshots/). They render directly on GitHub and are available for future product documentation.
+## Product walkthrough
 
 ### Public rental experience
 
-The public landing page explains BOB Cranes’ lifting-rental proposition and gives visitors direct routes to service information, capability context, quotation requests, and Portal Sign In.
+The public landing page provides a controlled-lifting proposition, service context, a rental-quote action, and the route to portal sign-in.
 
 ![BOB Cranes public landing page showing the controlled-lifting hero message, navigation, rental quote action, and capability action](client/public/assets/portal-screenshots/landing-hero.png)
 
-*Landing page: a controlled-lifting value proposition with quote and capability entry points.*
-
-The services and planning area presents the support available before crane mobilisation, including mobile crane rental, complex lift planning, lifting gear support, qualified crew, document control, and dispatch coordination.
+*Public landing page with the rental-quote and capability entry points.*
 
 ![BOB Cranes rental services and lift planning section showing six service cards and a crane-planning panel](client/public/assets/portal-screenshots/rental-services.png)
 
-*Service catalogue: the path from a client requirement to a coordinated lift plan.*
-
-The capability area places equipment in operational context and makes the next sales action explicit.
+*Service catalogue and lift-planning context.*
 
 ![BOB Cranes capability section showing site-lift support, branded fleet, managed mobilisation, and the rental quote call to action](client/public/assets/portal-screenshots/capability-and-cta.png)
 
-*Capability overview: site-lift support, fleet visibility, managed mobilisation, and handoff to Sales.*
+*Equipment and operational support presented in project context.*
 
-### Delivery workflow and enquiry capture
-
-The operating-process section documents the three practical steps used to translate a project brief into a controlled mobilisation route.
+### Delivery workflow and portal workspace
 
 ![BOB Cranes working-process section showing the brief, readiness, and mobilisation workflow steps](client/public/assets/portal-screenshots/working-process.png)
 
-*Working process: capture the brief, coordinate readiness, and mobilise through a controlled handoff.*
-
-The rental enquiry form captures the information needed to create a useful Sales follow-up: client contact data, project location, equipment type, duration, and lift context.
+*The public workflow: capture the brief, coordinate readiness, and mobilise.*
 
 ![BOB Cranes rental enquiry form and footer showing the project requirements form, rental estimate action, and site navigation](client/public/assets/portal-screenshots/rental-enquiry-and-footer.png)
 
-*Rental enquiry: structured inputs become an actionable Sales and operations conversation.*
-
-### Secure operations workspace
-
-The sign-in screen provides the entry point for authorised BOB Cranes users. The first administrator is created through the bootstrap flow when the database has no local accounts.
+*The rental-enquiry form captures the project information needed for Sales follow-up.*
 
 ![BOB Cranes portal sign-in screen showing the secure work-email and password form](client/public/assets/portal-screenshots/portal-sign-in.png)
 
-*Secure access: authorised users authenticate with a work email and password.*
-
-After authentication, the Operations Cockpit brings active dossiers, crew availability, compliance signals, department navigation, and priority actions together in one dashboard.
+*Authorised users sign in through the local-auth flow. A new database exposes the first-administrator setup flow.*
 
 ![BOB Cranes Operations Cockpit dashboard showing booking statistics, crew availability, compliance watch, and department navigation](client/public/assets/portal-screenshots/operations-dashboard.png)
 
-*Operations Cockpit: a consolidated view of booking pipeline, capacity, compliance, and departmental execution.*
-
----
-
-## Requirements and configuration
-
-Use the repository’s pinned package manager: **pnpm 10**. The Docker deployment configuration uses **Node.js 22**; the current Vercel project uses the compatible Node.js 24 runtime. A reachable **MySQL-compatible** database is required for migrations and all persistent portal features.
-
-### Required environment variables
-
-Create a local `.env` file from [`.env.example`](.env.example). Never commit a real `.env` file or production credentials.
-
-| Variable | Required | Description |
-|---|---:|---|
-| `DATABASE_URL` | Yes | MySQL connection string used by Drizzle migrations and server-side persistence. |
-| `JWT_SECRET` | Yes for sign-in | Strong secret used to sign and verify local-auth JWT sessions. |
-| `NODE_ENV` | Recommended | Use `development` locally and `production` for a built deployment. |
-| `PORT` | Optional | HTTP port for the persistent Express server; defaults to `3000`. |
-| `VITE_ANALYTICS_ENDPOINT` | Optional but paired | Build-time Umami analytics endpoint. Set it together with `VITE_ANALYTICS_WEBSITE_ID`. |
-| `VITE_ANALYTICS_WEBSITE_ID` | Optional but paired | Build-time Umami analytics website identifier. |
-| `SAMPLE_DB_PASSWORD` | Optional | Password used only by the local sample-data seeder; choose a non-production value. |
-
-The environment module also recognises optional platform integration variables such as `VITE_APP_ID`, `OAUTH_SERVER_URL`, `OWNER_OPEN_ID`, `BUILT_IN_FORGE_API_URL`, and `BUILT_IN_FORGE_API_KEY`. Do not set them unless the corresponding platform integration is intentionally enabled.
-
-> The current HTML template includes an Umami analytics script with `VITE_ANALYTICS_ENDPOINT` and `VITE_ANALYTICS_WEBSITE_ID` placeholders. A production build completes when these are unset, but Vite prints placeholder warnings. Define both variables when analytics is enabled; otherwise treat the warnings as an implementation note rather than a failed build.
-
----
-
-## Local development
-
-### 1. Install dependencies
-
-```bash
-corepack enable
-pnpm install --frozen-lockfile
-```
-
-### 2. Configure the environment
-
-```bash
-cp .env.example .env
-```
-
-Update `.env` with a local or development MySQL connection string and a unique `JWT_SECRET`.
-
-### 3. Create or update the database schema
-
-```bash
-pnpm run db:push
-```
-
-The `db:push` script runs `drizzle-kit generate` followed by `drizzle-kit migrate`. It requires `DATABASE_URL` to be set before it starts.
-
-### 4. Start the application
-
-```bash
-pnpm run dev
-```
-
-The development server starts through `tsx watch` and defaults to `http://localhost:3000`. In development, Express mounts the Vite middleware; in production, it serves static files from `dist/public`.
-
-### 5. Create the first administrator
-
-Open [`http://localhost:3000/portal`](http://localhost:3000/portal). When the database has no local user, the portal exposes the initial administrator setup flow. The first administrator is created in the `administrator` department; subsequent accounts are managed by an administrator or by a supervisor within their own department.
-
-### Optional: seed a local demonstration dataset
-
-```bash
-SAMPLE_DB_PASSWORD='use-a-local-only-password' pnpm run db:seed:sample
-```
-
-The sample seeder populates departments, local users, equipment, crew, lifting gears, trailers, bookings, allocations, documents, chat messages, notifications, rental enquiries, settings, audit records, telemetry, and provisioned dashboards. **Do not run this command against a production database.**
-
-The runtime also seeds baseline operational fixtures when required. This supports an empty development database but does not replace the first-administrator bootstrap or a controlled production data-load process.
-
----
-
-## Database migration and seeding workflow
-
-The portal uses Drizzle ORM with a MySQL dialect. The schema definition lives in [`drizzle/schema.ts`](drizzle/schema.ts), Drizzle configuration is in [`drizzle.config.ts`](drizzle.config.ts), and generated migration artifacts are stored under `drizzle/`. Every migration or seed command reads `DATABASE_URL`; therefore, confirm the target environment before running a command.
-
-| Task | Command | Outcome |
-|---|---|---|
-| Generate and apply local migrations | `pnpm run db:push` | Runs `drizzle-kit generate` followed by `drizzle-kit migrate`. |
-| Generate migration files only | `pnpm exec drizzle-kit generate` | Compares the Drizzle schema with the migration history and creates migration artifacts when required. |
-| Apply existing migrations only | `pnpm exec drizzle-kit migrate` | Applies committed migrations to the database selected by `DATABASE_URL`. |
-| Load the demonstration dataset | `pnpm run db:seed:sample` | Loads the sample-data script after schema creation; use it once on an empty or disposable database. |
-
-### Development schema workflow
-
-Use this workflow when changing a development database. It keeps the TypeScript schema and the committed migration history aligned.
-
-```bash
-# 1. Update drizzle/schema.ts.
-# 2. Confirm DATABASE_URL points to a local or disposable development database.
-pnpm run db:push
-
-# 3. Review the generated files before committing them.
-git status --short drizzle/
-git diff -- drizzle/
-
-# 4. Commit schema and migration changes together.
-git add drizzle/schema.ts drizzle/
-```
-
-`pnpm run db:push` is appropriate for a developer environment because it both generates and applies migrations. Do not use it blindly against a shared production database: review the generated SQL and coordinate the deployment first.
-
-### Controlled production migration workflow
-
-Production deployment should use the migrations already committed to Git rather than generating new migrations on the production database. Take a backup, verify the target connection string, and run the apply-only command from a trusted environment.
-
-```bash
-# DATABASE_URL must point to the intended production database.
-pnpm exec drizzle-kit migrate
-```
-
-After the migration completes, deploy the application version that expects the new schema. When a change adds non-null fields, transforms existing data, or removes columns, include an explicit data migration and validate it in a staging or disposable copy before production.
-
-> Vercel uses the prebuilt serverless application and does not run migrations automatically. Set the production `DATABASE_URL`, run the reviewed migrations separately, and then deploy or redeploy the Vercel application. The Railway container configuration currently invokes a schema push at startup; review this behavior carefully before using it for sensitive production migrations.
-
-### Sample data workflow
-
-The sample seeder in [`scripts/seedSampleDatabase.ts`](scripts/seedSampleDatabase.ts) runs in a transaction and uses upserts for many named core entities. It also writes allocation and activity-style operational records. Run it once on an empty or disposable database to create a coherent, non-production dataset for local evaluation; it is not a production data-management tool.
-
-```bash
-# Use only a local or disposable database.
-SAMPLE_DB_PASSWORD='choose-a-local-demo-password' pnpm run db:seed:sample
-```
-
-| Seeded domain | Included sample records |
-|---|---|
-| Departments and users | Seven departments and four local demonstration accounts, including one administrator. |
-| Fleet and workforce | Four cranes, six crew records, four lifting-gear records, and three trailers. |
-| Booking operations | Four bookings, persisted crew allocations, required documents, chat messages, and notifications. |
-| Sales workflow | Two rental enquiries with associated enquiry events. |
-| Governance and visibility | System settings, client feedback, activity records, telemetry events, audit entries, and two provisioned department dashboards. |
-
-The default demonstration administrator is `admin@bobcranes.demo`. Its default password is `Demo123!` **only when** `SAMPLE_DB_PASSWORD` is not supplied. Set `SAMPLE_DB_PASSWORD` explicitly for every seeded environment, never use the default password in a public or shared environment, and rotate or delete demonstration accounts before any external access is enabled.
-
-### Resetting a local development database
-
-For a disposable local database, drop and recreate the database with your MySQL administration tool, then apply the schema and seed only if sample records are desired.
-
-```bash
-# Recreate the empty database using your local MySQL administrator.
-# Then use the application commands:
-pnpm run db:push
-SAMPLE_DB_PASSWORD='choose-a-local-demo-password' pnpm run db:seed:sample
-```
-
-This reset procedure is intentionally limited to local or explicitly disposable environments. Do not drop, reseed, or overwrite a shared, staging, or production database without an approved backup and recovery plan.
-
-### Database safety checklist
-
-1. Check `DATABASE_URL` and database name before every migration or seed operation.
-2. Commit generated migrations with the schema change that created them.
-3. Back up production data and test irreversible changes in a staging or disposable copy.
-4. Use `drizzle-kit migrate` to apply reviewed migration history to production.
-5. Keep `SAMPLE_DB_PASSWORD` local and never expose sample accounts or default credentials in public environments.
-6. Verify the public site, portal sign-in flow, and a database-backed tRPC query after deployment.
-
----
+*The Operations Cockpit consolidates priority actions, capacity, compliance, and department navigation.*
 
 ## Application routes
 
 | Route | Audience | Purpose |
 |---|---|---|
-| `/` | Public | Rental landing page, service information, and quote enquiry form. |
-| `/login` | Public | Local-auth sign-in and first-administrator setup when no users exist. |
-| `/portal` | Authenticated users | Main role-aware Operations Cockpit. |
+| `/` | Public | Rental landing page, service context, and quote enquiry. |
+| `/login` | Public | Local sign-in and first-administrator setup when no local users exist. |
+| `/portal` | Authorised users | Role-aware Operations Cockpit. |
 | `/uploads` | Authorised Accounts users | Data upload workspace. |
 | `/attendance` | Authorised HR users | Attendance workspace. |
-| `/training` | Authenticated users | Training register workspace. |
-| `/crew` | Authorised Crew users | Crew assignment workspace. |
+| `/training` | Authorised users | Training register. |
+| `/crew` | Authorised Crew users | Crew-assignment workspace. |
 | `/gear` | Authorised Lifting Gears users | Gear workspace. |
-| `/client/:token` | Client-facing flow | Client portal and booking-document collaboration. |
-| `/api/trpc/*` | API clients | Typed Express/tRPC API surface. |
+| `/client/:token` | Client collaborators | Booking-document collaboration flow. |
+| `/api/trpc/*` | Client application | Typed API surface. |
 
-The public read-only `auth.setupStatus` procedure is suitable for checking initial account state through `/api/trpc/auth.setupStatus` without creating or changing data.
+## Getting started
 
----
+### Requirements
 
-## Access control and security model
+Use the package manager pinned by the repository: **pnpm 10**. Local development requires a reachable MySQL-compatible database and a recent Node.js runtime; the supported persistent container and CI workflow use Node.js 22.
 
-Local authentication uses `scrypt` for password hashing. On successful sign-in, the API creates an HS256-signed JWT with issuer and audience checks. The session lifetime is **12 hours** and is stored in a cookie using the environment-aware cookie settings implemented by the server.
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+cp .env.example .env
+```
 
-| Account type | Access model |
+Set `DATABASE_URL` and a strong `JWT_SECRET` in `.env`. The complete variable reference is in [`.env.example`](.env.example); do not commit local environment files or credentials.
+
+### Local development
+
+```bash
+# Generate and apply migrations only against a local or disposable database.
+pnpm run db:push
+
+# Start the Express and Vite development server.
+pnpm run dev
+```
+
+Open [http://localhost:3000/portal](http://localhost:3000/portal) to create the first administrator for an empty local database. The optional demonstration dataset is intended only for local or disposable environments:
+
+```bash
+SAMPLE_DB_PASSWORD='local-only-password' pnpm run db:seed:sample
+```
+
+> Never use `db:seed:sample` against a shared, staging, or production database.
+
+## Quality gates
+
+| Command | Purpose |
 |---|---|
-| Administrator | Full operational, configuration, account-management, dashboard, and governance access. |
-| Supervisor | Can manage accounts in the same department and can manage document taxonomy where permitted. |
-| User | Access is constrained by the assigned department and the individual workspace rules. |
+| `pnpm run check` | TypeScript compilation without emitted files. |
+| `pnpm test` | Vitest unit and integration suite. |
+| `pnpm run test:e2e` | Playwright smoke tests for the public rental flow and portal entry state. |
+| `pnpm run build` | Vite production client build and Node server bundle. |
+| `pnpm run lighthouse:ci` | Local Lighthouse CI helper. |
 
-Department ownership is checked in the API, not only hidden in the client interface. The client also guards navigation so users are directed back to an allowed workspace if their active role or department does not permit a view.
+The [`Quality gates`](.github/workflows/quality.yml) workflow runs on pull requests to `main`, pushes to `main`, and manual dispatch. It validates types, tests, a production build, and Chromium browser smoke tests. Dependabot proposes weekly npm dependency updates through [`.github/dependabot.yml`](.github/dependabot.yml).
 
-### Security requirements
-
-1. Keep `DATABASE_URL`, `JWT_SECRET`, service credentials, and API keys in protected hosting-provider environment settings. Do not commit them to Git.
-2. Use a long, randomly generated `JWT_SECRET`; rotate it promptly if it is exposed. Rotating it invalidates existing local-auth sessions.
-3. Use a database account with only the privileges required by the application and restrict public network access whenever the hosting topology allows it.
-4. Run database migrations deliberately and back up production data before schema changes.
-5. Do not run `db:seed:sample` against shared, staging, or production data unless the environment is intentionally disposable.
-6. Public sign-in, first-administrator setup, rental enquiry, and feedback mutations use client-aware in-memory rate limits. These limits are a first line of defence; retain provider-level firewall, bot, and alerting controls for distributed abuse protection.
-7. The Vercel deployment adds `nosniff`, clickjacking, referrer, permissions, cross-origin opener, and API no-cache headers. Review header compatibility whenever introducing new third-party browser integrations.
-
-See [SECURITY.md](SECURITY.md) for responsible vulnerability-reporting guidance.
-
----
-
-## Testing and quality checks
-
-The following commands are defined by [`package.json`](package.json).
-
-| Command | What it validates |
-|---|---|
-| `pnpm run check` | TypeScript compilation with no emitted files. |
-| `pnpm test` | Vitest server and UI-rule test suite. |
-| `pnpm run test:e2e` | Playwright user-flow tests against a local development server. |
-| `pnpm run lighthouse:ci` | Lighthouse CI helper script. |
-| `pnpm run build` | Vite client build and esbuild Node server bundle. |
-
-The repository has local and continuous quality gates. The GitHub Actions workflow runs TypeScript validation, Vitest, a production build, and Chromium-based browser smoke tests on changes to `main` and pull requests. Dependabot opens weekly npm update pull requests, grouped where safe.
-
-To run the E2E suite on a newly provisioned machine, install the required Playwright browser first:
+Before running browser tests on a new machine, install Chromium once:
 
 ```bash
 pnpm exec playwright install chromium
 pnpm run test:e2e
 ```
 
-The browser tests run against a local development server and cover the public rental landing page plus the portal sign-in prompt. They do not create or alter production data.
+## Deployment and operations
 
----
+**Active production topology:** GitHub `main` → Vercel → Railway MySQL. Vercel builds the Vite client, serves `dist/public`, and routes `/api/*` to the serverless Express/tRPC handler in [`api/index.js`](api/index.js). The routing and browser-security headers are defined in [`vercel.json`](vercel.json).
 
-## Production deployment
-
-### Vercel: current production topology
-
-The live project is hosted at [bob-cranes-portal.vercel.app](https://bob-cranes-portal.vercel.app). Vercel builds the client with `pnpm exec vite build`, serves `dist/public`, and routes `/api/*` requests to the serverless API entry at [`api/index.js`](api/index.js). The Vercel rewrite rules are maintained in [`vercel.json`](vercel.json).
-
-| Vercel setting | Required value or action |
+| Production control | Policy |
 |---|---|
-| Install command | `pnpm install --frozen-lockfile` |
-| Build command | `pnpm exec vite build` |
-| Output directory | `dist/public` |
-| Serverless API | `api/index.js` bundles the Express/tRPC application for the Node runtime. |
-| Production variables | Configure `DATABASE_URL` and `JWT_SECRET` as sensitive variables. Add the optional analytics pair only when used. |
-| Git integration | The production Vercel project is linked to the `main` branch, so pushed commits create new deployments. |
-| Security headers | `vercel.json` sets browser hardening headers and marks `/api/*` responses as non-cacheable. |
-| Release checks | GitHub Actions validates types, tests, the production build, and browser smoke flows before a reviewed change is merged. |
+| Application release | Push or merge a reviewed change to `main`; Vercel deploys the linked branch. |
+| Database migration | Review committed migrations, back up the target database, then run `pnpm exec drizzle-kit migrate` from a trusted environment. |
+| Database seeding | Never seed a production database with `db:seed:sample`. |
+| Production check | Confirm `/`, `/portal`, and the read-only `auth.setupStatus` tRPC endpoint after release. |
+| Railway | The repository retains Docker and Railway configuration for a persistent deployment alternative. It is not an active GitHub deployment source and does not run migrations at container startup. |
 
-### Fresh production database procedure
+The detailed procedures for releases, migrations, verification, monitoring, rollback, and credential hygiene are in [the production-readiness runbook](docs/PRODUCTION_READINESS.md).
 
-1. Create a MySQL database and an application user using a protected connection string.
-2. Set `DATABASE_URL` and a strong `JWT_SECRET` in the Vercel Production environment before deployment.
-3. From a trusted environment with the production `DATABASE_URL`, run `pnpm exec drizzle-kit migrate` to apply the reviewed migrations already committed to Git. Do not generate migrations against production.
-4. Deploy or redeploy Vercel after the required variables are set and the migration has completed.
-5. Open `/portal` and complete the first-administrator setup if the database has no user records.
-6. Verify the public site and the read-only `auth.setupStatus` API procedure.
+## Security
 
-### Railway container alternative
+Local credentials are hashed with `scrypt`. Successful local sign-in creates a signed, 12-hour session, and server-side procedures enforce account role and department permissions. Public sign-in, first-administrator setup, rental enquiry, feedback, and anonymous telemetry endpoints use client-aware in-memory rate limits.
 
-The repository includes a `Dockerfile` and [`railway.toml`](railway.toml) for a persistent Node deployment when needed. The retained Railway application services are not linked to GitHub auto-deploys; Vercel is the active production release path. The container starts the application only and intentionally does **not** mutate the database schema.
+Keep `DATABASE_URL`, `JWT_SECRET`, and third-party credentials only in protected environment settings. Report suspected vulnerabilities privately as described in [SECURITY.md](SECURITY.md); do not open a public issue containing a security-sensitive reproduction or secret.
 
-Apply reviewed migrations separately before starting a Railway deployment, use the configured root health check, and keep any Railway database connection private or protected with network controls. Do not treat the Railway fallback as a second source of production release status.
+## Documentation
 
-For the end-to-end release checklist, database safety process, live smoke checks, monitoring, rollback, and credential hygiene, see the [production-readiness runbook](docs/PRODUCTION_READINESS.md).
-
----
+| Document | Use it for |
+|---|---|
+| [Architecture guide](docs/ARCHITECTURE.md) | Components, API domains, data model, authentication, and route boundaries. |
+| [Development guide](docs/DEVELOPMENT.md) | Environment setup, database lifecycle, local workflows, and testing. |
+| [Operations guide](docs/OPERATIONS.md) | Vercel deployment, production migration, verification, rollback, and monitoring. |
+| [Production-readiness runbook](docs/PRODUCTION_READINESS.md) | Release checklist and ongoing operational safeguards. |
+| [Historical records](docs/HISTORY.md) | Index of retained QA, design-reference, and verification records. |
+| [Security policy](SECURITY.md) | Responsible reporting and supported release line. |
+| [Contribution guide](CONTRIBUTING.md) | Change scope, validation, migration review, and pull-request expectations. |
 
 ## Repository map
 
 ```text
-api/                         Vercel serverless API entry
-client/                      React/Vite client application
-  public/assets/             Public logo, crane imagery, and portal screenshots
+api/                         Bundled Vercel serverless API entry
+client/                      React and Vite application
+  public/assets/             Published images used by the landing page and README
   src/components/            Reusable UI and operational feature components
-  src/pages/                 Public landing, authentication, portal, and workspace views
-server/                      Express API, tRPC routers, auth, persistence, and tests
-  _core/                     Server factory, context, environment, integrations, and Vite/static runtime
+  src/pages/                 Public landing, authentication, portal, and workspace pages
+server/                      Express API, tRPC routers, authentication, persistence, and tests
+  _core/                     Server factory, context, integrations, and Vite/static runtime
   routers/                   Domain tRPC routers
-shared/                      Cross-layer workflow, role, validation, and business rules
-drizzle/                     MySQL schema, generated migrations, and relations
-e2e/                         Playwright user-flow tests
-scripts/                     Sample data seeding and Lighthouse CI helper
-api/index.js                 Bundled serverless Express handler used by Vercel
-Dockerfile                   Node 22 container deployment definition
-railway.toml                 Railway deployment configuration
-vercel.json                  Vercel build, static output, and rewrite configuration
+drizzle/                     MySQL schema and generated migrations
+docs/                        Architecture, development, operations, and historical documentation
+e2e/                         Playwright smoke tests
+scripts/                     Sample-data and Lighthouse helpers
 ```
+
+## Contributing
+
+Keep changes focused, update the relevant documentation with any behavior or configuration change, and run the applicable quality gates before opening a pull request. Do not commit secrets, database dumps, generated build output, or local environment files.
+
+For operational changes, include a migration review where applicable and verify both the public rental path and the authorised portal after deployment.
 
 ---
 
-## Source of truth
-
-The README intentionally reflects the current repository configuration. When behavior changes, update the relevant source and this documentation together.
-
-| Topic | Authoritative implementation |
-|---|---|
-| Commands, package manager, and dependencies | [`package.json`](package.json) |
-| Client routes and protected portal entry | [`client/src/App.tsx`](client/src/App.tsx) |
-| Workspace composition and client-side access guards | [`client/src/pages/Home.tsx`](client/src/pages/Home.tsx) |
-| API router composition | [`server/routers.ts`](server/routers.ts) |
-| Express application and tRPC mount | [`server/_core/app.ts`](server/_core/app.ts) |
-| Local authentication | [`server/localAuth.ts`](server/localAuth.ts) |
-| Environment variables | [`server/_core/env.ts`](server/_core/env.ts) |
-| Database entities and migrations | [`drizzle/schema.ts`](drizzle/schema.ts) and [`drizzle.config.ts`](drizzle.config.ts) |
-| Vercel deployment | [`vercel.json`](vercel.json) and [`api/index.js`](api/index.js) |
-| Railway deployment | [`Dockerfile`](Dockerfile) and [`railway.toml`](railway.toml) |
-
----
-
-## Contributing and maintenance
-
-Before opening a pull request or deploying a change, run the type check, test suite, and production build. Keep new runtime variables documented in `.env.example` and this README, and do not include database dumps, local secrets, generated build output, or private credentials in commits.
-
-```bash
-pnpm run check
-pnpm test
-pnpm run build
-```
-
-For operational changes, validate the appropriate role and department paths, document any data migration, and verify the public rental enquiry flow as well as the authenticated portal after deployment.
+This README is an entry point. The implementation files and linked guides above are the source of truth for maintained behavior and operational procedure.

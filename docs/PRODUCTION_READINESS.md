@@ -2,6 +2,15 @@
 
 This runbook defines the release controls for the BOB Cranes Operations Portal. The active production delivery path is GitHub `main` to Vercel. The retained Railway application services are intentionally disconnected from GitHub auto-deploys and are not part of the release-status signal.
 
+| Related guide | Use it for |
+|---|---|
+| [Architecture guide](ARCHITECTURE.md) | Application boundaries, API domains, and deployment topology. |
+| [Development guide](DEVELOPMENT.md) | Local setup, migration generation, seed data, and test execution. |
+| [Operations guide](OPERATIONS.md) | Active Vercel deployment, release ownership, verification, and rollback. |
+| [Historical records](HISTORY.md) | Retained QA, design, and release records that are not current operating procedure. |
+
+This runbook is the detailed release-control companion to the broader operations guide.
+
 ## Release gate
 
 A change is ready to release only after the source, lockfile, and generated migration artifacts are reviewed together. The GitHub Actions **Quality gates** workflow runs TypeScript validation, Vitest, a production build, and Chromium browser smoke tests. A successful Vercel production deployment must then be visible against the commit on `main`.
