@@ -108,7 +108,37 @@ pnpm install --frozen-lockfile
 cp .env.example .env
 ```
 
+> **Windows note:** `corepack enable` needs an elevated terminal (it links into `Program Files\nodejs`). Without admin rights, install pnpm for your user instead and start a fresh terminal afterwards:
+>
+> ```powershell
+> npm config set prefix "$env:LOCALAPPDATA\npm-global"
+> npm install --global pnpm@10
+> ```
+>
+> npm scripts use `cross-env`, so `pnpm dev` and `pnpm start` work on Windows, macOS, and Linux without changes.
+
 Set `DATABASE_URL` and a strong `JWT_SECRET` in `.env`. The complete variable reference is in [`.env.example`](.env.example); do not commit local environment files or credentials.
+
+Generate a secret with Node (works everywhere):
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+### Database (Docker, quickest path)
+
+If you have Docker, start a local MySQL 8 matching the default `.env.example` credentials:
+
+```bash
+docker run -d --name bob-cranes-mysql \
+  -e MYSQL_ROOT_PASSWORD=local-root-pw \
+  -e MYSQL_DATABASE=bob_cranes_portal \
+  -e MYSQL_USER=bob_portal \
+  -e MYSQL_PASSWORD=change-me \
+  -p 3306:3306 mysql:8.0
+```
+
+After a restart, bring it back with `docker start bob-cranes-mysql`. Any other MySQL-compatible database works — just point `DATABASE_URL` at it.
 
 ### Local development
 
@@ -119,6 +149,15 @@ pnpm run db:push
 # Start the Express and Vite development server.
 pnpm run dev
 ```
+
+### Production run (local)
+
+```bash
+pnpm run build
+pnpm start
+```
+
+This serves the built client and API from `dist/` on `http://localhost:3000` (or `$PORT`). The `OAuth server is not configured` message at startup is expected — local sign-in does not use OAuth.
 
 Open [http://localhost:3000/portal](http://localhost:3000/portal) to create the first administrator for an empty local database. The optional demonstration dataset is intended only for local or disposable environments:
 

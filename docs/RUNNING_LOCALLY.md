@@ -35,7 +35,24 @@ corepack enable
 pnpm install --frozen-lockfile
 ```
 
+> **Windows:** `corepack enable` requires an elevated terminal. Without admin rights, use a user-level pnpm instead (`npm config set prefix "$env:LOCALAPPDATA\npm-global"` then `npm install --global pnpm@10`) and open a fresh terminal. The repo's `dev`/`start` scripts use `cross-env`, so they run unchanged on Windows.
+
 `--frozen-lockfile` ensures that the installed dependency graph matches the committed `pnpm-lock.yaml`. If it fails, do not delete or manually edit the lockfile; first confirm that the local checkout is on the intended branch and has no uncommitted dependency changes.
+
+## 2a. Start a local MySQL with Docker (optional)
+
+If you have Docker and no local MySQL, this matches the default `.env.example` credentials:
+
+```bash
+docker run -d --name bob-cranes-mysql \
+  -e MYSQL_ROOT_PASSWORD=local-root-pw \
+  -e MYSQL_DATABASE=bob_cranes_portal \
+  -e MYSQL_USER=bob_portal \
+  -e MYSQL_PASSWORD=change-me \
+  -p 3306:3306 mysql:8.0
+```
+
+Restart it later with `docker start bob-cranes-mysql`. Wait until `docker exec bob-cranes-mysql mysqladmin ping -h 127.0.0.1 -u bob_portal -p'change-me'` reports `mysqld is alive` before running migrations.
 
 ## 3. Create the local environment file
 
@@ -154,7 +171,7 @@ The browser smoke suite starts its own local test server and does not create or 
 
 | Symptom | Likely cause | Safe next step |
 |---|---|---|
-| `pnpm` is not found | Corepack is disabled or pnpm is missing. | Run `corepack enable`, then repeat the install command. |
+| `pnpm` is not found | Corepack is disabled or pnpm is missing. | Run `corepack enable` (elevated terminal on Windows), then repeat the install command. Without admin rights on Windows, install user-level pnpm (`npm install --global pnpm@10` with a user prefix) and open a fresh terminal. |
 | Database connection or migration error | `DATABASE_URL` is invalid, unreachable, or points to a database the user cannot access. | Verify host, port, database name, and credentials; use a local/disposable database. |
 | Port `3000` is already in use | Another local process is running on the default port. | Stop that local process or set an unused `PORT` value in `.env`. |
 | OAuth configuration warning | Optional OAuth variables are intentionally absent. | Continue with the local landing and local-auth flow, or configure OAuth only when required. |
