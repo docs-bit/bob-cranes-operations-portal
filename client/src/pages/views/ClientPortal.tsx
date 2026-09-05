@@ -8,6 +8,7 @@ type ClientPortalProps = {
   onUpdateDocuments?: (documents: DocumentItem[]) => void;
   onPersistDocumentMetadata?: (document: DocumentItem) => Promise<void>;
   onBackToInternal: () => void;
+  actorDepartment?: string | null;
 };
 
 type ClientUploadQueueItem = {
@@ -40,6 +41,7 @@ export function ClientPortal({
   onUpdateDocuments,
   onPersistDocumentMetadata,
   onBackToInternal,
+  actorDepartment = null,
 }: ClientPortalProps) {
   const crews = legacyCrews;
   const [tab, setTab] = useState<"summary" | "documents" | "chat" | "feedback">(
@@ -186,13 +188,38 @@ export function ClientPortal({
       });
     }
   };
+  const chatMutation = trpc.operations.addChat.useMutation();
+  const chatTeam =
+    actorDepartment === "documentation"
+      ? "Documentation"
+      : actorDepartment === "hse"
+        ? "HSE"
+        : actorDepartment === "sales"
+          ? "Sales"
+          : actorDepartment === "accounts"
+            ? "Accounts"
+            : "Operations Management";
   const sendMessage = () => {
     if (!message.trim()) return;
+    const text = message.trim();
     setMessages(current => [
       ...current,
-      { from: "You", text: message, time: "Now" },
+      { from: "You", text, time: "Now" },
     ]);
     setMessage("");
+    void chatMutation
+      .mutateAsync({
+        id: `client-chat-${Date.now()}`,
+        bookingId: persistedBookingIdForUi(booking.id) ?? booking.id,
+        team: chatTeam,
+        sender: "Client portal",
+        body: text,
+      })
+      .catch(() => {
+        notify(
+          "Message shown locally but could not be saved. It will not appear for internal teams until you retry."
+        );
+      });
   };
   const notify = (text: string) => {
     setUploadToast(text);

@@ -39,10 +39,15 @@ export function getSessionCookieOptions(
   //       ? hostname
   //       : undefined;
 
+  // SameSite=None without Secure is rejected by browsers, which drops the
+  // session on plain-http local development. Only request cross-site
+  // semantics on genuinely secure requests; otherwise use Lax so the
+  // cookie is accepted on http://localhost and other same-site hosts.
+  const secure = isSecureRequest(req);
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "none",
-    secure: isSecureRequest(req),
+    sameSite: secure ? "none" : "lax",
+    secure,
   };
 }

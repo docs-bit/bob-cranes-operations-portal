@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import {
@@ -49,6 +49,8 @@ import { CrewViewLegacy } from "./views/CrewViewLegacy";
 import { TrainingView } from "./views/TrainingView";
 import { GearView, gears } from "./views/GearView";
 import { BookingDetail } from "./views/BookingDetail";
+import { DocSupervisorConsole } from "./views/DocSupervisorConsole";
+import { TokenPortal } from "./views/TokenPortal";
 import { AttendanceView } from "./views/AttendanceView";
 import { DepartmentView } from "./views/DepartmentView";
 import { ProvisionedDepartmentDashboard } from "./views/DepartmentView";
@@ -72,6 +74,11 @@ export default function Home() {
   const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
   const isClient = location.startsWith("/client");
+  const routeParams = useParams();
+  const clientToken =
+    isClient && typeof routeParams.token === "string" ? routeParams.token : null;
+  // Magic-link tokens (bob_…) render the logged-out portal. Anything else
+  // falls through to the legacy authenticated client view.
   const clientDocumentBookingId = persistedBookingIdForUi("BOB Booking-31511") ?? "BOB-59116";
   const clientTaxonomyQuery = trpc.documents.getTaxonomy.useQuery(undefined, { enabled: Boolean(user && isClient) });
   const clientMetadataQuery = trpc.documents.getMetadata.useQuery(
@@ -206,6 +213,13 @@ export default function Home() {
     await clientMetadataQuery.refetch();
   };
 
+  if (isClient && clientToken?.startsWith("bob_"))
+    return <TokenPortal token={clientToken} />;
+
+  // Logged-out visitors without a magic link get the request-link page
+  // instead of an authenticated view that cannot load.
+  if (isClient && !user) return <TokenPortal token="none" forceInvalid />;
+
   if (isClient && clientBooking)
     return (
       <ClientPortal
@@ -246,12 +260,18 @@ export default function Home() {
           await Promise.all(assignments.map(({ document, file }) => persistClientDocumentMetadata({ ...document, state: "Uploaded", fileName: file.name, fileType: file.type, fileSize: file.size })));
         }}
         onBackToInternal={() => setLocation("/")}
+        actorDepartment={user?.departmentCode ?? null}
       />
     );
 
   const openDetail = (booking: Booking) => {
     setActiveBooking(booking);
     setView("detail");
+  };
+
+  const openConsole = (booking: Booking) => {
+    setActiveBooking(booking);
+    setView("console");
   };
 
   const createBooking = (booking: Booking) => {
@@ -376,6 +396,12 @@ export default function Home() {
           setActiveBooking(bookings.find(booking => booking.id === focusedAssignmentBookingId) ?? null);
           setFocusedAssignmentBookingId(null);
           setActiveDepartment(null);
+          setView("detail");
+          return;
+        }
+        if (view === "console" && activeBooking) {
+          setActiveDepartment(null);
+          setActiveProvisionedDepartmentCode(null);
           setView("detail");
           return;
         }
@@ -531,6 +557,8 @@ export default function Home() {
           generatedBy={user.name ?? user.email ?? "BOB Cranes Operations"}
           onUpdate={updateBooking}
           onOpenClientPortal={() => setLocation("/client/portal-bob-31511")}
+          canCoordinate={user.role === "admin" || user.departmentCode === "documentation"}
+          onOpenConsole={() => activeBooking && openConsole(activeBooking)}
           onEditAssignment={() => {
             if (!canView("crew")) {
               toast.error("Crew assignment access required", {
@@ -550,6 +578,18 @@ export default function Home() {
             setActiveBooking(null);
             setView("overview");
           }}
+        />
+      )}
+      {view === "console" && activeBooking && (
+        <DocSupervisorConsole
+          booking={activeBooking}
+          documents={uploadDocuments}
+          allocations={allocations}
+          canCoordinate={user.role === "admin" || user.departmentCode === "documentation"}
+          onUpdate={updateBooking}
+          onBack={() => setView("detail")}
+          onAdvance={advanceDepartmentBooking}
+          onOpenClientPortal={() => setLocation("/client/portal-bob-31511")}
         />
       )}
       <div style={{ color: "#555", fontSize: 10, textAlign: "right", padding: "10px 0 0" }}>

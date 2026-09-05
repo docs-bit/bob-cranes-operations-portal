@@ -1842,3 +1842,18 @@ textarea,
   html, body, #root, button, input, select, textarea, .panel, .card, .dashboard-summary-widget, .dashboard-summary-card, .sidebar, .topbar, .content { transition: none; }
   .dashboard-summary-card::after { transition: none; }
 }
+
+/* Documentation Supervisor Console layout (PRD §11): main column + live-context rail. */
+.console-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+@media (max-width: 1000px) { .console-layout { grid-template-columns: 1fr; } }
+
+/* Small-screen stacking for shared dossier grids and card actions. */
+@media (max-width: 620px) {
+  .detail-list { grid-template-columns: 1fr; }
+  .resource-action { flex-wrap: wrap; }
+  .resource-action .secondary-button, .resource-action .primary-button { flex: 1 1 140px; justify-content: center; }
+  .wizard-actions { flex-wrap: wrap; }
+  .wizard-actions button { flex: 1 1 160px; justify-content: center; }
+}
+.field-error { color: #e31e24; font-size: 11px; margin-top: 4px; }
+.form-input[aria-invalid="true"] { border-color: #e31e24; }

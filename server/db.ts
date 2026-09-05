@@ -22,6 +22,7 @@ import {
   telemetryEvents,
   bookings,
   bookingCrewAllocations,
+  trainingFlags,
   equipment,
   crew,
   liftingGears,
@@ -38,6 +39,8 @@ import {
   documentTaxonomyTags,
   persistedDocumentMetadata,
   clientFilterPresets,
+  clientPortalTokens,
+  dispatches,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -570,6 +573,67 @@ export async function replaceCrewBookingAllocations(input: {
     );
   }
   return await listBookingCrewAllocations();
+}
+
+export async function listTrainingFlags(bookingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(trainingFlags)
+    .where(eq(trainingFlags.bookingId, bookingId))
+    .orderBy(desc(trainingFlags.createdAt));
+}
+
+export async function createTrainingFlag(data: {
+  id: string;
+  bookingId: string;
+  crewId: string;
+  crewName: string;
+  flagType: string;
+  note: string;
+  raisedBy: string;
+  raisedByUserId?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(trainingFlags).values({
+    ...data,
+    raisedByUserId: data.raisedByUserId ?? null,
+    status: "OPEN",
+  });
+  const rows = await db
+    .select()
+    .from(trainingFlags)
+    .where(eq(trainingFlags.id, data.id));
+  return rows[0];
+}
+
+export async function updateTrainingFlagStatus(
+  id: string,
+  status: "ACKNOWLEDGED" | "RESOLVED",
+  resolvedBy?: string | null
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const current = await db
+    .select()
+    .from(trainingFlags)
+    .where(eq(trainingFlags.id, id));
+  if (!current[0]) throw new Error("Training flag not found.");
+  await db
+    .update(trainingFlags)
+    .set({
+      status,
+      resolvedBy: status === "RESOLVED" ? (resolvedBy ?? null) : null,
+      resolvedAt: status === "RESOLVED" ? new Date() : null,
+    })
+    .where(eq(trainingFlags.id, id));
+  const rows = await db
+    .select()
+    .from(trainingFlags)
+    .where(eq(trainingFlags.id, id));
+  return rows[0];
 }
 
 export async function getAllEquipment() {
@@ -1768,4 +1832,180 @@ export async function deleteClientFilterPreset(userId: number, name: string) {
   await db
     .delete(clientFilterPresets)
     .where(and(eq(clientFilterPresets.userId, userId), eq(clientFilterPresets.name, name)));
+}
+
+export async function createDispatchRecord(data: {
+  id: string;
+  bookingId: string;
+  dispatchedBy?: number | null;
+  sentToEmail: string;
+  subject: string;
+  summary: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(dispatches).values({
+    ...data,
+    dispatchedBy: data.dispatchedBy ?? null,
+    status: "Recorded",
+  });
+  const rows = await db
+    .select()
+    .from(dispatches)
+    .where(eq(dispatches.id, data.id));
+  return rows[0];
+}
+
+export async function getExpiryCheckLastRun() {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db
+    .select()
+    .from(systemSettings)
+    .where(eq(systemSettings.key, "expiry_check_last_run"))
+    .limit(1);
+  return result[0]?.value ?? null;
+}
+
+export async function runCertificateExpiryCheck(nowMs: number = Date.now()) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const { findExpiringDatedItems } = await import(
+    "../shared/notificationAndExpiryRules"
+  );
+  const crew = await getAllCrew();
+  const gears = await getAllLiftingGears();
+  const assets = await getAllEquipment();
+  const hits = findExpiringDatedItems(
+    [
+      ...crew.map(member => ({
+        key: `crew-${member.id}`,
+        label: `Crew certificate · ${member.name}`,
+        expiry: member.certificateExpiry,
+        ownerDepartment: "crew",
+      })),
+      ...gears.map(gear => ({
+        key: `gear-${gear.id}`,
+        label: `Lifting gear inspection · ${gear.name}`,
+        expiry: gear.inspectionExpiry,
+        ownerDepartment: "lifting-gears",
+      })),
+      ...assets.map(asset => ({
+        key: `asset-${asset.id}`,
+        label: `Equipment inspection · ${asset.name}`,
+        expiry: asset.inspectionExpiry,
+        ownerDepartment: "maintenance",
+      })),
+    ],
+    nowMs,
+    20
+  );
+  const today = new Date(nowMs).toISOString().slice(0, 10);
+  let alerts = 0;
+  for (const hit of hits) {
+    const title =
+      hit.status === "expired"
+        ? `Certificate expired · ${hit.label}`
+        : `Certificate expiring in ${hit.daysLeft}d · ${hit.label}`;
+    const body = `${hit.label} expires ${hit.expiry}. Owner department: ${hit.ownerDepartment}.`;
+    await addNotification({
+      id: `expiry-${hit.key}-${today}`,
+      userId: null,
+      departmentCode: "hse",
+      title,
+      body,
+    });
+    if (hit.ownerDepartment !== "hse") {
+      await addNotification({
+        id: `expiry-${hit.key}-${today}-owner`,
+        userId: null,
+        departmentCode: hit.ownerDepartment,
+        title,
+        body,
+      });
+    }
+    alerts += 1;
+  }
+  await db
+    .insert(systemSettings)
+    .values({ key: "expiry_check_last_run", value: today, updatedBy: null })
+    .onDuplicateKeyUpdate({ set: { value: today, updatedBy: null } });
+  return { ran: true, alerts, checkedAt: today };
+}
+
+export async function runCertificateExpiryCheckIfStale(
+  nowMs: number = Date.now()
+) {
+  const lastRun = await getExpiryCheckLastRun();
+  const today = new Date(nowMs).toISOString().slice(0, 10);
+  if (lastRun === today) return { ran: false, alerts: 0, checkedAt: lastRun };
+  return await runCertificateExpiryCheck(nowMs);
+}
+
+export async function createPortalToken(data: {
+  id: string;
+  tokenHash: string;
+  bookingId: string;
+  clientName: string;
+  projectName: string;
+  mobDate: string;
+  offHireDate: string;
+  priority: string;
+  createdBy?: number | null;
+  expiresAt: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(clientPortalTokens).values({
+    ...data,
+    createdBy: data.createdBy ?? null,
+  });
+  const rows = await db
+    .select()
+    .from(clientPortalTokens)
+    .where(eq(clientPortalTokens.id, data.id));
+  return rows[0];
+}
+
+export async function getPortalTokenByHash(tokenHash: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db
+    .select()
+    .from(clientPortalTokens)
+    .where(eq(clientPortalTokens.tokenHash, tokenHash))
+    .limit(1);
+  return rows[0];
+}
+
+export async function listPortalTokens(bookingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select({
+      id: clientPortalTokens.id,
+      bookingId: clientPortalTokens.bookingId,
+      createdBy: clientPortalTokens.createdBy,
+      expiresAt: clientPortalTokens.expiresAt,
+      revokedAt: clientPortalTokens.revokedAt,
+      createdAt: clientPortalTokens.createdAt,
+    })
+    .from(clientPortalTokens)
+    .where(eq(clientPortalTokens.bookingId, bookingId))
+    .orderBy(desc(clientPortalTokens.createdAt));
+}
+
+export async function revokePortalTokensForBooking(bookingId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(clientPortalTokens)
+    .set({ revokedAt: new Date() })
+    .where(
+      and(
+        eq(clientPortalTokens.bookingId, bookingId),
+        isNull(clientPortalTokens.revokedAt)
+      )
+    );
+  return await listPortalTokens(bookingId);
 }

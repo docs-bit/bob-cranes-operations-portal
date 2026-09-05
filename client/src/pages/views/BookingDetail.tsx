@@ -19,6 +19,8 @@ export function BookingDetail({
   onUpdate,
   onEditAssignment,
   onOpenClientPortal,
+  canCoordinate,
+  onOpenConsole,
 }: {
   booking: Booking;
   documents: DocumentItem[];
@@ -29,6 +31,8 @@ export function BookingDetail({
   onUpdate: (booking: Booking) => void;
   onEditAssignment: () => void;
   onOpenClientPortal: () => void;
+  canCoordinate: boolean;
+  onOpenConsole: () => void;
 }) {
   const [toast, setToast] = useState("");
   const assignedCrew = useMemo(
@@ -63,6 +67,8 @@ export function BookingDetail({
   >([]);
   const dispatchBundleMutation =
     trpc.operations.requestDispatchBundle.useMutation();
+  const recordDispatchMutation =
+    trpc.operations.recordDispatch.useMutation();
   const dossierDocuments = useMemo(
     () =>
       documents.map(doc =>
@@ -195,6 +201,11 @@ export function BookingDetail({
         copy={`${booking.client} · ${booking.project} · ${booking.site}`}
         action={
           <div style={{ display: "flex", gap: 8 }}>
+            {canCoordinate && (
+              <button className="secondary-button" onClick={onOpenConsole}>
+                <ClipboardCheck size={14} /> Coordination console
+              </button>
+            )}
             <button className="secondary-button" onClick={onOpenClientPortal}>
               <MessageCircle size={14} /> Client portal
             </button>
@@ -750,12 +761,29 @@ export function BookingDetail({
                 </button>
                 <button
                   className="primary-button"
-                  onClick={() => {
-                    setDispatchPreview(false);
-                    notify(
-                      "Final package emailed to the locked notification email."
-                    );
-                  }}
+                  onClick={() => void (async () => {
+                    if (!canDispatch) return;
+                    try {
+                      const recipient = window.prompt(
+                        "Confirm the locked notification email for this dispatch:",
+                        ""
+                      );
+                      if (!recipient) return;
+                      const result = await recordDispatchMutation.mutateAsync({
+                        id: `dispatch-${booking.id}-${Date.now()}`,
+                        bookingId: persistedBookingIdForUi(booking.id) ?? booking.id,
+                        sentToEmail: recipient,
+                        subject: `BOB Cranes — Booking ${booking.id} Document Package — ${booking.client}`,
+                        summary: `${dossierCrew.length} crew, ${dossierDocuments.length} documents, completion ${completion}%. PDF bundle generated locally; SMTP not configured so nothing was emailed.`,
+                      });
+                      setDispatchPreview(false);
+                      notify(`Dispatch recorded as ${result.record.id}. SMTP is not configured, so nothing was emailed.`);
+                    } catch (caught) {
+                      globalToast.error("Dispatch could not be recorded", {
+                        description: caught instanceof Error ? caught.message : "Please try again.",
+                      });
+                    }
+                  })()}
                 >
                   <Send size={14} /> Send final package
                 </button>

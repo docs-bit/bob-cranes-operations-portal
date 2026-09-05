@@ -14,6 +14,11 @@ vi.mock("../client/src/lib/trpc", () => ({
         useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
       },
     },
+    operations: {
+      addChat: {
+        useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
+      },
+    },
     filterPresets: {
       list: {
         useQuery: () => ({ data: [], refetch: vi.fn() }),

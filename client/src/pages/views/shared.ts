@@ -74,6 +74,7 @@ export type View =
   | "training"
   | "uploads"
   | "detail"
+  | "console"
   | "department"
   | "provisioned-dashboard"
   | "sales-enquiries"

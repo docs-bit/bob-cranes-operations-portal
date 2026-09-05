@@ -75,5 +75,6 @@ export function departmentsForUser(user: DepartmentAccessUser) {
 
 export function canAccessWorkspaceView(user: DepartmentAccessUser, view: string) {
   const trainingAccess = view === "training" && ["hr", "hse", "crew"].includes(user.departmentCode ?? "");
-  return user.role === "admin" || view === "overview" || view === "detail" || view === "department" || trainingAccess || (view === "users" && user.role === "supervisor") || DEPARTMENT_WORKSPACE_VIEW[user.departmentCode as DepartmentCode] === view;
+  const consoleAccess = view === "console" && (user.role === "admin" || user.departmentCode === "documentation");
+  return user.role === "admin" || view === "overview" || view === "detail" || view === "department" || trainingAccess || consoleAccess || (view === "users" && user.role === "supervisor") || DEPARTMENT_WORKSPACE_VIEW[user.departmentCode as DepartmentCode] === view;
 }

@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { Check, CheckCircle2, ChevronDown, FolderOpen, Lock, Send, X, ArrowLeft, ArrowRight, AlertTriangle } from "lucide-react";
 import { departmentList, crews, gears, initials, type Booking } from "./shared";
+import {
+  formatDossierDate,
+  validateDossierInput,
+} from "@shared/dossierDates";
 import { PageHeading } from "./OverviewHelpers";
 import { StatusBadge } from "./primitives";
 
@@ -13,6 +17,12 @@ export function Wizard({
 }) {
   const [step, setStep] = useState(1);
   const [wizardToast, setWizardToast] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{
+    client?: string;
+    email?: string;
+    mob?: string;
+    offHire?: string;
+  }>({});
   const [selectedCrane, setSelectedCrane] = useState(
     "200T Mobile Crane · B-205"
   );
@@ -72,15 +82,19 @@ export function Wizard({
   const update = (key: string, value: string) =>
     setForm(current => ({ ...current, [key]: value }));
   const next = () => {
-    if (
-      step === 1 &&
-      (!form.client || !form.email || !form.mob || !form.offHire)
-    ) {
-      setWizardToast(
-        "Complete client, email, and mobilization dates before continuing."
-      );
-      setTimeout(() => setWizardToast(""), 2600);
-      return;
+    if (step === 1) {
+      const errors = validateDossierInput({
+        client: form.client,
+        email: form.email,
+        mob: form.mob,
+        offHire: form.offHire,
+      });
+      setFieldErrors(errors);
+      if (Object.keys(errors).length > 0) {
+        setWizardToast("Fix the highlighted fields before continuing.");
+        setTimeout(() => setWizardToast(""), 2600);
+        return;
+      }
     }
     setStep(current => Math.min(6, current + 1));
   };
@@ -94,8 +108,8 @@ export function Wizard({
       stage: "Created by Salesperson",
       priority: form.priority as Booking["priority"],
       progress: 0,
-      mob: "11 Aug 2026",
-      offHire: "18 Aug 2026",
+      mob: formatDossierDate(form.mob) || form.mob,
+      offHire: formatDossierDate(form.offHire) || form.offHire,
       pm: form.pm,
       crew: `${selectedCrew.length} assigned`,
     };
@@ -166,8 +180,15 @@ export function Wizard({
                   <input
                     className="form-input"
                     value={form.client}
-                    onChange={event => update("client", event.target.value)}
+                    aria-invalid={Boolean(fieldErrors.client)}
+                    onChange={event => {
+                      update("client", event.target.value);
+                      setFieldErrors(current => ({ ...current, client: undefined }));
+                    }}
                   />
+                  {fieldErrors.client && (
+                    <div className="field-error" role="alert">{fieldErrors.client}</div>
+                  )}
                 </div>
                 <div className="form-field">
                   <label>Project / scope *</label>
@@ -199,8 +220,15 @@ export function Wizard({
                     className="form-input"
                     type="date"
                     value={form.mob}
-                    onChange={event => update("mob", event.target.value)}
+                    aria-invalid={Boolean(fieldErrors.mob)}
+                    onChange={event => {
+                      update("mob", event.target.value);
+                      setFieldErrors(current => ({ ...current, mob: undefined }));
+                    }}
                   />
+                  {fieldErrors.mob && (
+                    <div className="field-error" role="alert">{fieldErrors.mob}</div>
+                  )}
                 </div>
                 <div className="form-field">
                   <label>Off-hire date *</label>
@@ -208,8 +236,15 @@ export function Wizard({
                     className="form-input"
                     type="date"
                     value={form.offHire}
-                    onChange={event => update("offHire", event.target.value)}
+                    aria-invalid={Boolean(fieldErrors.offHire)}
+                    onChange={event => {
+                      update("offHire", event.target.value);
+                      setFieldErrors(current => ({ ...current, offHire: undefined }));
+                    }}
                   />
+                  {fieldErrors.offHire && (
+                    <div className="field-error" role="alert">{fieldErrors.offHire}</div>
+                  )}
                 </div>
                 <div className="form-field">
                   <label>Client contact person</label>
@@ -233,8 +268,15 @@ export function Wizard({
                     className="form-input"
                     type="email"
                     value={form.email}
-                    onChange={event => update("email", event.target.value)}
+                    aria-invalid={Boolean(fieldErrors.email)}
+                    onChange={event => {
+                      update("email", event.target.value);
+                      setFieldErrors(current => ({ ...current, email: undefined }));
+                    }}
                   />
+                  {fieldErrors.email && (
+                    <div className="field-error" role="alert">{fieldErrors.email}</div>
+                  )}
                 </div>
                 <div className="form-field">
                   <label>Priority tier</label>

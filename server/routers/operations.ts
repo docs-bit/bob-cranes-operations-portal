@@ -4,10 +4,22 @@ import {
   transitionBooking,
   type BookingStage,
 } from "@shared/bookingRules";
+import {
+  transitionTrainingFlagStatus,
+  type TrainingFlagAction,
+} from "@shared/docConsoleRules";
+import {
+  generatePortalToken,
+  hashPortalToken,
+  isPortalTokenLive,
+  portalTokenExpiry,
+} from "../portalTokens";
+import { nanoid } from "nanoid";
 import { isDepartmentCode, type DepartmentCode } from "@shared/departmentAccess";
 import { isKnownCrewAssignmentMember } from "../../shared/crewAssignmentRoster";
+import { parseDossierDate } from "@shared/dossierDates";
 import { TRPCError } from "@trpc/server";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { z } from "zod";
 import * as db from "../db";
 import { storagePut } from "../storage";
@@ -56,22 +68,33 @@ export const operationsRouter = router({
   createBooking: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
-        clientName: z.string(),
-        projectName: z.string(),
-        projectManager: z.string(),
-        lpoReference: z.string(),
-        mobilizationDate: z.string(),
-        offHireDate: z.string(),
-        clientContactName: z.string(),
-        clientEmail: z.string(),
-        clientPhone: z.string(),
-        priority: z.string(),
-        stage: z.string(),
-        craneId: z.string().optional(),
-        crewIds: z.array(z.string()).optional(),
-        gearIds: z.array(z.string()).optional(),
-        trailerIds: z.array(z.string()).optional(),
+        id: z.string().trim().min(1).max(64),
+        clientName: z.string().trim().min(1).max(255),
+        projectName: z.string().trim().min(1).max(255),
+        projectManager: z.string().trim().min(1).max(255),
+        lpoReference: z.string().trim().min(1).max(128),
+        mobilizationDate: z.string().trim().min(1).max(64),
+        offHireDate: z.string().trim().min(1).max(64),
+        clientContactName: z.string().trim().min(1).max(255),
+        clientEmail: z.string().trim().email().max(320),
+        clientPhone: z.string().trim().min(1).max(64),
+        priority: z.string().trim().min(1).max(32),
+        stage: z.string().trim().min(1).max(128),
+        craneId: z.string().trim().min(1).max(64).optional(),
+        crewIds: z.array(z.string().trim().min(1).max(64)).max(50).optional(),
+        gearIds: z.array(z.string().trim().min(1).max(64)).max(50).optional(),
+        trailerIds: z.array(z.string().trim().min(1).max(64)).max(50).optional(),
+      })
+      .superRefine((value, ctx) => {
+        const mob = parseDossierDate(value.mobilizationDate);
+        const offHire = parseDossierDate(value.offHireDate);
+        if (mob && offHire && offHire.getTime() <= mob.getTime()) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["offHireDate"],
+            message: "Off-hire must be after mobilization.",
+          });
+        }
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -196,6 +219,359 @@ export const operationsRouter = router({
     await db.seedInitialDataIfNeeded();
     return await db.listBookingCrewAllocations();
   }),
+
+  listTrainingFlags: protectedProcedure
+    .input(z.object({ bookingId: z.string().min(1) }))
+    .query(async ({ input }) => {
+      return await db.listTrainingFlags(input.bookingId);
+    }),
+
+  createTrainingFlag: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.string().min(1).max(64),
+        crewId: z.string().min(1).max(64),
+        crewName: z.string().trim().min(1).max(255),
+        flagType: z.string().trim().min(1).max(64),
+        note: z.string().trim().min(1).max(2000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "documentation");
+      const raisedBy =
+        ctx.user.name ?? ctx.user.email ?? "Documentation Supervisor";
+      const flag = await db.createTrainingFlag({
+        id: `tflag-${nanoid(12)}`,
+        bookingId: input.bookingId,
+        crewId: input.crewId,
+        crewName: input.crewName,
+        flagType: input.flagType,
+        note: input.note,
+        raisedBy,
+        raisedByUserId: ctx.user.id,
+      });
+      const timestamp = Date.now();
+      const notifications = await Promise.all(
+        (["documentation", "crew", "hse"] as const).map(
+          (departmentCode, index) =>
+            db.addNotification({
+              id: `tflag-${flag.id}-${departmentCode}-${timestamp}-${index}`,
+              userId: null,
+              departmentCode,
+              title: `Training flag raised · ${input.crewName}`,
+              body: `${input.flagType} on ${input.bookingId} — ${input.note} (raised by ${raisedBy}).`,
+            })
+        )
+      );
+      return { flag, notifications };
+    }),
+
+  updateTrainingFlag: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1).max(64),
+        action: z.enum(["acknowledge", "resolve"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const action = input.action as TrainingFlagAction;
+      if (ctx.user.role !== "admin") {
+        const department = ctx.user.departmentCode ?? "";
+        if (action === "resolve") {
+          if (department !== "hse")
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Only HSE or an administrator can resolve a training flag.",
+            });
+        } else if (!["documentation", "crew", "hse"].includes(department)) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "Only Crew, HSE, Documentation or an administrator can acknowledge flags.",
+          });
+        }
+      }
+      const existing = (await db.listTrainingFlags("")).find(
+        row => row.id === input.id
+      );
+      const current = existing?.status ?? "OPEN";
+      let next: "ACKNOWLEDGED" | "RESOLVED";
+      try {
+        next = transitionTrainingFlagStatus(
+          current as "OPEN" | "ACKNOWLEDGED" | "RESOLVED",
+          action
+        );
+      } catch (error) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            error instanceof Error
+              ? error.message
+              : "This flag cannot change state that way.",
+        });
+      }
+      const flag = await db.updateTrainingFlagStatus(
+        input.id,
+        next,
+        ctx.user.name ?? ctx.user.email ?? null
+      );
+      return { flag };
+    }),
+
+  runExpiryCheck: protectedProcedure.mutation(async ({ ctx }) => {
+    if (
+      ctx.user.role !== "admin" &&
+      !["hse", "documentation", "crew"].includes(ctx.user.departmentCode ?? "")
+    )
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only HSE, Crew, Documentation or an administrator can run the expiry check.",
+      });
+    return await db.runCertificateExpiryCheckIfStale();
+  }),
+
+  getExpiryCheckStatus: protectedProcedure.query(async () => ({
+    lastRun: await db.getExpiryCheckLastRun(),
+  })),
+
+  issuePortalToken: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.string().trim().min(1).max(64),
+        clientName: z.string().trim().min(1).max(255),
+        projectName: z.string().trim().min(1).max(255),
+        mobDate: z.string().trim().min(1).max(64),
+        offHireDate: z.string().trim().min(1).max(64),
+        priority: z.string().trim().min(1).max(32).default("Standard"),
+        requiredDocs: z
+          .array(
+            z.object({
+              name: z.string().trim().min(1).max(255),
+              departmentCode: z.string().trim().min(1).max(32),
+            })
+          )
+          .max(30)
+          .default([]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "documentation");
+      for (const doc of input.requiredDocs) {
+        if (!isDepartmentCode(doc.departmentCode))
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Unknown department: ${doc.departmentCode}.`,
+          });
+      }
+      const token = generatePortalToken();
+      const record = await db.createPortalToken({
+        id: `ptk-${nanoid(12)}`,
+        tokenHash: hashPortalToken(token),
+        bookingId: input.bookingId,
+        clientName: input.clientName,
+        projectName: input.projectName,
+        mobDate: input.mobDate,
+        offHireDate: input.offHireDate,
+        priority: input.priority,
+        createdBy: ctx.user.id,
+        expiresAt: portalTokenExpiry(),
+      });
+      let seeded = 0;
+      for (const doc of input.requiredDocs) {
+        await db.upsertDocument({
+          id: `req-${nanoid(12)}`,
+          bookingId: input.bookingId,
+          departmentCode: doc.departmentCode,
+          name: doc.name,
+          state: "Required",
+          required: 1,
+        });
+        seeded += 1;
+      }
+      await db.addNotification({
+        id: `portal-issued-${record.id}`,
+        userId: null,
+        departmentCode: "documentation",
+        title: `Client portal link issued · ${input.bookingId}`,
+        body: `A 24-hour portal link was issued by ${ctx.user.name ?? ctx.user.email ?? "Documentation"} with ${seeded} required documents.`,
+      });
+      return { token, expiresAt: record.expiresAt, seeded };
+    }),
+
+  revokePortalTokens: protectedProcedure
+    .input(z.object({ bookingId: z.string().trim().min(1).max(64) }))
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "documentation");
+      const tokens = await db.revokePortalTokensForBooking(input.bookingId);
+      await db.addNotification({
+        id: `portal-revoked-${input.bookingId}-${Date.now()}`,
+        userId: null,
+        departmentCode: "documentation",
+        title: `Client portal closed · ${input.bookingId}`,
+        body: `All portal links were revoked by ${ctx.user.name ?? ctx.user.email ?? "Documentation"}.`,
+      });
+      return { tokens };
+    }),
+
+  listPortalTokens: protectedProcedure
+    .input(z.object({ bookingId: z.string().trim().min(1).max(64) }))
+    .query(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "documentation");
+      return await db.listPortalTokens(input.bookingId);
+    }),
+
+  getPortalContext: publicProcedure
+    .input(z.object({ token: z.string().trim().min(1).max(128) }))
+    .query(async ({ input }) => {
+      const row = await db.getPortalTokenByHash(hashPortalToken(input.token));
+      if (!row || !isPortalTokenLive(row))
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "This link is no longer valid. Contact your BOB Cranes coordinator for a new one.",
+        });
+      const [documents, metadata, chat] = await Promise.all([
+        db.getDocumentsForBooking(row.bookingId),
+        db.listPersistedDocumentMetadata(row.bookingId),
+        db.getChatForBooking(row.bookingId),
+      ]);
+      return {
+        booking: {
+          id: row.bookingId,
+          clientName: row.clientName,
+          projectName: row.projectName,
+          mobDate: row.mobDate,
+          offHireDate: row.offHireDate,
+          priority: row.priority,
+        },
+        documents: documents.filter(document => document.required === 1),
+        metadata,
+        chat: chat.slice(-20),
+        expiresAt: row.expiresAt,
+      };
+    }),
+
+  postPortalChat: publicProcedure
+    .input(
+      z.object({
+        token: z.string().trim().min(1).max(128),
+        team: z.enum([
+          "Sales",
+          "Documentation",
+          "HSE",
+          "Accounts",
+          "Operations Management",
+        ]),
+        displayName: z.string().trim().min(1).max(120),
+        body: z.string().trim().min(1).max(2000),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const row = await db.getPortalTokenByHash(hashPortalToken(input.token));
+      if (!row || !isPortalTokenLive(row))
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "This link is no longer valid. Contact your BOB Cranes coordinator for a new one.",
+        });
+      const message = await db.addChatMessage({
+        id: `pchat-${nanoid(12)}`,
+        bookingId: row.bookingId,
+        team: input.team,
+        sender: `Client · ${input.displayName}`,
+        body: input.body,
+      });
+      await db.addNotification({
+        id: `pchat-${message.id}`,
+        userId: null,
+        departmentCode:
+          input.team === "Documentation"
+            ? "documentation"
+            : input.team === "HSE"
+              ? "hse"
+              : input.team === "Sales"
+                ? "sales"
+                : input.team === "Accounts"
+                  ? "accounts"
+                  : "documentation",
+        title: `Client message · ${row.bookingId}`,
+        body: `${input.displayName} wrote to ${input.team}: ${input.body.slice(0, 140)}`,
+      });
+      return { message };
+    }),
+
+  uploadPortalDocument: publicProcedure
+    .input(
+      z.object({
+        token: z.string().trim().min(1).max(128),
+        documentId: z.string().trim().min(1).max(64),
+        fileName: z.string().trim().min(1).max(255),
+        fileType: z.enum(["application/pdf", "image/jpeg", "image/png"]),
+        fileSize: z.number().int().min(1).max(25 * 1024 * 1024),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const row = await db.getPortalTokenByHash(hashPortalToken(input.token));
+      if (!row || !isPortalTokenLive(row))
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "This link is no longer valid. Contact your BOB Cranes coordinator for a new one.",
+        });
+      const docs = await db.getDocumentsForBooking(row.bookingId);
+      const target = docs.find(document => document.id === input.documentId);
+      if (!target)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "That required document is not on this booking checklist.",
+        });
+      await db.upsertDocument({
+        id: target.id,
+        bookingId: row.bookingId,
+        departmentCode: target.departmentCode,
+        name: target.name,
+        state: "Uploaded",
+        required: 1,
+      });
+      await db.upsertPersistedDocumentMetadata({
+        id: target.id,
+        bookingId: row.bookingId,
+        name: target.name,
+        departmentCode: target.departmentCode,
+        state: "Uploaded",
+        fileName: input.fileName,
+        fileType: input.fileType,
+        fileSize: input.fileSize,
+        uploadedBy: null,
+      });
+      await db.addNotification({
+        id: `pupload-${target.id}-${Date.now()}`,
+        userId: null,
+        departmentCode: "documentation",
+        title: `Client upload · ${row.bookingId}`,
+        body: `${target.name} was uploaded by the client (${input.fileName}).`,
+      });
+      return { documentId: target.id, state: "Uploaded" as const };
+    }),
+
+  requestPortalLink: publicProcedure
+    .input(
+      z.object({
+        bookingLabel: z.string().trim().max(255).optional(),
+        contactEmail: z.string().trim().email().max(320),
+        message: z.string().trim().min(1).max(1000),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await db.addNotification({
+        id: `portal-request-${Date.now()}`,
+        userId: null,
+        departmentCode: "documentation",
+        title: "Client requested a portal link",
+        body: `${input.contactEmail}${input.bookingLabel ? ` · ${input.bookingLabel}` : ""}: ${input.message}`,
+      });
+      return { received: true };
+    }),
 
   saveCrewAllocations: protectedProcedure
     .input(
@@ -480,5 +856,30 @@ export const operationsRouter = router({
         detail: `${ctx.user.name ?? ctx.user.email ?? "Sales"} requested the dispatch PDF bundle for ${input.bookingId}.`,
       });
       return { booking, documents: docs };
+    }),
+
+  recordDispatch: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().trim().min(1).max(64),
+        bookingId: z.string().trim().min(1).max(64),
+        sentToEmail: z.string().trim().email().max(320),
+        subject: z.string().trim().min(1).max(255),
+        summary: z.string().trim().min(1).max(4000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        requireDepartmentAccess(ctx.user, "documentation");
+      const record = await db.createDispatchRecord({
+        ...input,
+        dispatchedBy: ctx.user.id,
+      });
+      await db.addUserActivity({
+        userId: ctx.user.id,
+        action: "dispatch_recorded",
+        detail: `${ctx.user.name ?? ctx.user.email ?? "Documentation"} recorded dispatch ${input.id} for ${input.bookingId}. Email sending is not configured; the package was NOT emailed.`,
+      });
+      return { record };
     }),
 });

@@ -70,3 +70,32 @@ export function getExpiringTrainingEmployees(employees: TrainingEmployee[], days
 
   return results.sort((a, b) => a.daysRemaining - b.daysRemaining);
 }
+
+export type ExpiringDatedItem = {
+  key: string;
+  label: string;
+  expiry: string;
+  ownerDepartment: string;
+};
+
+export type ExpiringDatedHit = ExpiringDatedItem & {
+  daysLeft: number;
+  status: "expired" | "expiring";
+};
+
+/** Items whose expiry is past (expired) or within `warnDays` (expiring). Unparseable dates are ignored. */
+export function findExpiringDatedItems(
+  items: ExpiringDatedItem[],
+  nowMs: number,
+  warnDays = 20
+): ExpiringDatedHit[] {
+  const hits: ExpiringDatedHit[] = [];
+  for (const item of items) {
+    const parsed = Date.parse(item.expiry);
+    if (Number.isNaN(parsed)) continue;
+    const daysLeft = Math.ceil((parsed - nowMs) / 86_400_000);
+    if (daysLeft < 0) hits.push({ ...item, daysLeft, status: "expired" });
+    else if (daysLeft <= warnDays) hits.push({ ...item, daysLeft, status: "expiring" });
+  }
+  return hits.sort((a, b) => a.daysLeft - b.daysLeft);
+}

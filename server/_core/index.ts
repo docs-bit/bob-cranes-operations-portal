@@ -33,6 +33,18 @@ async function startServer() {
     serveStatic(app);
   }
 
+  try {
+    const { runCertificateExpiryCheckIfStale } = await import("../db");
+    const expiry = await runCertificateExpiryCheckIfStale();
+    if (expiry.ran)
+      console.log(`Expiry check: ${expiry.alerts} certificate alerts created.`);
+  } catch (error) {
+    console.warn(
+      "Expiry check skipped:",
+      error instanceof Error ? error.message : error
+    );
+  }
+
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
 

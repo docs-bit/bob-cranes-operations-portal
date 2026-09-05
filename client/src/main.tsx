@@ -25,6 +25,14 @@ const queryClient = new QueryClient();
 
 queryClient.getQueryCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
+    // An expired/revoked portal link is an expected state with its own
+    // friendly UI, not an application error — don't log it as one.
+    const key = event.query.queryKey as unknown;
+    const path = Array.isArray(key) ? key.flat(2).join(".") : "";
+    const code = (
+      event.query.state.error as { data?: { code?: string } } | null
+    )?.data?.code;
+    if (path.includes("getPortalContext") && code === "NOT_FOUND") return;
     console.error("[API Query Error]", event.query.state.error);
   }
 });

@@ -106,6 +106,22 @@ export const bookingCrewAllocations = mysqlTable("booking_crew_allocations", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const trainingFlags = mysqlTable("training_flags", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  crewId: varchar("crewId", { length: 64 }).notNull(),
+  crewName: varchar("crewName", { length: 255 }).notNull(),
+  flagType: varchar("flagType", { length: 64 }).notNull(),
+  note: text("note").notNull(),
+  raisedBy: varchar("raisedBy", { length: 255 }).notNull(),
+  raisedByUserId: int("raisedByUserId"),
+  status: varchar("status", { length: 16 }).notNull().default("OPEN"),
+  resolvedBy: varchar("resolvedBy", { length: 255 }),
+  resolvedAt: timestamp("resolvedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export const equipment = mysqlTable("equipment", {
   id: varchar("id", { length: 64 }).primaryKey(),
   assetCode: varchar("assetCode", { length: 64 }).notNull().unique(),
@@ -244,6 +260,7 @@ export type SystemSetting = typeof systemSettings.$inferSelect;
 export type RuntimeErrorEvent = typeof runtimeErrorEvents.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type BookingCrewAllocation = typeof bookingCrewAllocations.$inferSelect;
+export type TrainingFlagRecord = typeof trainingFlags.$inferSelect;
 export type InsertBooking = typeof bookings.$inferInsert;
 export type EquipmentItem = typeof equipment.$inferSelect;
 export type CrewMemberItem = typeof crew.$inferSelect;
@@ -303,4 +320,32 @@ export const clientFilterPresets = mysqlTable("client_filter_presets", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+export const clientPortalTokens = mysqlTable("client_portal_tokens", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  tokenHash: varchar("tokenHash", { length: 128 }).notNull().unique(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  clientName: varchar("clientName", { length: 255 }).notNull(),
+  projectName: varchar("projectName", { length: 255 }).notNull(),
+  mobDate: varchar("mobDate", { length: 64 }).notNull(),
+  offHireDate: varchar("offHireDate", { length: 64 }).notNull(),
+  priority: varchar("priority", { length: 32 }).notNull().default("Standard"),
+  createdBy: int("createdBy"),
+  expiresAt: timestamp("expiresAt").notNull(),
+  revokedAt: timestamp("revokedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const dispatches = mysqlTable("dispatches", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  dispatchedBy: int("dispatchedBy"),
+  sentToEmail: varchar("sentToEmail", { length: 320 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  summary: text("summary").notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("Recorded"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export type ClientFilterPresetRecord = typeof clientFilterPresets.$inferSelect;
+export type ClientPortalTokenRecord = typeof clientPortalTokens.$inferSelect;
+export type DispatchRecord = typeof dispatches.$inferSelect;
