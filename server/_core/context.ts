@@ -19,7 +19,15 @@ export async function createContext(
     const revoked = await isSessionRevoked(session.jti).catch(() => false);
     if (!revoked) {
       const localUser = await getUserById(session.userId);
-      if (localUser && localUser.isActive === 1) user = localUser;
+      const credentialsCutoff = localUser?.credentialsRevokedAt
+        ? new Date(localUser.credentialsRevokedAt).getTime()
+        : 0;
+      if (
+        localUser &&
+        localUser.isActive === 1 &&
+        session.issuedAt.getTime() >= credentialsCutoff
+      )
+        user = localUser;
     }
   }
 

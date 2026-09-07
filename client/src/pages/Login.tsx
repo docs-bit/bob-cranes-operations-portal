@@ -136,6 +136,16 @@ export default function Login() {
             <button className="auth-submit" type="submit" disabled={pending}><span className={pending ? "button-spinner" : ""} aria-hidden="true" />{pending ? "Please wait…" : setupMode ? "Create administrator account" : "Sign in"}</button>
           </form>
           )}
+          {!needsChange && !setupMode && (
+            <button
+              className="auth-landing-back"
+              type="button"
+              style={{ marginTop: 12 }}
+              onClick={() => setLocation("/forgot-password")}
+            >
+              Forgot your password?
+            </button>
+          )}
           <div className="auth-note"><ShieldCheck size={14} />Your administrator controls new accounts and department access.</div>
         </div>
       </section>

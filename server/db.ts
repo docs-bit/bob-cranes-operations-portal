@@ -41,6 +41,7 @@ import {
   clientFilterPresets,
   clientPortalTokens,
   revokedSessions,
+  passwordResets,
   attendance,
   dispatches,
 } from "../drizzle/schema";
@@ -181,9 +182,49 @@ export async function setLocalUserPassword(id: number, passwordHash: string) {
   if (!db) throw new Error("Database unavailable for password change.");
   await db
     .update(users)
-    .set({ passwordHash, mustChangePassword: 0 })
+    .set({
+      passwordHash,
+      mustChangePassword: 0,
+      credentialsRevokedAt: new Date(),
+    })
     .where(eq(users.id, id));
   return await getUserById(id);
+}
+
+export async function createPasswordReset(input: {
+  id: string;
+  userId: number;
+  tokenHash: string;
+  expiresAt: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(passwordResets).values(input);
+  const rows = await db
+    .select()
+    .from(passwordResets)
+    .where(eq(passwordResets.id, input.id));
+  return rows[0];
+}
+
+export async function getPasswordResetByHash(tokenHash: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db
+    .select()
+    .from(passwordResets)
+    .where(eq(passwordResets.tokenHash, tokenHash))
+    .limit(1);
+  return rows[0];
+}
+
+export async function markPasswordResetUsed(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(passwordResets)
+    .set({ usedAt: new Date() })
+    .where(eq(passwordResets.id, id));
 }
 
 export async function revokeSession(jti: string, expiresAt: Date) {

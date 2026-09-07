@@ -24,6 +24,12 @@ import {
   toSessionUser,
   verifyPassword,
 } from "../localAuth";
+import {
+  generateResetToken,
+  hashResetToken,
+  isResetTokenLive,
+  resetTokenExpiry,
+} from "../passwordResetTokens";
 import { checkPublicMutationRateLimit } from "../_core/rateLimiter";
 import { isValidDashboardGreetingTemplate } from "../../shared/dashboardGreeting";
 import {
@@ -546,4 +552,80 @@ export const authRouter = router({
     clearAuthCookies(ctx);
     return { success: true } as const;
   }),
+
+  requestPasswordReset: publicProcedure
+    .input(z.object({ email: z.string().trim().email().max(320) }))
+    .mutation(async ({ ctx, input }) => {
+      if (!checkPublicMutationRateLimit(ctx.req, "passwordReset")) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many reset attempts. Please try again later.",
+        });
+      }
+      // Always respond identically so the endpoint never reveals whether
+      // an address has an account.
+      const user = await db.getUserByLocalEmail(normalizeEmail(input.email));
+      if (user && user.isActive === 1) {
+        const token = generateResetToken();
+        await db.createPasswordReset({
+          id: `pwreset-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`,
+          userId: user.id,
+          tokenHash: hashResetToken(token),
+          expiresAt: resetTokenExpiry(),
+        });
+        await db.addUserActivity({
+          userId: user.id,
+          action: "password_reset_requested",
+          detail: `${user.name ?? user.email ?? "Account"} requested a password reset link (30-minute TTL).`,
+        });
+        // No mailer is configured in this build: the operator delivers the
+        // link from the server terminal. Never log tokens for unknown emails.
+        console.log(
+          `[Password reset] ${user.localEmail ?? input.email}: ` +
+            `http://localhost:${process.env.PORT ?? "3000"}/reset-password/${token} (valid 30 minutes)`
+        );
+      }
+      return { received: true } as const;
+    }),
+
+  resetPassword: publicProcedure
+    .input(
+      z.object({
+        token: z.string().trim().min(1).max(128),
+        newPassword: z.string().min(10).max(160),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!checkPublicMutationRateLimit(ctx.req, "passwordReset")) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many reset attempts. Please try again later.",
+        });
+      }
+      const record = await db.getPasswordResetByHash(
+        hashResetToken(input.token)
+      );
+      if (!record || !isResetTokenLive(record))
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "This reset link is invalid or has expired.",
+        });
+      const user = await db.getUserById(record.userId);
+      if (!user || user.isActive !== 1)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "This reset link is invalid or has expired.",
+        });
+      await db.setLocalUserPassword(
+        user.id,
+        await hashPassword(input.newPassword)
+      );
+      await db.markPasswordResetUsed(record.id);
+      await db.addUserActivity({
+        userId: user.id,
+        action: "password_reset_completed",
+        detail: `${user.name ?? user.email ?? "Account"} completed a password reset. Earlier sessions were invalidated.`,
+      });
+      return { success: true } as const;
+    }),
 });

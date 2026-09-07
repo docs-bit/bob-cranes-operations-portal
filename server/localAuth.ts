@@ -53,6 +53,7 @@ export type LocalSession = {
   userId: number;
   jti: string;
   expiresAt: Date;
+  issuedAt: Date;
 };
 
 export async function readLocalSession(
@@ -73,7 +74,11 @@ export async function readLocalSession(
       typeof payload.exp === "number"
         ? new Date(payload.exp * 1000)
         : new Date(Date.now() + 12 * 60 * 60 * 1000);
-    return { userId, jti: payload.jti, expiresAt };
+    const issuedAt =
+      typeof payload.iat === "number"
+        ? new Date(payload.iat * 1000)
+        : new Date(0);
+    return { userId, jti: payload.jti, expiresAt, issuedAt };
   } catch {
     return undefined;
   }

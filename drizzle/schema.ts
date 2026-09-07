@@ -26,6 +26,7 @@ export const users = mysqlTable("users", {
     .default("user")
     .notNull(),
   mustChangePassword: int("mustChangePassword").notNull().default(0),
+  credentialsRevokedAt: timestamp("credentialsRevokedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -318,6 +319,15 @@ export const revokedSessions = mysqlTable("revoked_sessions", {
   expiresAt: timestamp("expiresAt").notNull(),
 });
 
+export const passwordResets = mysqlTable("password_resets", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: int("userId").notNull(),
+  tokenHash: varchar("tokenHash", { length: 128 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const attendance = mysqlTable(
   "attendance",
   {
@@ -374,5 +384,6 @@ export const dispatches = mysqlTable("dispatches", {
 export type ClientFilterPresetRecord = typeof clientFilterPresets.$inferSelect;
 export type ClientPortalTokenRecord = typeof clientPortalTokens.$inferSelect;
 export type RevokedSessionRecord = typeof revokedSessions.$inferSelect;
+export type PasswordResetRecord = typeof passwordResets.$inferSelect;
 export type AttendanceRow = typeof attendance.$inferSelect;
 export type DispatchRecord = typeof dispatches.$inferSelect;

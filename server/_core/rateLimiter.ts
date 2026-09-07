@@ -20,6 +20,7 @@ const TELEMETRY_RATE_LIMIT: RateLimit = {
 const PUBLIC_MUTATION_RATE_LIMITS = {
   login: { capacity: 8, refillRatePerSecond: 8 / (15 * 60) },
   bootstrap: { capacity: 4, refillRatePerSecond: 4 / (15 * 60) },
+  passwordReset: { capacity: 5, refillRatePerSecond: 5 / (60 * 60) },
   enquiry: { capacity: 8, refillRatePerSecond: 8 / (10 * 60) },
   feedback: { capacity: 8, refillRatePerSecond: 8 / (10 * 60) },
 } as const satisfies Record<string, RateLimit>;

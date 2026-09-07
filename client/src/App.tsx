@@ -10,6 +10,8 @@ import PerformanceTelemetry from "./components/PerformanceTelemetry";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const RentalLanding = lazy(() => import("./pages/RentalLanding"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -53,6 +55,8 @@ function Router() {
         <Route path={"/crew"} component={ProtectedPortal} />
         <Route path={"/gear"} component={ProtectedPortal} />
         <Route path={"/login"} component={Login} />
+        <Route path={"/forgot-password"} component={ForgotPassword} />
+        <Route path="/reset-password/:token" component={ResetPassword} />
         <Route path="/client/:token" component={Home} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
