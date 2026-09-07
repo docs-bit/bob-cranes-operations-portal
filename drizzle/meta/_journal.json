@@ -183,6 +183,13 @@
       "when": 1788768727258,
       "tag": "0025_sweet_carnage",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1788770200148,
+      "tag": "0026_stiff_corsair",
+      "breakpoints": true
     }
   ]
 }

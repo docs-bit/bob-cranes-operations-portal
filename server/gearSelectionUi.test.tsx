@@ -11,6 +11,9 @@ vi.mock("@/lib/trpc", () => ({
       createBooking: {
         useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
       },
+      addAdditionalRequirement: {
+        useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
+      },
     },
   },
 }));

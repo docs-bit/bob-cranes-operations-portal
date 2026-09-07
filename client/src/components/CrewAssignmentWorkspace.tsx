@@ -622,7 +622,7 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
       }
     }}
   >
-    <div className="panel-title" style={{ fontSize: 14, color: "#1d725f", marginBottom: 4 }}>
+    <div className="panel-title" style={{ fontSize: 14, marginBottom: 4 }}>
       Drop Zone · Assign Crew to {targetBooking?.id}
     </div>
       <p className="muted" style={{ fontSize: 12, margin: 0 }}>

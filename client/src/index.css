@@ -1895,3 +1895,424 @@ textarea,
 }
 .field-error { color: #e31e24; font-size: 11px; margin-top: 4px; }
 .form-input[aria-invalid="true"] { border-color: #e31e24; }
+
+/* ---------------------------------------------------------------------------
+ * Complete dark theme. The light themes above are built on CSS variables
+ * (--industrial-*, --equipment-*, --analytics-*) plus hardcoded hex rules;
+ * this block remaps every variable and every hardcoded surface/text rule so
+ * no dark-on-dark or light-on-light text survives. `html.dark` outranks the
+ * `:root` blocks regardless of source order.
+ * ------------------------------------------------------------------------- */
+html.dark {
+  --industrial-navy: #070b1d;
+  --industrial-navy-soft: #0d1530;
+  --industrial-blue: #16264d;
+  --industrial-yellow: #ffc400;
+  --industrial-orange: #f36b13;
+  --industrial-orange-deep: #ff8a3d;
+  --industrial-canvas: #0b1220;
+  --industrial-surface: #131c33;
+  --industrial-ink: #eef2f7;
+  --industrial-muted: #9aa7b8;
+  --industrial-line: #26324a;
+  --industrial-success: #4cc38a;
+  --industrial-danger: #f08080;
+  --equipment-orange: #ff9b3d;
+  --equipment-orange-deep: #ffa95c;
+  --equipment-orange-soft: #2b2111;
+  --equipment-canvas: #0b1220;
+  --equipment-surface: #131c33;
+  --equipment-surface-subtle: #1a2540;
+  --equipment-ink: #eef2f7;
+  --equipment-muted: #9aa7b8;
+  --equipment-line: #26324a;
+  --equipment-chart: #ff9b3d;
+  --equipment-success: #4cc38a;
+  --equipment-danger: #f08080;
+  --analytics-mint-strong: #7cc9b4;
+  --analytics-mint-soft: #14324a;
+  --analytics-warning: #ffcf4d;
+  --analytics-danger: #f08080;
+  color-scheme: dark;
+}
+
+html.dark body {
+  background: #0b1220;
+  color: #eef2f7;
+}
+
+/* Hardcoded light surfaces -> dark */
+html.dark .metric-card,
+html.dark .panel,
+html.dark .upload-summary-card,
+html.dark .upload-card,
+html.dark .mapping-panel,
+html.dark .dashboard-summary-card,
+html.dark .bob-hero-card,
+html.dark .kanban-column,
+html.dark .auth-card,
+html.dark .notification-dropdown,
+html.dark .department-search-suggestions,
+html.dark .attendance-summary-card {
+  background: #131c33;
+  border-color: #26324a;
+  color: #eef2f7;
+}
+
+html.dark .detail-cell,
+html.dark .resource-card,
+html.dark .wizard-step,
+html.dark .mapping-row,
+html.dark .mapping-source-panel,
+html.dark .upload-dropzone,
+html.dark .attendance-row,
+html.dark .compliance-row,
+html.dark .activity-item,
+html.dark .booking-row,
+html.dark .filter-preset-row {
+  background: #131c33;
+  border-color: #26324a;
+}
+
+html.dark .topbar,
+html.dark .sidebar,
+html.dark .profile-menu,
+html.dark .department-portal-banner,
+html.dark .notification-stack {
+  background: #101828;
+  border-color: #26324a;
+}
+
+/* Hardcoded dark text -> light */
+html.dark .page-title,
+html.dark .client-title,
+html.dark .panel-title,
+html.dark .metric-value,
+html.dark .metric-label,
+html.dark .booking-client,
+html.dark .booking-detail,
+html.dark .resource-name,
+html.dark .compliance-name,
+html.dark .detail-cell,
+html.dark .detail-cell > div,
+html.dark .detail-cell value,
+html.dark .data-table td,
+html.dark .data-table th,
+html.dark .data-table strong,
+html.dark .panel-meta,
+html.dark .page-copy,
+html.dark .metric-foot,
+html.dark .compliance-sub,
+html.dark .data-table .muted,
+html.dark .activity-text,
+html.dark .activity-time,
+html.dark .user-name,
+html.dark .brand-title,
+html.dark .breadcrumb,
+html.dark .breadcrumb strong,
+html.dark .resource-sub,
+html.dark .wizard-step,
+html.dark .empty-state,
+html.dark .notification .title,
+html.dark .notification .body,
+html.dark .toast-note,
+html.dark .auth-card h2,
+html.dark .auth-card p,
+html.dark .auth-card label span,
+html.dark .mapping-system-field,
+html.dark .mapping-source-title,
+html.dark .mapping-sample-title,
+html.dark .upload-format,
+html.dark .analytics-kpi strong,
+html.dark .analytics-section-heading strong,
+html.dark h1,
+html.dark h2,
+html.dark h3 {
+  color: #eef2f7;
+}
+
+html.dark .detail-cell label,
+html.dark .panel-meta,
+html.dark .page-copy,
+html.dark .metric-foot,
+html.dark .compliance-sub,
+html.dark .data-table .muted,
+html.dark .activity-time,
+html.dark .user-role,
+html.dark .brand-subtitle,
+html.dark .breadcrumb,
+html.dark .resource-sub,
+html.dark .auth-card p,
+html.dark .mapping-sample-grid span,
+html.dark .analytics-kpi span,
+html.dark .analytics-kpi small,
+html.dark .analytics-legend,
+html.dark .empty-state {
+  color: #9aa7b8;
+}
+
+/* Inputs, selects, textareas */
+html.dark .form-input,
+html.dark .form-select,
+html.dark .form-textarea,
+html.dark .mapping-select,
+html.dark select,
+html.dark textarea,
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark input[type="number"],
+html.dark input[type="date"],
+html.dark input[type="time"],
+html.dark .bob-enquiry-form input,
+html.dark .bob-enquiry-form select,
+html.dark .bob-enquiry-form textarea {
+  background: #0f1830;
+  border-color: #2d3d5c;
+  color: #eef2f7;
+}
+
+html.dark .form-input::placeholder,
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #67748a;
+}
+
+html.dark select option {
+  background: #131c33;
+  color: #eef2f7;
+}
+
+/* Buttons, chips, badges */
+html.dark .secondary-button {
+  background: #1a2540;
+  border-color: #2d3d5c;
+  color: #eef2f7;
+}
+
+html.dark .secondary-button:hover {
+  background: #233156;
+  border-color: #3d5178;
+  color: #ffffff;
+}
+
+html.dark .filter-chip {
+  background: #1a2540;
+  border-color: #2d3d5c;
+  color: #9aa7b8;
+}
+
+html.dark .filter-chip.selected {
+  background: #14324a;
+  border-color: #67b8ee;
+  color: #d9efff;
+}
+
+html.dark .icon-button {
+  background: #1a2540;
+  border-color: #2d3d5c;
+  color: #c4cfdb;
+}
+
+html.dark .status-badge.red {
+  background: rgba(240, 128, 128, .14);
+  color: #ff9d9d;
+}
+
+html.dark .status-badge.green {
+  background: rgba(76, 195, 138, .14);
+  color: #6fe3a5;
+}
+
+html.dark .status-badge.amber {
+  background: rgba(255, 207, 77, .14);
+  color: #ffd970;
+}
+
+html.dark .status-badge.blue {
+  background: rgba(103, 184, 238, .16);
+  color: #8fcdf5;
+}
+
+html.dark .status-badge.gray {
+  background: #233148;
+  color: #c4cfdb;
+}
+
+/* Tables */
+html.dark .data-table th {
+  border-bottom-color: #26324a;
+}
+
+html.dark .data-table td {
+  border-bottom-color: #1d2942;
+}
+
+html.dark .data-table tbody tr:hover {
+  background: #1a2540;
+}
+
+html.dark .table-wrap {
+  border-color: #26324a;
+}
+
+/* White cards caught by the contrast audit (light inherited text on #fff) */
+html.dark .booking-card,
+html.dark .analytics-kpi,
+html.dark .daily-operations-summary {
+  background: #131c33;
+  border-color: #26324a;
+}
+
+html.dark .unassigned-enquiry-status {
+  background: #131c33;
+}
+
+html.dark .unassigned-enquiry-status.warning {
+  background: #241d0e;
+  border-color: #8a6a1f;
+}
+
+html.dark .unassigned-enquiry-status.critical {
+  background: #2a1414;
+  border-color: #8a2f2f;
+}
+
+/* Chat */
+html.dark .chat-bubble {
+  background: #1a2540;
+  color: #eef2f7;
+  border-color: #26324a;
+}
+
+html.dark .chat-message.outgoing .chat-bubble {
+  background: #14324a;
+  color: #eaf4ff;
+}
+
+html.dark .chat-from {
+  color: #9aa7b8;
+}
+
+/* Kanban, progress, meters */
+html.dark .kanban-column {
+  background: #101828;
+}
+
+html.dark .progress-track,
+html.dark .minimal-track,
+html.dark .analytics-inline-meter {
+  background: #233148;
+}
+
+html.dark .progress-stage-dot {
+  background: #1a2540;
+  border-color: #2d3d5c;
+  color: #9aa7b8;
+}
+
+html.dark .eyebrow {
+  color: #67b8ee;
+}
+
+/* Auth pages */
+html.dark .auth-page {
+  background: #0b1220;
+}
+
+html.dark .auth-visual {
+  background: #101828;
+}
+
+html.dark .auth-note,
+html.dark .auth-pending-note {
+  color: #9aa7b8;
+}
+
+html.dark .auth-error {
+  background: rgba(240, 128, 128, .12);
+  border-color: rgba(240, 128, 128, .4);
+  color: #ffb3b3;
+}
+
+/* Muted inline text: components use .muted-inline instead of hardcoded
+   slate so dark mode stays readable. */
+.muted-inline {
+  color: #475569;
+}
+
+html.dark .muted-inline {
+  color: #a8bac5;
+}
+
+.dropzone-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+html.dark .dropzone-title {
+  color: #eef2f7;
+}
+
+html.dark .upload-dropzone {
+  border-color: #2d3d5c;
+  color: #eef2f7;
+}
+
+/* Scrollbars */
+html.dark ::-webkit-scrollbar-thumb {
+  background: #2d3d5c;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+
+/* Search */
+html.dark .search-pill {
+  background: #0f1830;
+  border-color: #2d3d5c;
+  color: #9aa7b8;
+}
+
+html.dark .search-pill input {
+  color: #eef2f7;
+}
+
+html.dark .search-pill input::placeholder {
+  color: #67748a;
+}
+
+/* Analytics boards and stage indicators */
+html.dark .analytics-progress-board,
+html.dark .reference-progress-board,
+html.dark .client-reference-progress {
+  background: linear-gradient(145deg, #101a30, #0e1628);
+}
+
+html.dark .analytics-stage span {
+  background: #1a2540;
+  border-color: #2d3d5c;
+}
+
+html.dark .analytics-stage.complete span,
+html.dark .analytics-stage.current span {
+  background: var(--analytics-mint, #54b39d);
+  border-color: var(--analytics-mint, #54b39d);
+  color: #0b1a14;
+}
+
+html.dark .analytics-stage:not(:last-child)::after {
+  background: #2d3d5c;
+}
+
+html.dark .booking-pagination {
+  background: #101828;
+  border-top-color: #26324a;
+  color: #eef2f7;
+}
+
+html.dark .selected-row {
+  background: #1a2c4e;
+}

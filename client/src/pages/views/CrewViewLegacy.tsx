@@ -463,7 +463,7 @@ export function CrewViewLegacy({
                                 Allocated
                               </span>
                             ) : (
-                              <span style={{ color: "#555", fontSize: 11 }}>
+                              <span className="muted-inline" style={{ fontSize: 11 }}>
                                 Free
                               </span>
                             )}

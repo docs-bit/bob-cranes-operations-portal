@@ -722,10 +722,10 @@ export function ClientPortal({
                   }}
                 >
                   <CloudUpload size={24} color="#217c64" style={{ marginBottom: "6px" }} />
-                  <div style={{ fontSize: "13px", fontWeight: 600, color: "#1f2937" }}>
+                  <div className="dropzone-title">
                     {isDraggingOver ? "Release to upload your files" : "Drag and drop your files here"}
                   </div>
-                  <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>
+                  <div className="muted-inline" style={{ fontSize: "11px", marginTop: "2px" }}>
                     or click to browse · Supports PDF, JPG, PNG (up to 25MB)
                   </div>
                 </div>
@@ -854,7 +854,7 @@ export function ClientPortal({
                   {documentTags.map(tag => <span className="status-badge green" key={`active-tag-${tag}`}>Tag: {tag}</span>)}
                   <span className="status-badge gray">{visibleClientDocuments.length} of {documentRecords.length} documents</span>
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 14, fontSize: 11, color: "#475569" }}>
+                <div className="muted-inline" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 14, fontSize: 11 }}>
                   <span>Saved search presets:</span>
                   {filterPresets.map(preset => (
                     <div key={preset.name} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#f1f5f9", padding: "3px 8px", borderRadius: 12, border: "1px solid #e2e8f0" }}>
@@ -1318,7 +1318,7 @@ export function ClientPortal({
                 <FileText size={48} color="#217c64" style={{ margin: "0 auto 12px" }} />
                 <div style={{ fontSize: "14px", fontWeight: 600, color: "#1f2937" }}>{previewDoc.name}</div>
                 <div style={{ fontSize: "12px", color: "#64748b", marginTop: "4px" }}>
-                  Department: {previewDoc.departmentCode} · Status: {previewDoc.state} · Synced to Google Drive archive
+                  Department: {previewDoc.departmentCode} · Status: {previewDoc.state}{previewDoc.storageKey ? " · Stored copy available" : " · No stored copy yet — upload the file to keep it here"}
                 </div>
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
@@ -1329,22 +1329,26 @@ export function ClientPortal({
                 >
                   Close
                 </button>
-                <button
-                  type="button"
-                  className="primary-button"
-                  onClick={() => {
-                    notify(`Downloading ${previewDoc.name}...`);
-                    const blob = new Blob([`BOB Cranes Verified Document: ${previewDoc.name}\nDepartment: ${previewDoc.departmentCode}\nStatus: ${previewDoc.state}`], { type: "text/plain" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `${previewDoc.name.toLowerCase().replace(/\s+/g, "-")}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                >
-                  Download File
-                </button>
+                {previewDoc.storageKey ? (
+                  <a
+                    className="primary-button"
+                    href={`/files/${previewDoc.storageKey}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ textDecoration: "none" }}
+                  >
+                    Download File
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className="primary-button"
+                    disabled
+                    title="Upload this document first — only then is a stored copy available."
+                  >
+                    Download File
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -318,6 +318,18 @@ export function TokenPortal({
                         {meta?.fileName && (
                           <span className="panel-meta"> · {meta.fileName}</span>
                         )}
+                        {meta?.storageKey && (
+                          <>
+                            {" · "}
+                            <a
+                              href={`/files/${meta.storageKey}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Download
+                            </a>
+                          </>
+                        )}
                       </span>
                       <span
                         style={{

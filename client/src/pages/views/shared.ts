@@ -81,6 +81,9 @@ export type View =
   | "users"
   | "supervisor-audit"
   | "integrations"
+  | "catalogs"
+  | "schedule"
+  | "hse-trainings"
   | "web-vitals";
 
 export type Booking = {

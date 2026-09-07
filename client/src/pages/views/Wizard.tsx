@@ -101,6 +101,7 @@ export function Wizard({
     setStep(current => Math.min(6, current + 1));
   };
   const createBookingMutation = trpc.operations.createBooking.useMutation();
+  const addRequirementMutation = trpc.operations.addAdditionalRequirement.useMutation();
   const [saving, setSaving] = useState(false);
   const finish = async () => {
     if (saving) return;
@@ -138,6 +139,29 @@ export function Wizard({
         gearIds: selectedGear,
         trailerIds: [],
       });
+      const seedDocs = form.docs
+        .split(/[\n,]+/)
+        .map(entry => entry.trim())
+        .filter(Boolean)
+        .slice(0, 30);
+      if (seedDocs.length) {
+        const seeded = await Promise.allSettled(
+          seedDocs.map(docName =>
+            addRequirementMutation.mutateAsync({
+              bookingId: booking.id,
+              docName,
+              source: "SALES",
+            })
+          )
+        );
+        const failed = seeded.filter(
+          result => result.status === "rejected"
+        ).length;
+        if (failed)
+          toast.warning("Booking saved; some requirements were not seeded", {
+            description: `${failed} checklist item${failed === 1 ? "" : "s"} can be added from the Coordination console.`,
+          });
+      }
     } catch (caught) {
       setSaving(false);
       setWizardToast(

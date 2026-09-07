@@ -73,6 +73,15 @@ const TrainingView = lazy(() =>
 const DocsView = lazy(() =>
   import("./views/DocsView").then(module => ({ default: module.DocsView }))
 );
+const CrewScheduleView = lazy(() =>
+  import("./views/CrewScheduleView").then(module => ({ default: module.CrewScheduleView }))
+);
+const HSETrainingsView = lazy(() =>
+  import("./views/HSETrainingsView").then(module => ({ default: module.HSETrainingsView }))
+);
+const CatalogsView = lazy(() =>
+  import("./views/CatalogsView").then(module => ({ default: module.CatalogsView }))
+);
 
 // Re-export feature views and shared fixture data for route-level consumers and integration tests.
 export { Shell, Wizard, ClientPortal, gears };
@@ -110,6 +119,9 @@ export default function Home() {
   const advanceBookingStageMutation = trpc.operations.advanceBookingStage.useMutation();
   const completeWorkstreamMutation = trpc.operations.completeBookingWorkstream.useMutation();
   const crewAllocationsQuery = trpc.operations.getCrewAllocations.useQuery();
+  const serverBookingsQuery = trpc.operations.getBookings.useQuery(undefined, {
+    enabled: Boolean(user),
+  });
   const provisionedDashboardsQuery = trpc.departments.listProvisioned.useQuery(undefined, { enabled: Boolean(user) });
   const dashboardGreetingQuery = trpc.auth.getDashboardGreeting.useQuery(undefined, { enabled: Boolean(user) });
   const canViewSalesEnquiries = Boolean(user && (user.role === "admin" || user.departmentCode === "sales"));
@@ -159,6 +171,47 @@ export default function Home() {
       );
     }
   }, [crewAllocationsQuery.data]);
+
+  useEffect(() => {
+    if (!serverBookingsQuery.data?.length) return;
+    const stageProgress: Record<string, number> = {
+      "Created by Salesperson": 5,
+      "Documentation Supervisor": 15,
+      "Crew Assigned": 35,
+      "Gear Confirmed": 50,
+      "Docs In Progress": 70,
+      "All Docs Submitted": 90,
+      Reviewed: 100,
+      Dispatched: 100,
+    };
+    const validStages = new Set(Object.keys(stageProgress));
+    const serverBookings: Booking[] = serverBookingsQuery.data.map(row => {
+      const crewCount = Array.isArray(row.crewIds) ? row.crewIds.length : 0;
+      return {
+        id: row.id,
+        client: row.clientName,
+        project: row.projectName,
+        crane: row.craneId ?? "To be confirmed",
+        site: "To be confirmed",
+        stage: (validStages.has(row.stage) ? row.stage : "Created by Salesperson") as Booking["stage"],
+        priority: (["Standard", "High", "Critical"].includes(row.priority)
+          ? row.priority
+          : "Standard") as Booking["priority"],
+        progress: stageProgress[row.stage] ?? 5,
+        mob: row.mobilizationDate,
+        offHire: row.offHireDate,
+        pm: row.projectManager,
+        crew: crewCount ? `${crewCount} assigned` : "Awaiting",
+      };
+    });
+    setBookings(current => {
+      const serverIds = new Set(serverBookings.map(booking => booking.id));
+      return [
+        ...serverBookings,
+        ...current.filter(booking => !serverIds.has(booking.id)),
+      ];
+    });
+  }, [serverBookingsQuery.data]);
 
   const [uploadRecords, setUploadRecords] = useState<UploadMap>({});
   const [selectedTrainingEmployeeId, setSelectedTrainingEmployeeId] = useState<string | null>(null);
@@ -416,6 +469,12 @@ export default function Home() {
     if (nextView === "sales-enquiries") {
       return Boolean(user && (user.role === "admin" || user.departmentCode === "sales"));
     }
+    if (nextView === "schedule") {
+      return Boolean(user && (user.role === "admin" || user.departmentCode === "crew"));
+    }
+    if (nextView === "hse-trainings") {
+      return Boolean(user && (user.role === "admin" || user.departmentCode === "hse"));
+    }
     if (nextView === "web-vitals") return Boolean(user?.role === "admin");
     if (nextView === "provisioned-dashboard") {
       return Boolean(user && activeProvisionedDepartmentCode && canAccessProvisionedDepartmentDashboard(user, activeProvisionedDepartmentCode));
@@ -577,6 +636,15 @@ export default function Home() {
       {view === "integrations" && user.role === "admin" && (
         <IntegrationsView />
       )}
+      {view === "schedule" && (user.role === "admin" || user.departmentCode === "crew") && (
+        <CrewScheduleView bookings={bookings} />
+      )}
+      {view === "hse-trainings" && (user.role === "admin" || user.departmentCode === "hse") && (
+        <HSETrainingsView />
+      )}
+      {view === "catalogs" && user.role === "admin" && (
+        <CatalogsView />
+      )}
       {view === "department" && activeDepartment && (
         workspaceLoading ? <WorkspaceLoadingSkeleton title={`Loading ${activeDepartment} workspace…`} /> : <>
           <DepartmentView
@@ -667,7 +735,7 @@ export default function Home() {
         />
       )}
       </Suspense>
-      <div style={{ color: "#555", fontSize: 10, textAlign: "right", padding: "10px 0 0" }}>
+      <div className="muted-inline" style={{ fontSize: 10, textAlign: "right", padding: "10px 0 0" }}>
         System status: operational · {groupedCount} dossiers in view · v3.0
       </div>
     </Shell>

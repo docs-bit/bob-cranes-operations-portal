@@ -92,6 +92,7 @@ export const bookings = mysqlTable("bookings", {
   stage: varchar("stage", { length: 128 })
     .notNull()
     .default("Created by Salesperson"),
+  handoffNotes: text("handoffNotes"),
   craneId: varchar("craneId", { length: 64 }),
   crewIds: json("crewIds"),
   gearIds: json("gearIds"),
@@ -134,6 +135,7 @@ export const equipment = mysqlTable("equipment", {
   inspectionExpiry: varchar("inspectionExpiry", { length: 64 }).notNull(),
   type: varchar("type", { length: 64 }).notNull().default("Mobile Crane"),
   registration: varchar("registration", { length: 64 }),
+  active: int("active").notNull().default(1),
 });
 
 export const crew = mysqlTable("crew", {
@@ -153,6 +155,7 @@ export const liftingGears = mysqlTable("lifting_gears", {
   gearType: varchar("gearType", { length: 64 }).notNull().default("Shackle"),
   swlTons: int("swlTons").notNull().default(10),
   inspectionExpiry: varchar("inspectionExpiry", { length: 64 }).notNull(),
+  active: int("active").notNull().default(1),
 });
 
 export const trailers = mysqlTable("trailers", {
@@ -162,6 +165,7 @@ export const trailers = mysqlTable("trailers", {
     .notNull()
     .default("Flatbed"),
   status: varchar("status", { length: 64 }).notNull().default("Available"),
+  active: int("active").notNull().default(1),
 });
 
 export const documents = mysqlTable("documents", {
@@ -328,6 +332,60 @@ export const passwordResets = mysqlTable("password_resets", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const bookingAdditionalRequirements = mysqlTable("booking_additional_requirements", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  bookingId: varchar("bookingId", { length: 64 }).notNull(),
+  docName: varchar("docName", { length: 255 }).notNull(),
+  source: varchar("source", { length: 16 }).notNull().default("DOC_SUP"),
+  addedBy: int("addedBy"),
+  isRemoved: int("isRemoved").notNull().default(0),
+  removalReason: varchar("removalReason", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const scheduledBookings = mysqlTable("scheduled_bookings", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  clientName: varchar("clientName", { length: 255 }),
+  date: varchar("date", { length: 10 }).notNull(),
+  durationDays: int("durationDays").notNull().default(1),
+  requiredRoles: json("requiredRoles"),
+  craneType: varchar("craneType", { length: 128 }),
+  notes: text("notes"),
+  colorTag: varchar("colorTag", { length: 32 }).notNull().default("blue"),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const trainings = mysqlTable("trainings", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  trainer: varchar("trainer", { length: 255 }).notNull(),
+  startsAt: varchar("startsAt", { length: 64 }).notNull(),
+  durationMins: int("durationMins"),
+  location: varchar("location", { length: 255 }),
+  notes: text("notes"),
+  certificateIssued: int("certificateIssued").notNull().default(0),
+  validityMonths: int("validityMonths"),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const trainingAttendees = mysqlTable("training_attendees", {
+  id: int("id").autoincrement().primaryKey(),
+  trainingId: varchar("trainingId", { length: 64 }).notNull(),
+  employeeName: varchar("employeeName", { length: 255 }).notNull(),
+});
+
+export const employeeCertificates = mysqlTable("employee_certificates", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  employeeName: varchar("employeeName", { length: 255 }).notNull(),
+  trainingTitle: varchar("trainingTitle", { length: 255 }).notNull(),
+  issuedAt: varchar("issuedAt", { length: 10 }).notNull(),
+  expiresAt: varchar("expiresAt", { length: 10 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const attendance = mysqlTable(
   "attendance",
   {
@@ -385,5 +443,9 @@ export type ClientFilterPresetRecord = typeof clientFilterPresets.$inferSelect;
 export type ClientPortalTokenRecord = typeof clientPortalTokens.$inferSelect;
 export type RevokedSessionRecord = typeof revokedSessions.$inferSelect;
 export type PasswordResetRecord = typeof passwordResets.$inferSelect;
+export type BookingAdditionalRequirement = typeof bookingAdditionalRequirements.$inferSelect;
+export type ScheduledBookingRow = typeof scheduledBookings.$inferSelect;
+export type TrainingRow = typeof trainings.$inferSelect;
+export type EmployeeCertificateRow = typeof employeeCertificates.$inferSelect;
 export type AttendanceRow = typeof attendance.$inferSelect;
 export type DispatchRecord = typeof dispatches.$inferSelect;

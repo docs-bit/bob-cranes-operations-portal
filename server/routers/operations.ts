@@ -833,6 +833,356 @@ export const operationsRouter = router({
       return { received: true };
     }),
 
+  listAdditionalRequirements: protectedProcedure
+    .input(z.object({ bookingId: z.string().trim().min(1).max(64) }))
+    .query(async ({ input }) => {
+      return await db.listAdditionalRequirements(input.bookingId);
+    }),
+
+  addAdditionalRequirement: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.string().trim().min(1).max(64),
+        docName: z.string().trim().min(1).max(255),
+        source: z.enum(["SALES", "DOC_SUP"]).default("DOC_SUP"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (
+        ctx.user.role !== "admin" &&
+        ctx.user.departmentCode !== "documentation" &&
+        ctx.user.departmentCode !== "sales"
+      )
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only Sales, Documentation or an administrator can add requirements.",
+        });
+      return await db.addAdditionalRequirement({
+        id: `req-${nanoid(12)}`,
+        bookingId: input.bookingId,
+        docName: input.docName,
+        source: input.source,
+        addedBy: ctx.user.id,
+      });
+    }),
+
+  removeAdditionalRequirement: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().trim().min(1).max(64),
+        removalReason: z.string().trim().min(1).max(255),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "documentation");
+      await db.removeAdditionalRequirement(input.id, input.removalReason);
+      return { success: true } as const;
+    }),
+
+  updateHandoffNotes: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.string().trim().min(1).max(64),
+        notes: z.string().trim().max(2000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (
+        ctx.user.role !== "admin" &&
+        ctx.user.departmentCode !== "documentation" &&
+        ctx.user.departmentCode !== "sales"
+      )
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only Sales, Documentation or an administrator can edit hand-off notes.",
+        });
+      const booking = await db.updateBookingHandoffNotes(
+        input.bookingId,
+        input.notes
+      );
+      return { booking };
+    }),
+
+  listScheduledBookings: protectedProcedure.query(async ({ ctx }) => {
+    if (
+      ctx.user.role !== "admin" &&
+      ctx.user.departmentCode !== "crew"
+    )
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only Crew or an administrator can view scheduled bookings.",
+      });
+    return await db.listScheduledBookings();
+  }),
+
+  createScheduledBooking: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().trim().min(1).max(255),
+        clientName: z.string().trim().max(255).nullable().optional(),
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        durationDays: z.number().int().min(1).max(90).default(1),
+        requiredRoles: z.array(z.string().trim().min(1).max(64)).max(10).default([]),
+        craneType: z.string().trim().max(128).nullable().optional(),
+        notes: z.string().trim().max(1000).nullable().optional(),
+        colorTag: z.string().trim().max(32).default("blue"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "crew");
+      return await db.createScheduledBooking({
+        id: `sched-${nanoid(12)}`,
+        ...input,
+        createdBy: ctx.user.id,
+      });
+    }),
+
+  deleteScheduledBooking: protectedProcedure
+    .input(z.object({ id: z.string().trim().min(1).max(64) }))
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "crew");
+      await db.deleteScheduledBooking(input.id);
+      return { success: true } as const;
+    }),
+
+  listTrainings: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user.role !== "admin" && ctx.user.departmentCode !== "hse")
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only HSE or an administrator can view scheduled trainings.",
+      });
+    const trainings = await db.listTrainings();
+    const withAttendees = await Promise.all(
+      trainings.map(async training => ({
+        ...training,
+        attendees: await db.listTrainingAttendees(training.id),
+      }))
+    );
+    return withAttendees;
+  }),
+
+  createTraining: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().trim().min(1).max(255),
+        trainer: z.string().trim().min(1).max(255),
+        startsAt: z.string().trim().min(1).max(64),
+        durationMins: z.number().int().min(15).max(1440).nullable().optional(),
+        location: z.string().trim().max(255).nullable().optional(),
+        notes: z.string().trim().max(1000).nullable().optional(),
+        certificateIssued: z.number().int().min(0).max(1).default(0),
+        validityMonths: z.number().int().min(1).max(60).nullable().optional(),
+        attendees: z.array(z.string().trim().min(1).max(255)).max(100).default([]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "hse");
+      if (input.certificateIssued === 1 && !input.validityMonths)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Certificate-issuing trainings need a validity in months.",
+        });
+      return await db.createTraining({
+        id: `trn-${nanoid(12)}`,
+        ...input,
+        createdBy: ctx.user.id,
+      });
+    }),
+
+  issueTrainingCertificates: protectedProcedure
+    .input(z.object({ trainingId: z.string().trim().min(1).max(64) }))
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "hse");
+      const result = await db.issueTrainingCertificates(input.trainingId);
+      await db.addNotification({
+        id: `certs-${input.trainingId}-${Date.now()}`,
+        userId: null,
+        departmentCode: "hse",
+        title: "Training certificates issued",
+        body: `${ctx.user.name ?? ctx.user.email ?? "HSE"} issued ${result.count} certificates expiring ${result.expiresAt}.`,
+      });
+      return result;
+    }),
+
+  listEmployeeCertificates: protectedProcedure.query(async ({ ctx }) => {
+    if (
+      ctx.user.role !== "admin" &&
+      !["hse", "crew", "hr"].includes(ctx.user.departmentCode ?? "")
+    )
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only HSE, Crew, HR or an administrator can review certificates.",
+      });
+    return await db.listEmployeeCertificates();
+  }),
+
+  listEquipmentAdmin: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user.role !== "admin")
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only an administrator can manage the equipment catalog.",
+      });
+    const [cranes, gears, trailers] = await Promise.all([
+      db.listAllEquipment(),
+      db.listAllLiftingGears(),
+      db.listAllTrailers(),
+    ]);
+    return { cranes, gears, trailers };
+  }),
+
+  createEquipmentAsset: protectedProcedure
+    .input(
+      z.object({
+        assetCode: z.string().trim().min(1).max(64),
+        name: z.string().trim().min(1).max(255),
+        capacityTons: z.number().int().min(1).max(2000),
+        status: z.string().trim().min(1).max(32).default("Available"),
+        inspectionExpiry: z.string().trim().min(1).max(64),
+        type: z.string().trim().min(1).max(64).default("Mobile Crane"),
+        registration: z.string().trim().max(64).nullable().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      return await db.createEquipmentAsset({
+        id: `eq-${nanoid(12)}`,
+        ...input,
+      });
+    }),
+
+  updateEquipmentAsset: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().trim().min(1).max(64),
+        name: z.string().trim().min(1).max(255).optional(),
+        capacityTons: z.number().int().min(1).max(2000).optional(),
+        status: z.string().trim().min(1).max(32).optional(),
+        inspectionExpiry: z.string().trim().min(1).max(64).optional(),
+        type: z.string().trim().min(1).max(64).optional(),
+        registration: z.string().trim().max(64).nullable().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      const { id, ...patch } = input;
+      return await db.updateEquipmentAsset(id, patch);
+    }),
+
+  deleteEquipmentAsset: protectedProcedure
+    .input(z.object({ id: z.string().trim().min(1).max(64) }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      return await db.deleteEquipmentAsset(input.id);
+    }),
+
+  createGearAsset: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().trim().min(1).max(255),
+        gearType: z.string().trim().min(1).max(64).default("Shackle"),
+        swlTons: z.number().int().min(1).max(1000),
+        inspectionExpiry: z.string().trim().min(1).max(64),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      return await db.createLiftingGear({ id: `gear-${nanoid(12)}`, ...input });
+    }),
+
+  updateGearAsset: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().trim().min(1).max(64),
+        name: z.string().trim().min(1).max(255).optional(),
+        gearType: z.string().trim().min(1).max(64).optional(),
+        swlTons: z.number().int().min(1).max(1000).optional(),
+        inspectionExpiry: z.string().trim().min(1).max(64).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      const { id, ...patch } = input;
+      return await db.updateLiftingGear(id, patch);
+    }),
+
+  deleteGearAsset: protectedProcedure
+    .input(z.object({ id: z.string().trim().min(1).max(64) }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      return await db.deleteLiftingGear(input.id);
+    }),
+
+  createTrailerAsset: protectedProcedure
+    .input(
+      z.object({
+        plateNumber: z.string().trim().min(1).max(64),
+        trailerType: z.string().trim().min(1).max(64).default("Flatbed"),
+        status: z.string().trim().min(1).max(64).default("Available"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      return await db.createTrailer({ id: `tr-${nanoid(12)}`, ...input });
+    }),
+
+  updateTrailerAsset: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().trim().min(1).max(64),
+        plateNumber: z.string().trim().min(1).max(64).optional(),
+        trailerType: z.string().trim().min(1).max(64).optional(),
+        status: z.string().trim().min(1).max(64).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      const { id, ...patch } = input;
+      return await db.updateTrailer(id, patch);
+    }),
+
+  deleteTrailerAsset: protectedProcedure
+    .input(z.object({ id: z.string().trim().min(1).max(64) }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can manage the equipment catalog.",
+        });
+      return await db.deleteTrailer(input.id);
+    }),
+
   saveCrewAllocations: protectedProcedure
     .input(
       z.object({

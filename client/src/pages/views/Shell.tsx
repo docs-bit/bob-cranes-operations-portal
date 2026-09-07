@@ -278,6 +278,24 @@ export function Shell({
               <span>{item.label}</span>
             </button>
           ))}
+          {(user.role === "admin" || user.departmentCode === "crew") && (
+            <button
+              className={`nav-item ${view === "schedule" ? "active" : ""}`}
+              onClick={() => setView("schedule")}
+            >
+              <CalendarDays />
+              <span>Crew Schedule</span>
+            </button>
+          )}
+          {(user.role === "admin" || user.departmentCode === "hse") && (
+            <button
+              className={`nav-item ${view === "hse-trainings" ? "active" : ""}`}
+              onClick={() => setView("hse-trainings")}
+            >
+              <ShieldCheck />
+              <span>HSE Trainings</span>
+            </button>
+          )}
           <div className="nav-section" style={{ marginTop: 22 }}>
             Departments
           </div>
@@ -330,6 +348,13 @@ export function Shell({
               >
                 <PlugZap />
                 <span>Integrations</span>
+              </button>
+              <button
+                className={`nav-item ${view === "catalogs" ? "active" : ""}`}
+                onClick={() => setView("catalogs")}
+              >
+                <FolderOpen />
+                <span>Catalogs</span>
               </button>
               <button
                 className="nav-item"
@@ -546,7 +571,7 @@ export function Shell({
               aria-expanded={dossierSearchOpen}
             >
               <Search size={14} /> Search dossiers{" "}
-              <span style={{ marginLeft: "auto", color: "#555" }}>⌘ K</span>
+              <span className="muted-inline" style={{ marginLeft: "auto" }}>⌘ K</span>
             </button>
             {dossierSearchOpen && (
               <div

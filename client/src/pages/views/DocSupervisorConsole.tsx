@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -70,15 +70,6 @@ const TAB_LABELS: Array<{ id: ConsoleTab; label: string }> = [
   { id: "docs", label: "Documents" },
 ];
 
-type AdditionalReq = {
-  id: string;
-  name: string;
-  departmentCode: string;
-  source: string;
-  removed: boolean;
-  removalReason?: string;
-};
-
 const STAGE_ORDER: Stage[] = [
   "Created by Salesperson",
   "Documentation Supervisor",
@@ -144,18 +135,8 @@ export function DocSupervisorConsole({
   const [selectedTrailers, setSelectedTrailers] = useState<string[]>([]);
   const [trailerRequired, setTrailerRequired] = useState(true);
   const [handoffNotes, setHandoffNotes] = useState("");
+  const [handoffLoadedFor, setHandoffLoadedFor] = useState<string | null>(null);
 
-  const [additionalReqs, setAdditionalReqs] = useState<AdditionalReq[]>(() =>
-    documents
-      .filter(document => document.required)
-      .map(document => ({
-        id: document.id,
-        name: document.name,
-        departmentCode: document.departmentCode,
-        source: "Sales intake",
-        removed: false,
-      }))
-  );
   const [newReqName, setNewReqName] = useState("");
   const [removalReason, setRemovalReason] = useState<Record<string, string>>({});
   const [flagCrewId, setFlagCrewId] = useState("");
@@ -486,22 +467,79 @@ export function DocSupervisorConsole({
     }
   };
 
+  const reqsQuery = trpc.operations.listAdditionalRequirements.useQuery({
+    bookingId: persistedId,
+  });
+  const addReqMutation = trpc.operations.addAdditionalRequirement.useMutation();
+  const removeReqMutation = trpc.operations.removeAdditionalRequirement.useMutation();
+  const handoffMutation = trpc.operations.updateHandoffNotes.useMutation();
+  const persistedBookingQuery = trpc.operations.getBooking.useQuery({
+    id: persistedId,
+  });
+  const liveReqs = useMemo(
+    () =>
+      (reqsQuery.data ?? []).map(row => ({
+        id: row.id,
+        name: row.docName,
+        source: row.source === "SALES" ? "Sales intake" : "Doc Supervisor addition",
+        removed: row.isRemoved === 1,
+        removalReason: row.removalReason ?? undefined,
+      })),
+    [reqsQuery.data]
+  );
+
+  useEffect(() => {
+    if (handoffLoadedFor === persistedId) return;
+    const saved = persistedBookingQuery.data?.handoffNotes;
+    if (saved !== undefined && saved !== null) {
+      setHandoffNotes(saved);
+      setHandoffLoadedFor(persistedId);
+    }
+  }, [persistedBookingQuery.data, persistedId, handoffLoadedFor]);
+
+  const saveHandoffNotes = () => {
+    if (!canCoordinate) return;
+    void handoffMutation
+      .mutateAsync({ bookingId: persistedId, notes: handoffNotes })
+      .then(result => {
+        if (result.booking) {
+          toast.success("Hand-off notes saved", {
+            description: "Visible on this card and in the console.",
+          });
+        } else {
+          toast.warning("Notes kept for this session", {
+            description: "This dossier is not in the database yet, so notes could not be persisted.",
+          });
+        }
+      })
+      .catch((caught: unknown) => {
+        toast.error("Notes not saved", {
+          description:
+            caught instanceof Error ? caught.message : "Please try again.",
+        });
+      });
+  };
+
   const addAdditionalReq = () => {
     if (!canCoordinate || !newReqName.trim()) return;
-    setAdditionalReqs(current => [
-      ...current,
-      {
-        id: `req-${Date.now()}`,
-        name: newReqName.trim(),
-        departmentCode: "documentation",
-        source: "Doc Supervisor addition",
-        removed: false,
-      },
-    ]);
+    const name = newReqName.trim();
     setNewReqName("");
-    toast.success("Requirement added", {
-      description: "Propagated to department checklists and the Client Portal Documents tab.",
-    });
+    void addReqMutation
+      .mutateAsync({ bookingId: persistedId, docName: name, source: "DOC_SUP" })
+      .then(() => reqsQuery.refetch())
+      .then(() =>
+        toast.success("Requirement added", {
+          description:
+            "Propagated to department checklists and the Client Portal Documents tab.",
+        })
+      )
+      .catch((caught: unknown) => {
+        setNewReqName(name);
+        toast.error("Requirement not added", {
+          description:
+            caught instanceof Error ? caught.message : "Please try again.",
+        });
+      });
   };
 
   const removeAdditionalReq = (id: string) => {
@@ -513,11 +551,15 @@ export function DocSupervisorConsole({
       });
       return;
     }
-    setAdditionalReqs(current =>
-      current.map(item =>
-        item.id === id ? { ...item, removed: true, removalReason: reason } : item
-      )
-    );
+    void removeReqMutation
+      .mutateAsync({ id, removalReason: reason })
+      .then(() => reqsQuery.refetch())
+      .catch((caught: unknown) => {
+        toast.error("Requirement not removed", {
+          description:
+            caught instanceof Error ? caught.message : "Please try again.",
+        });
+      });
   };
 
   const flagDocument = (documentId: string) => {
@@ -624,6 +666,17 @@ export function DocSupervisorConsole({
                   rows={2}
                   style={{ width: "100%", resize: "vertical" }}
                 />
+                {canCoordinate && (
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    style={{ marginTop: 6 }}
+                    disabled={handoffMutation.isPending}
+                    onClick={saveHandoffNotes}
+                  >
+                    {handoffMutation.isPending ? "Saving…" : "Save notes"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -898,8 +951,23 @@ export function DocSupervisorConsole({
                 <div className="panel-title">Additional requirements (client documents)</div>
                 <div className="panel-meta">Seeded from Sales intake. Changes propagate to department checklists and the Client Portal.</div>
               </div>
+              {reqsQuery.isLoading ? (
+                <div className="panel-meta">Loading requirements…</div>
+              ) : reqsQuery.isError ? (
+                <div className="detail-list">
+                  <div className="detail-cell">
+                    <label>Error</label>
+                    <div>Requirements could not be loaded.</div>
+                    <div style={{ marginTop: 6 }}>
+                      <button type="button" className="secondary-button" onClick={() => void reqsQuery.refetch()}>
+                        Retry
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
               <div className="detail-list">
-                {additionalReqs.filter(item => !item.removed).map(item => (
+                {liveReqs.filter(item => !item.removed).map(item => (
                   <div className="detail-cell" key={item.id}>
                     <label>{item.source}</label>
                     <div>{item.name}</div>
@@ -920,6 +988,7 @@ export function DocSupervisorConsole({
                   </div>
                 ))}
               </div>
+              )}
               {canCoordinate && (
                 <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
                   <input
@@ -929,16 +998,16 @@ export function DocSupervisorConsole({
                     onChange={event => setNewReqName(event.target.value)}
                     style={{ flex: 1 }}
                   />
-                  <button type="button" className="secondary-button" onClick={addAdditionalReq}>
+                  <button type="button" className="secondary-button" onClick={addAdditionalReq} disabled={addReqMutation.isPending}>
                     <Plus size={14} /> Add
                   </button>
                 </div>
               )}
-              {additionalReqs.some(item => item.removed) && (
+              {liveReqs.some(item => item.removed) && (
                 <>
                   <div className="panel-title" style={{ marginTop: 16 }}>Reference (removed by Doc Supervisor)</div>
                   <div className="detail-list">
-                    {additionalReqs.filter(item => item.removed).map(item => (
+                    {liveReqs.filter(item => item.removed).map(item => (
                       <div className="detail-cell" key={item.id}>
                         <label>Removed · {item.removalReason}</label>
                         <div>{item.name}</div>
@@ -1129,11 +1198,11 @@ export function DocSupervisorConsole({
                         mobDate: booking.mob,
                         offHireDate: booking.offHire,
                         priority: booking.priority,
-                        requiredDocs: additionalReqs
+                        requiredDocs: liveReqs
                           .filter(item => !item.removed)
                           .map(item => ({
                             name: item.name,
-                            departmentCode: item.departmentCode,
+                            departmentCode: "documentation",
                           })),
                       });
                       await portalLinksQuery.refetch();

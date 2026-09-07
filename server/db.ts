@@ -42,6 +42,11 @@ import {
   clientPortalTokens,
   revokedSessions,
   passwordResets,
+  bookingAdditionalRequirements,
+  scheduledBookings,
+  trainings,
+  trainingAttendees,
+  employeeCertificates,
   attendance,
   dispatches,
 } from "../drizzle/schema";
@@ -225,6 +230,199 @@ export async function markPasswordResetUsed(id: string) {
     .update(passwordResets)
     .set({ usedAt: new Date() })
     .where(eq(passwordResets.id, id));
+}
+
+export async function listAdditionalRequirements(bookingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(bookingAdditionalRequirements)
+    .where(eq(bookingAdditionalRequirements.bookingId, bookingId))
+    .orderBy(bookingAdditionalRequirements.createdAt);
+}
+
+export async function addAdditionalRequirement(data: {
+  id: string;
+  bookingId: string;
+  docName: string;
+  source: string;
+  addedBy?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(bookingAdditionalRequirements).values({
+    ...data,
+    addedBy: data.addedBy ?? null,
+    isRemoved: 0,
+  });
+  const rows = await db
+    .select()
+    .from(bookingAdditionalRequirements)
+    .where(eq(bookingAdditionalRequirements.id, data.id));
+  return rows[0];
+}
+
+export async function removeAdditionalRequirement(
+  id: string,
+  removalReason: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(bookingAdditionalRequirements)
+    .set({ isRemoved: 1, removalReason })
+    .where(eq(bookingAdditionalRequirements.id, id));
+}
+
+export async function updateBookingHandoffNotes(id: string, notes: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(bookings)
+    .set({ handoffNotes: notes })
+    .where(eq(bookings.id, id));
+  return await getBookingById(id);
+}
+
+export async function listScheduledBookings() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(scheduledBookings)
+    .orderBy(scheduledBookings.date);
+}
+
+export async function createScheduledBooking(data: {
+  id: string;
+  title: string;
+  clientName?: string | null;
+  date: string;
+  durationDays?: number | null;
+  requiredRoles?: string[] | null;
+  craneType?: string | null;
+  notes?: string | null;
+  colorTag?: string | null;
+  createdBy?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(scheduledBookings).values({
+    id: data.id,
+    title: data.title,
+    clientName: data.clientName ?? null,
+    date: data.date,
+    durationDays: data.durationDays ?? 1,
+    requiredRoles: data.requiredRoles ?? [],
+    craneType: data.craneType ?? null,
+    notes: data.notes ?? null,
+    colorTag: data.colorTag ?? "blue",
+    createdBy: data.createdBy ?? null,
+  });
+  const rows = await db
+    .select()
+    .from(scheduledBookings)
+    .where(eq(scheduledBookings.id, data.id));
+  return rows[0];
+}
+
+export async function deleteScheduledBooking(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(scheduledBookings).where(eq(scheduledBookings.id, id));
+}
+
+export async function listTrainings() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(trainings).orderBy(trainings.startsAt);
+}
+
+export async function createTraining(data: {
+  id: string;
+  title: string;
+  trainer: string;
+  startsAt: string;
+  durationMins?: number | null;
+  location?: string | null;
+  notes?: string | null;
+  certificateIssued?: number | null;
+  validityMonths?: number | null;
+  attendees?: string[] | null;
+  createdBy?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(trainings).values({
+    id: data.id,
+    title: data.title,
+    trainer: data.trainer,
+    startsAt: data.startsAt,
+    durationMins: data.durationMins ?? null,
+    location: data.location ?? null,
+    notes: data.notes ?? null,
+    certificateIssued: data.certificateIssued ?? 0,
+    validityMonths: data.validityMonths ?? null,
+    createdBy: data.createdBy ?? null,
+  });
+  for (const employeeName of data.attendees ?? []) {
+    await db.insert(trainingAttendees).values({
+      trainingId: data.id,
+      employeeName,
+    });
+  }
+  const rows = await db
+    .select()
+    .from(trainings)
+    .where(eq(trainings.id, data.id));
+  return rows[0];
+}
+
+export async function listTrainingAttendees(trainingId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(trainingAttendees)
+    .where(eq(trainingAttendees.trainingId, trainingId));
+}
+
+export async function issueTrainingCertificates(trainingId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const training = (
+    await db.select().from(trainings).where(eq(trainings.id, trainingId))
+  )[0];
+  if (!training) throw new Error("Training not found.");
+  if (training.certificateIssued !== 1 || !training.validityMonths)
+    throw new Error("This training does not issue certificates.");
+  const attendees = await listTrainingAttendees(trainingId);
+  const issuedAt = new Date().toISOString().slice(0, 10);
+  const expires = new Date();
+  expires.setMonth(expires.getMonth() + training.validityMonths);
+  const expiresAt = expires.toISOString().slice(0, 10);
+  let count = 0;
+  for (const attendee of attendees) {
+    await db.insert(employeeCertificates).values({
+      id: `cert-${trainingId}-${count}-${Date.now()}`,
+      employeeName: attendee.employeeName,
+      trainingTitle: training.title,
+      issuedAt,
+      expiresAt,
+    });
+    count += 1;
+  }
+  return { count, expiresAt };
+}
+
+export async function listEmployeeCertificates() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(employeeCertificates)
+    .orderBy(desc(employeeCertificates.expiresAt));
 }
 
 export async function revokeSession(jti: string, expiresAt: Date) {
@@ -851,8 +1049,90 @@ export async function getAllEquipment() {
   ];
   const db = await getDb();
   if (!db) return fallbackEquipment;
-  const rows = await db.select().from(equipment);
+  const rows = await db
+    .select()
+    .from(equipment)
+    .where(eq(equipment.active, 1));
   return rows.length > 0 ? rows : fallbackEquipment;
+}
+
+export async function listAllEquipment() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(equipment).orderBy(equipment.assetCode);
+}
+
+export async function createEquipmentAsset(data: {
+  id: string;
+  assetCode: string;
+  name: string;
+  capacityTons: number;
+  status?: string | null;
+  inspectionExpiry: string;
+  type?: string | null;
+  registration?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(equipment).values({
+    id: data.id,
+    assetCode: data.assetCode,
+    name: data.name,
+    capacityTons: data.capacityTons,
+    status: data.status ?? "Available",
+    inspectionExpiry: data.inspectionExpiry,
+    type: data.type ?? "Mobile Crane",
+    registration: data.registration ?? null,
+    active: 1,
+  });
+  const rows = await db
+    .select()
+    .from(equipment)
+    .where(eq(equipment.id, data.id));
+  return rows[0];
+}
+
+export async function updateEquipmentAsset(
+  id: string,
+  patch: Partial<{
+    name: string;
+    capacityTons: number;
+    status: string;
+    inspectionExpiry: string;
+    type: string;
+    registration: string | null;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(equipment).set(patch).where(eq(equipment.id, id));
+  const rows = await db.select().from(equipment).where(eq(equipment.id, id));
+  return rows[0];
+}
+
+export async function deleteEquipmentAsset(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const asset = (
+    await db.select().from(equipment).where(eq(equipment.id, id))
+  )[0];
+  if (!asset) throw new Error("Asset not found.");
+  const bookings = await getAllBookings();
+  const referenced = bookings.some(
+    booking =>
+      booking.craneId === asset.id ||
+      booking.craneId === asset.assetCode ||
+      booking.craneId === asset.name
+  );
+  if (referenced) {
+    await db
+      .update(equipment)
+      .set({ active: 0 })
+      .where(eq(equipment.id, id));
+    return { deactivated: true as const };
+  }
+  await db.delete(equipment).where(eq(equipment.id, id));
+  return { deactivated: false as const };
 }
 
 export async function getAllCrew() {
@@ -864,13 +1144,156 @@ export async function getAllCrew() {
 export async function getAllLiftingGears() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(liftingGears);
+  return await db
+    .select()
+    .from(liftingGears)
+    .where(eq(liftingGears.active, 1));
+}
+
+export async function listAllLiftingGears() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(liftingGears).orderBy(liftingGears.name);
+}
+
+export async function createLiftingGear(data: {
+  id: string;
+  name: string;
+  gearType?: string | null;
+  swlTons: number;
+  inspectionExpiry: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(liftingGears).values({
+    id: data.id,
+    name: data.name,
+    gearType: data.gearType ?? "Shackle",
+    swlTons: data.swlTons,
+    inspectionExpiry: data.inspectionExpiry,
+    active: 1,
+  });
+  const rows = await db
+    .select()
+    .from(liftingGears)
+    .where(eq(liftingGears.id, data.id));
+  return rows[0];
+}
+
+export async function updateLiftingGear(
+  id: string,
+  patch: Partial<{
+    name: string;
+    gearType: string;
+    swlTons: number;
+    inspectionExpiry: string;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(liftingGears).set(patch).where(eq(liftingGears.id, id));
+  const rows = await db
+    .select()
+    .from(liftingGears)
+    .where(eq(liftingGears.id, id));
+  return rows[0];
+}
+
+export async function deleteLiftingGear(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const gear = (
+    await db.select().from(liftingGears).where(eq(liftingGears.id, id))
+  )[0];
+  if (!gear) throw new Error("Gear not found.");
+  const bookings = await getAllBookings();
+  const referenced = bookings.some(booking => {
+    const ids = booking.gearIds;
+    return (
+      (Array.isArray(ids) && ids.includes(id)) ||
+      (Array.isArray(ids) && ids.includes(gear.name))
+    );
+  });
+  if (referenced) {
+    await db
+      .update(liftingGears)
+      .set({ active: 0 })
+      .where(eq(liftingGears.id, id));
+    return { deactivated: true as const };
+  }
+  await db.delete(liftingGears).where(eq(liftingGears.id, id));
+  return { deactivated: false as const };
 }
 
 export async function getAllTrailers() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(trailers);
+  return await db
+    .select()
+    .from(trailers)
+    .where(eq(trailers.active, 1));
+}
+
+export async function listAllTrailers() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(trailers).orderBy(trailers.plateNumber);
+}
+
+export async function createTrailer(data: {
+  id: string;
+  plateNumber: string;
+  trailerType?: string | null;
+  status?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(trailers).values({
+    id: data.id,
+    plateNumber: data.plateNumber,
+    trailerType: data.trailerType ?? "Flatbed",
+    status: data.status ?? "Available",
+    active: 1,
+  });
+  const rows = await db
+    .select()
+    .from(trailers)
+    .where(eq(trailers.id, data.id));
+  return rows[0];
+}
+
+export async function updateTrailer(
+  id: string,
+  patch: Partial<{ plateNumber: string; trailerType: string; status: string }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(trailers).set(patch).where(eq(trailers.id, id));
+  const rows = await db
+    .select()
+    .from(trailers)
+    .where(eq(trailers.id, id));
+  return rows[0];
+}
+
+export async function deleteTrailer(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const trailer = (
+    await db.select().from(trailers).where(eq(trailers.id, id))
+  )[0];
+  if (!trailer) throw new Error("Trailer not found.");
+  const bookings = await getAllBookings();
+  const referenced = bookings.some(booking => {
+    const ids = booking.trailerIds;
+    return Array.isArray(ids) && ids.includes(id);
+  });
+  if (referenced) {
+    await db.update(trailers).set({ active: 0 }).where(eq(trailers.id, id));
+    return { deactivated: true as const };
+  }
+  await db.delete(trailers).where(eq(trailers.id, id));
+  return { deactivated: false as const };
 }
 
 export async function getDocumentsForBooking(bookingId: string) {
