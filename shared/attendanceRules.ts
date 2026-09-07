@@ -1,7 +1,29 @@
-export const ATTENDANCE_STATUSES = ["Present", "On Leave", "Assigned", "Off-Site"] as const;
+export const ATTENDANCE_STATUSES = ["Present", "Half-day", "Late", "On Leave", "Assigned", "Off-Site"] as const;
 
 export type AttendanceStatus = (typeof ATTENDANCE_STATUSES)[number];
 export type AttendanceRecord = Record<string, AttendanceStatus>;
+
+export type AttendanceDetail = {
+  checkIn?: string;
+  checkOut?: string;
+  note?: string;
+};
+
+/**
+ * Returns a warning when check-out precedes check-in. The remark still
+ * saves (PRD: warn, don't block).
+ */
+export function timeOrderWarning(
+  checkIn: string | undefined,
+  checkOut: string | undefined
+): string | null {
+  if (!checkIn || !checkOut) return null;
+  if (!/^\d{2}:\d{2}$/.test(checkIn) || !/^\d{2}:\d{2}$/.test(checkOut))
+    return null;
+  return checkOut < checkIn
+    ? "Check-out is earlier than check-in. Saved with a warning."
+    : null;
+}
 
 export function summarizeAttendance(record: AttendanceRecord) {
   return ATTENDANCE_STATUSES.reduce(
@@ -66,6 +88,7 @@ export function computeMonthlyAttendanceSummary(
 ) {
   return roster.map((employee) => {
     let daysWorked = 0;
+    let presenceDays = 0;
     let daysOnLeave = 0;
     let daysOffSite = 0;
     let daysAssigned = 0;
@@ -76,8 +99,12 @@ export function computeMonthlyAttendanceSummary(
       const status = record?.[employee.name];
       if (!status) {
         unrecorded++;
-      } else if (status === "Present") {
+      } else if (status === "Present" || status === "Late") {
         daysWorked++;
+        presenceDays++;
+      } else if (status === "Half-day") {
+        daysWorked += 0.5;
+        presenceDays++;
       } else if (status === "On Leave") {
         daysOnLeave++;
       } else if (status === "Off-Site") {
@@ -88,7 +115,7 @@ export function computeMonthlyAttendanceSummary(
     }
 
     const recordedDays = days.length - unrecorded;
-    const absences = Math.max(0, recordedDays - (daysWorked + daysOnLeave + daysOffSite + daysAssigned));
+    const absences = Math.max(0, recordedDays - (presenceDays + daysOnLeave + daysOffSite + daysAssigned));
 
     return {
       name: employee.name,

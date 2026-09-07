@@ -2,6 +2,7 @@ import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
+import { registerLocalFiles } from "../localFiles";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 
@@ -17,6 +18,7 @@ export function createPortalApp() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  registerLocalFiles(app);
   app.use(
     "/api/trpc",
     createExpressMiddleware({

@@ -27,6 +27,7 @@ export const documentsRouter = router({
         fileName: z.string().trim().max(255).nullable().optional(),
         fileType: z.string().trim().max(128).nullable().optional(),
         fileSize: z.number().int().nonnegative().max(25 * 1024 * 1024).nullable().optional(),
+        storageKey: z.string().trim().min(1).max(128).nullable().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => await db.upsertPersistedDocumentMetadata({ ...input, uploadedBy: ctx.user.id })),

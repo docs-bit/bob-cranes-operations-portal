@@ -4,9 +4,10 @@ import { AlertTriangle, ArrowRight, Bell, Check, CheckCircle2, ClipboardCheck, C
 import { DEPARTMENTS, PARALLEL_WORKSTREAMS, departmentList, type Booking, type DepartmentDashboardConfig, type Stage } from "./shared";
 import { PageHeading } from "./OverviewHelpers";
 import { MetricCard, StatusBadge } from "./primitives";
+import { PendingActionsQueue } from "./PendingActionsQueue";
 import { departmentPortalConfigs, type DepartmentPortalConfig } from "./DepartmentConfig";
 import { canDispatch as canDispatchByRule, departmentCompletion, documentCompletion, type DocumentItem } from "@shared/bookingRules";
-import { DEPARTMENT_LABEL_TO_CODE, canAccessWorkspaceView } from "@shared/departmentAccess";
+import { DEPARTMENT_LABEL_TO_CODE, canAccessWorkspaceView, isDepartmentCode } from "@shared/departmentAccess";
 import { normalizeDepartmentDashboardConfig, defaultWorkflowChecklist, DEPARTMENT_DASHBOARD_METRICS, DEPARTMENT_DASHBOARD_WIDGETS, type DepartmentDashboardMetric, type DepartmentDashboardWidget, type WorkflowChecklistItem } from "@shared/departmentDashboardRules";
 import { ATTENDANCE_CREW_ROSTER } from "@shared/attendanceCrewRoster";
 import { trpc } from "@/lib/trpc";
@@ -163,6 +164,12 @@ export function DepartmentView({
             </span>
           )
         }
+      />
+      <PendingActionsQueue
+        bookings={bookings}
+        departmentCode={departmentCode}
+        departmentName={config.label}
+        onOpenDossier={setDetail}
       />
       <div className="department-portal-banner">
         <div>
@@ -606,6 +613,14 @@ export function ProvisionedDepartmentDashboard({
   const visibleWidgets = new Set(config.widgets);
   return <div className="content" data-testid="provisioned-department-dashboard">
     <div className="page-heading" style={{ borderLeft: `4px solid ${accent}`, paddingLeft: 16 }}><div><div className="eyebrow">Provisioned department workspace</div><h1 className="page-title">{dashboard.name}</h1><p className="page-copy">{dashboard.description}</p></div><div className="status-badge blue"><LayoutDashboard size={12} /> Dedicated dashboard</div></div>
+    {isDepartmentCode(dashboard.code) && (
+      <PendingActionsQueue
+        bookings={bookings}
+        departmentCode={dashboard.code}
+        departmentName={dashboard.name}
+        onOpenDossier={onOpenDossier}
+      />
+    )}
     <div className="metric-grid"><MetricCard label={metricLabels[primaryMetric]} value={metricValue[primaryMetric].value} foot={metricValue[primaryMetric].foot} icon={<ClipboardCheck size={13} />} tone="green" /><MetricCard label={metricLabels[secondaryMetric]} value={metricValue[secondaryMetric].value} foot={metricValue[secondaryMetric].foot} icon={<AlertTriangle size={13} />} tone="red" /><MetricCard label="Active department team" value={String(departmentMembers.length)} foot="Named accounts assigned here" icon={<Users size={13} />} tone="green" /><MetricCard label="Workspace status" value="Ready" foot="Dashboard provisioned and isolated" icon={<CheckCircle2 size={13} />} tone="green" /></div>
     <div className="detail-grid">{visibleWidgets.has("team_readiness") && <section className="panel"><div className="panel-header"><div><div className="panel-title">{config.overviewLabel}</div><div className="panel-meta">{config.objective}</div></div><span className="status-badge amber">{config.workstream}</span></div><div className="panel-body"><div className="notification"><div className="title">Controlled department access</div><div className="body">This dashboard is linked to the <strong>{dashboard.code}</strong> department code. Only its assigned users, supervisor, and administrators can open this workspace.</div></div><div className="workflow-actions" style={{ marginTop: 16 }}><button className="primary-button" type="button" onClick={() => firstDossier && onOpenDossier(firstDossier)} disabled={!firstDossier}><ClipboardCheck size={14} /> {config.quickActions[0]}</button><button className="secondary-button" type="button" onClick={onManageTeam} disabled={!canManageTeam}><Users size={14} /> {canManageTeam ? config.quickActions[1] : "Supervisor access required"}</button></div></div></section>}{visibleWidgets.has("handoff_queue") && <section className="panel"><div className="panel-header"><div><div className="panel-title">Department handoff queue</div><div className="panel-meta">Dossiers are shared with the department’s configured operational focus.</div></div><span className="status-badge blue">{activeBookings.length} active</span></div><div className="panel-body activity-list">{activeBookings.slice(0, 4).map((booking, index) => <button className="activity-row" type="button" key={`handoff-${booking.id}-${index}`} onClick={() => onOpenDossier(booking)}><div className="activity-icon" style={{ color: accent }}><ClipboardCheck size={14} /></div><div className="activity-copy"><div><strong>{booking.id}</strong><span className="activity-action">{booking.client}</span></div><p>{booking.project} · {booking.stage}</p></div><span className="status-badge gray">{booking.priority}</span></button>)}{!activeBookings.length && <div className="empty-state">No active dossiers are currently awaiting this department’s attention.</div>}</div></section>}</div>
     <DepartmentWorkspaceControls dashboard={dashboard} config={config} canManage={canManageTeam} canArchiveWorkflows={canArchiveWorkflows} showWorkflow={visibleWidgets.has("workflow_library")} />

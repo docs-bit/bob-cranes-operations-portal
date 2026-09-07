@@ -135,6 +135,7 @@ docker run -d --name bob-cranes-mysql \
   -e MYSQL_DATABASE=bob_cranes_portal \
   -e MYSQL_USER=bob_portal \
   -e MYSQL_PASSWORD=change-me \
+  -v bob-cranes-mysql-data:/var/lib/mysql \
   -p 3306:3306 mysql:8.0
 ```
 

@@ -7,4 +7,12 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  googleDriveServiceJson: process.env.GOOGLE_DRIVE_SA_JSON ?? "",
+  googleDriveRootFolder: process.env.GOOGLE_DRIVE_ROOT_FOLDER ?? "",
+  smtpHost: process.env.SMTP_HOST ?? "",
+  smtpPort: process.env.SMTP_PORT ?? "",
+  smtpUser: process.env.SMTP_USER ?? "",
+  smtpPassword: process.env.SMTP_PASSWORD ?? "",
+  smtpFromEmail: process.env.SMTP_FROM_EMAIL ?? "",
+  smtpFromName: process.env.SMTP_FROM_NAME ?? "",
 };

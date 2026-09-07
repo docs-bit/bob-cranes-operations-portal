@@ -49,10 +49,23 @@ docker run -d --name bob-cranes-mysql \
   -e MYSQL_DATABASE=bob_cranes_portal \
   -e MYSQL_USER=bob_portal \
   -e MYSQL_PASSWORD=change-me \
+  -v bob-cranes-mysql-data:/var/lib/mysql \
   -p 3306:3306 mysql:8.0
 ```
 
-Restart it later with `docker start bob-cranes-mysql`. Wait until `docker exec bob-cranes-mysql mysqladmin ping -h 127.0.0.1 -u bob_portal -p'change-me'` reports `mysqld is alive` before running migrations.
+The named volume keeps data across container restarts and recreation. Restart it later with `docker start bob-cranes-mysql`. Wait until `docker exec bob-cranes-mysql mysqladmin ping -h 127.0.0.1 -u bob_portal -p'change-me'` reports `mysqld is alive` before running migrations.
+
+Back up the local database before destructive experiments:
+
+```bash
+docker exec bob-cranes-mysql mysqldump -u bob_portal -p'change-me' bob_cranes_portal > bob-cranes-backup.sql
+```
+
+Restore with:
+
+```bash
+docker exec -i bob-cranes-mysql mysql -u bob_portal -p'change-me' bob_cranes_portal < bob-cranes-backup.sql
+```
 
 ## 3. Create the local environment file
 
@@ -181,6 +194,10 @@ The browser smoke suite starts its own local test server and does not create or 
 ## Stop the server
 
 Press `Ctrl+C` in the terminal that is running `pnpm run dev`.
+
+## Certificate-expiry alerts
+
+Crew, gear, and equipment certificates expiring within 20 days raise HSE notifications through the `runExpiryCheck` procedure. The check runs automatically once per server boot (guarded by a daily stamp) and on demand from the Doc Supervisor Console ("Run certificate expiry check"). A single self-hosted instance therefore alerts without any scheduler. Multi-instance or production deployments should trigger `operations.runExpiryCheck` from an external daily cron instead of relying on boot.
 
 ## Production boundary
 

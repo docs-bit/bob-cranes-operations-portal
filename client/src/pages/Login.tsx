@@ -20,19 +20,25 @@ export default function Login() {
   const setupStatus = trpc.auth.setupStatus.useQuery(undefined, { retry: false });
   const login = trpc.auth.login.useMutation();
   const bootstrapAdmin = trpc.auth.bootstrapAdmin.useMutation();
+  const changePassword = trpc.auth.changePassword.useMutation();
   const [form, setForm] = useState<LoginForm>(emptyForm);
   const [error, setError] = useState("");
+  const [forceChange, setForceChange] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const setupMode = setupStatus.data?.needsAdminSetup === true;
-  const pending = login.isPending || bootstrapAdmin.isPending;
+  const needsChange =
+    forceChange || (user?.mustChangePassword ?? 0) === 1;
+  const pending = login.isPending || bootstrapAdmin.isPending || changePassword.isPending;
   const readableError = (caught: unknown) => {
     const message = caught instanceof Error ? caught.message : "We could not complete that sign-in request.";
     return /invalid email|invalid password|unauthorized/i.test(message) ? "The email or password is incorrect. Check your credentials or contact your administrator." : message;
   };
 
   useEffect(() => {
-    if (user) setLocation("/portal");
-  }, [setLocation, user]);
+    if (user && !needsChange) setLocation("/portal");
+  }, [setLocation, user, needsChange]);
 
   const update = (field: keyof LoginForm, value: string) => {
     setError("");
@@ -53,6 +59,34 @@ export default function Login() {
         : await login.mutateAsync({ email: form.email, password: form.password });
       utils.auth.me.setData(undefined, account);
       await utils.auth.me.invalidate();
+      if ((account.mustChangePassword ?? 0) === 1) {
+        setForceChange(true);
+        setForm(current => ({ ...current, password: "" }));
+        return;
+      }
+      setLocation("/portal");
+    } catch (caught) {
+      setError(readableError(caught));
+    }
+  };
+
+  const submitPasswordChange = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    if (newPassword.length < 10) {
+      setError("The new password must be at least 10 characters.");
+      return;
+    }
+    try {
+      const account = await changePassword.mutateAsync({
+        currentPassword,
+        newPassword,
+      });
+      utils.auth.me.setData(undefined, account);
+      await utils.auth.me.invalidate();
+      setForceChange(false);
+      setCurrentPassword("");
+      setNewPassword("");
       setLocation("/portal");
     } catch (caught) {
       setError(readableError(caught));
@@ -82,8 +116,17 @@ export default function Login() {
         <div className="auth-card">
           <button className="auth-landing-back" type="button" onClick={() => setLocation("/")}><ArrowLeft size={14} /> Back to Heavy Equipment Rental</button>
           <div className="auth-card-icon">{setupMode ? <UserRound size={22} /> : <LockKeyhole size={22} />}</div>
-          <h2>{setupMode ? "Set up the administrator account" : "Sign in to BOB Cranes"}</h2>
-          <p>{setupMode ? "Create the first administrator account. Only administrators can register department users after setup." : "Use the email address and password provided by your administrator."}</p>
+          <h2>{needsChange ? "Choose a new password" : setupMode ? "Set up the administrator account" : "Sign in to BOB Cranes"}</h2>
+          <p>{needsChange ? "Your account requires a password change before you can continue. Use at least 10 characters." : setupMode ? "Create the first administrator account. Only administrators can register department users after setup." : "Use the email address and password provided by your administrator."}</p>
+          {needsChange ? (
+          <form onSubmit={submitPasswordChange} className="auth-form">
+            <label><span>Current password</span><input type="password" value={currentPassword} onChange={(event) => { setError(""); setCurrentPassword(event.target.value); }} autoComplete="current-password" placeholder="Enter your current password" required /></label>
+            <label><span>New password</span><input type="password" value={newPassword} onChange={(event) => { setError(""); setNewPassword(event.target.value); }} autoComplete="new-password" placeholder="At least 10 characters" minLength={10} required /></label>
+            {error && <div className="auth-error" role="alert"><ShieldCheck size={15} /> <span>{error}</span></div>}
+            {pending && <div className="auth-pending-note" role="status"><span className="button-spinner" aria-hidden="true" /> Updating your password…</div>}
+            <button className="auth-submit" type="submit" disabled={pending}><span className={pending ? "button-spinner" : ""} aria-hidden="true" />{pending ? "Please wait…" : "Set new password"}</button>
+          </form>
+          ) : (
           <form onSubmit={submit} className="auth-form">
             {setupMode && <label><span>Administrator name</span><input value={form.name} onChange={(event) => update("name", event.target.value)} autoComplete="name" placeholder="e.g. Nishanth Shetty" required /></label>}
             <label><span>Work email</span><input type="email" value={form.email} onChange={(event) => update("email", event.target.value)} autoComplete="email" placeholder="name@bobcranes.com" required /></label>
@@ -92,6 +135,7 @@ export default function Login() {
             {pending && <div className="auth-pending-note" role="status"><span className="button-spinner" aria-hidden="true" /> Securely verifying your account…</div>}
             <button className="auth-submit" type="submit" disabled={pending}><span className={pending ? "button-spinner" : ""} aria-hidden="true" />{pending ? "Please wait…" : setupMode ? "Create administrator account" : "Sign in"}</button>
           </form>
+          )}
           <div className="auth-note"><ShieldCheck size={14} />Your administrator controls new accounts and department access.</div>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -102,26 +102,39 @@ export function TokenPortal({
     }
     const target = uploadTarget;
     setUploadTarget(null);
-    void uploadMutation
-      .mutateAsync({
-        token,
-        documentId: target,
-        fileName: file.name,
-        fileType: file.type as "application/pdf" | "image/jpeg" | "image/png",
-        fileSize: file.size,
-      })
-      .then(() => contextQuery.refetch())
-      .then(() =>
-        toast.success("Document received", {
-          description: `${file.name} is now with the Documentation team.`,
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result ?? "");
+      const comma = dataUrl.indexOf(",");
+      const base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+      void uploadMutation
+        .mutateAsync({
+          token,
+          documentId: target,
+          fileName: file.name,
+          fileType: file.type as "application/pdf" | "image/jpeg" | "image/png",
+          fileSize: file.size,
+          contentBase64: base64,
         })
-      )
-      .catch((caught: unknown) => {
-        toast.error("Upload failed", {
-          description:
-            caught instanceof Error ? caught.message : "Please try again.",
+        .then(() => contextQuery.refetch())
+        .then(() =>
+          toast.success("Document received", {
+            description: `${file.name} is now with the Documentation team.`,
+          })
+        )
+        .catch((caught: unknown) => {
+          toast.error("Upload failed", {
+            description:
+              caught instanceof Error ? caught.message : "Please try again.",
+          });
         });
+    };
+    reader.onerror = () => {
+      toast.error("Upload failed", {
+        description: "The file could not be read. Please try again.",
       });
+    };
+    reader.readAsDataURL(file);
   };
 
   const requestLink = () => {

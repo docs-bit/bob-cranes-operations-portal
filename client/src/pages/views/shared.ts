@@ -80,6 +80,7 @@ export type View =
   | "sales-enquiries"
   | "users"
   | "supervisor-audit"
+  | "integrations"
   | "web-vitals";
 
 export type Booking = {
@@ -382,6 +383,8 @@ export function initials(value: string) {
 export function statusTone(value: string) {
   if (value === "Compliant" || value === "Present" || value === "Dispatched") return "green";
   if (value === "Expired" || value === "Critical" || value === "Training required") return "red";
+  if (value === "Late") return "red";
+  if (value === "Half-day") return "amber";
   if (value === "Assigned" || value === "High" || value === "Renewal due in 16 days") return "amber";
   if (value === "Off-Site") return "blue";
   return "gray";

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useLocation, useParams } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -44,16 +44,35 @@ import { Wizard } from "./views/Wizard";
 import { ClientPortal } from "./views/ClientPortal";
 import { Overview } from "./views/Overview";
 import { BookingsView } from "./views/BookingsView";
-import { DocsView } from "./views/DocsView";
 import { CrewViewLegacy } from "./views/CrewViewLegacy";
-import { TrainingView } from "./views/TrainingView";
 import { GearView, gears } from "./views/GearView";
-import { BookingDetail } from "./views/BookingDetail";
-import { DocSupervisorConsole } from "./views/DocSupervisorConsole";
-import { TokenPortal } from "./views/TokenPortal";
-import { AttendanceView } from "./views/AttendanceView";
 import { DepartmentView } from "./views/DepartmentView";
 import { ProvisionedDepartmentDashboard } from "./views/DepartmentView";
+
+// Heavy views load on demand so the initial portal bundle stays lean.
+// Wizard, ClientPortal, CrewView, GearView, Overview, and BookingsView stay
+// static: integration tests and route-level consumers import them.
+const BookingDetail = lazy(() =>
+  import("./views/BookingDetail").then(module => ({ default: module.BookingDetail }))
+);
+const DocSupervisorConsole = lazy(() =>
+  import("./views/DocSupervisorConsole").then(module => ({ default: module.DocSupervisorConsole }))
+);
+const IntegrationsView = lazy(() =>
+  import("./views/IntegrationsView").then(module => ({ default: module.IntegrationsView }))
+);
+const TokenPortal = lazy(() =>
+  import("./views/TokenPortal").then(module => ({ default: module.TokenPortal }))
+);
+const AttendanceView = lazy(() =>
+  import("./views/AttendanceView").then(module => ({ default: module.AttendanceView }))
+);
+const TrainingView = lazy(() =>
+  import("./views/TrainingView").then(module => ({ default: module.TrainingView }))
+);
+const DocsView = lazy(() =>
+  import("./views/DocsView").then(module => ({ default: module.DocsView }))
+);
 
 // Re-export feature views and shared fixture data for route-level consumers and integration tests.
 export { Shell, Wizard, ClientPortal, gears };
@@ -87,6 +106,7 @@ export default function Home() {
   );
   const saveDocumentMetadataMutation = trpc.documents.saveMetadata.useMutation();
   const deleteDocumentMetadataMutation = trpc.documents.deleteMetadata.useMutation();
+  const uploadDocumentFileMutation = trpc.operations.uploadDocumentFile.useMutation();
   const advanceBookingStageMutation = trpc.operations.advanceBookingStage.useMutation();
   const completeWorkstreamMutation = trpc.operations.completeBookingWorkstream.useMutation();
   const crewAllocationsQuery = trpc.operations.getCrewAllocations.useQuery();
@@ -189,6 +209,7 @@ export default function Home() {
           fileName: persisted.fileName ?? document.fileName,
           fileType: persisted.fileType ?? document.fileType,
           fileSize: persisted.fileSize ?? document.fileSize,
+          storageKey: persisted.storageKey ?? document.storageKey,
         };
         if (JSON.stringify(hydrated) !== JSON.stringify(document)) changed = true;
         return hydrated;
@@ -196,6 +217,28 @@ export default function Home() {
       return changed ? next : current;
     });
   }, [clientMetadataQuery.data, isClient]);
+
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = String(reader.result ?? "");
+        const comma = result.indexOf(",");
+        resolve(comma >= 0 ? result.slice(comma + 1) : result);
+      };
+      reader.onerror = () => reject(new Error("Could not read the file."));
+      reader.readAsDataURL(file);
+    });
+
+  const storeUploadedBytes = async (file: File) => {
+    const base64 = await fileToBase64(file);
+    const stored = await uploadDocumentFileMutation.mutateAsync({
+      fileName: file.name,
+      contentType: file.type as "application/pdf" | "image/jpeg" | "image/png",
+      base64,
+    });
+    return stored;
+  };
 
   const persistClientDocumentMetadata = async (document: DocumentItem) => {
     await saveDocumentMetadataMutation.mutateAsync({
@@ -209,16 +252,30 @@ export default function Home() {
       fileName: document.fileName ?? null,
       fileType: document.fileType ?? null,
       fileSize: document.fileSize ?? null,
+      storageKey: document.storageKey ?? null,
     });
     await clientMetadataQuery.refetch();
   };
 
   if (isClient && clientToken?.startsWith("bob_"))
-    return <TokenPortal token={clientToken} />;
+    return (
+      <Suspense
+        fallback={<WorkspaceLoadingSkeleton title="Loading client portal…" />}
+      >
+        <TokenPortal token={clientToken} />
+      </Suspense>
+    );
 
   // Logged-out visitors without a magic link get the request-link page
   // instead of an authenticated view that cannot load.
-  if (isClient && !user) return <TokenPortal token="none" forceInvalid />;
+  if (isClient && !user)
+    return (
+      <Suspense
+        fallback={<WorkspaceLoadingSkeleton title="Loading client portal…" />}
+      >
+        <TokenPortal token="none" forceInvalid />
+      </Suspense>
+    );
 
   if (isClient && clientBooking)
     return (
@@ -234,7 +291,7 @@ export default function Home() {
             const existing = uploadDocuments.find(document => document.id === documentId);
             setUploadDocuments(current => current.map(doc =>
               doc.id === documentId
-                ? { ...doc, state: "Required", fileName: undefined, fileType: undefined, fileSize: undefined }
+                ? { ...doc, state: "Required", fileName: undefined, fileType: undefined, fileSize: undefined, storageKey: undefined }
                 : doc
             ));
             await deleteDocumentMetadataMutation.mutateAsync({ id: documentId });
@@ -247,17 +304,20 @@ export default function Home() {
             const target = uploadDocuments.find(document => document.id === documentId);
             const file = filesToUpload[0];
             if (!target) return;
-            const nextDocument = { ...target, state: "Uploaded" as const, fileName: file.name, fileType: file.type, fileSize: file.size };
+            const stored = await storeUploadedBytes(file);
+            const nextDocument = { ...target, state: "Uploaded" as const, fileName: file.name, fileType: file.type, fileSize: file.size, storageKey: stored.key };
             setUploadDocuments(current => current.map(document => document.id === documentId ? nextDocument : document));
             await persistClientDocumentMetadata(nextDocument);
             return;
           }
           const assignments = uploadDocuments.filter(document => document.state === "Required").slice(0, filesToUpload.length).map((document, index) => ({ document, file: filesToUpload[index] }));
+          const storedKeys = await Promise.all(assignments.map(({ file }) => storeUploadedBytes(file).then(stored => stored.key)));
+          const withKeys = assignments.map((assignment, index) => ({ ...assignment, storageKey: storedKeys[index] }));
           setUploadDocuments(current => current.map(document => {
-            const assignment = assignments.find(item => item.document.id === document.id);
-            return assignment ? { ...document, state: "Uploaded", fileName: assignment.file.name, fileType: assignment.file.type, fileSize: assignment.file.size } : document;
+            const assignment = withKeys.find(item => item.document.id === document.id);
+            return assignment ? { ...document, state: "Uploaded", fileName: assignment.file.name, fileType: assignment.file.type, fileSize: assignment.file.size, storageKey: assignment.storageKey } : document;
           }));
-          await Promise.all(assignments.map(({ document, file }) => persistClientDocumentMetadata({ ...document, state: "Uploaded", fileName: file.name, fileType: file.type, fileSize: file.size })));
+          await Promise.all(withKeys.map(({ document, file, storageKey }) => persistClientDocumentMetadata({ ...document, state: "Uploaded", fileName: file.name, fileType: file.type, fileSize: file.size, storageKey })));
         }}
         onBackToInternal={() => setLocation("/")}
         actorDepartment={user?.departmentCode ?? null}
@@ -421,6 +481,9 @@ export default function Home() {
       user={user}
       onSignOut={signOut}
     >
+      <Suspense
+        fallback={<WorkspaceLoadingSkeleton title="Loading workspace…" />}
+      >
       {view === "overview" && (
         <Overview
           bookings={bookings}
@@ -448,7 +511,13 @@ export default function Home() {
         <Wizard onCreated={createBooking} onCancel={() => guardedSetView("overview")} />
       )}
       {view === "docs" && (user.role === "admin" || user.departmentCode === "documentation" || user.departmentCode === "hse") && (
-        <DocsView bookings={bookings} setDetail={openDetail} />
+        <DocsView
+          bookings={bookings}
+          documents={uploadDocuments}
+          setDetail={openDetail}
+          actorRole={user.role}
+          actorDepartment={user.departmentCode ?? null}
+        />
       )}
       {view === "crew" && (user.role === "admin" || user.departmentCode === "crew") && (
         <CrewView
@@ -456,6 +525,8 @@ export default function Home() {
           allocations={allocations}
           setAllocations={setAllocations}
           focusedBookingId={focusedAssignmentBookingId}
+          actorRole={user.role}
+          actorDepartment={user.departmentCode ?? null}
           onOpenDossier={(bookingId) => {
             const booking = bookings.find((candidate) => candidate.id === bookingId);
             if (!booking) return;
@@ -502,6 +573,9 @@ export default function Home() {
       )}
       {view === "web-vitals" && user.role === "admin" && (
         <WebVitalsAnalyticsView />
+      )}
+      {view === "integrations" && user.role === "admin" && (
+        <IntegrationsView />
       )}
       {view === "department" && activeDepartment && (
         workspaceLoading ? <WorkspaceLoadingSkeleton title={`Loading ${activeDepartment} workspace…`} /> : <>
@@ -592,6 +666,7 @@ export default function Home() {
           onOpenClientPortal={() => setLocation("/client/portal-bob-31511")}
         />
       )}
+      </Suspense>
       <div style={{ color: "#555", fontSize: 10, textAlign: "right", padding: "10px 0 0" }}>
         System status: operational · {groupedCount} dossiers in view · v3.0
       </div>

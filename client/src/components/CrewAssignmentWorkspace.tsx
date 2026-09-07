@@ -9,6 +9,7 @@ import { toggleEmployeeBookingAllocation, type EmployeeAllocation } from "@share
 import { focusAssignmentBooking } from "@shared/assignmentRules";
 import { allocationAwareAvailability, summarizeAllocationTiming } from "@shared/crewAssignmentAvailability";
 import { buildBulkConflictSummary } from "@shared/bulkCrewAssignmentRules";
+import { TrainingFlagsInbox } from "@/pages/views/TrainingFlagsInbox";
 
 type Booking = {
   id: string;
@@ -259,7 +260,7 @@ function CsvColumnDialog({ open, onOpenChange, selected, onSelectedChange, onExp
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent><DialogHeader><DialogTitle>Choose CSV columns</DialogTitle><DialogDescription>Select the data fields included in the current filtered Crew Assignment export.</DialogDescription></DialogHeader><div className="csv-column-grid">{EXPORT_COLUMNS.map(column => <label className="csv-column-option" key={column.key}><input type="checkbox" checked={selected.includes(column.key)} onChange={() => toggle(column.key)} disabled={exporting}/><span>{column.label}</span></label>)}</div><div className="csv-column-actions"><button className="filter-chip" onClick={() => onSelectedChange(DEFAULT_EXPORT_COLUMNS)} disabled={exporting}>Select all</button><button className="filter-chip" onClick={() => onSelectedChange([])} disabled={exporting}>Clear all</button></div><DialogFooter><button className="secondary-button" onClick={() => onOpenChange(false)} disabled={exporting}>Cancel</button><button className="primary-button" onClick={onExport} disabled={!selected.length || exporting}>{exporting ? <><LoaderCircle size={14} className="animate-spin"/> Generating CSV…</> : <><Download size={14}/> Download CSV</>}</button></DialogFooter></DialogContent></Dialog>;
 }
 
-export function CrewView({ bookings, setBookings, allocations, setAllocations, focusedBookingId, onAddWorkman, onAllocationSaved, onOpenDossier = () => undefined }: { bookings: Booking[]; setBookings?: React.Dispatch<React.SetStateAction<Booking[]>>; allocations: EmployeeAllocation[]; setAllocations: React.Dispatch<React.SetStateAction<EmployeeAllocation[]>>; focusedBookingId?: string | null; onAddWorkman: () => void; onAllocationSaved: (details: { bookingId: string; employeeName: string; action: "saved" | "removed" }) => void; onOpenDossier?: (bookingId: string) => void }) {
+export function CrewView({ bookings, setBookings, allocations, setAllocations, focusedBookingId, onAddWorkman, onAllocationSaved, onOpenDossier = () => undefined, actorRole = "user", actorDepartment = "crew" }: { bookings: Booking[]; setBookings?: React.Dispatch<React.SetStateAction<Booking[]>>; allocations: EmployeeAllocation[]; setAllocations: React.Dispatch<React.SetStateAction<EmployeeAllocation[]>>; focusedBookingId?: string | null; onAddWorkman: () => void; onAllocationSaved: (details: { bookingId: string; employeeName: string; action: "saved" | "removed" }) => void; onOpenDossier?: (bookingId: string) => void; actorRole?: string; actorDepartment?: string | null }) {
   const saveAllocation = trpc.operations.saveCrewAllocations.useMutation();
   const focusedCrewId = allocations.find(allocation => allocation.bookingId === focusedBookingId)?.crewId;
   const [query, setQuery] = useState(""); const [availableCrewQuery, setAvailableCrewQuery] = useState(""); const [department, setDepartment] = useState("All"); const [role, setRole] = useState("All"); const [availability, setAvailability] = useState<Availability>("All"); const [availabilityDate, setAvailabilityDate] = useState(todayKey);
@@ -362,6 +363,11 @@ export function CrewView({ bookings, setBookings, allocations, setAllocations, f
   const toggleSingle = async (booking: Booking) => { if (!selectedCrew) return; const next = selectedCrew.bookingIds.includes(booking.id) ? selectedCrew.bookingIds.filter(id => id !== booking.id) : [...selectedCrew.bookingIds, booking.id]; try { const result = await persistCrew(selectedCrew, next); mergeCrewResult(selectedCrew.id, result); onAllocationSaved({ bookingId: booking.id, employeeName: selectedCrew.name, action: selectedCrew.bookingIds.includes(booking.id) ? "removed" : "saved" }); } catch { toast.error("Allocation could not be saved."); } };
   const bulkAssign = async () => { if (!targetBooking || !selectedBulkCrew.length) return toast.info("Select one or more crew members first."); if (!toPersistedBookingId(targetBooking.id)) return toast.info("This preview dossier cannot receive durable assignments."); try { const results = await Promise.all(selectedBulkCrew.map(async crew => ({ crew, result: await persistCrew(crew, crew.bookingIds.includes(targetBooking.id) ? crew.bookingIds : [...crew.bookingIds, targetBooking.id]) }))); results.forEach(({ crew, result }) => mergeCrewResult(crew.id, result)); results.forEach(({ crew }) => onAllocationSaved({ bookingId: targetBooking.id, employeeName: crew.name, action: "saved" })); toast.success(`${results.length} crew member${results.length === 1 ? "" : "s"} assigned to ${targetBooking.id}.`); } catch { toast.error("Bulk assignment could not be saved. Existing assignments were left unchanged."); } };
   return       <div className="content">
+      <TrainingFlagsInbox
+        actorRole={actorRole}
+        actorDepartment={actorDepartment}
+        onOpenBooking={onOpenDossier}
+      />
         <Dialog open={Boolean(undoRequest)} onOpenChange={open => { if (!open) setUndoRequest(null); }}>
           <DialogContent className="max-w-md">
             <DialogHeader>

@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
-import { AlertTriangle, ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ClipboardCheck, Clock3, Download, FileText, LayoutDashboard, LoaderCircle, Moon, Plus, Search, Send, ShieldCheck, Users, Wrench, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ClipboardCheck, Clock3, Download, FileText, LayoutDashboard, LoaderCircle, Moon, Plus, Save, Search, Send, ShieldCheck, Users, Wrench, X } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 import { attendanceRoster, dateKey, defaultAttendanceRecord, initials, formatAttendanceDate, computeMonthlyAttendanceSummary, type AttendanceRecord, type AttendanceStatus, type Stage } from "./shared";
 import { PageHeading } from "./OverviewHelpers";
 import { MetricCard, StatusBadge } from "./primitives";
-import { ATTENDANCE_STATUSES, attendanceCompletion, historicalAttendanceRecord, shiftDate, summarizeAttendance, updateAttendance } from "@shared/attendanceRules";
+import { ATTENDANCE_STATUSES, attendanceCompletion, historicalAttendanceRecord, shiftDate, summarizeAttendance, timeOrderWarning, updateAttendance, type AttendanceDetail } from "@shared/attendanceRules";
 import { ATTENDANCE_CREW_ROSTER } from "@shared/attendanceCrewRoster";
 
 export function AttendanceView({
@@ -24,6 +25,8 @@ export function AttendanceView({
   const [query, setQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("All");
   const [viewMode, setViewMode] = useState<"daily" | "summary">("daily");
+  const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null);
+  const [details, setDetails] = useState<Record<string, AttendanceDetail>>({});
   const today = dateKey(new Date());
   const baseRecord = defaultAttendanceRecord(attendanceRoster);
   const record =
@@ -38,6 +41,48 @@ export function AttendanceView({
       ...current,
       [selectedDate]: updateAttendance(record, employeeName, status),
     }));
+  const updateDetail = (employeeName: string, patch: Partial<AttendanceDetail>) =>
+    setDetails(current => ({
+      ...current,
+      [employeeName]: { ...current[employeeName], ...patch },
+    }));
+
+  const dayQuery = trpc.operations.getAttendance.useQuery(
+    { date: selectedDate },
+    {}
+  );
+  const saveDayMutation = trpc.operations.saveAttendance.useMutation();
+
+  useEffect(() => {
+    setDetails({});
+    setExpandedEmployee(null);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (!dayQuery.data?.length) return;
+    setRecords(current => {
+      const next = { ...(current[selectedDate] ?? {}) };
+      for (const row of dayQuery.data) {
+        if (
+          (ATTENDANCE_STATUSES as readonly string[]).includes(row.status)
+        )
+          next[row.employeeName] = row.status as AttendanceStatus;
+      }
+      return { ...current, [selectedDate]: next };
+    });
+    setDetails(() => {
+      const merged: Record<string, AttendanceDetail> = {};
+      for (const row of dayQuery.data ?? []) {
+        if (row.checkIn || row.checkOut || row.note)
+          merged[row.employeeName] = {
+            checkIn: row.checkIn ?? undefined,
+            checkOut: row.checkOut ?? undefined,
+            note: row.note ?? undefined,
+          };
+      }
+      return merged;
+    });
+  }, [dayQuery.data, selectedDate]);
   const markAllPresent = () =>
     setRecords(current => ({
       ...current,
@@ -50,6 +95,63 @@ export function AttendanceView({
     setSelectedDate(current =>
       current < today ? shiftDate(current, 1) : current
     );
+
+  const saveDay = () => {
+    const rows = attendanceRoster.map(employee => ({
+      employeeName: employee.name,
+      status: record[employee.name] ?? "Present",
+      checkIn: details[employee.name]?.checkIn ?? null,
+      checkOut: details[employee.name]?.checkOut ?? null,
+      note: details[employee.name]?.note?.trim() || null,
+    }));
+    const warnings = rows.filter(employee =>
+      timeOrderWarning(
+        details[employee.employeeName]?.checkIn,
+        details[employee.employeeName]?.checkOut
+      )
+    ).length;
+    void saveDayMutation
+      .mutateAsync({ date: selectedDate, rows })
+      .then(() => dayQuery.refetch())
+      .then(() =>
+        toast.success("Attendance saved", {
+          description: `${rows.length} employees recorded for ${formatAttendanceDate(selectedDate)}.${warnings ? ` ${warnings} saved with time warnings.` : ""}`,
+        })
+      )
+      .catch((caught: unknown) => {
+        toast.error("Save failed", {
+          description:
+            caught instanceof Error ? caught.message : "Please try again.",
+        });
+      });
+  };
+
+  const exportDayCsv = () => {
+    const header = ["Employee", "Role", "Department", "Status", "Check-in", "Check-out", "Note"];
+    const cell = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const lines = attendanceRoster.map(employee => {
+      const detail = details[employee.name] ?? {};
+      return [
+        employee.name,
+        employee.role,
+        employee.department ?? "",
+        record[employee.name] ?? "Present",
+        detail.checkIn ?? "",
+        detail.checkOut ?? "",
+        detail.note ?? "",
+      ].map(cell).join(",");
+    });
+    const csv = [header.map(cell).join(","), ...lines].join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `BOB-Attendance-${selectedDate}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Daily report exported", {
+      description: `Downloaded attendance CSV for ${formatAttendanceDate(selectedDate)}.`,
+    });
+  };
 
   const departmentsList = useMemo(
     () => [
@@ -123,6 +225,20 @@ export function AttendanceView({
                 <CheckCircle2 size={14} /> Mark all present
               </button>
             )}
+            {viewMode === "daily" && (
+              <button
+                className="primary-button"
+                onClick={saveDay}
+                disabled={saveDayMutation.isPending}
+              >
+                <Save size={14} /> {saveDayMutation.isPending ? "Saving…" : "Save day"}
+              </button>
+            )}
+            {viewMode === "daily" && (
+              <button className="secondary-button" onClick={exportDayCsv}>
+                <Download size={14} /> Export day (.csv)
+              </button>
+            )}
           </div>
         }
       />
@@ -163,6 +279,16 @@ export function AttendanceView({
                   Today
                 </button>
               )}
+              <input
+                type="date"
+                className="mapping-select"
+                aria-label="Choose attendance date"
+                value={selectedDate}
+                max={today}
+                onChange={event => {
+                  if (event.target.value) setSelectedDate(event.target.value);
+                }}
+              />
             </div>
             <StatusBadge
               value={selectedDate === today ? "Current day" : "History"}
@@ -260,6 +386,9 @@ export function AttendanceView({
               <div className="attendance-list">
                 {filteredRoster.map((employee, employeeIndex) => {
                   const status = record[employee.name] ?? "Present";
+                  const detail = details[employee.name] ?? {};
+                  const warning = timeOrderWarning(detail.checkIn, detail.checkOut);
+                  const expanded = expandedEmployee === employee.name;
                   return (
                     <div
                       className="attendance-row"
@@ -296,7 +425,84 @@ export function AttendanceView({
                             </option>
                           ))}
                         </select>
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          aria-expanded={expanded}
+                          aria-label={`Times and note for ${employee.name}`}
+                          onClick={() =>
+                            setExpandedEmployee(current =>
+                              current === employee.name ? null : employee.name
+                            )
+                          }
+                        >
+                          <Clock3 size={13} /> {expanded ? "Hide" : "Times"}
+                        </button>
                       </div>
+                      {expanded && (
+                        <div
+                          className="detail-list"
+                          style={{ gridColumn: "1 / -1", marginTop: 8 }}
+                        >
+                          <div className="detail-cell">
+                            <label>Check-in</label>
+                            <input
+                              type="time"
+                              aria-label={`Check-in for ${employee.name}`}
+                              value={detail.checkIn ?? ""}
+                              onChange={event =>
+                                updateDetail(employee.name, {
+                                  checkIn: event.target.value || undefined,
+                                })
+                              }
+                              style={{ width: "100%" }}
+                            />
+                          </div>
+                          <div className="detail-cell">
+                            <label>Check-out</label>
+                            <input
+                              type="time"
+                              aria-label={`Check-out for ${employee.name}`}
+                              value={detail.checkOut ?? ""}
+                              onChange={event =>
+                                updateDetail(employee.name, {
+                                  checkOut: event.target.value || undefined,
+                                })
+                              }
+                              style={{ width: "100%" }}
+                            />
+                          </div>
+                          <div className="detail-cell">
+                            <label>Note</label>
+                            <input
+                              aria-label={`Note for ${employee.name}`}
+                              placeholder="Shift note (optional)"
+                              value={detail.note ?? ""}
+                              onChange={event =>
+                                updateDetail(employee.name, {
+                                  note: event.target.value || undefined,
+                                })
+                              }
+                              style={{ width: "100%" }}
+                            />
+                          </div>
+                          {warning && (
+                            <div className="detail-cell">
+                              <label>Warning</label>
+                              <div style={{ color: "#e31e24", fontSize: 12 }}>
+                                <AlertTriangle
+                                  size={12}
+                                  style={{
+                                    verticalAlign: "-2px",
+                                    marginRight: 6,
+                                  }}
+                                />
+                                {warning}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -414,9 +620,9 @@ export function AttendanceView({
       <div className="attendance-note">
         <ShieldCheck size={15} />
         <span>
-          Attendance changes are kept in this dashboard session and can be
-          reviewed by moving back through the date controls or exported as a
-          monthly summary.
+          Saving a day persists it to the database (one row per employee per
+          day — re-marking updates). Check-out before check-in saves with a
+          red warning. Export the day as CSV or the month as a spreadsheet.
         </span>
       </div>
     </div>

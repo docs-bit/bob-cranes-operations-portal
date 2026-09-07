@@ -162,6 +162,20 @@
       "when": 1788612840731,
       "tag": "0022_quick_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1788764394342,
+      "tag": "0023_cultured_killraven",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1788765430437,
+      "tag": "0024_absurd_lester",
+      "breakpoints": true
     }
   ]
 }

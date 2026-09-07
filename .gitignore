@@ -101,6 +101,9 @@ jspm_packages/
 tmp/
 temp/
 
+# Local uploaded files (self-hosted storage, never commit)
+uploads/
+
 # Database
 *.db
 *.sqlite

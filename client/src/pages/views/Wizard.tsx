@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Check, CheckCircle2, ChevronDown, FolderOpen, Lock, Send, X, ArrowLeft, ArrowRight, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 import { departmentList, crews, gears, initials, type Booking } from "./shared";
 import {
   formatDossierDate,
@@ -98,7 +100,10 @@ export function Wizard({
     }
     setStep(current => Math.min(6, current + 1));
   };
-  const finish = () => {
+  const createBookingMutation = trpc.operations.createBooking.useMutation();
+  const [saving, setSaving] = useState(false);
+  const finish = async () => {
+    if (saving) return;
     const booking: Booking = {
       id: `BOB Booking-${Math.floor(10000 + Math.random() * 89999)}`,
       client: form.client,
@@ -113,6 +118,37 @@ export function Wizard({
       pm: form.pm,
       crew: `${selectedCrew.length} assigned`,
     };
+    setSaving(true);
+    try {
+      await createBookingMutation.mutateAsync({
+        id: booking.id,
+        clientName: form.client.trim(),
+        projectName: form.project.trim(),
+        projectManager: form.pm.trim() || "Unassigned",
+        lpoReference: form.lpo.trim() || "TBD",
+        mobilizationDate: booking.mob,
+        offHireDate: booking.offHire,
+        clientContactName: form.contact.trim() || form.client.trim(),
+        clientEmail: form.email.trim(),
+        clientPhone: form.phone.trim(),
+        priority: booking.priority,
+        stage: booking.stage,
+        craneId: selectedCrane,
+        crewIds: selectedCrew,
+        gearIds: selectedGear,
+        trailerIds: [],
+      });
+    } catch (caught) {
+      setSaving(false);
+      setWizardToast(
+        caught instanceof Error
+          ? `Booking could not be saved: ${caught.message}`
+          : "Booking could not be saved. Please try again."
+      );
+      setTimeout(() => setWizardToast(""), 4000);
+      return;
+    }
+    setSaving(false);
     onCreated(booking);
   };
   return (
@@ -584,8 +620,8 @@ export function Wizard({
                 Continue <ArrowRight size={14} />
               </button>
             ) : (
-              <button className="primary-button" onClick={finish}>
-                <CheckCircle2 size={15} /> Confirm booking
+              <button className="primary-button" onClick={() => void finish()} disabled={saving}>
+                <CheckCircle2 size={15} /> {saving ? "Saving…" : "Confirm booking"}
               </button>
             )}
           </div>

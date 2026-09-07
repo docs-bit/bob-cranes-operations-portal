@@ -14,12 +14,18 @@ import {
   isPortalTokenLive,
   portalTokenExpiry,
 } from "../portalTokens";
+import {
+  isAllowedUploadType,
+  MAX_UPLOAD_BYTES,
+  saveUploadedFile,
+} from "../localFiles";
 import { nanoid } from "nanoid";
 import { isDepartmentCode, type DepartmentCode } from "@shared/departmentAccess";
 import { isKnownCrewAssignmentMember } from "../../shared/crewAssignmentRoster";
 import { parseDossierDate } from "@shared/dossierDates";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
+import { ENV } from "../_core/env";
 import { z } from "zod";
 import * as db from "../db";
 import { storagePut } from "../storage";
@@ -224,6 +230,243 @@ export const operationsRouter = router({
     .input(z.object({ bookingId: z.string().min(1) }))
     .query(async ({ input }) => {
       return await db.listTrainingFlags(input.bookingId);
+    }),
+
+  listAllTrainingFlags: protectedProcedure
+    .input(z.object({ status: z.enum(["OPEN", "ACKNOWLEDGED", "RESOLVED", "ALL"]).default("ALL") }).optional())
+    .query(async ({ ctx, input }) => {
+      if (
+        ctx.user.role !== "admin" &&
+        !["crew", "hse", "documentation"].includes(ctx.user.departmentCode ?? "")
+      )
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only Crew, HSE, Documentation or an administrator can review training flags.",
+        });
+      const flags = await db.listAllTrainingFlags();
+      const status = input?.status ?? "ALL";
+      return status === "ALL"
+        ? flags
+        : flags.filter(flag => flag.status === status);
+    }),
+
+  getAttendance: protectedProcedure
+    .input(z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }))
+    .query(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "hr");
+      return await db.getAttendanceForDate(input.date);
+    }),
+
+  saveAttendance: protectedProcedure
+    .input(
+      z.object({
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        rows: z
+          .array(
+            z.object({
+              employeeName: z.string().trim().min(1).max(255),
+              status: z.enum([
+                "Present",
+                "Half-day",
+                "Late",
+                "On Leave",
+                "Assigned",
+                "Off-Site",
+              ]),
+              checkIn: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
+              checkOut: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
+              note: z.string().trim().max(255).nullable().optional(),
+            })
+          )
+          .max(500),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireDepartmentAccess(ctx.user, "hr");
+      const saved = await db.saveAttendanceDay(input.date, input.rows, ctx.user.id);
+      await db.addUserActivity({
+        userId: ctx.user.id,
+        action: "attendance_saved",
+        detail: `${ctx.user.name ?? ctx.user.email ?? "HR"} saved attendance for ${input.date} (${saved.length} employees).`,
+      });
+      return { rows: saved };
+    }),
+
+  getIntegrations: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user.role !== "admin")
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only an administrator can review integrations.",
+      });
+    const settings = await db.getIntegrationSettings();
+    return {
+      settings,
+      drive: {
+        serviceAccountConfigured: ENV.googleDriveServiceJson.trim().length > 0,
+        rootFolder: settings.driveRootFolder || ENV.googleDriveRootFolder,
+      },
+      smtp: {
+        host: settings.smtpHost || ENV.smtpHost,
+        port: settings.smtpPort || ENV.smtpPort,
+        fromName: settings.smtpFromName,
+        fromEmail: settings.smtpFromEmail || ENV.smtpFromEmail,
+        credentialsConfigured:
+          (ENV.smtpUser.trim().length > 0 &&
+            ENV.smtpPassword.trim().length > 0) ||
+          false,
+        sendingEnabled: false,
+      },
+    };
+  }),
+
+  saveIntegrations: protectedProcedure
+    .input(
+      z.object({
+        driveRootFolder: z.string().trim().max(128),
+        smtpHost: z.string().trim().max(255),
+        smtpPort: z.string().trim().regex(/^$|^\d{1,5}$/),
+        smtpFromName: z.string().trim().max(128),
+        smtpFromEmail: z.string().trim().email().max(320).or(z.literal("")),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can configure integrations.",
+        });
+      if (input.smtpFromEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.smtpFromEmail))
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Enter a valid sender email or leave it blank.",
+        });
+      const settings = await db.saveIntegrationSettings(
+        {
+          driveRootFolder: input.driveRootFolder,
+          smtpHost: input.smtpHost,
+          smtpPort: input.smtpPort || "587",
+          smtpFromName: input.smtpFromName || "BOB Cranes",
+          smtpFromEmail: input.smtpFromEmail,
+        },
+        ctx.user.id
+      );
+      await db.addUserActivity({
+        userId: ctx.user.id,
+        action: "integrations_updated",
+        detail: `${ctx.user.name ?? ctx.user.email ?? "Administrator"} updated integration settings. Secrets stay environment-managed.`,
+      });
+      return { settings };
+    }),
+
+  testDriveConfig: protectedProcedure
+    .input(
+      z.object({
+        serviceJson: z.string().trim().min(1).max(20000),
+        rootFolderId: z.string().trim().min(1).max(128),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can test integrations.",
+        });
+      const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
+      let parsed: Record<string, unknown> | null = null;
+      try {
+        parsed = JSON.parse(input.serviceJson) as Record<string, unknown>;
+        checks.push({
+          name: "Service account JSON parses",
+          ok: true,
+          detail: "Valid JSON object.",
+        });
+      } catch {
+        checks.push({
+          name: "Service account JSON parses",
+          ok: false,
+          detail: "Paste the full service-account JSON key file.",
+        });
+      }
+      const isServiceAccount =
+        parsed !== null && parsed.type === "service_account";
+      checks.push({
+        name: "Service account type",
+        ok: isServiceAccount,
+        detail: isServiceAccount
+          ? `Client: ${String(parsed?.client_email ?? "unknown")}.`
+          : 'The JSON "type" field must be "service_account".',
+      });
+      const hasKey =
+        parsed !== null &&
+        typeof parsed.private_key === "string" &&
+        parsed.private_key.includes("BEGIN PRIVATE KEY");
+      checks.push({
+        name: "Private key present",
+        ok: hasKey,
+        detail: hasKey
+          ? "A private key block is embedded."
+          : "No private_key block found in the JSON.",
+      });
+      const folderOk = /^[A-Za-z0-9_-]{10,}$/.test(input.rootFolderId);
+      checks.push({
+        name: "Root folder ID shape",
+        ok: folderOk,
+        detail: folderOk
+          ? "Looks like a Drive folder ID."
+          : "Folder IDs are at least 10 URL-safe characters.",
+      });
+      checks.push({
+        name: "Live connection",
+        ok: false,
+        detail:
+          "Not attempted — pasting a key here never stores or transmits it. Configure GOOGLE_DRIVE_SA_JSON server-side to enable sync.",
+      });
+      return { checks, passed: checks.every(check => check.ok) };
+    }),
+
+  testSmtpConnection: protectedProcedure
+    .input(
+      z.object({
+        host: z.string().trim().min(1).max(255),
+        port: z.number().int().min(1).max(65535),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.user.role !== "admin")
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only an administrator can test integrations.",
+        });
+      const reachable = await new Promise<boolean>(resolve => {
+        let settled = false;
+        const done = (value: boolean) => {
+          if (!settled) {
+            settled = true;
+            resolve(value);
+          }
+        };
+        void import("node:net").then(({ Socket }) => {
+          const socket = new Socket();
+          socket.setTimeout(5000);
+          socket.once("connect", () => {
+            socket.destroy();
+            done(true);
+          });
+          socket.once("timeout", () => {
+            socket.destroy();
+            done(false);
+          });
+          socket.once("error", () => done(false));
+          socket.connect(input.port, input.host);
+        }).catch(() => done(false));
+        setTimeout(() => done(false), 6000).unref?.();
+      });
+      return {
+        reachable,
+        detail: reachable
+          ? `TCP connect to ${input.host}:${input.port} succeeded. No email was sent.`
+          : `Could not open TCP to ${input.host}:${input.port} within 5s. Check host, port, and outbound firewall rules. No email was sent.`,
+      };
     }),
 
   createTrainingFlag: protectedProcedure
@@ -508,6 +751,7 @@ export const operationsRouter = router({
         fileName: z.string().trim().min(1).max(255),
         fileType: z.enum(["application/pdf", "image/jpeg", "image/png"]),
         fileSize: z.number().int().min(1).max(25 * 1024 * 1024),
+        contentBase64: z.string().min(1).max(35_000_000).optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -525,6 +769,21 @@ export const operationsRouter = router({
           code: "NOT_FOUND",
           message: "That required document is not on this booking checklist.",
         });
+      let storageKey: string | null = null;
+      if (input.contentBase64) {
+        const bytes = Buffer.from(input.contentBase64, "base64");
+        if (bytes.length !== input.fileSize)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "The uploaded file arrived incomplete. Please retry.",
+          });
+        const stored = await saveUploadedFile({
+          fileName: input.fileName,
+          contentType: input.fileType,
+          bytes,
+        });
+        storageKey = stored.key;
+      }
       await db.upsertDocument({
         id: target.id,
         bookingId: row.bookingId,
@@ -542,6 +801,7 @@ export const operationsRouter = router({
         fileName: input.fileName,
         fileType: input.fileType,
         fileSize: input.fileSize,
+        storageKey,
         uploadedBy: null,
       });
       await db.addNotification({
@@ -626,6 +886,23 @@ export const operationsRouter = router({
     return await db.getAllLiftingGears();
   }),
 
+  uploadDocumentFile: protectedProcedure
+    .input(
+      z.object({
+        fileName: z.string().trim().min(1).max(255),
+        contentType: z.enum(["application/pdf", "image/jpeg", "image/png"]),
+        base64: z.string().min(1).max(35_000_000),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const bytes = Buffer.from(input.base64, "base64");
+      return await saveUploadedFile({
+        fileName: input.fileName,
+        contentType: input.contentType,
+        bytes,
+      });
+    }),
+
   uploadGearDocument: protectedProcedure
     .input(
       z.object({
@@ -662,17 +939,35 @@ export const operationsRouter = router({
         input.fileName
           .replace(/[^a-zA-Z0-9._-]+/g, "-")
           .replace(/^-+|-+$/, "") || "gear-document";
-      const { key, url } = await storagePut(
-        `lifting-gears/${ctx.user.id}/${Date.now()}-${safeName}`,
+      // Managed Forge storage when configured; otherwise self-hosted disk.
+      if (ENV.forgeApiUrl && ENV.forgeApiKey) {
+        const { key, url } = await storagePut(
+          `lifting-gears/${ctx.user.id}/${Date.now()}-${safeName}`,
+          bytes,
+          contentType
+        );
+        return {
+          key,
+          url,
+          name: input.fileName,
+          contentType,
+          size: bytes.length,
+        };
+      }
+      const stored = await saveUploadedFile({
+        fileName: safeName,
+        contentType:
+          contentType === "application/octet-stream"
+            ? "application/pdf"
+            : contentType,
         bytes,
-        contentType
-      );
+      });
       return {
-        key,
-        url,
+        key: stored.key,
+        url: stored.url,
         name: input.fileName,
         contentType,
-        size: bytes.length,
+        size: stored.size,
       };
     }),
 

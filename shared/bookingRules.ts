@@ -32,6 +32,7 @@ export type DocumentItem = {
   fileName?: string;
   fileType?: string;
   fileSize?: number;
+  storageKey?: string;
 };
 export type ChatMessage = { id: string; team: "Documentation" | "HSE" | "Sales" | "Accounts" | "Operations Management"; sender: string; body: string; createdAt: string };
 export type Notification = { id: string; departmentCode: DepartmentCode; title: string; body: string; read: boolean; createdAt: string };

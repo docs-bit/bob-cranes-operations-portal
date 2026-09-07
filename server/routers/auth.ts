@@ -20,6 +20,7 @@ import {
   createLocalSession,
   hashPassword,
   normalizeEmail,
+  readLocalSession,
   toSessionUser,
   verifyPassword,
 } from "../localAuth";
@@ -93,6 +94,7 @@ export const authRouter = router({
         passwordHash,
         departmentCode: "administrator",
         role: "admin",
+        mustChangePassword: 1,
       });
       writeLocalSession(ctx, await createLocalSession(user));
       return toSessionUser(user);
@@ -336,6 +338,7 @@ export const authRouter = router({
         departmentCode: input.departmentCode,
         role: targetRole,
         supervisorId: ctx.user.role === "supervisor" ? ctx.user.id : null,
+        mustChangePassword: 1,
       });
       return toSessionUser(user);
     }),
@@ -493,7 +496,53 @@ export const authRouter = router({
       return toSessionUser(user);
     }),
 
-  logout: publicProcedure.mutation(({ ctx }) => {
+  changePassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1).max(160),
+        newPassword: z.string().min(10).max(160),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.passwordHash)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The account could not be found.",
+        });
+      const matches = await verifyPassword(
+        input.currentPassword,
+        user.passwordHash
+      );
+      if (!matches)
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "The current password is incorrect.",
+        });
+      if (input.currentPassword === input.newPassword)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "The new password must differ from the current one.",
+        });
+      const updated = await db.setLocalUserPassword(
+        user.id,
+        await hashPassword(input.newPassword)
+      );
+      await db.addUserActivity({
+        userId: user.id,
+        action: "password_changed",
+        detail: `${user.name ?? user.email ?? "Account"} changed their sign-in password.`,
+      });
+      return toSessionUser(updated!);
+    }),
+
+  logout: publicProcedure.mutation(async ({ ctx }) => {
+    try {
+      const session = await readLocalSession(ctx.req.headers.cookie);
+      if (session) await db.revokeSession(session.jti, session.expiresAt);
+    } catch {
+      // Revocation is best-effort; the cookie is cleared regardless.
+    }
     clearAuthCookies(ctx);
     return { success: true } as const;
   }),

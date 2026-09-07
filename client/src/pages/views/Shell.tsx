@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, ClipboardCheck, Download, FileCheck2, FileText, FolderOpen, Gauge, HardHat, Landmark, LayoutDashboard, Lock, LoaderCircle, LogOut, Mail, MapPin, MessageCircle, MoreHorizontal, Moon, Plus, Search, Send, Settings, ShieldCheck, Sun, TrendingUp, Truck, Users, UserCog, Wrench, Upload, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, ClipboardCheck, Download, FileCheck2, FileText, FolderOpen, Gauge, HardHat, Landmark, LayoutDashboard, Lock, LoaderCircle, LogOut, Mail, MapPin, Menu, MessageCircle, MoreHorizontal, Moon, PlugZap, Plus, Search, Send, Settings, ShieldCheck, Sun, TrendingUp, Truck, Users, UserCog, Wrench, Upload, X } from "lucide-react";
 import { DEPARTMENTS, type View, type Booking, initials, statusTone } from "./shared";
 import { canAccessWorkspaceView, roleLabel } from "@shared/departmentAccess";
 import { filterNotifications } from "@shared/notificationAndExpiryRules";
@@ -49,6 +49,7 @@ export function Shell({
 }) {
   const { theme, toggleTheme } = useTheme();
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [moreActionsOpen, setMoreActionsOpen] = useState(false);
   const [dossierSearchOpen, setDossierSearchOpen] = useState(false);
@@ -86,7 +87,10 @@ export function Shell({
         event.preventDefault();
         openDossierSearch();
       }
-      if (event.key === "Escape") setDossierSearchOpen(false);
+      if (event.key === "Escape") {
+        setDossierSearchOpen(false);
+        setNavOpen(false);
+      }
     };
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
@@ -94,6 +98,9 @@ export function Shell({
   useEffect(() => {
     if (!canSearchDossiers) setDossierSearchOpen(false);
   }, [canSearchDossiers]);
+  useEffect(() => {
+    setNavOpen(false);
+  }, [view]);
   const notificationInput = useMemo(
     () =>
       user.role === "admin"
@@ -242,7 +249,7 @@ export function Shell({
           ?.name ?? DEPARTMENTS.find(department => department.code === user.departmentCode)
           ?.label ?? "Department user");
   return (
-    <div className="app-shell">
+    <div className={`app-shell${navOpen ? " sidebar-open" : ""}`}>
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-row">
@@ -316,6 +323,13 @@ export function Shell({
               >
                 <TrendingUp />
                 <span>Web Vitals Analytics</span>
+              </button>
+              <button
+                className={`nav-item ${view === "integrations" ? "active" : ""}`}
+                onClick={() => setView("integrations")}
+              >
+                <PlugZap />
+                <span>Integrations</span>
               </button>
               <button
                 className="nav-item"
@@ -460,9 +474,26 @@ export function Shell({
           </div>
         </div>
       </aside>
+      {navOpen && (
+        <button
+          type="button"
+          className="nav-backdrop"
+          aria-label="Close navigation"
+          onClick={() => setNavOpen(false)}
+        />
+      )}
       <main className="main-shell">
         <header className="topbar">
           <div className="topbar-leading">
+            <button
+              type="button"
+              className="icon-button nav-toggle"
+              onClick={() => setNavOpen(current => !current)}
+              aria-expanded={navOpen}
+              aria-label={navOpen ? "Close navigation" : "Open navigation"}
+            >
+              <Menu size={16} />
+            </button>
             {view !== "overview" && (
               <button
                 className="back-button"

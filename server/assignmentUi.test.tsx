@@ -18,6 +18,12 @@ vi.mock("@/lib/trpc", () => ({
       saveCrewAllocations: {
         useMutation: () => ({ mutateAsync: saveCrewAllocations, isPending: false }),
       },
+      listAllTrainingFlags: {
+        useQuery: () => ({ data: [], refetch: vi.fn(), isLoading: false, isError: false }),
+      },
+      updateTrainingFlag: {
+        useMutation: () => ({ mutateAsync: vi.fn(), isPending: false }),
+      },
     },
   },
 }));

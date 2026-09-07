@@ -1855,5 +1855,43 @@ textarea,
   .wizard-actions { flex-wrap: wrap; }
   .wizard-actions button { flex: 1 1 160px; justify-content: center; }
 }
+
+/* Mobile navigation drawer: full sidebar with search, toggled from topbar. */
+.nav-toggle { display: none; }
+@media (max-width: 760px) {
+  .nav-toggle { display: inline-flex; }
+  .app-shell .sidebar {
+    width: min(300px, 84vw);
+    transform: translateX(-105%);
+    transition: transform .2s ease;
+    z-index: 60;
+  }
+  .app-shell.sidebar-open .sidebar {
+    transform: none;
+    box-shadow: 12px 0 40px rgba(0, 0, 0, .35);
+  }
+  .app-shell.sidebar-open .brand-copy,
+  .app-shell.sidebar-open .nav-section,
+  .app-shell.sidebar-open .nav-item span,
+  .app-shell.sidebar-open .user-copy {
+    display: initial;
+  }
+  .app-shell.sidebar-open .nav-item {
+    justify-content: flex-start;
+    padding: 11px 12px;
+  }
+  .app-shell.sidebar-open .search-pill {
+    display: flex;
+  }
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    border: 0;
+    padding: 0;
+    background: rgba(0, 0, 0, .45);
+    cursor: pointer;
+  }
+}
 .field-error { color: #e31e24; font-size: 11px; margin-top: 4px; }
 .form-input[aria-invalid="true"] { border-color: #e31e24; }

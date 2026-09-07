@@ -1,4 +1,4 @@
-import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { parse } from "cookie";
 import { jwtVerify, SignJWT } from "jose";
@@ -43,12 +43,21 @@ export async function createLocalSession(user: User) {
     .setSubject(String(user.id))
     .setIssuer(SESSION_ISSUER)
     .setAudience(SESSION_AUDIENCE)
+    .setJti(randomUUID())
     .setIssuedAt()
     .setExpirationTime(SESSION_LIFETIME)
     .sign(sessionKey());
 }
 
-export async function readLocalSession(cookieHeader?: string) {
+export type LocalSession = {
+  userId: number;
+  jti: string;
+  expiresAt: Date;
+};
+
+export async function readLocalSession(
+  cookieHeader?: string
+): Promise<LocalSession | undefined> {
   const token = cookieHeader ? parse(cookieHeader)[LOCAL_AUTH_COOKIE_NAME] : undefined;
   if (!token) return undefined;
 
@@ -58,7 +67,13 @@ export async function readLocalSession(cookieHeader?: string) {
       audience: SESSION_AUDIENCE,
     });
     const userId = Number(payload.sub);
-    return Number.isSafeInteger(userId) && userId > 0 ? userId : undefined;
+    if (!Number.isSafeInteger(userId) || userId <= 0) return undefined;
+    if (typeof payload.jti !== "string" || !payload.jti) return undefined;
+    const expiresAt =
+      typeof payload.exp === "number"
+        ? new Date(payload.exp * 1000)
+        : new Date(Date.now() + 12 * 60 * 60 * 1000);
+    return { userId, jti: payload.jti, expiresAt };
   } catch {
     return undefined;
   }
@@ -75,6 +90,7 @@ export function toSessionUser(user: User) {
     departmentCode: user.departmentCode,
     supervisorId: user.supervisorId,
     isActive: user.isActive,
+    mustChangePassword: user.mustChangePassword ?? 0,
     createdAt: user.createdAt,
     lastSignedIn: user.lastSignedIn,
   };

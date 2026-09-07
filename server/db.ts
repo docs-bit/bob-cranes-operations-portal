@@ -40,6 +40,8 @@ import {
   persistedDocumentMetadata,
   clientFilterPresets,
   clientPortalTokens,
+  revokedSessions,
+  attendance,
   dispatches,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -149,6 +151,7 @@ export async function createLocalUser(input: {
   departmentCode: string;
   role: "admin" | "supervisor" | "user";
   supervisorId?: number | null;
+  mustChangePassword?: number | null;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable for account creation.");
@@ -164,12 +167,48 @@ export async function createLocalUser(input: {
     isActive: 1,
     loginMethod: "password",
     role: input.role,
+    mustChangePassword: input.mustChangePassword ?? 0,
     lastSignedIn: new Date(),
   });
 
   const user = await getUserByLocalEmail(input.email);
   if (!user) throw new Error("Account was created but could not be retrieved.");
   return user;
+}
+
+export async function setLocalUserPassword(id: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable for password change.");
+  await db
+    .update(users)
+    .set({ passwordHash, mustChangePassword: 0 })
+    .where(eq(users.id, id));
+  return await getUserById(id);
+}
+
+export async function revokeSession(jti: string, expiresAt: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .insert(revokedSessions)
+    .values({ jti, expiresAt })
+    .onDuplicateKeyUpdate({ set: { expiresAt } });
+}
+
+export async function isSessionRevoked(jti: string) {
+  const db = await getDb();
+  if (!db) return false;
+  const rows = await db
+    .select()
+    .from(revokedSessions)
+    .where(eq(revokedSessions.jti, jti))
+    .limit(1);
+  if (!rows[0]) return false;
+  if (new Date(rows[0].expiresAt).getTime() <= Date.now()) {
+    await db.delete(revokedSessions).where(eq(revokedSessions.jti, jti));
+    return false;
+  }
+  return true;
 }
 
 export async function updateUserLastSignedIn(id: number) {
@@ -583,6 +622,134 @@ export async function listTrainingFlags(bookingId: string) {
     .from(trainingFlags)
     .where(eq(trainingFlags.bookingId, bookingId))
     .orderBy(desc(trainingFlags.createdAt));
+}
+
+export async function listAllTrainingFlags(limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(trainingFlags)
+    .orderBy(desc(trainingFlags.createdAt))
+    .limit(Math.min(Math.max(limit, 1), 250));
+}
+
+export async function getAttendanceForDate(date: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(attendance)
+    .where(eq(attendance.date, date))
+    .orderBy(attendance.employeeName);
+}
+
+export async function saveAttendanceDay(
+  date: string,
+  rows: Array<{
+    employeeName: string;
+    status: string;
+    checkIn?: string | null;
+    checkOut?: string | null;
+    note?: string | null;
+  }>,
+  markedBy?: number | null
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  for (const row of rows) {
+    await db
+      .insert(attendance)
+      .values({
+        employeeName: row.employeeName,
+        date,
+        status: row.status,
+        checkIn: row.checkIn ?? null,
+        checkOut: row.checkOut ?? null,
+        note: row.note ?? null,
+        markedBy: markedBy ?? null,
+      })
+      .onDuplicateKeyUpdate({
+        set: {
+          status: row.status,
+          checkIn: row.checkIn ?? null,
+          checkOut: row.checkOut ?? null,
+          note: row.note ?? null,
+          markedBy: markedBy ?? null,
+        },
+      });
+  }
+  return await getAttendanceForDate(date);
+}
+
+export type IntegrationSettings = {
+  driveRootFolder: string;
+  smtpHost: string;
+  smtpPort: string;
+  smtpFromName: string;
+  smtpFromEmail: string;
+};
+
+const INTEGRATION_DEFAULTS: IntegrationSettings = {
+  driveRootFolder: "",
+  smtpHost: "",
+  smtpPort: "587",
+  smtpFromName: "BOB Cranes",
+  smtpFromEmail: "",
+};
+
+export async function getIntegrationSettings(): Promise<IntegrationSettings> {
+  const db = await getDb();
+  if (!db) return { ...INTEGRATION_DEFAULTS };
+  const keys = [
+    "integration_drive_root_folder",
+    "integration_smtp_host",
+    "integration_smtp_port",
+    "integration_smtp_from_name",
+    "integration_smtp_from_email",
+  ] as const;
+  const rows = await db
+    .select()
+    .from(systemSettings)
+    .where(
+      or(
+        eq(systemSettings.key, keys[0]),
+        eq(systemSettings.key, keys[1]),
+        eq(systemSettings.key, keys[2]),
+        eq(systemSettings.key, keys[3]),
+        eq(systemSettings.key, keys[4])
+      )
+    );
+  const byKey = new Map(rows.map(row => [row.key, row.value]));
+  return {
+    driveRootFolder: byKey.get(keys[0]) ?? INTEGRATION_DEFAULTS.driveRootFolder,
+    smtpHost: byKey.get(keys[1]) ?? INTEGRATION_DEFAULTS.smtpHost,
+    smtpPort: byKey.get(keys[2]) ?? INTEGRATION_DEFAULTS.smtpPort,
+    smtpFromName: byKey.get(keys[3]) ?? INTEGRATION_DEFAULTS.smtpFromName,
+    smtpFromEmail: byKey.get(keys[4]) ?? INTEGRATION_DEFAULTS.smtpFromEmail,
+  };
+}
+
+export async function saveIntegrationSettings(
+  input: IntegrationSettings,
+  updatedBy: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const entries: Array<[string, string]> = [
+    ["integration_drive_root_folder", input.driveRootFolder],
+    ["integration_smtp_host", input.smtpHost],
+    ["integration_smtp_port", input.smtpPort],
+    ["integration_smtp_from_name", input.smtpFromName],
+    ["integration_smtp_from_email", input.smtpFromEmail],
+  ];
+  for (const [key, value] of entries) {
+    await db
+      .insert(systemSettings)
+      .values({ key, value, updatedBy })
+      .onDuplicateKeyUpdate({ set: { value, updatedBy } });
+  }
+  return await getIntegrationSettings();
 }
 
 export async function createTrainingFlag(data: {
@@ -1609,6 +1776,7 @@ export type PersistedDocumentMetadataInput = {
   fileName?: string | null;
   fileType?: string | null;
   fileSize?: number | null;
+  storageKey?: string | null;
   uploadedBy?: number | null;
 };
 
@@ -1708,6 +1876,7 @@ export async function upsertPersistedDocumentMetadata(input: PersistedDocumentMe
     fileName: input.fileName ?? null,
     fileType: input.fileType ?? null,
     fileSize: input.fileSize ?? null,
+    storageKey: input.storageKey ?? null,
     uploadedBy: input.uploadedBy ?? null,
   };
   await db
@@ -1721,6 +1890,7 @@ export async function upsertPersistedDocumentMetadata(input: PersistedDocumentMe
         fileName: values.fileName,
         fileType: values.fileType,
         fileSize: values.fileSize,
+        storageKey: values.storageKey,
         uploadedBy: values.uploadedBy,
       },
     });

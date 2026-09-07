@@ -4,6 +4,7 @@ import {
   mysqlTable,
   text,
   timestamp,
+  unique,
   varchar,
   json,
 } from "drizzle-orm/mysql-core";
@@ -24,6 +25,7 @@ export const users = mysqlTable("users", {
   role: mysqlEnum("role", ["user", "supervisor", "admin"])
     .default("user")
     .notNull(),
+  mustChangePassword: int("mustChangePassword").notNull().default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -304,10 +306,33 @@ export const persistedDocumentMetadata = mysqlTable("persisted_document_metadata
   fileName: varchar("fileName", { length: 255 }),
   fileType: varchar("fileType", { length: 128 }),
   fileSize: int("fileSize"),
+  storageKey: varchar("storageKey", { length: 128 }),
   uploadedBy: int("uploadedBy"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
+
+export const revokedSessions = mysqlTable("revoked_sessions", {
+  jti: varchar("jti", { length: 64 }).primaryKey(),
+  revokedAt: timestamp("revokedAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+});
+
+export const attendance = mysqlTable(
+  "attendance",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    employeeName: varchar("employeeName", { length: 255 }).notNull(),
+    date: varchar("date", { length: 10 }).notNull(),
+    status: varchar("status", { length: 32 }).notNull().default("Present"),
+    checkIn: varchar("checkIn", { length: 5 }),
+    checkOut: varchar("checkOut", { length: 5 }),
+    note: varchar("note", { length: 255 }),
+    markedBy: int("markedBy"),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  table => [unique("attendance_employee_day").on(table.employeeName, table.date)]
+);
 
 export const clientFilterPresets = mysqlTable("client_filter_presets", {
   id: varchar("id", { length: 64 }).primaryKey(),
@@ -348,4 +373,6 @@ export const dispatches = mysqlTable("dispatches", {
 
 export type ClientFilterPresetRecord = typeof clientFilterPresets.$inferSelect;
 export type ClientPortalTokenRecord = typeof clientPortalTokens.$inferSelect;
+export type RevokedSessionRecord = typeof revokedSessions.$inferSelect;
+export type AttendanceRow = typeof attendance.$inferSelect;
 export type DispatchRecord = typeof dispatches.$inferSelect;
